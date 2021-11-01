@@ -18,10 +18,21 @@ const tagsToConvert = {
   // ?: 'tex-math',
 }
 
-const tagsToIgnore = ['ext-link', 'list', 'sc', 'sec', 'sub', 'sup', 'title']
+const tagsToIgnore = [
+  'ext-link',
+  'list',
+  'sc',
+  'sec',
+  'sub',
+  'sup',
+  'title',
+  'inline-formula',
+  'disp-formula',
+  'tex-math',
+]
 
 const convertRemainingTags = markup => {
-  const openTagRegex = /<([^/>\s]+)(?:(?!\/?>)[\s\S])*>/g
+  const openTagRegex = /<([^/>!\s]+)(?:(?!\/?>)[\s\S])*>/g
   const closeTagRegex = /<\/([^/>\s]+)>/g
   const selfClosingTagRegex = /<([^/>\s]+)(?:(?!\/?>)[\s\S])*\/>/g
 
@@ -100,6 +111,23 @@ const convertSmallCaps = markup => {
   )
 }
 
+const convertMath = markup => {
+  return markup
+    .replace(
+      /<math-inline class="math-node">((?:(?!<\/math-inline>)[\s\S])+)<\/math-inline>/g,
+      '<inline-formula><tex-math><![CDATA[\\displaystyle $1]]></tex-math></inline-formula>',
+    )
+    .replace(
+      /<math-display class="math-node">((?:(?!<\/math-display>)[\s\S])+)<\/math-display>/g,
+      '<p><inline-formula><tex-math><![CDATA[\\displaystyle $1]]></tex-math></inline-formula></p>',
+    )
+  // TODO The above is not a great solution. I haven't yet figured out how to legally insert <disp-formula> within an <abstract> element!
+  // .replace(
+  //   /<math-display class="math-node">((?:(?!<\/math-display>)[\s\S])+)<\/math-display>/g,
+  //   '<p><disp-formula><tex-math><![CDATA[\\displaystyle $1]]></tex-math></disp-formula></p>',
+  // )
+}
+
 const convertCharacterEntities = markup => {
   const entityRegex = /&[a-zA-Z#0-9]+;/g
   let result = ''
@@ -129,6 +157,7 @@ const htmlToJats = html => {
   jats = convertLinks(jats)
   jats = convertLists(jats)
   jats = convertSmallCaps(jats)
+  jats = convertMath(jats)
   jats = convertRemainingTags(jats)
   jats = convertCharacterEntities(jats)
   return jats
