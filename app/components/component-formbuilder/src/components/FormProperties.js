@@ -7,6 +7,7 @@ import { th } from '@pubsweet/ui-toolkit'
 import { Formik } from 'formik'
 import { AbstractField, RadioBox } from './builderComponents'
 import { Page, Heading } from './style'
+import { ActionButton } from '../../../shared'
 
 export const Legend = styled.div`
   font-size: ${th('fontSizeBase')};
@@ -26,6 +27,7 @@ const FormProperties = ({
   structure,
 }) => {
   const [popup, setPopup] = useState(structure.haspopup)
+  const [isClicked, setIsClicked] = useState(false)
 
   return isEmpty(structure) && mode !== 'create' ? (
     <Page>
@@ -91,9 +93,9 @@ const FormProperties = ({
             />
           </Section>,
         ]}
-        <Button primary type="submit">
+        <ActionButton primary type="submit" onClick={() => setIsClicked(true)} status={isClicked ? 'success' : ''}>
           {mode === 'create' ? 'Create Form' : 'Update Form'}
-        </Button>
+        </ActionButton>
       </form>
     </Page>
   )
