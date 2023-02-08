@@ -6,10 +6,6 @@ import {
   SectionRow,
   Title,
 } from '../../../../shared'
-import {
-  sendEmail,
-  sendEmailChannelMessage,
-} from '../emailNotifications/emailUtils'
 import InviteReviewerModal from './InviteReviewerModal'
 import ReviewerForm from './ReviewerForm'
 
@@ -24,7 +20,9 @@ const InviteReviewer = ({
   selectedEmail,
   isEmailAddressOptedOut,
   setExternalEmail,
+  externalEmail,
   updateTeamMember,
+  setSelectedEmail,
 }) => {
   const [open, setOpen] = useState(false)
 
@@ -34,6 +32,8 @@ const InviteReviewer = ({
   const [optedOut, setOptedOut] = useState(false)
   const [notificationStatus, setNotificationStatus] = useState(null)
 
+  const [externalName, setExternalName] = useState('')
+
   return (
     <>
       <Formik
@@ -42,39 +42,21 @@ const InviteReviewer = ({
         onSubmit={async values => {
           setOptedOut(false)
 
-          if (!isNewUser) {
-            setOpen(true)
-            setUserId(values.user.id)
-          } else {
-            setNotificationStatus('pending')
-
-            const output = await sendEmail(
-              manuscript,
-              isNewUser,
-              currentUser,
-              sendNotifyEmail,
-              'reviewerInvitationEmailTemplate',
-              selectedEmail,
-              setOptedOut,
-              values.email,
-              values.name,
-              isEmailAddressOptedOut,
-            )
-
-            setNotificationStatus(output?.invitation ? 'success' : 'failure')
-
-            if (output?.input) {
-              sendEmailChannelMessage(
-                sendChannelMessageCb,
-                currentUser,
-                output.input,
-                reviewerUsers.map(reviewer => ({
-                  userName: reviewer.username,
-                  value: reviewer.email,
-                })),
-              )
+          if (isNewUser) {
+            if (isEmailAddressOptedOut?.data?.getBlacklistInformation.length) {
+              setOptedOut(true)
+              setNotificationStatus('failure')
+              return
             }
+
+            setNotificationStatus('success')
+            setExternalName(values.name)
+          } else {
+            setUserId(values.user.id)
+            setSelectedEmail(values.user.email)
           }
+
+          setOpen(true)
         }}
       >
         {formikProps => (
@@ -101,6 +83,10 @@ const InviteReviewer = ({
       <InviteReviewerModal
         addReviewer={addReviewer}
         currentUser={currentUser}
+        externalEmail={externalEmail}
+        externalName={externalName}
+        isEmailAddressOptedOut={isEmailAddressOptedOut}
+        isNewUser={isNewUser}
         manuscript={manuscript}
         onClose={() => setOpen(false)}
         open={open}

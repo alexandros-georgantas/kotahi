@@ -39,6 +39,7 @@ const ReviewerInput = ({ field, form: { setFieldValue }, reviewerUsers }) => (
     optionRenderer={OptionRenderer}
     options={reviewerUsers}
     promptTextCreator={label => `Add ${label}?`}
+    value={field.value?.id}
     valueKey="id"
   />
 )
@@ -80,8 +81,15 @@ const ReviewerForm = ({
               setExternalEmail(e.target.value)
             }}
             placeholder="Email"
+            validate={required}
           />
-          <Field as={InputField} id="name" name="name" placeholder="Name" />
+          <Field
+            as={InputField}
+            id="name"
+            name="name"
+            placeholder="Name"
+            validate={required}
+          />
           <ActionButton
             disabled={!isValid}
             primary

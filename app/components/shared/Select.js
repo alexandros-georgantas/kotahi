@@ -69,7 +69,9 @@ export const Select = ({
   let selectedOption = value
 
   if (!isMulti && value) {
-    selectedOption = options.find(option => option.value === value)
+    selectedOption = options.find(
+      option => (otherProps.getOptionValue?.(option) ?? option.value) === value,
+    )
   }
 
   const myStyles = { ...styles(th), ...(customStyles || {}) }

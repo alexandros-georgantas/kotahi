@@ -1,5 +1,5 @@
-import { CheckboxGroup } from '@pubsweet/ui'
 import { grid, th } from '@pubsweet/ui-toolkit'
+import { Checkbox } from '@pubsweet/ui/dist/atoms'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { UserAvatar } from '../../../../component-avatar/src'
@@ -18,7 +18,7 @@ import {
 
 const ModalContainer = styled(LooseColumn)`
   background-color: ${th('colorBackground')};
-  padding: ${grid(2.5)} ${grid(3)};
+  padding: ${grid(2)} ${grid(2.5)};
   z-index: 10000;
 `
 
@@ -44,14 +44,20 @@ const InviteReviewerModal = ({
   reviewerUsers,
   addReviewer,
   manuscript,
-  selectedEmail,
   sendChannelMessageCb,
   sendNotifyEmail,
   currentUser,
   updateSharedStatusForInvitedReviewer,
   updateTeamMember,
+  isNewUser,
+  externalName,
+  externalEmail,
+  isEmailAddressOptedOut,
 }) => {
-  const [condition, setCondition] = useState([])
+  const [shared, setShared] = useState(false)
+  const [sendEmailNotification, setSendEmailNotification] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+
   const identity = reviewerUsers.find(user => user.id === userId)
 
   const toggleSharedStatus = async (isInvitation, reviewerTeamMember) => {
@@ -72,58 +78,61 @@ const InviteReviewerModal = ({
     }
   }
 
-  const options = [
-    {
-      value: 'shared',
-      label: 'Shared',
-    },
-    {
-      value: 'email-notification',
-      label: 'Email Notification',
-    },
-  ]
+  const userOptedOut = !!isEmailAddressOptedOut?.data?.getBlacklistInformation
+    .length
+
+  const isInvitation = isNewUser || (!userOptedOut && sendEmailNotification)
 
   return (
     <Modal isOpen={open} onClose={onClose} title="Invite Reviewer">
       <ModalContainer>
         <StyledInfo>
-          <UserAvatar isClickable={false} size={48} user={identity?.username} />
+          <UserAvatar isClickable size={48} user={!isNewUser && identity} />
           <UserId>
-            <Primary>{identity?.username}</Primary>
-            <Secondary>{identity?.defaultIdentity?.identifier}</Secondary>
+            <Primary>{isNewUser ? externalName : identity?.username}</Primary>
+            <Secondary>
+              {isNewUser
+                ? externalEmail
+                : identity?.defaultIdentity?.identifier}
+            </Secondary>
           </UserId>
           <StyledCheckbox>
-            <CheckboxGroup
-              onChange={value => setCondition({ value })}
-              options={options}
-              value={condition.value}
+            <Checkbox
+              checked={shared}
+              label="Shared"
+              onChange={() => setShared(v => !v)}
+            />
+            <Checkbox
+              checked={isInvitation}
+              disabled={isNewUser || userOptedOut}
+              label="Email Notification"
+              onChange={() => setSendEmailNotification(v => !v)}
             />
           </StyledCheckbox>
         </StyledInfo>
+        {userOptedOut && <div>User email address opted out</div>}
         <MediumRow>
           <ActionButton onClick={onClose}>Cancel</ActionButton>
           &nbsp;
           <ActionButton
             data-test-id="submit-modal"
+            disabled={submitting}
             onClick={async () => {
-              const isInvitation = condition?.value?.includes(
-                'email-notification',
-              )
-
+              setSubmitting(true)
               let teamMember
 
               if (isInvitation) {
                 const response = await sendEmail(
                   manuscript,
-                  false,
+                  isNewUser,
                   currentUser,
                   sendNotifyEmail,
                   'reviewerInvitationEmailTemplate',
-                  identity.email,
+                  identity?.email,
                   () => {},
-                  identity.email,
-                  identity.username,
-                  false,
+                  externalEmail,
+                  externalName,
+                  isEmailAddressOptedOut,
                 )
 
                 if (!response) return
@@ -154,7 +163,7 @@ const InviteReviewerModal = ({
                 )
               }
 
-              if (condition?.value?.includes('shared')) {
+              if (shared) {
                 toggleSharedStatus(isInvitation, {
                   id: teamMember.id,
                   isShared: false,
@@ -162,6 +171,7 @@ const InviteReviewerModal = ({
               }
 
               onClose()
+              setSubmitting(false)
             }}
             primary
           >

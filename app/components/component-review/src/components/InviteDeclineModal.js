@@ -4,7 +4,13 @@ import styled from 'styled-components'
 import { convertTimestampToDateString } from '../../../../shared/dateUtils'
 import { UserAvatar } from '../../../component-avatar/src'
 import Modal from '../../../component-modal/src/Modal'
-import { ConfigurableStatus } from '../../../shared'
+import {
+  ConfigurableStatus,
+  Primary,
+  UserCombo,
+  UserInfo,
+  Secondary,
+} from '../../../shared'
 
 const ModalBody = styled.div`
   display: flex;
@@ -40,6 +46,9 @@ const TextChange = styled.div`
 const InviteDeclineModal = ({ invitation, isOpen, onClose }) => {
   const name = invitation.invitedPersonName ?? invitation.user.username
 
+  const details =
+    invitation?.user?.defaultIdentity?.identifier ?? invitation.toEmail
+
   return (
     <Modal
       isOpen={isOpen}
@@ -50,15 +59,20 @@ const InviteDeclineModal = ({ invitation, isOpen, onClose }) => {
       title={`${name}'s Invitation Decline`}
     >
       <ModalBody style={{ width: '600px' }}>
-        <ModalBodyRow style={{ gap: '0px' }}>
+        <UserCombo style={{ marginBottom: '1em' }}>
           <UserAvatar
-            size={56}
-            style={{ marginRight: '15px' }}
+            isClickable
+            showHoverProfile
+            size="48"
             user={invitation.user}
           />
-          <StyledH4 style={{ marginRight: '5px' }}>Reviewer: </StyledH4>
-          <p>{name}</p>
-        </ModalBodyRow>
+          <UserInfo>
+            <p>
+              <Primary>Reviewer: </Primary> {`${name}`}
+            </p>
+            <Secondary>{details}</Secondary>
+          </UserInfo>
+        </UserCombo>
         <ModalBodyRow>
           <StyledH4>Status</StyledH4>
           <DeclinedBadge lightText>Declined</DeclinedBadge>

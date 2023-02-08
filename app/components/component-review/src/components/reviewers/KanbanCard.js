@@ -1,5 +1,6 @@
 import { grid, th } from '@pubsweet/ui-toolkit'
 import PropTypes from 'prop-types'
+import Tooltip from 'rc-tooltip'
 import React, { useState } from 'react'
 import { Mail } from 'react-feather'
 import styled from 'styled-components'
@@ -8,13 +9,13 @@ import { UserAvatar } from '../../../../component-avatar/src'
 import ReviewDetailsModal from '../../../../component-review-detail-modal/src'
 
 const Card = styled.div`
+  align-items: center;
   background-color: #f8f8f9;
   border-bottom: 0.8px solid #bfbfbf;
   border-radius: 8px;
   display: flex;
   flex-direction: row;
   font-size: ${th('fontSizeBaseSmall')};
-  justify-content: space-between;
   padding: ${grid(1)};
   position: relative;
   width: 100%;
@@ -32,37 +33,34 @@ const InfoGrid = styled.div`
   flex-direction: column;
   justify-content: center;
   margin-left: ${grid(1)};
+  min-width: 0;
 `
 
 const NameDisplay = styled.div`
   font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `
 
 const DateDisplay = styled.div`
   color: gray;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.2;
 `
 
-const LeftSide = styled.div`
-  align-items: center;
-  display: flex;
-`
-
-const EmailDisplay = styled(DateDisplay)`
-  align-items: center;
-  color: ${props =>
-    props.invitationStatus === 'rejected'
-      ? th('colorError')
-      : th('colorPrimary')};
-  display: flex;
-  margin-top: calc(${th('gridUnit')} / 2);
-`
-
 const MailIcon = styled(Mail)`
-  height: 12px;
+  color: ${th('colorPrimary')};
+  height: 14px;
   margin-right: calc(${th('gridUnit')} / 2);
   width: auto;
+`
+
+const NameWithIconRow = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
 `
 
 const KanbanCard = ({
@@ -101,33 +99,45 @@ const KanbanCard = ({
         updateTeamMember={updateTeamMember}
       />
       <Card onClick={() => setOpen(true)}>
-        <LeftSide>
-          <UserAvatar
-            isClickable={!!reviewer.user}
-            showHoverProfile={false}
-            user={
-              reviewer.user ?? {
-                username: reviewer.invitedPersonName,
-                isOnline: false,
-              }
+        <UserAvatar
+          isClickable={!!reviewer.user}
+          showHoverProfile={false}
+          user={
+            reviewer.user ?? {
+              username: reviewer.invitedPersonName,
+              isOnline: false,
             }
-          />
-          <InfoGrid>
+          }
+        />
+        <InfoGrid>
+          <NameWithIconRow>
             <NameDisplay>
               {reviewer.user?.username ?? reviewer.invitedPersonName}
             </NameDisplay>
-            <DateDisplay>
-              Last updated
-              {` ${convertTimestampToRelativeDateString(reviewer.updated)}`}
-            </DateDisplay>
             {showEmailInvitation && (
-              <EmailDisplay>
-                <MailIcon invitationStatus={reviewer.status.toLowerCase()} />
-                {' Invited via email'}
-              </EmailDisplay>
+              <Tooltip
+                overlay={<p>Invited via Email</p>}
+                overlayInnerStyle={{
+                  backgroundColor: 'LightGray',
+                  borderColor: 'LightGray',
+                  padding: '4px 10px',
+                  minHeight: 'unset',
+                  opacity: 1,
+                }}
+                overlayStyle={{
+                  backgroundColor: 'transparent',
+                }}
+                placement="top"
+              >
+                <MailIcon />
+              </Tooltip>
             )}
-          </InfoGrid>
-        </LeftSide>
+          </NameWithIconRow>
+          <DateDisplay>
+            Last updated
+            {` ${convertTimestampToRelativeDateString(reviewer.updated)}`}
+          </DateDisplay>
+        </InfoGrid>
       </Card>
     </>
   )

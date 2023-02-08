@@ -301,12 +301,15 @@ const DecisionVersion = ({
               <InviteReviewer
                 addReviewer={addReviewer}
                 currentUser={currentUser}
+                externalEmail={externalEmail}
                 isEmailAddressOptedOut={isEmailAddressOptedOut}
                 manuscript={version}
                 reviewerUsers={allUsers}
+                selectedEmail={selectedEmail}
                 sendChannelMessageCb={sendChannelMessageCb}
                 sendNotifyEmail={sendNotifyEmail}
                 setExternalEmail={setExternalEmail}
+                setSelectedEmail={setSelectedEmail}
                 updateSharedStatusForInvitedReviewer={
                   updateSharedStatusForInvitedReviewer
                 }
