@@ -318,6 +318,7 @@ CREATE TABLE public.manuscripts (
     type text NOT NULL,
     evaluations_hypothesis_map jsonb,
     is_imported boolean,
+    is_hidden boolean not null default false,
     import_source uuid,
     import_source_server text,
     short_id integer,

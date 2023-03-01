@@ -354,7 +354,7 @@ CREATE TABLE "public"."manuscripts" (
     "import_source_server" text,
     "short_id" int4 NOT NULL DEFAULT nextval('manuscripts_short_id_seq'::regclass),
     "submitted_date" timestamptz,
-    "is_hidden" bool,
+    "is_hidden" bool not null DEFAULT false,
     "form_fields_to_publish" jsonb NOT NULL DEFAULT '[]'::jsonb,
     PRIMARY KEY ("id")
 );
