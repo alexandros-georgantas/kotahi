@@ -1,13 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { cloneDeep, get } from 'lodash'
 import { FieldArray } from 'formik'
 import { grid, th } from '@pubsweet/ui-toolkit'
 import styled from 'styled-components'
+import Modal from 'react-modal'
 import UploadingFile from './UploadingFile'
 import { Dropzone } from './Dropzone'
 import { Icon } from './Icon'
 import theme from '../../theme'
+import { Spinner } from './Spinner'
 
 const Root = styled.div`
   border: 1px dashed ${th('colorBorder')};
@@ -65,6 +67,7 @@ const DropzoneAndList = ({
     .filter(val => (fileType ? val.tags.includes(fileType) : true))
 
   const disabled = !acceptMultiple && !!files.length
+  const [loading, setLoading] = useState(false)
 
   const defaultFileListing = clonedFiles => {
     return (
@@ -86,13 +89,33 @@ const DropzoneAndList = ({
 
   return (
     <>
+      <Modal
+        isOpen={loading}
+        style={{
+          content: {
+            top: '50%',
+            left: '50%',
+            right: 'auto',
+            bottom: 'auto',
+            marginRight: '-50%',
+            transform: 'translate(-50%, -50%)',
+          },
+        }}
+      >
+        <h2 style={{ marginBottom: '1em' }}>
+          <p>Uploading...</p>
+        </h2>
+        <Spinner />
+      </Modal>
       <Dropzone
         accept={mimeTypesToAccept}
         disabled={disabled}
         multiple={acceptMultiple}
         onDrop={async dropFiles => {
           Array.from(dropFiles).forEach(async file => {
+            setLoading(true)
             const data = await createFile(file)
+            setLoading(false)
             push(data.createFile)
           })
         }}
