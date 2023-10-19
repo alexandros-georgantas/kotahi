@@ -31,6 +31,7 @@ const ReviewerInput = ({ field, form: { setFieldValue }, reviewerUsers }) => (
   <Select
     {...field}
     aria-label="Invite reviewers"
+    data-testid="reviewerSelect"
     getOptionLabel={option => option?.username}
     getOptionValue={option => option.id}
     onChange={user => {

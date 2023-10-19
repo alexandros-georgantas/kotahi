@@ -31,7 +31,7 @@ const WORD_COUNT_INFO = 'Counter Info'
 const EDITOR_CLASS = '.wax-surface-scroll >  div .ProseMirror'
 
 // specific to aperture
-const TYPE_OF_RESEARCH_OBJECT = '.css-1f7humo-control'
+const TYPE_OF_RESEARCH_OBJECT = 'submission.objectType'
 
 // specific to elife
 const FORM_OPTION_LIST = '[class*=style__Section]'
@@ -199,7 +199,7 @@ export const SubmissionFormPage = {
     return cy.getByContainsClass(VALIDATION_ERROR_MESSAGE)
   },
   getTypeOfResearchObject() {
-    return cy.get(TYPE_OF_RESEARCH_OBJECT)
+    return cy.getByDataTestId(TYPE_OF_RESEARCH_OBJECT)
   },
   clickTypeOfResearchObject() {
     this.getTypeOfResearchObject().click()
