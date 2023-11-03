@@ -1,9 +1,10 @@
 /* eslint-disable no-shadow */
-import React from 'react'
+import React, { useContext } from 'react'
 import { useQuery, useMutation, gql, useApolloClient } from '@apollo/client'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { adopt } from 'react-adopt'
 import Production from './Production'
+import { ConfigContext } from '../../../config/src'
 import { Spinner, CommsErrorBanner } from '../../../shared'
 import { getSpecificFilesQuery } from '../../../asset-manager/src/queries'
 import withModal from '../../../asset-manager/src/ui/Modal/withModal'
@@ -60,17 +61,27 @@ const mapProps = args => ({
 
 const Composed = adopt(mapper, mapProps)
 
+const fileFragment = `
+  files {
+    id
+    name
+    tags
+    created
+    storedObjects {
+      type
+      key
+      mimetype
+      size
+      url
+    }
+  }
+`
+
 const fragmentFields = `
   id
   created
   status
-  files {
-    id
-    tags
-    storedObjects {
-      mimetype
-    }
-  }
+  ${fileFragment}
 	submission
   meta {
     title
@@ -78,6 +89,19 @@ const fragmentFields = `
 		abstract
     manuscriptId
   }
+`
+
+const templateQuery = gql`
+  query($groupId: ID!) {
+    templateByGroupId(groupId: $groupId) {
+      id
+      name
+      groupId
+      ${fileFragment}
+      articleTemplate
+      cssTemplate
+    }
+}
 `
 
 const query = gql`
@@ -97,7 +121,21 @@ export const updateMutation = gql`
   }
 `
 
+export const updateTemplateMutation = gql`
+  mutation($id: ID!, $input: updateTemplateInput!) {
+    updateTemplate(id: $id, input: $input) {
+      id
+      name
+      groupId
+      ${fileFragment}
+      articleTemplate
+      cssTemplate
+    }
+  }
+`
+
 const ProductionPage = ({ currentUser, match, ...props }) => {
+  const { groupId } = useContext(ConfigContext)
   const client = useApolloClient()
   const [makingPdf, setMakingPdf] = React.useState(false)
   const [makingJats, setMakingJats] = React.useState(false)
@@ -110,6 +148,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
   // })
 
   const [update] = useMutation(updateMutation)
+  const [updateTempl] = useMutation(updateTemplateMutation)
 
   const updateManuscript = async (versionId, manuscriptDelta) => {
     const newQuery = await update({
@@ -122,24 +161,43 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
     return newQuery
   }
 
+  const updateTemplate = (id, input) =>
+    updateTempl({ variables: { id, input } })
+
   const { data, loading, error } = useQuery(query, {
     variables: {
       id: match.params.version,
     },
   })
 
-  if (loading) return <Spinner />
-  if (error) return <CommsErrorBanner error={error} />
+  const {
+    data: templateData,
+    loading: templateLoading,
+    error: templateError,
+  } = useQuery(templateQuery, {
+    variables: {
+      groupId,
+    },
+  })
+
+  if (loading || templateLoading) return <Spinner />
+  if (error || templateError)
+    return <CommsErrorBanner error={error || templateError} />
 
   const { manuscript } = data
+
+  const { templateByGroupId: articleTemplate } = templateData
+
   return (
     <Composed
+      articleTemplate={articleTemplate}
       client={client}
       currentUser={currentUser}
       manuscript={manuscript}
       setMakingJats={setMakingJats}
       setMakingPdf={setMakingPdf}
       updateManuscript={updateManuscript}
+      updateTemplate={updateTemplate}
     >
       {({ onAssetManager }) => (
         <div>
@@ -164,6 +222,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
             />
           ) : null}
           <Production
+            articleTemplate={articleTemplate}
             client={client}
             currentUser={currentUser}
             file={manuscript.files.find(file =>
@@ -178,6 +237,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
               // console.log('in update manuscript!')
               updateManuscript(a, b)
             }}
+            updateTemplate={updateTemplate}
           />
         </div>
       )}

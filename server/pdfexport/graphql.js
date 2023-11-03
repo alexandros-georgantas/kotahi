@@ -83,14 +83,21 @@ const getManuscriptById = async id => {
   return models.Manuscript.query().findById(id).withGraphFetched('[files]')
 }
 
+const getGroupAssets = async groupId => {
+  return models.ArticleTemplate.query()
+    .where({ groupId })
+    .withGraphFetched('[files]')
+    .first()
+}
+
 const pdfHandler = async manuscriptId => {
   if (!pagedJsAccessToken) {
     pagedJsAccessToken = await serviceHandshake()
   }
 
   // get article from Id
-
   const articleData = await getManuscriptById(manuscriptId)
+  const groupData = await getGroupAssets(articleData.groupId)
 
   const raw = await randomBytes(16)
   const dirName = `tmp/${raw.toString('hex')}_${manuscriptId}`
@@ -110,16 +117,26 @@ const pdfHandler = async manuscriptId => {
 
   // articleData.meta.source = svgedSource
 
-  const outHtml = await applyTemplate(articleData)
+  const outHtml = await applyTemplate({ articleData, groupData })
 
   await fsPromised.appendFile(`${dirName}/index.html`, outHtml)
 
-  const css = await generateCss()
+  let css = ''
+
+  if (groupData.cssTemplate) {
+    css = await generateCss(true)
+    css += groupData.cssTemplate.toString()
+  } else {
+    css = await generateCss()
+  }
 
   await fsPromised.appendFile(`${dirName}/styles.css`, css)
 
-  // Manually copy the two fonts to the folder that will be zipped. This is a temporary fix!
+  // await groupData.files.map(file =>
+  //   fileStorage.download(file.storedObjects[0].key, `${dirName}/${file.name}`),
+  // )
 
+  // Manually copy the two fonts to the folder that will be zipped. This is a temporary fix!
   publicationMetadata.fonts.forEach(async fontPath => {
     const thisFont = path.join(__dirname, `../../profiles/${fontPath}`)
 
@@ -144,10 +161,7 @@ const pdfHandler = async manuscriptId => {
 
   // need to get the zip from zipPath and pass to the FormData
   const form = new FormData()
-  // form.append('zip', zipPath, 'index.html.zip')
   form.append('zip', fs.createReadStream(`${zipPath}`))
-  form.append('onlySourceStylesheet', 'true')
-  form.append('imagesForm', 'base64')
 
   const filename = `${raw.toString('hex')}_${manuscriptId}.pdf`
 
@@ -220,11 +234,12 @@ const pdfHandler = async manuscriptId => {
 
 const htmlHandler = async manuscriptId => {
   const articleData = await getManuscriptById(manuscriptId)
+  const groupData = await getGroupAssets(articleData.groupId)
 
   const raw = await randomBytes(16)
   const filename = `${raw.toString('hex')}_${manuscriptId}.html`
 
-  const templatedHtml = await applyTemplate(articleData)
+  const templatedHtml = await applyTemplate({ articleData, groupData })
 
   const css = await generateCss()
 
