@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next'
 import CodeMirror from '@uiw/react-codemirror'
 import { html } from '@codemirror/lang-html'
 import { css } from '@codemirror/lang-css'
-import gatherManuscriptVersions from '../../../../shared/manuscript_versions'
 import ProductionWaxEditor from '../../../wax-collab/src/ProductionWaxEditor'
 import { DownloadDropdown } from './DownloadDropdown'
 import {
@@ -31,7 +30,7 @@ const FlexRow = styled.div`
 `
 
 const FormTemplateStyled = styled.div`
-height: 800px;
+  height: 800px;
 `
 
 const Production = ({
@@ -48,7 +47,6 @@ const Production = ({
   updateTemplate,
   onAssetManager,
 }) => {
-  const [version] = gatherManuscriptVersions(manuscript)
   const debouncedSave = useCallback(
     debounce(source => {
       updateManuscript(manuscript.id, { meta: { source } })
@@ -169,10 +167,10 @@ const Production = ({
             displayShortIdAsIdentifier={displayShortIdAsIdentifier}
             form={form}
             formData={{
-              ...version,
-              submission: JSON.parse(version.submission),
+              ...manuscript,
+              submission: JSON.parse(manuscript.submission),
             }}
-            manuscript={version}
+            manuscript={manuscript}
             showEditorOnlyFields
             // threadedDiscussionProps={threadedDiscussionExtendedProps}
           />

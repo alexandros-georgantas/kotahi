@@ -3,7 +3,14 @@ import React from 'react'
 import ReadonlyFieldData from './ReadonlyFieldData'
 import { color } from '../../../../theme'
 import { Heading, Cell } from './styles'
-import { SectionContent, Action, Title, SectionHeader, SectionRowGrid, Icon } from '../../../shared'
+import {
+  SectionContent,
+  Action,
+  Title,
+  SectionHeader,
+  SectionRowGrid,
+  Icon,
+} from '../../../shared'
 
 const ReadonlyFormTemplate = ({
   form,
@@ -16,10 +23,11 @@ const ReadonlyFormTemplate = ({
   threadedDiscussionProps,
   allowAuthorsSubmitNewVersion,
 }) => {
-
-
   const onCopyHandleBarsCode = name => {
-    return () => navigator.clipboard.writeText(`{{article.${name.replace('submission.', 'articleMetadata.')}}}`)
+    return () =>
+      navigator.clipboard.writeText(
+        `{{article.${name.replace('submission.', 'articleMetadata.')}}}`,
+      )
   }
 
   return (
@@ -59,8 +67,11 @@ const ReadonlyFormTemplate = ({
             </Cell>
             <Cell>
               {element.name}
-              <Action onClick={onCopyHandleBarsCode(element.name)} primary>{' '}
-                <Icon color={color.brand1.base()} inline>file-plus</Icon>
+              <Action onClick={onCopyHandleBarsCode(element.name)} primary>
+                {' '}
+                <Icon color={color.brand1.base()} inline>
+                  file-plus
+                </Icon>
               </Action>
             </Cell>
           </SectionRowGrid>

@@ -236,7 +236,6 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
 
   const { templateByGroupId: articleTemplate } = templateData
 
-
   const form = submissionForm?.structure ?? {
     name: '',
     children: [],
@@ -282,9 +281,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
             articleTemplate={articleTemplate}
             client={client}
             currentUser={currentUser}
-            displayShortIdAsIdentifier={
-              controlPanel?.displayManuscriptShortId
-            }
+            displayShortIdAsIdentifier={controlPanel?.displayManuscriptShortId}
             file={manuscript.files.find(file =>
               file.tags.includes('manuscript'),
             )}
