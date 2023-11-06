@@ -158,7 +158,7 @@ const isCMSFile = rule({ cache: 'contextual' })(
 
 const isExportTemplatingFile = rule({ cache: 'contextual' })(
   async (parent, args, ctx, info) => {
-    return  parent.tags && parent.tags.includes('templateGroupAsset')
+    return parent.tags && parent.tags.includes('templateGroupAsset')
   },
 )
 

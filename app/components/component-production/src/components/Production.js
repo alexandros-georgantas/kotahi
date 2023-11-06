@@ -136,7 +136,7 @@ const Production = ({
       </SectionContent>
     ),
     key: 'html-template',
-    label: 'Html Template',
+    label: 'PagedJs Html Template',
   }
 
   const uploadAssets = {
@@ -149,7 +149,17 @@ const Production = ({
       </SectionContent>
     ),
     key: 'template-assets',
-    label: 'Template Assets',
+    label: 'PagedJs Template Assets',
+  }
+
+  const manuscriptMetadata = {
+    content: (
+      <SectionContent>
+        
+      </SectionContent>
+    ),
+    key: 'manuscript-metadata',
+    label: 'PagedJs Metadata',
   }
 
   return (
@@ -170,7 +180,7 @@ const Production = ({
       <ErrorBoundary>
         <HiddenTabs
           defaultActiveKey="editor"
-          sections={[editorSection, cssPagedJS, htmlTemplate, uploadAssets]}
+          sections={[editorSection, cssPagedJS, htmlTemplate, uploadAssets, manuscriptMetadata]}
         />
       </ErrorBoundary>
     </Manuscript>

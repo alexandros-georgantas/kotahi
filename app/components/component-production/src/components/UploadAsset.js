@@ -5,16 +5,18 @@ import { useTranslation } from 'react-i18next'
 import { useDropzone } from 'react-dropzone'
 import styled from 'styled-components'
 import { color } from '../../../../theme'
-// import { Placeholder } from '../../../component-dashboard/src/style'
-// import FileRow from './FileRow'
+import { convertTimestampToRelativeDateString } from '../../../../shared/dateUtils'
+import { Placeholder } from '../../../component-dashboard/src/style'
+import FileRow from './FileRow'
 import {
   Container,
   SectionContent,
   SectionRow,
   Icon,
   Spinner,
+  Action,
 } from '../../../shared'
-// import { HeadingCell } from './styles'
+import { HeadingCell } from './styles'
 
 const Message = styled.div`
   align-items: center;
@@ -48,18 +50,6 @@ const DropZoneContainer = styled.div`
   outline: none;
   padding: 20px;
   transition: border 0.24s ease-in-out;
-`
-
-const Button = styled.button`
-  :hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
-`
-
-const UlFiles = styled.ul`
-  height: 600px;
-  overflow-y: auto;
 `
 
 export const FileTableStyled = styled.div`
@@ -151,32 +141,79 @@ const UploadAsset = ({ files, groupTemplateId }) => {
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop })
 
-  // const columnsProps = [
-  //   {
-  //     name: 'id',
-  //     centered: false,
-  //     title: 'ID',
-  //     component: ({ file }) => {
-  //       return file && file.id
-  //     },
-  //   },
-  //   {
-  //     name: 'created',
-  //     centered: false,
-  //     title: 'Created',
-  //     component: ({ file }) => {
-  //       return file && file.created
-  //     },
-  //   },
-  //   {
-  //     name: 'name',
-  //     centered: false,
-  //     title: 'Name',
-  //     component: ({ file }) => {
-  //       return file && file.name
-  //     },
-  //   },
-  // ]
+  let counter = 1
+
+  const columnsProps = [
+    {
+      name: 'id',
+      centered: false,
+      title: 'ID',
+      // eslint-disable-next-line no-plusplus
+      component: ({ file }) => counter++,
+    },
+    {
+      name: 'created',
+      centered: false,
+      title: 'Created',
+      component: ({ file }) => {
+        return file && convertTimestampToRelativeDateString(file.created)
+      },
+    },
+    {
+      name: 'name',
+      centered: false,
+      title: 'Name',
+      component: ({ file }) => file && file.name,
+    },
+    {
+      name: 'copy-as-css',
+      centered: false,
+      title: 'Copy as Css',
+      component: ({ file }) => (
+        <Action onClick={onCopyAsCssLink(file)} primary>
+          Create Css
+        </Action>
+      ),
+    },
+    {
+      name: 'copy-as-script',
+      centered: false,
+      title: 'Copy as Script',
+      component: ({ file }) => (
+        <Action onClick={onCopyAsScriptLink(file)} primary>
+          Create Script
+        </Action>
+      ),
+    },
+    {
+      name: 'copy-as-image',
+      centered: false,
+      title: 'Copy as Image',
+      component: ({ file }) => (
+        <Action onClick={onCopyAsImage(file)} primary>
+          Create Image
+        </Action>
+      ),
+    },
+    {
+      name: 'copy-as-font',
+      centered: false,
+      title: 'Copy as Font',
+      component: ({ file }) => (
+        <Action onClick={onCopyAsFont(file)} primary>
+          Create Font
+        </Action>
+      ),
+    },
+    {
+      name: 'copy-as-url',
+      centered: false,
+      title: 'Copy as Url',
+      component: ({ file }) => (
+        <Action onClick={onCopyAsUrl(file)}>Create URL</Action>
+      ),
+    },
+  ]
 
   return (
     <UploadAssetContainer>
@@ -201,21 +238,6 @@ const UploadAsset = ({ files, groupTemplateId }) => {
           </section>
         </SectionRow>
         <SectionRow key="files">
-          Asset Files:
-          <UlFiles>
-            {filesState.map(file => (
-              <li key={file.storedObjects[0].key}>
-                {file.name} -{' '}
-                <Button onClick={onCopyAsCssLink(file)}>Copy Css</Button>{' '}
-                <Button onClick={onCopyAsScriptLink(file)}>Copy Script</Button>{' '}
-                <Button onClick={onCopyAsImage(file)}>Copy Image</Button>{' '}
-                <Button onClick={onCopyAsFont(file)}>Copy Font</Button>
-                <Button onClick={onCopyAsUrl(file)}>Copy URL</Button>
-              </li>
-            ))}
-          </UlFiles>
-        </SectionRow>
-        {/* <SectionRow key="files">
           <FileTableStyled>
             <FilesRow>
               {columnsProps.map(info => (
@@ -236,7 +258,7 @@ const UploadAsset = ({ files, groupTemplateId }) => {
               ))
             )}
           </FileTableStyled>
-        </SectionRow> */}
+        </SectionRow>
       </SectionContent>
     </UploadAssetContainer>
   )
