@@ -135,3 +135,27 @@ export const StyledFileRow = styled.div`
     padding: ${grid(1.5)} ${grid(2)};
   }
 `
+
+export const Heading = styled.span`
+  font-weight: inherit;
+  overflow: hidden;
+  padding: 0 1em 0 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`
+
+export const Affiliation = styled.span`
+  color: ${color.gray40};
+  margin-left: 0.5em;
+`
+
+export const Email = styled.span`
+  color: ${color.brand1.base};
+  margin-left: 1em;
+`
+
+export const BadgeContainer = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+  gap: 4px 18px;
+`

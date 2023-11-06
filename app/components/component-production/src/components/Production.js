@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import CodeMirror from '@uiw/react-codemirror'
 import { html } from '@codemirror/lang-html'
 import { css } from '@codemirror/lang-css'
+import gatherManuscriptVersions from '../../../../shared/manuscript_versions'
 import ProductionWaxEditor from '../../../wax-collab/src/ProductionWaxEditor'
 import { DownloadDropdown } from './DownloadDropdown'
 import {
@@ -21,6 +22,7 @@ import {
 import { Info } from './styles'
 import { ControlsContainer } from '../../../component-manuscripts/src/style'
 import UploadAsset from './UploadAsset'
+import ReadonlyFormTemplate from './ReadonlyFormTemplate'
 
 const FlexRow = styled.div`
   display: flex;
@@ -28,10 +30,16 @@ const FlexRow = styled.div`
   justify-content: space-between;
 `
 
+const FormTemplateStyled = styled.div`
+height: 800px;
+`
+
 const Production = ({
   client,
   file,
   articleTemplate,
+  displayShortIdAsIdentifier,
+  form,
   manuscript,
   currentUser,
   makePdf,
@@ -40,6 +48,7 @@ const Production = ({
   updateTemplate,
   onAssetManager,
 }) => {
+  const [version] = gatherManuscriptVersions(manuscript)
   const debouncedSave = useCallback(
     debounce(source => {
       updateManuscript(manuscript.id, { meta: { source } })
@@ -64,7 +73,7 @@ const Production = ({
   const onChangeHtml = useCallback(
     debounce(article => {
       setHtmlValue(article)
-      updateTemplate(articleTemplate.id, { article })
+      updateTemplate(articleTemplate.id, { articleTemplate: article })
     }, 2000),
     [],
   )
@@ -155,7 +164,19 @@ const Production = ({
   const manuscriptMetadata = {
     content: (
       <SectionContent>
-        
+        <FormTemplateStyled>
+          <ReadonlyFormTemplate
+            displayShortIdAsIdentifier={displayShortIdAsIdentifier}
+            form={form}
+            formData={{
+              ...version,
+              submission: JSON.parse(version.submission),
+            }}
+            manuscript={version}
+            showEditorOnlyFields
+            // threadedDiscussionProps={threadedDiscussionExtendedProps}
+          />
+        </FormTemplateStyled>
       </SectionContent>
     ),
     key: 'manuscript-metadata',
@@ -180,7 +201,13 @@ const Production = ({
       <ErrorBoundary>
         <HiddenTabs
           defaultActiveKey="editor"
-          sections={[editorSection, cssPagedJS, htmlTemplate, uploadAssets, manuscriptMetadata]}
+          sections={[
+            editorSection,
+            cssPagedJS,
+            htmlTemplate,
+            uploadAssets,
+            manuscriptMetadata,
+          ]}
         />
       </ErrorBoundary>
     </Manuscript>

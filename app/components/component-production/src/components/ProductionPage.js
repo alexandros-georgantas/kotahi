@@ -77,6 +77,46 @@ const fileFragment = `
   }
 `
 
+const formFields = `
+  structure {
+    name
+    description
+    haspopup
+    popuptitle
+    popupdescription
+    children {
+      title
+      shortDescription
+      id
+      component
+      name
+      description
+      doiValidation
+      doiUniqueSuffixValidation
+      placeholder
+      permitPublishing
+      parse
+      format
+      options {
+        id
+        label
+        labelColor
+        value
+      }
+      validate {
+        id
+        label
+        value
+      }
+      validateValue {
+        minChars
+        maxChars
+        minSize
+      }
+    }
+  }
+`
+
 const fragmentFields = `
   id
   created
@@ -105,9 +145,16 @@ const templateQuery = gql`
 `
 
 const query = gql`
-  query($id: ID!) {
+  query($id: ID!, $groupId: ID!) {
     manuscript(id: $id) {
       ${fragmentFields}
+      manuscriptVersions {
+        ${fragmentFields}
+      }
+    }
+
+    submissionForm: formForPurposeAndCategory(purpose: "submit", category: "submission", groupId: $groupId) {
+      ${formFields}
     }
 	}
 `
@@ -135,7 +182,7 @@ export const updateTemplateMutation = gql`
 `
 
 const ProductionPage = ({ currentUser, match, ...props }) => {
-  const { groupId } = useContext(ConfigContext)
+  const { groupId, controlPanel } = useContext(ConfigContext)
   const client = useApolloClient()
   const [makingPdf, setMakingPdf] = React.useState(false)
   const [makingJats, setMakingJats] = React.useState(false)
@@ -167,6 +214,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
   const { data, loading, error } = useQuery(query, {
     variables: {
       id: match.params.version,
+      groupId,
     },
   })
 
@@ -184,15 +232,24 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
   if (error || templateError)
     return <CommsErrorBanner error={error || templateError} />
 
-  const { manuscript } = data
+  const { manuscript, submissionForm } = data
 
   const { templateByGroupId: articleTemplate } = templateData
+
+
+  const form = submissionForm?.structure ?? {
+    name: '',
+    children: [],
+    description: '',
+    haspopup: 'false',
+  }
 
   return (
     <Composed
       articleTemplate={articleTemplate}
       client={client}
       currentUser={currentUser}
+      form={form}
       manuscript={manuscript}
       setMakingJats={setMakingJats}
       setMakingPdf={setMakingPdf}
@@ -225,9 +282,13 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
             articleTemplate={articleTemplate}
             client={client}
             currentUser={currentUser}
+            displayShortIdAsIdentifier={
+              controlPanel?.displayManuscriptShortId
+            }
             file={manuscript.files.find(file =>
               file.tags.includes('manuscript'),
             )}
+            form={form}
             makeJats={setMakingJats}
             makePdf={setMakingPdf}
             manuscript={manuscript}

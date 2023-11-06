@@ -245,9 +245,7 @@ const UploadAsset = ({ files, groupTemplateId }) => {
               ))}
             </FilesRow>
             {filesState.length === 0 ? (
-              <Placeholder>
-                {t('manuscriptsTable.No matching manuscripts were found')}
-              </Placeholder>
+              <Placeholder>No Files found</Placeholder>
             ) : (
               filesState.map((file, key) => (
                 <FileRow
