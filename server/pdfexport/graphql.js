@@ -132,10 +132,6 @@ const pdfHandler = async manuscriptId => {
 
   await fsPromised.appendFile(`${dirName}/styles.css`, css)
 
-  // await groupData.files.map(file =>
-  //   fileStorage.download(file.storedObjects[0].key, `${dirName}/${file.name}`),
-  // )
-
   // Manually copy the two fonts to the folder that will be zipped. This is a temporary fix!
   publicationMetadata.fonts.forEach(async fontPath => {
     const thisFont = path.join(__dirname, `../../profiles/${fontPath}`)
@@ -158,7 +154,6 @@ const pdfHandler = async manuscriptId => {
   // 2 zip this.
 
   const zipPath = await makeZip(dirName)
-
   // need to get the zip from zipPath and pass to the FormData
   const form = new FormData()
   // form.append('zip', zipPath, 'index.html.zip')

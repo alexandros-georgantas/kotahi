@@ -26,7 +26,11 @@ const ReadonlyFormTemplate = ({
   const onCopyHandleBarsCode = name => {
     return () =>
       navigator.clipboard.writeText(
-        `{{article.${name.replace('submission.', 'articleMetadata.')}}}`,
+        `<span>{{
+          article.${name.replace(
+            'submission.',
+            'articleMetadata.',
+          )} | safe }}</span>`,
       )
   }
 
