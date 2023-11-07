@@ -161,6 +161,7 @@ const pdfHandler = async manuscriptId => {
 
   // need to get the zip from zipPath and pass to the FormData
   const form = new FormData()
+  // form.append('zip', zipPath, 'index.html.zip')
   form.append('zip', fs.createReadStream(`${zipPath}`))
 
   const filename = `${raw.toString('hex')}_${manuscriptId}.pdf`
