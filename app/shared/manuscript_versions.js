@@ -26,6 +26,10 @@ const manuscriptVersions = manuscript => {
     manuscript: {
       ...manuscript,
       submission: JSON.parse(manuscript.submission),
+      reviews: manuscript.reviews.map(r => ({
+        ...r,
+        jsonData: JSON.parse(r.jsonData),
+      })),
     },
   }))
 }

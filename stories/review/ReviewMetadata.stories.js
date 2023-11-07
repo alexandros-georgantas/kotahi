@@ -3,7 +3,7 @@ import { JournalProvider } from '../../app/components/xpub-journal/src'
 import { XpubProvider } from '../../app/components/xpub-with-context/src'
 import * as journal from '../../config/journal'
 import DesignEmbed from '../common/utils'
-import ReadonlyFormTemplate from '../../app/components/component-review/src/components/metadata/ReadonlyFormTemplate'
+import { ReadonlyFormTemplate } from '../../app/components/component-form/src'
 
 export const Base = args => (
   <XpubProvider>

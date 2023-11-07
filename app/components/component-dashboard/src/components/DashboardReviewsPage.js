@@ -72,7 +72,7 @@ const DashboardReviewsPage = ({ currentUser, history }) => {
       currentUser={currentUser}
       manuscriptsUserHasCurrentRoleIn={data.manuscriptsUserHasCurrentRoleIn}
       reviewerRespond={reviewerRespond}
-      submissionForm={data.formForPurposeAndCategory}
+      submissionForm={data.submissionForms}
       updateReviewerStatus={updateReviewerStatus}
       uriQueryParams={uriQueryParams}
     />

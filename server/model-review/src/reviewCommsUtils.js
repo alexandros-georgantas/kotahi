@@ -1,19 +1,28 @@
 const models = require('@pubsweet/models')
 
-const getForm = async categoryAndPurpose => {
-  const form = await models.Form.query().where(categoryAndPurpose)
-  if (!form || !form.length)
-    throw new Error(`No form found for "${categoryAndPurpose.purpose}"`)
-  return form[0]
+const getForm = async criteria => {
+  const form = await models.Form.query().findOne(criteria)
+  if (!form) throw new Error(`No form found for "${JSON.stringify(criteria)}"`)
+  return form
 }
 
 const getReviewForm = async groupId =>
-  getForm({ category: 'review', purpose: 'review', groupId })
+  getForm({ category: 'review', isActive: true, groupId })
 
 const getDecisionForm = async groupId =>
-  getForm({ category: 'decision', purpose: 'decision', groupId })
+  getForm({ category: 'decision', isActive: true, groupId })
 
-const getSubmissionForm = async groupId =>
-  getForm({ category: 'submission', purpose: 'submit', groupId })
+const getSubmissionForms = async groupId =>
+  models.Form.query().where({ category: 'submission', isActive: true, groupId })
 
-module.exports = { getReviewForm, getDecisionForm, getSubmissionForm }
+const getSubmissionFormForPurpose = async (purpose, groupId) =>
+  models.Form.query()
+    .findOne({ category: 'submission', isActive: true, groupId })
+    .whereRaw("structure->>'purpose' = ?", purpose)
+
+module.exports = {
+  getReviewForm,
+  getDecisionForm,
+  getSubmissionForms,
+  getSubmissionFormForPurpose,
+}

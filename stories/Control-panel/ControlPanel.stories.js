@@ -637,62 +637,6 @@ const props = {
     files: [],
     reviews: [],
     decision: '',
-    teams: [
-      {
-        __typename: 'Team',
-        id: '2ea0530f-c2c1-4524-b16b-782c0d81d5e4',
-        name: 'Author',
-        role: 'author',
-        manuscript: {
-          __typename: 'Manuscript',
-          id: '2f920e7f-066a-496b-a9b8-e207ff7326d3',
-        },
-        members: [
-          {
-            __typename: 'TeamMember',
-            id: '2b74f783-d8a0-4f1a-a53c-b998618b5293',
-            user: {
-              __typename: 'User',
-              id: '92f99a84-fc8b-4f94-bc9e-10bb3f7c3902',
-              username: 'Harriet Handling-Editor',
-              defaultIdentity: {
-                __typename: 'Identity',
-                id: 'aeb8257c-2fd4-44b9-a464-0c38e0eae7b5',
-                name: 'Harriet Handling-Editor',
-              },
-            },
-            status: null,
-          },
-        ],
-      },
-      {
-        __typename: 'Team',
-        id: '0c3dcae3-8c4a-43b0-8924-93b7ecc1d7e8',
-        name: 'Reviewers',
-        role: 'reviewer',
-        manuscript: {
-          __typename: 'Manuscript',
-          id: '2f920e7f-066a-496b-a9b8-e207ff7326d3',
-        },
-        members: [
-          {
-            __typename: 'TeamMember',
-            id: '4cfc3559-bf1b-4e5f-8338-60f65f99be31',
-            user: {
-              __typename: 'User',
-              id: '187f6a96-84c9-4785-b01a-89de4003099e',
-              username: 'Shanthi',
-              defaultIdentity: {
-                __typename: 'Identity',
-                id: '43b57bf4-3bda-4832-9b4b-ea5d594f9d5e',
-                name: 'Shanthi ',
-              },
-            },
-            status: 'invited',
-          },
-        ],
-      },
-    ],
     status: 'new',
     meta: {
       __typename: 'ManuscriptMeta',
@@ -1503,7 +1447,6 @@ const props = {
   page: 1,
   sortDirection: 'DESC',
   sortName: 'created',
-  threadedDiscussions: [],
   updatePendingComment: () => null,
   currentDecisionData: {
     id: '955518ff-9ee5-4a0c-93ea-16e6d46b699a',

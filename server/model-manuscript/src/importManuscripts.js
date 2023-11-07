@@ -25,9 +25,7 @@ const importManuscripts = async (groupId, ctx) => {
     active: true,
   })
 
-  await runImports(groupId, ctx.user)
-
-  const promises = []
+  const promises = [runImports(groupId, ctx.user)]
 
   if (activeConfig.formData.instanceName === 'ncrc') {
     promises.push(importArticlesFromBiorxiv(groupId, ctx))

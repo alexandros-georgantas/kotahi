@@ -22,44 +22,16 @@ export const reviewFields = `
 `
 
 const formFields = `
+  id
+  category
   structure {
     name
+    purpose
     description
     haspopup
     popuptitle
     popupdescription
-    children {
-      title
-      shortDescription
-      id
-      component
-      name
-      description
-      doiValidation
-      doiUniqueSuffixValidation
-      placeholder
-      parse
-      format
-      options {
-        id
-        label
-        value
-        labelColor
-      }
-      validate {
-        id
-        label
-        value
-      }
-      validateValue {
-        minChars
-        maxChars
-        minSize
-      }
-      hideFromAuthors
-      permitPublishing
-      readonly
-    }
+    children
   }
 `
 
@@ -122,7 +94,7 @@ export const fragmentFields = `
 `
 
 const query = gql`
-  query($id: ID!, $groupId: ID) {
+  query($id: ID!, $groupId: ID!) {
     manuscript(id: $id) {
       ${fragmentFields}
       manuscriptVersions {
@@ -136,15 +108,15 @@ const query = gql`
       }
     }
 
-    submissionForm: formForPurposeAndCategory(purpose: "submit", category: "submission", groupId: $groupId) {
+    submissionForms: activeFormsInCategory(category: "submission", groupId: $groupId) {
       ${formFields}
     }
 
-    decisionForm: formForPurposeAndCategory(purpose: "decision", category: "decision", groupId: $groupId) {
+    decisionForm: activeFormInCategory(category: "decision", groupId: $groupId) {
       ${formFields}
     }
 
-    reviewForm: formForPurposeAndCategory(purpose: "review", category: "review", groupId: $groupId) {
+    reviewForm: activeFormInCategory(category: "review", groupId: $groupId) {
       ${formFields}
     }
 

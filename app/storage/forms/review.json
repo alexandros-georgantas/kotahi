@@ -1,5 +1,6 @@
 {
   "name": "Review",
+  "purpose": "review",
   "description": "<p class=\"paragraph\">By completing this review, you agree that you do not have any conflict of interests to declare. For any questions about what constitutes a conflict of interest, contact the administrator.</p>",
   "haspopup": "true",
   "popuptitle": "Confirm your review",

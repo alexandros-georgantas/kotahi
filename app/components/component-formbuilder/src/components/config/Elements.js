@@ -605,25 +605,25 @@ const submissionFieldOptions = [
  * generic types.
  */
 const decisionFieldOptions = [
-  {
-    fieldType: 'verdict',
-    label: 'Verdict',
-    component: ['RadioGroup', 'Select'],
-    title: requiredTextFieldWithDefault('Decision'),
-    name: presetTextField('$verdict'),
-  },
+  ...genericFieldOptions,
   {
     isCustom: true,
     fieldType: 'discussion',
     label: 'Discussion',
     component: 'ThreadedDiscussion',
   },
-  ...genericFieldOptions,
   {
     isCustom: true,
     fieldType: 'attachments',
     label: 'Attachments',
     component: 'SupplementaryFiles',
+  },
+  {
+    fieldType: 'verdict',
+    label: 'Verdict',
+    component: ['RadioGroup', 'Select'],
+    title: requiredTextFieldWithDefault('Decision'),
+    name: presetTextField('$verdict'),
   },
   {
     fieldType: 'doiSuffix',

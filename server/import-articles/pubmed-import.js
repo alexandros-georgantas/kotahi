@@ -5,7 +5,7 @@ const FormData = require('form-data')
 const fetch = require('node-fetch')
 const models = require('@pubsweet/models')
 const flattenObj = require('../utils/flattenObj')
-const { getSubmissionForm } = require('../model-review/src/reviewCommsUtils')
+const { getEmptySubmission } = require('./importTools')
 
 const selectVersionRegexp = /(v)(?!.*\1)/g
 
@@ -156,32 +156,7 @@ const getData = async (groupId, ctx) => {
     })
   }
 
-  const submissionForm = await getSubmissionForm(groupId)
-
-  const parsedFormStructure = submissionForm.structure.children
-    .map(formElement => {
-      const parsedName = formElement.name && formElement.name.split('.')[1]
-
-      if (parsedName) {
-        return {
-          name: parsedName,
-          component: formElement.component,
-        }
-      }
-
-      return undefined
-    })
-    .filter(x => x !== undefined)
-
-  const emptySubmission = parsedFormStructure.reduce((acc, curr) => {
-    acc[curr.name] =
-      curr.component === 'CheckboxGroup' || curr.component === 'LinksInput'
-        ? []
-        : ''
-    return {
-      ...acc,
-    }
-  }, {})
+  const emptySubmission = getEmptySubmission(groupId)
 
   const topicsIdsResult = topicsIdsResponse.map(
     async ({ topic, ids }, index) => {

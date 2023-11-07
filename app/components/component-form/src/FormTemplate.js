@@ -1,34 +1,43 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Formik, ErrorMessage } from 'formik'
-import { unescape, get, set, debounce } from 'lodash'
-import { sanitize } from 'isomorphic-dompurify'
+import { get, set, debounce, merge } from 'lodash'
 import { RadioGroup } from '@pubsweet/ui'
 import { th } from '@pubsweet/ui-toolkit'
 import {
   Section as Container,
   Select,
   FilesUpload,
-  Attachment,
   FieldPublishingSelector,
   TextInput,
   CheckboxGroup,
   RichTextEditor,
-} from '../../../shared'
-import { Heading1, Section, Legend, SubNote } from '../style'
-import AuthorsInput from './AuthorsInput'
-import LinksInput from './LinksInput'
-import ValidatedFieldFormik from './ValidatedField'
-import Confirm from './Confirm'
-import { articleStatuses } from '../../../../globals'
-import { validateFormField } from '../../../../shared/formValidation'
-import ThreadedDiscussion from '../../../component-formbuilder/src/components/builderComponents/ThreadedDiscussion/ThreadedDiscussion'
-import ActionButton from '../../../shared/ActionButton'
-import { hasValue } from '../../../../shared/htmlUtils'
-import { ConfigContext } from '../../../config/src'
-import Modal from '../../../component-modal/src/Modal'
-import PublishingResponse from '../../../component-review/src/components/publishing/PublishingResponse'
+  MediumRow,
+} from '../../shared'
+import {
+  Heading1,
+  Section,
+  Legend,
+  SubNote,
+} from '../../component-submit/src/style'
+import AuthorsInput from '../../component-submit/src/components/AuthorsInput'
+import LinksInput from '../../component-submit/src/components/LinksInput'
+import ValidatedFieldFormik from '../../component-submit/src/components/ValidatedField'
+import Confirm from '../../component-submit/src/components/Confirm'
+import { articleStatuses } from '../../../globals'
+import { validateFormField } from '../../../shared/formValidation'
+import ActionButton from '../../shared/ActionButton'
+import { createSafeMarkup, hasValue } from '../../../shared/htmlUtils'
+import { ConfigContext } from '../../config/src'
+import Modal from '../../component-modal/src/Modal'
+import PublishingResponse from '../../component-review/src/components/publishing/PublishingResponse'
 
 const FormContainer = styled(Container)`
   background: white;
@@ -100,6 +109,11 @@ const NoteRight = styled.div`
   text-align: right;
 `
 
+const HeadingToolsContainer = styled(MediumRow)`
+  float: right;
+  width: unset;
+`
+
 const FieldHead = styled.div`
   align-items: baseline;
   display: flex;
@@ -110,9 +124,6 @@ const FieldHead = styled.div`
     margin-left: auto;
   }
 `
-
-const filterFileManuscript = files =>
-  files.filter(file => file.tags.includes('manuscript'))
 
 /** Definitions for available field types */
 const elements = {
@@ -127,7 +138,6 @@ const elements = {
   AuthorsInput,
   Select,
   LinksInput,
-  ThreadedDiscussion,
 }
 
 /** Shallow clone props, leaving out all specified keys, and also stripping all keys with (string) value 'false'. */
@@ -141,13 +151,6 @@ const rejectProps = (obj, keys) =>
       {},
     )
 
-const link = (urlFrag, manuscriptId) =>
-  String.raw`<a href=${urlFrag}/versions/${manuscriptId}/manuscript>view here</a>`
-
-const createMarkup = encodedHtml => ({
-  __html: sanitize(unescape(encodedHtml)),
-})
-
 /** Rename some props so the various formik components can understand them */
 const prepareFieldProps = rawField => ({
   ...rawField,
@@ -156,6 +159,20 @@ const prepareFieldProps = rawField => ({
     rawField.options.map(e => ({ ...e, color: e.labelColor })),
 })
 
+/** Fleshes out all fields with empty strings if they have no existing data */
+const createInitializedFormData = (form, existingData) => {
+  const allBlankedFields = {}
+  const fieldNames = form.structure.children.map(field => field.name)
+  fieldNames.forEach(fieldName => set(allBlankedFields, fieldName, ''))
+
+  // The following should be stored in the form but not displayed
+  if (allBlankedFields.submission) {
+    allBlankedFields.submission.$$formPurpose = form.structure.purpose
+  }
+
+  return merge(allBlankedFields, existingData)
+}
+
 // This is not being kept as state because we need to access it
 // outside of the render thread. This is a global variable, NOT
 // per component, but that's OK for our purposes.
@@ -163,16 +180,15 @@ let lastChangedField = null
 
 const FormTemplate = ({
   form,
-  initialValues,
+  formData,
+  customComponents: volatileCustomComponents = {},
   manuscriptId,
   manuscriptShortId,
-  manuscriptStatus,
   submissionButtonText,
   onChange,
   republish,
   onSubmit,
   showEditorOnlyFields,
-  urlFrag,
   displayShortIdAsIdentifier,
   validateDoi,
   validateSuffix,
@@ -183,43 +199,44 @@ const FormTemplate = ({
   shouldStoreFilesInForm,
   initializeReview,
   tagForFiles,
-  threadedDiscussionProps: tdProps,
   fieldsToPublish,
   setShouldPublishField,
   shouldShowOptionToPublish = false,
+  headingControls,
 }) => {
   const config = useContext(ConfigContext)
   const [confirming, setConfirming] = React.useState(false)
+  const customComponents = useMemo(() => volatileCustomComponents, [])
+
+  const fields = form.structure.children || []
 
   const toggleConfirming = () => {
     setConfirming(confirm => !confirm)
   }
 
-  const sumbitPendingThreadedDiscussionComments = async values => {
+  const doCustomSubmitActions = async values => {
     await Promise.all(
-      form.children
-        .filter(field => field.component === 'ThreadedDiscussion')
-        .map(field => get(values, field.name))
-        .filter(Boolean)
-        .map(async threadedDiscussionId =>
-          tdProps.completeComments({
-            variables: { threadedDiscussionId },
-          }),
-        ),
+      fields.map(async field => {
+        const customOnSubmit = customComponents[field.component]?.onSubmit
+        if (!customOnSubmit) return
+        const value = get(values, field.name)
+        await customOnSubmit(value)
+      }),
     )
   }
 
-  const createBlankSubmissionBasedOnForm = value => {
-    const allBlankedFields = {}
-    const fieldNames = value.children.map(field => field.name)
-    fieldNames.forEach(fieldName => set(allBlankedFields, fieldName, ''))
-    return allBlankedFields
-  }
+  const initialValues = createInitializedFormData(form, formData)
 
-  const initialValuesWithDummyValues = {
-    ...createBlankSubmissionBasedOnForm(form),
-    ...initialValues,
-  }
+  useEffect(() => {
+    if (
+      initialValues.submission?.$$formPurpose !==
+      formData?.submission?.$$formPurpose
+    )
+      onChange(
+        initialValues.submission.$$formPurpose,
+        'submission.$$formPurpose',
+      )
+  }, [])
 
   const debounceChange = useCallback(
     debounce(
@@ -235,12 +252,17 @@ const FormTemplate = ({
 
   useEffect(() => debounceChange.flush, [])
 
+  const submitButtonTestId = `${form.structure.name
+    .toLowerCase()
+    .replace(/ /g, '-')
+    .replace(/[^\w-]+/g, '')}-action-btn`
+
   return (
     <Formik
-      displayName={form.name}
-      initialValues={initialValuesWithDummyValues}
+      displayName={form.structure.name}
+      initialValues={initialValues}
       onSubmit={async (values, actions) => {
-        await sumbitPendingThreadedDiscussionComments(values)
+        await doCustomSubmitActions(values)
         if (onSubmit) await onSubmit(values, actions)
       }}
       validateOnBlur
@@ -278,10 +300,7 @@ const FormTemplate = ({
           return (
             <div>
               <ActionButton
-                dataTestid={`${form.name
-                  .toLowerCase()
-                  .replace(/ /g, '-')
-                  .replace(/[^\w-]+/g, '')}-action-btn`}
+                dataTestid={submitButtonTestId}
                 onClick={async () => {
                   setButtonIsPending(true)
 
@@ -339,7 +358,9 @@ const FormTemplate = ({
         }
 
         // this is whether the form includes a popup
-        const hasPopup = form.haspopup ? JSON.parse(form.haspopup) : false
+        const hasPopup = form.structure.haspopup
+          ? JSON.parse(form.structure.haspopup)
+          : false
 
         // this is whether to show a popup
         const showPopup = hasPopup && values.status !== 'revise'
@@ -354,29 +375,28 @@ const FormTemplate = ({
                 values.status === 'submitted')
             : true)
 
-        const manuscriptFiles = filterFileManuscript(values.files || [])
-
-        const submittedManuscriptFile =
-          isSubmission && manuscriptFiles.length ? manuscriptFiles[0] : null
-
         return (
           <FormContainer>
-            {displayShortIdAsIdentifier && (
-              <NoteRight>Manuscript Number: {manuscriptShortId}</NoteRight>
-            )}
             <header>
-              <Heading1>{form.name}</Heading1>
+              <div>
+                <HeadingToolsContainer>
+                  {headingControls}
+                  {displayShortIdAsIdentifier && (
+                    <NoteRight>
+                      Manuscript Number: {manuscriptShortId}
+                    </NoteRight>
+                  )}
+                </HeadingToolsContainer>
+                <Heading1>{form.structure.name}</Heading1>
+              </div>
               <Intro
-                dangerouslySetInnerHTML={createMarkup(
-                  (form.description || '').replace(
-                    '###link###',
-                    link(urlFrag, manuscriptId),
-                  ),
+                dangerouslySetInnerHTML={createSafeMarkup(
+                  form.structure.description || '',
                 )}
               />
             </header>
             <form>
-              {(form.children || [])
+              {fields
                 .filter(
                   element =>
                     element.component &&
@@ -385,36 +405,20 @@ const FormTemplate = ({
                 )
                 .map(prepareFieldProps)
                 .map((element, i) => {
-                  let threadedDiscussionProps
+                  const component =
+                    customComponents[element.component]?.component ??
+                    elements[element.component]
 
-                  if (element.component === 'ThreadedDiscussion') {
-                    const setShouldPublishComment =
-                      shouldShowOptionToPublish &&
-                      element.permitPublishing === 'true' &&
-                      ((id, val) =>
-                        setShouldPublishField(`${element.name}:${id}`, val))
+                  const customValidate =
+                    customComponents[element.component]?.customValidate
 
-                    threadedDiscussionProps = {
-                      ...tdProps,
-                      threadedDiscussion: tdProps.threadedDiscussions.find(
-                        d => d.id === values[element.name],
-                      ),
-                      threadedDiscussions: undefined,
-                      commentsToPublish: fieldsToPublish
-                        .filter(f => f.startsWith(`${element.name}:`))
-                        .map(f => f.split(':')[1]),
-                      setShouldPublishComment,
-                      userCanAddThread: true,
-                    }
-                  }
-
-                  let markup = createMarkup(element.title)
+                  let markup = createSafeMarkup(element.title)
 
                   // add an '*' to the markup if it is marked required
                   if (Array.isArray(element.validate)) {
                     // element.validate can specify multiple validation functions; we're looking for 'required'
                     if (element.validate.some(v => v.value === 'required'))
-                      markup = createMarkup(`${element.title} *`)
+                      markup = createSafeMarkup(`${element.title} *`)
                   }
 
                   return (
@@ -474,19 +478,7 @@ const FormTemplate = ({
                           values={values}
                         />
                       )}
-                      {element.component === 'ManuscriptFile' &&
-                      submittedManuscriptFile ? (
-                        <Attachment
-                          file={submittedManuscriptFile}
-                          key={submittedManuscriptFile.storedObjects[0].url}
-                          uploaded
-                        />
-                      ) : null}
-                      {![
-                        'SupplementaryFiles',
-                        'VisualAbstract',
-                        'ManuscriptFile',
-                      ].includes(element.component) && (
+                      {component && (
                         <ValidatedFieldFormik
                           {...rejectProps(element, [
                             'component',
@@ -501,8 +493,9 @@ const FormTemplate = ({
                             'labelColor',
                           ])}
                           aria-label={element.placeholder || element.title}
-                          component={elements[element.component]}
-                          data-testid={element.name} // TODO: Improve this
+                          component={component}
+                          data-testid={element.name}
+                          hasSubmitButton={showSubmitButton}
                           key={`validate-${element.id}`}
                           name={element.name}
                           onChange={value => {
@@ -520,9 +513,9 @@ const FormTemplate = ({
                             setFieldValue(element.name, val, false)
                             innerOnChange(val, element.name)
                           }}
+                          setShouldPublishField={setShouldPublishField}
                           setTouched={setTouched}
                           spellCheck
-                          threadedDiscussionProps={threadedDiscussionProps}
                           validate={validateFormField(
                             element.validate,
                             element.validateValue,
@@ -534,14 +527,14 @@ const FormTemplate = ({
                             validateDoi,
                             validateSuffix,
                             element.component,
-                            threadedDiscussionProps,
+                            customValidate,
                           )}
                           values={values}
                         />
                       )}
                       {hasValue(element.description) && (
                         <SubNote
-                          dangerouslySetInnerHTML={createMarkup(
+                          dangerouslySetInnerHTML={createSafeMarkup(
                             element.description,
                           )}
                         />
@@ -582,28 +575,32 @@ const FormTemplate = ({
 
 FormTemplate.propTypes = {
   form: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    children: PropTypes.arrayOf(
-      PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired,
-        sectioncss: PropTypes.string,
-        id: PropTypes.string.isRequired,
-        component: PropTypes.string.isRequired,
-        group: PropTypes.string,
-        placeholder: PropTypes.string,
-        validate: PropTypes.arrayOf(PropTypes.object.isRequired),
-        validateValue: PropTypes.objectOf(
-          PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        ),
-        hideFromAuthors: PropTypes.string,
-        readonly: PropTypes.bool,
-      }).isRequired,
-    ).isRequired,
-    popuptitle: PropTypes.string,
-    popupdescription: PropTypes.string,
-    haspopup: PropTypes.string.isRequired, // bool as string
+    category: PropTypes.string.isRequired,
+    structure: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      purpose: PropTypes.string.isRequired,
+      description: PropTypes.string,
+      children: PropTypes.arrayOf(
+        PropTypes.shape({
+          name: PropTypes.string.isRequired,
+          title: PropTypes.string.isRequired,
+          sectioncss: PropTypes.string,
+          id: PropTypes.string.isRequired,
+          component: PropTypes.string.isRequired,
+          group: PropTypes.string,
+          placeholder: PropTypes.string,
+          validate: PropTypes.arrayOf(PropTypes.object.isRequired),
+          validateValue: PropTypes.objectOf(
+            PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+          ),
+          hideFromAuthors: PropTypes.string,
+          readonly: PropTypes.bool,
+        }).isRequired,
+      ).isRequired,
+      popuptitle: PropTypes.string,
+      popupdescription: PropTypes.string,
+      haspopup: PropTypes.string.isRequired, // bool as string
+    }).isRequired,
   }).isRequired,
   manuscriptId: PropTypes.string.isRequired,
   manuscriptShortId: PropTypes.number.isRequired,

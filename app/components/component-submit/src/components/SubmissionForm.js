@@ -1,11 +1,12 @@
 import React from 'react'
-import { SectionContent } from '../../../shared'
-import FormTemplate from './FormTemplate'
+import { Action, SectionContent } from '../../../shared'
+import { FormTemplate } from '../../../component-form/src'
 import { articleStatuses } from '../../../../globals'
 
 const SubmissionForm = ({
-  versionValues,
-  form,
+  version,
+  submissionForm,
+  submissionFormComponents,
   onSubmit,
   onChange,
   republish,
@@ -14,9 +15,9 @@ const SubmissionForm = ({
   createFile,
   deleteFile,
   setShouldPublishField,
-  threadedDiscussionProps,
   validateDoi,
   validateSuffix,
+  canChangeForm,
 }) => {
   let submissionButtonText = 'Submit your research object'
   let submitButtonShouldRepublish = false
@@ -28,18 +29,35 @@ const SubmissionForm = ({
     } else submissionButtonText = 'Submit Evaluation'
   }
 
+  let headingControls = null
+
+  if (canChangeForm) {
+    headingControls = (
+      <Action
+        onClick={async () => {
+          onChange(null, 'submission.$$formPurpose', manuscript.id)
+          await new Promise(resolve => setTimeout(resolve, 5000)) // Pause a while to keep the spinner going until page refreshes
+        }}
+      >
+        Change form
+      </Action>
+    )
+  }
+
   return (
     <SectionContent>
       <FormTemplate
         createFile={createFile}
+        customComponents={submissionFormComponents}
         deleteFile={deleteFile}
         fieldsToPublish={
           manuscript.formFieldsToPublish.find(
             ff => ff.objectId === manuscript.id,
           )?.fieldsToPublish ?? []
         }
-        form={form}
-        initialValues={versionValues}
+        form={submissionForm}
+        formData={version}
+        headingControls={headingControls}
         isSubmission
         manuscriptId={manuscript.id}
         manuscriptShortId={manuscript.shortId}
@@ -68,7 +86,6 @@ const SubmissionForm = ({
         shouldShowOptionToPublish={!!setShouldPublishField}
         showEditorOnlyFields={false}
         submissionButtonText={submissionButtonText}
-        threadedDiscussionProps={threadedDiscussionProps}
         validateDoi={validateDoi}
         validateSuffix={validateSuffix}
       />

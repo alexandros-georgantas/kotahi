@@ -125,12 +125,9 @@ const hasElifeStyleEvaluations = manuscript => {
  * Also returns valuesAreKeyedObjects, which indicates whether values for this field
  * are key-value pairs as opposed to strings.
  */
-const getSafelyNamedJsonbFieldInfo = (fieldName, submissionForm) => {
+const getSafelyNamedJsonbFieldInfo = (fieldName, fieldsMap) => {
   if (!fieldName.startsWith('submission.')) return null
-
-  const field =
-    submissionForm &&
-    submissionForm.structure.children.find(f => f.name === fieldName)
+  const field = fieldsMap[fieldName]
 
   if (!field) {
     console.warn(`Ignoring unknown field "${fieldName}"`)
@@ -151,16 +148,13 @@ const getSafelyNamedJsonbFieldInfo = (fieldName, submissionForm) => {
 }
 
 /** Check that the field exists and is not dangerously named (to avoid sql injection) */
-const isValidNonJsonbField = (fieldName, submissionForm) => {
+const isValidNonJsonbField = (fieldName, fieldsMap) => {
   if (!/^[a-zA-Z]\w*$/.test(fieldName)) {
     console.warn(`Ignoring unsupported field "${fieldName}"`)
     return false
   }
 
-  if (
-    !submissionForm ||
-    submissionForm.structure.children.find(f => f.name === fieldName)
-  ) {
+  if (!fieldsMap[fieldName]) {
     console.warn(`Ignoring unknown field "${fieldName}"`)
     return false
   }
@@ -182,14 +176,14 @@ const addItem = (collection, rawFragment, params) => {
 /** Apply a specified ordering to the query.
  * This doesn't apply search rank ordering, which is done elsewhere.
  */
-const applySortOrder = ({ field, isAscending }, submissionForm, addOrder) => {
+const applySortOrder = ({ field, isAscending }, fieldsMap, addOrder) => {
   const sortDirection = isAscending ? '' : ' DESC'
-  const jsonbField = getSafelyNamedJsonbFieldInfo(field, submissionForm)
+  const jsonbField = getSafelyNamedJsonbFieldInfo(field, fieldsMap)
 
   if (jsonbField) {
     const { name: jsonName } = jsonbField
     addOrder(`LOWER(m.submission->>?)${sortDirection}`, jsonName)
-  } else if (isValidNonJsonbField(field, submissionForm)) {
+  } else if (isValidNonJsonbField(field, fieldsMap)) {
     // eslint-disable-next-line no-param-reassign
 
     let sortingField = ''
@@ -211,7 +205,7 @@ const applySortOrder = ({ field, isAscending }, submissionForm, addOrder) => {
 const applyFilters = (
   /** Array of {field, value} objects */
   filters,
-  submissionForm,
+  fieldsMap,
   /** Function to add a WHERE clause to SQL query. Arguments are: (rawCondition, ...params). Each '?' in the rawCondition needs a corresponding param. */
   addWhere,
   /** The local timezone offset */
@@ -260,10 +254,7 @@ const applyFilters = (
         return // i.e., continue.
       }
 
-      const jsonbField = getSafelyNamedJsonbFieldInfo(
-        filter.field,
-        submissionForm,
-      )
+      const jsonbField = getSafelyNamedJsonbFieldInfo(filter.field, fieldsMap)
 
       if (jsonbField) {
         const { name: jsonName, valuesAreKeyedObjects: isKeyed } = jsonbField
@@ -283,6 +274,17 @@ const applyFilters = (
     })
 }
 
+/** Return all fields from all submission forms, mapped by name */
+const getFieldsMap = submissionForms => {
+  const result = {}
+  submissionForms.forEach(form => {
+    form.structure.children.forEach(field => {
+      if (!result[field.name]) result[field.name] = field
+    })
+  })
+  return result
+}
+
 /** Builds a raw query string and an array of params, based on the requested filtering, sorting, offset and limit.
  * If manuscriptIDs is specified, then the query is restricted to those IDs.
  * Returns [query, params]
@@ -292,7 +294,7 @@ const buildQueryForManuscriptSearchFilterAndOrder = (
   offset,
   limit,
   filters,
-  submissionForm,
+  submissionForms,
   timezoneOffsetMinutes,
   manuscriptIDs = null,
   groupId = null,
@@ -353,15 +355,17 @@ const buildQueryForManuscriptSearchFilterAndOrder = (
     setOrderOnRank = 'ORDER BY rank DESC'
   }
 
+  const fieldsMap = getFieldsMap(submissionForms)
+
   if (!searchQuery && sort) {
-    applySortOrder(sort, submissionForm, addOrder)
+    applySortOrder(sort, fieldsMap, addOrder)
   } else {
     // Give it some order to prevent it changing on refetch.
     addOrder('COALESCE(p.created, m.created) DESC')
     addOrder('m.short_id DESC')
   }
 
-  applyFilters(filters, submissionForm, addWhere, timezoneOffsetMinutes)
+  applyFilters(filters, fieldsMap, addWhere, timezoneOffsetMinutes)
 
   const query = `
     SELECT ${selectItems.rawFragments.join(', ')}
@@ -402,32 +406,37 @@ const addAllFieldsToTemplatingMap = (
   fieldsMap,
   objectId,
   formData,
-  form,
+  forms,
   threadedDiscussions,
 ) => {
-  form.structure.children.forEach(field => {
-    const value = get(formData, field.name)
+  forms.forEach(form => {
+    form.structure.children.forEach(field => {
+      const key = `${objectId ? `${objectId}.` : ''}${field.name}`
+      if (get(fieldsMap, key)) return // Key already exists. Skip.
 
-    if (field.component === 'ThreadedDiscussion') {
-      if (!threadedDiscussions) return
-      const discussion = threadedDiscussions.find(td => td.id === value)
-      if (!discussion) return
+      const value = get(formData, field.name)
 
-      discussion.threads.forEach(thread => {
-        thread.comments.forEach(comment => {
-          const text = getPublishableTextFromComment(comment)
-          set(
-            fieldsMap,
-            `${objectId ? `${objectId}.` : ''}${field.name}:${comment.id}`,
-            text,
-          )
+      if (field.component === 'ThreadedDiscussion') {
+        if (!threadedDiscussions) return
+        const discussion = threadedDiscussions.find(td => td.id === value)
+        if (!discussion) return
+
+        discussion.threads.forEach(thread => {
+          thread.comments.forEach(comment => {
+            const text = getPublishableTextFromComment(comment)
+            set(
+              fieldsMap,
+              `${objectId ? `${objectId}.` : ''}${field.name}:${comment.id}`,
+              text,
+            )
+          })
         })
-      })
-      return
-    }
+        return
+      }
 
-    const content = getPublishableTextFromValue(value, field)
-    set(fieldsMap, `${objectId ? `${objectId}.` : ''}${field.name}`, content)
+      const content = getPublishableTextFromValue(value, field)
+      set(fieldsMap, key, content)
+    })
   })
 }
 
@@ -448,7 +457,7 @@ const getPreprintUri = manuscript => {
  */
 const getFieldsMapForTemplating = (
   manuscript,
-  submissionForm,
+  submissionForms,
   reviewForm,
   decisionForm,
 ) => {
@@ -480,7 +489,7 @@ const getFieldsMapForTemplating = (
     fieldsMap,
     manuscript.id,
     manuscript,
-    submissionForm,
+    submissionForms,
     manuscript.threadedDiscussions,
   )
   // Add all submission fields referenced as e.g. 'submission.$authors'
@@ -488,7 +497,7 @@ const getFieldsMapForTemplating = (
     fieldsMap,
     null,
     manuscript,
-    submissionForm,
+    submissionForms,
     manuscript.threadedDiscussions,
   )
   // Add all review and decision fields referenced as e.g. '913ed8c4-794e-470e-9214-9c77d90e0144.comment'
@@ -497,7 +506,7 @@ const getFieldsMapForTemplating = (
       fieldsMap,
       review.id,
       review,
-      review.isDecision ? decisionForm : reviewForm,
+      [review.isDecision ? decisionForm : reviewForm],
       manuscript.threadedDiscussions,
     ),
   )
@@ -508,7 +517,7 @@ const getFieldsMapForTemplating = (
       fieldsMap,
       'decision',
       decision,
-      decisionForm,
+      [decisionForm],
       manuscript.threadedDiscussions,
     )
 
@@ -519,14 +528,14 @@ const getFieldsMapForTemplating = (
 const applyTemplatesToArtifacts = (
   artifacts,
   manuscript,
-  submissionForm,
+  submissionForms,
   reviewForm,
   decisionForm,
 ) => {
   const fieldsMap = artifacts.length
     ? getFieldsMapForTemplating(
         manuscript,
-        submissionForm,
+        submissionForms,
         reviewForm,
         decisionForm,
       )

@@ -67,7 +67,8 @@ const {
 const {
   getReviewForm,
   getDecisionForm,
-  getSubmissionForm,
+  getSubmissionForms,
+  getSubmissionFormForPurpose,
 } = require('../../model-review/src/reviewCommsUtils')
 
 const {
@@ -84,6 +85,8 @@ const {
   addUserToManuscriptChatChannel,
   removeUserFromManuscriptChatChannel,
 } = require('../../model-channel/src/channelCommsUtils')
+
+const { getEmptySubmission } = require('../../import-articles/importTools')
 
 const { getPubsub } = pubsubManager
 
@@ -184,14 +187,14 @@ const getRelatedPublishedArtifacts = async (manuscript, ctx) => {
 
   if (!templatedArtifacts.length) return []
 
-  const { submissionForm, reviewForm, decisionForm } = await getActiveForms(
+  const { submissionForms, reviewForm, decisionForm } = await getActiveForms(
     manuscript.groupId,
   )
 
   return applyTemplatesToArtifacts(
     templatedArtifacts,
     { ...manuscript, reviews, submission, threadedDiscussions },
-    submissionForm,
+    submissionForms,
     reviewForm,
     decisionForm,
   )
@@ -355,7 +358,11 @@ const publishOnCMS = async (groupId, manuscriptId) => {
 }
 
 const getPublishableSubmissionFiles = async manuscript => {
-  const submissionForm = await getSubmissionForm(manuscript.groupId)
+  const submissionForms = await getSubmissionForms(manuscript.groupId)
+
+  const submissionForm = submissionForms.find(
+    form => manuscript.submission.$$formPurpose === form.structure.purpose,
+  )
 
   const { fieldsToPublish } =
     manuscript.formFieldsToPublish.find(ff => ff.objectId === manuscript.id) ||
@@ -387,32 +394,7 @@ const resolvers = {
     async createManuscript(_, vars, ctx) {
       const { meta, files, groupId } = vars.input
       const group = await models.Group.query().findById(groupId)
-      const submissionForm = await getSubmissionForm(group.id)
-
-      const parsedFormStructure = submissionForm.structure.children
-        .map(formElement => {
-          const parsedName = formElement.name && formElement.name.split('.')[1]
-
-          if (parsedName) {
-            return {
-              name: parsedName,
-              component: formElement.component,
-            }
-          }
-
-          return undefined
-        })
-        .filter(x => x !== undefined)
-
-      const emptySubmission = parsedFormStructure.reduce((acc, curr) => {
-        acc[curr.name] =
-          curr.component === 'CheckboxGroup' || curr.component === 'LinksInput'
-            ? []
-            : ''
-        return {
-          ...acc,
-        }
-      }, {})
+      const emptySubmission = getEmptySubmission(groupId)
 
       // We want the submission information to be stored as JSONB
       // but we want the input to come in as a JSON string
@@ -1241,7 +1223,7 @@ const resolvers = {
       },
       ctx,
     ) {
-      const submissionForm = await getSubmissionForm(groupId)
+      const submissionForms = await getSubmissionForms(groupId)
 
       // Get IDs of the top-level manuscripts
       // TODO move this query to the model
@@ -1312,7 +1294,7 @@ const resolvers = {
         offset,
         limit,
         filters,
-        submissionForm,
+        submissionForms,
         timezoneOffsetMinutes || 0,
         Object.keys(userManuscriptsWithInfo),
         groupId,
@@ -1371,7 +1353,7 @@ const resolvers = {
     ) {
       const groupIdFromHeader = ctx.req.headers['group-id']
       const finalGroupId = groupId || groupIdFromHeader
-      const submissionForm = await getSubmissionForm(finalGroupId)
+      const submissionForms = await getSubmissionForms(finalGroupId)
 
       // TODO Move this to the model, as only the model should interact with DB directly
       const [rawQuery, rawParams] = buildQueryForManuscriptSearchFilterAndOrder(
@@ -1379,7 +1361,7 @@ const resolvers = {
         offset,
         limit,
         filters,
-        submissionForm,
+        submissionForms,
         timezoneOffsetMinutes || 0,
         null,
         finalGroupId,
@@ -1742,7 +1724,10 @@ const resolvers = {
       return editorAndRoles
     },
     async submissionWithFields(parent) {
-      const submissionForm = await getSubmissionForm(parent.groupId)
+      const submissionForm = await getSubmissionFormForPurpose(
+        parent.submission.$$formPurpose,
+        parent.groupId,
+      )
 
       const submissionWithFields = getPublishableSubmissionFields(
         submissionForm,

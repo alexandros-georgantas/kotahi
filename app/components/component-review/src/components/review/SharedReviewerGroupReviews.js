@@ -8,10 +8,10 @@ import { SectionContent } from '../../../../shared'
  * This displays completed reviews by other shared reviewers IF the current user is in the shared group.
  */
 const SharedReviewerGroupReviews = ({
+  customComponents,
   manuscript,
   reviewerId,
   reviewForm,
-  threadedDiscussionProps,
 }) => {
   const thisReviewIsShared = manuscript.reviews?.find(
     r => r.user?.id === reviewerId && !r.isDecision,
@@ -34,9 +34,9 @@ const SharedReviewerGroupReviews = ({
       {sharedReviews.map(r => (
         <SectionRow key={r.id}>
           <Review
+            customComponents={customComponents}
             review={r}
             reviewForm={reviewForm}
-            threadedDiscussionProps={threadedDiscussionProps}
           />
         </SectionRow>
       ))}

@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react'
 import styled from 'styled-components'
 import { get } from 'lodash'
+import PropTypes from 'prop-types'
 import { Checkbox } from '@pubsweet/ui/dist/atoms'
 import { convertTimestampToDateString } from '../../../shared/dateUtils'
 import { ensureJsonIsParsed } from '../../../shared/objectUtils'
@@ -16,7 +17,7 @@ import reviewStatuses from '../../../../config/journal/review-status'
 import recommendations from '../../../../config/journal/recommendations'
 import { UserAvatar } from '../../component-avatar/src'
 import DeleteReviewerModal from '../../component-review/src/components/reviewers/DeleteReviewerModal'
-import ReadonlyFieldData from '../../component-review/src/components/metadata/ReadonlyFieldData'
+import { ReadonlyFieldData } from '../../component-form/src'
 import { ConfigContext } from '../../config/src'
 
 const Header = styled.div`
@@ -57,8 +58,8 @@ const ReviewDetailsModal = (
     review,
     reviewerTeamMember,
     reviewForm,
+    reviewFormComponents,
     onClose,
-    threadedDiscussionProps,
     showEditorOnlyFields,
     isOpen,
     isControlPage = true,
@@ -158,8 +159,8 @@ const ReviewDetailsModal = (
         <ReviewData
           review={review}
           reviewForm={reviewForm}
+          reviewFormComponents={reviewFormComponents}
           showEditorOnlyFields={showEditorOnlyFields}
-          threadedDiscussionProps={threadedDiscussionProps}
         />
       ) : (
         <ReviewItemsContainer>
@@ -247,7 +248,7 @@ const CheckboxActions = ({
 const ReviewData = ({
   review,
   reviewForm,
-  threadedDiscussionProps,
+  reviewFormComponents,
   showEditorOnlyFields,
 }) => {
   const reviewFormData = ensureJsonIsParsed(review.jsonData) ?? {}
@@ -264,11 +265,11 @@ const ReviewData = ({
   const isFileField = element =>
     ['SupplementaryFiles', 'VisualAbstract'].includes(element.component)
 
-  const nonFileFields = reviewForm.children.filter(
+  const nonFileFields = reviewForm.structure.children.filter(
     element => isViewable(element) && !isFileField(element),
   )
 
-  const fileFields = reviewForm.children.filter(
+  const fileFields = reviewForm.structure.children.filter(
     element => isViewable(element) && isFileField(element),
   )
 
@@ -288,16 +289,22 @@ const ReviewData = ({
           <ReviewItemContainer key={element.id}>
             <Header>{element.shortDescription || element.title}</Header>
             <ReadonlyFieldData
+              customComponents={reviewFormComponents}
               fieldName={element.name}
               form={reviewForm}
               formData={reviewFormData}
-              threadedDiscussionProps={threadedDiscussionProps}
             />
           </ReviewItemContainer>
         ))}
       </ReviewItemsContainer>
     </>
   )
+}
+
+ReviewData.propTypes = {
+  reviewFormComponents: PropTypes.objectOf(
+    PropTypes.shape({ component: PropTypes.func.isRequired }),
+  ).isRequired,
 }
 
 export default ReviewDetailsModal

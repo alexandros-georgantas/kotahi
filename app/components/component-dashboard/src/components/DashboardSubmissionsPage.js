@@ -58,7 +58,7 @@ const DashboardSubmissionsPage = ({ history }) => {
     <SubmissionsTable
       applyQueryParams={applyQueryParams}
       manuscriptsUserHasCurrentRoleIn={data.manuscriptsUserHasCurrentRoleIn}
-      submissionForm={data.formForPurposeAndCategory}
+      submissionForms={data.submissionForms}
       uriQueryParams={uriQueryParams}
     />
   ) : null

@@ -4,6 +4,7 @@ import ReactRouterPropTypes from 'react-router-prop-types'
 import ReviewPreview from './reviewPreview/ReviewPreview'
 import { Heading, Page, Spinner } from '../../../shared'
 import { ConfigContext } from '../../../config/src'
+import { getComponentsForManuscriptVersions } from '../../../component-form/src'
 
 const fragmentFields = `
   id
@@ -34,17 +35,12 @@ const query = gql`
       }
     }
 
-    formForPurposeAndCategory(purpose: "submit", category: "submission", groupId: $groupId) {
+    submissionForms: activeFormsInCategory(category: "submission", groupId: $groupId) {
+      id
+      category
       structure {
-        children {
-          title
-          shortDescription
-          id
-          component
-          name
-          hideFromReviewers
-          format
-        }
+        purpose
+        children
       }
     }
   }
@@ -72,28 +68,36 @@ const ReviewPreviewPage = ({ match, currentUser }) => {
     )
   }
 
-  const { manuscript, formForPurposeAndCategory } = data
+  const { manuscript: rawManuscript, submissionForms } = data
 
-  const submissionForm = formForPurposeAndCategory?.structure ?? {
-    name: '',
-    children: [],
-    description: '',
-    haspopup: 'false',
+  const manuscript = rawManuscript
+    ? { ...rawManuscript, submission: JSON.parse(rawManuscript.submission) }
+    : null
+
+  const submissionForm = submissionForms.find(
+    f => f.structure.purpose === manuscript.submission.$$formPurpose,
+  ) ?? {
+    category: 'submission',
+    structure: {
+      name: '',
+      purpose: '',
+      children: [],
+      description: '',
+      haspopup: 'false',
+    },
   }
 
-  // Currently not expecting to preview threadedDiscussions from the ReviewPreviewPage
-  const threadedDiscussionDummyProps = {
-    threadedDiscussions: [],
-  }
+  const componentsMap = getComponentsForManuscriptVersions(
+    [{ manuscript }],
+    { threadedDiscussions: [] },
+    false,
+  )
 
   return (
     <ReviewPreview
-      manuscript={{
-        ...manuscript,
-        submission: JSON.parse(manuscript.submission),
-      }}
+      customComponents={componentsMap[manuscript.id]}
+      manuscript={manuscript}
       submissionForm={submissionForm}
-      threadedDiscussionProps={threadedDiscussionDummyProps}
     />
   )
 }

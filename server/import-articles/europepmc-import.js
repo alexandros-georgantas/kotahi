@@ -1,7 +1,7 @@
 /* eslint-disable camelcase, consistent-return */
 const axios = require('axios')
 const models = require('@pubsweet/models')
-const { getSubmissionForm } = require('../model-review/src/reviewCommsUtils')
+const { getEmptySubmission } = require('./importTools')
 
 // Not sure if this code is used anymore could not find any relevant import triggers for europepmc?
 const getData = async (groupId, ctx) => {
@@ -75,32 +75,7 @@ const getData = async (groupId, ctx) => {
 
   const importedManuscripts = await requests('', date, [])
 
-  const submissionForm = await getSubmissionForm(groupId)
-
-  const parsedFormStructure = submissionForm.structure.children
-    .map(formElement => {
-      const parsedName = formElement.name && formElement.name.split('.')[1]
-
-      if (parsedName) {
-        return {
-          name: parsedName,
-          component: formElement.component,
-        }
-      }
-
-      return undefined
-    })
-    .filter(x => x !== undefined)
-
-  const emptySubmission = parsedFormStructure.reduce((acc, curr) => {
-    acc[curr.name] =
-      curr.component === 'CheckboxGroup' || curr.component === 'LinksInput'
-        ? []
-        : ''
-    return {
-      ...acc,
-    }
-  }, {})
+  const emptySubmission = getEmptySubmission(groupId)
 
   const doiAndPublisher = importedManuscripts.map(article => {
     return { doi: article.doi, server: article.bookOrReportDetails.publisher }

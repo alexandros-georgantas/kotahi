@@ -15,10 +15,9 @@ const SUBMISSION_FORM_PATHS = {
 const REVIEW_FORM_PATH = '../app/storage/forms/review.json'
 const DECISION_FORM_PATH = '../app/storage/forms/decison.json'
 
-const tryAddForm = async (purpose, category, group, seedFilePath) => {
-  const hasForm = !!(
-    await Form.query().where({ purpose, category, groupId: group.id })
-  ).length
+const tryAddForm = async (category, group, seedFilePath) => {
+  const hasForm = !!(await Form.query().where({ category, groupId: group.id }))
+    .length
 
   if (hasForm) {
     console.log(
@@ -28,9 +27,10 @@ const tryAddForm = async (purpose, category, group, seedFilePath) => {
     const formStructure = require(seedFilePath)
 
     const form = {
-      purpose,
       structure: formStructure,
       category,
+      isActive: true,
+      isDefault: true,
       groupId: group.id,
     }
 
@@ -44,13 +44,12 @@ const tryAddForm = async (purpose, category, group, seedFilePath) => {
 const seed = async (group, config) => {
   await Promise.all([
     tryAddForm(
-      'submit',
       'submission',
       group,
       SUBMISSION_FORM_PATHS[config.formData.instanceName],
     ),
-    tryAddForm('review', 'review', group, REVIEW_FORM_PATH),
-    tryAddForm('decision', 'decision', group, DECISION_FORM_PATH),
+    tryAddForm('review', group, REVIEW_FORM_PATH),
+    tryAddForm('decision', group, DECISION_FORM_PATH),
   ])
 }
 

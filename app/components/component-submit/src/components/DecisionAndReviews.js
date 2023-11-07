@@ -2,7 +2,7 @@ import React from 'react'
 
 // TODO: Sort out the imports, perhaps make DecisionReview a shared component?
 import DecisionReview from '../../../component-review/src/components/decision/DecisionReview'
-import ReadonlyFormTemplate from '../../../component-review/src/components/metadata/ReadonlyFormTemplate'
+import { ReadonlyFormTemplate } from '../../../component-form/src'
 
 import {
   SectionHeader,
@@ -13,36 +13,34 @@ import {
 
 const Decision = ({
   decisionForm,
+  decisionFormComponents,
   manuscript,
   showEditorOnlyFields,
-  threadedDiscussionProps,
   allowAuthorsSubmitNewVersion,
 }) => {
-  const decisionDataString = manuscript.reviews.find(r => r.isDecision)
-    ?.jsonData
+  const decisionData = manuscript.reviews.find(r => r.isDecision)?.jsonData
 
-  const decisionData = decisionDataString
-    ? JSON.parse(decisionDataString)
-    : null
-
-  const filteredChildren = !manuscript.decision
+  const filteredForm = !manuscript.decision
     ? {
         ...decisionForm,
-        children: decisionForm.children.filter(
-          formComponent => formComponent.component === 'ThreadedDiscussion',
-        ),
+        structure: {
+          ...decisionForm.structure,
+          children: decisionForm.structure.children.filter(
+            formComponent => formComponent.component === 'ThreadedDiscussion',
+          ),
+        },
       }
     : decisionForm
 
   return decisionData ? (
     <ReadonlyFormTemplate
       allowAuthorsSubmitNewVersion={allowAuthorsSubmitNewVersion}
-      form={filteredChildren}
+      customComponents={decisionFormComponents}
+      form={filteredForm}
       formData={decisionData}
       hideSpecialInstructions
       manuscript={manuscript}
       showEditorOnlyFields={showEditorOnlyFields}
-      threadedDiscussionProps={threadedDiscussionProps}
     />
   ) : (
     <SectionRow>Pending.</SectionRow>
@@ -53,9 +51,10 @@ const DecisionAndReviews = ({
   manuscript,
   isControlPage = false,
   reviewForm,
+  reviewFormComponents,
   decisionForm,
+  decisionFormComponents,
   showEditorOnlyFields,
-  threadedDiscussionProps,
   currentUser,
   allowAuthorsSubmitNewVersion,
 }) => {
@@ -97,10 +96,10 @@ const DecisionAndReviews = ({
         <Decision
           allowAuthorsSubmitNewVersion={allowAuthorsSubmitNewVersion}
           decisionForm={decisionForm}
+          decisionFormComponents={decisionFormComponents}
           editor={decision?.user}
           manuscript={manuscript}
           showEditorOnlyFields={showEditorOnlyFields}
-          threadedDiscussionProps={threadedDiscussionProps}
         />
       </SectionContent>
       <SectionContent>
@@ -123,9 +122,9 @@ const DecisionAndReviews = ({
                   user: review.user,
                 }}
                 reviewForm={reviewForm}
+                reviewFormComponents={reviewFormComponents}
                 showEditorOnlyFields={showEditorOnlyFields}
                 teams={manuscript.teams}
-                threadedDiscussionProps={threadedDiscussionProps}
               />
             </SectionRow>
           ))

@@ -524,5 +524,6 @@
   ],
   "name": "NCRC Submission Form",
   "description": "<p>NCRC Form</p>",
-  "haspopup": "false"
+  "haspopup": "false",
+  "purpose": "submit"
 }

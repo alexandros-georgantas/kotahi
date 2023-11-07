@@ -1,51 +1,93 @@
-const { NotFoundError } = require('@pubsweet/errors')
-const Form = require('./form')
+const models = require('@pubsweet/models')
 
-const notFoundError = (property, value, className) =>
-  new NotFoundError(`Object not found: ${className} with ${property} ${value}`)
+/** Ensure we don't have two active forms for the same category/purpose combination,
+ * by deactivating other forms as necessary. If one of the deactivated forms was
+ * the default form for the category, this form will now be promoted to default.
+ */
+const reorganiseActiveAndDefaultForms = async (
+  form,
+  wasActive,
+  wasDefault,
+  oldPurpose,
+) => {
+  let result = form
+
+  if (form.isActive && (!wasActive || form.structure.purpose !== oldPurpose)) {
+    const shouldMakeDefault = !!(
+      await models.Form.query()
+        .where({
+          isDefault: true,
+          category: form.category,
+          groupId: form.groupId,
+        })
+        .whereRaw("structure->>'purpose' = ?", form.structure.purpose)
+        .whereNot({ id: form.id })
+    ).length
+
+    if (shouldMakeDefault)
+      result = await models.Form.query().patchAndFetchById(form.id, {
+        isDefault: true,
+      })
+
+    await models.Form.query()
+      .patch({ isActive: false, isDefault: false })
+      .where({
+        isActive: true,
+        category: form.category,
+        groupId: form.groupId,
+      })
+      .whereRaw("structure->>'purpose' = ?", form.structure.purpose)
+      .whereNot({ id: form.id })
+  }
+
+  if (result.isDefault && !wasDefault) {
+    await models.Form.query()
+      .patch({ isDefault: false })
+      .where({
+        isDefault: true,
+        category: form.category,
+        groupId: form.groupId,
+      })
+      .whereNot({ id: form.id })
+  }
+
+  return result
+}
 
 const resolvers = {
   Mutation: {
-    deleteForm: async (_, { formId }) => {
-      await Form.query().deleteById(formId)
-      return { query: {} }
-    },
+    deleteForm: async (_, { formId }) => models.Form.query().deleteById(formId),
     deleteFormElement: async (_, { formId, elementId }) => {
-      const form = await Form.find(formId)
+      const form = await models.Form.find(formId)
 
       if (!form) return null
       form.structure.children = form.structure.children.filter(
         child => child.id !== elementId,
       )
 
-      const formRes = await Form.query().patchAndFetchById(formId, {
+      const result = await models.Form.query().patchAndFetchById(formId, {
         structure: form.structure,
       })
 
-      return formRes
-    },
-    createForm: async (_, { form }) => {
-      return Form.query().insertAndFetch(form)
-    },
-    updateForm: async (_, { form }) => {
-      const result = await Form.query().patchAndFetchById(form.id, form)
-      let purposeIndicatingActiveForm = form.category
-      if (form.category === 'submission') purposeIndicatingActiveForm = 'submit'
-      const thisFormIsActive = form.purpose === purposeIndicatingActiveForm
-
-      if (thisFormIsActive) {
-        // Ensure all other forms in this category are inactive
-        await Form.query()
-          .patch({ purpose: 'other' })
-          .where({ purpose: purposeIndicatingActiveForm })
-          .where({ category: form.category })
-          .whereNot({ id: form.id })
-      }
-
       return result
     },
+    createForm: async (_, { form }) => {
+      const result = await models.Form.query().insertAndFetch(form)
+      return reorganiseActiveAndDefaultForms(result, false, false, null)
+    },
+    updateForm: async (_, { form }) => {
+      const prior = await models.Form.query().findById(form.id)
+      const result = await models.Form.query().patchAndFetchById(form.id, form)
+
+      return reorganiseActiveAndDefaultForms(
+        result,
+        prior.isActive,
+        prior.isDefault,
+        prior.structure.purpose,
+      )
+    },
     updateFormElement: async (_, { element, formId }) => {
-      const form = await Form.find(formId)
+      const form = await models.Form.find(formId)
       if (!form) return null
 
       const indexToReplace = form.structure.children.findIndex(
@@ -55,42 +97,58 @@ const resolvers = {
       if (indexToReplace < 0) form.structure.children.push(element)
       else form.structure.children[indexToReplace] = element
 
-      return Form.query().patchAndFetchById(formId, {
+      return models.Form.query().patchAndFetchById(formId, {
         structure: form.structure,
       })
     },
   },
   Query: {
-    form: async (_, { formId }) => Form.find(formId),
-    forms: async () => Form.all(),
-    formsByCategory: async (_, { category, groupId }) =>
-      Form.query().where({
-        category,
-        groupId,
-      }),
-
-    /** Returns the specific requested form, with any incomplete fields omitted */
-    formForPurposeAndCategory: async (_, { purpose, category, groupId }) => {
-      const form = await Form.query().findOne({
-        purpose,
+    form: async (_, { formId }) => models.Form.find(formId),
+    /** Both active and inactive forms in this category, for the current group */
+    allFormsInCategory: async (_, { category, groupId }) => {
+      return models.Form.query().where({
         category,
         groupId,
       })
-
-      if (!form) {
-        throw notFoundError(
-          'Category and purpose',
-          `${purpose} ${category}`,
-          this.name,
+    },
+    /** A single active form for this category, current group.
+     *  Not for use with "submission" category, which allows multiple active forms */
+    activeFormInCategory: async (_, { category, groupId }) => {
+      if (category === 'submission')
+        throw new Error(
+          'Use activeFormsInCategory instead for "submission" category, as as there may be multiple active forms.',
         )
-      }
 
-      // TODO Remove this once the form-builder no longer permits incomplete/malformed fields.
-      form.structure.children = form.structure.children.filter(
-        field => field.component && field.name,
-      )
+      const result = models.Form.query().findOne({
+        category,
+        groupId,
+        isActive: true,
+      })
 
-      return form
+      if (!result)
+        throw new Error(
+          `No active form found for category ${category}, groupId ${groupId}`,
+        )
+      return result
+    },
+    /** Returns active forms for this category, current group.
+     * Currently intended for use with the "submission" category only, which can
+     * have multiple active forms.
+     */
+    activeFormsInCategory: async (_, { category, groupId }) => {
+      return models.Form.query()
+        .where({ category, groupId, isActive: true })
+        .orderByRaw("structure->>'name'")
+    },
+    submissionFormUseCounts: async (_, { groupId }) => {
+      const distinctFormPurposesWithCounts = await models.Manuscript.query()
+        .select(
+          models.Manuscript.raw("submission->>'$$formPurpose' as purpose"),
+        )
+        .count('* as manuscriptsCount')
+        .groupBy('purpose')
+
+      return distinctFormPurposesWithCounts.filter(x => x.purpose !== null)
     },
   },
 }

@@ -8,7 +8,7 @@ import { set, debounce } from 'lodash'
 import { ConfigContext } from '../../../config/src'
 import ReviewLayout from './review/ReviewLayout'
 import { Heading, Page, Spinner } from '../../../shared'
-import manuscriptVersions from '../../../../shared/manuscript_versions'
+import gatherManuscriptVersions from '../../../../shared/manuscript_versions'
 import {
   UPDATE_PENDING_COMMENT,
   COMPLETE_COMMENTS,
@@ -109,44 +109,17 @@ const fragmentFields = `
   submission
 `
 
-const formStructure = `
+const formFields = `
+  id
+  category
   structure {
     name
+    purpose
     description
     haspopup
     popuptitle
     popupdescription
-    children {
-      title
-      shortDescription
-      id
-      component
-      name
-      description
-      doiValidation
-      doiUniqueSuffixValidation
-      placeholder
-      parse
-      format
-      options {
-        id
-        label
-        labelColor
-        value
-      }
-      validate {
-        id
-        label
-        value
-      }
-      validateValue {
-        minChars
-        maxChars
-        minSize
-      }
-      hideFromReviewers
-      readonly
-    }
+    children
   }
 `
 
@@ -200,16 +173,16 @@ const query = gql`
       userCanEditAnyComment
     }
 
-    submissionForm: formForPurposeAndCategory(purpose: "submit", category: "submission", groupId: $groupId) {
-      ${formStructure}
+    submissionForms: activeFormsInCategory(category: "submission", groupId: $groupId) {
+      ${formFields}
     }
 
-    reviewForm: formForPurposeAndCategory(purpose: "review", category: "review", groupId: $groupId) {
-      ${formStructure}
+    reviewForm: activeFormInCategory(category: "review", groupId: $groupId) {
+      ${formFields}
     }
 
-    decisionForm: formForPurposeAndCategory(purpose: "decision", category: "decision", groupId: $groupId) {
-      ${formStructure}
+    decisionForm: activeFormInCategory(category: "decision", groupId: $groupId) {
+      ${formFields}
     }
   }
 `
@@ -332,15 +305,9 @@ const ReviewPage = ({ currentUser, history, match }) => {
   if (manuscript.parentId)
     return <Redirect to={`${urlFrag}/versions/${manuscript.parentId}/review`} />
 
-  const versions = manuscriptVersions(manuscript).map(v => ({
-    ...v.manuscript,
-    reviews: v.manuscript.reviews.map(r => ({
-      ...r,
-      jsonData: JSON.parse(r.jsonData),
-    })),
-  }))
+  const versions = gatherManuscriptVersions(manuscript)
 
-  const latestVersion = versions[0]
+  const latestVersion = versions[0].manuscript
 
   const existingReview = latestVersion.reviews.find(
     review => review.user?.id === currentUser.id && !review.isDecision,
@@ -353,29 +320,45 @@ const ReviewPage = ({ currentUser, history, match }) => {
     isDecision: false,
     isHiddenReviewerName: true,
     jsonData: {},
-    manuscriptId: latestVersion?.id,
+    manuscriptId: latestVersion.id,
     userId: currentUser.id,
   }
 
-  const submissionForm = data.submissionForm?.structure ?? {
-    name: '',
-    children: [],
-    description: '',
-    haspopup: 'false',
+  const { submissionForms } = data
+
+  const submissionForm = submissionForms.find(
+    f => f.structure.purpose === latestVersion.submission.$$formPurpose,
+  ) ?? {
+    category: 'submission',
+    structure: {
+      name: '',
+      purpose: '',
+      children: [],
+      description: '',
+      haspopup: 'false',
+    },
   }
 
-  const reviewForm = data.reviewForm?.structure ?? {
-    name: '',
-    children: [],
-    description: '',
-    haspopup: 'false',
+  const reviewForm = data.reviewForm ?? {
+    category: 'review',
+    structure: {
+      name: '',
+      purpose: '',
+      children: [],
+      description: '',
+      haspopup: 'false',
+    },
   }
 
-  const decisionForm = data.decisionForm?.structure ?? {
-    name: '',
-    children: [],
-    description: '',
-    haspopup: 'false',
+  const decisionForm = data.decisionForm ?? {
+    category: 'decision',
+    structure: {
+      name: '',
+      purpose: '',
+      children: [],
+      description: '',
+      haspopup: 'false',
+    },
   }
 
   const channelId = manuscript.channels.find(c => c.type === 'editorial')?.id

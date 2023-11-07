@@ -2,7 +2,7 @@
 const { useTransaction, logger } = require('@coko/server')
 
 const {
-  getSubmissionForm,
+  getSubmissionForms,
   getReviewForm,
   getDecisionForm,
   // eslint-disable-next-line import/no-unresolved
@@ -49,7 +49,7 @@ exports.up = async knex => {
   logger.info(`Total Manuscripts having hypothesis maps: ${manuscripts.length}`)
 
   if (manuscripts.length > 0) {
-    const submissionForm = await getSubmissionForm()
+    const submissionForm = (await getSubmissionForms())[0]
     const reviewForm = await getReviewForm()
     const decisionForm = await getDecisionForm()
 

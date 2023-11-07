@@ -112,7 +112,7 @@ const Chat = ({
         },
       })
     } catch (error) {
-      console.error('Error updating notification digest:', error)
+      console.error('Error registering user activity:', error)
     }
   }
 

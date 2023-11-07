@@ -13,7 +13,7 @@ const {
   pharmaceuticalInterventions,
 } = require('./topics')
 
-const { getSubmissionForm } = require('../model-review/src/reviewCommsUtils')
+const { getEmptySubmission } = require('./importTools')
 
 const getData = async (groupId, ctx) => {
   const dateTwoWeeksAgo =
@@ -88,32 +88,7 @@ const getData = async (groupId, ctx) => {
       ),
   )
 
-  const submissionForm = await getSubmissionForm(groupId)
-
-  const parsedFormStructure = submissionForm.structure.children
-    .map(formElement => {
-      const parsedName = formElement.name && formElement.name.split('.')[1]
-
-      if (parsedName) {
-        return {
-          name: parsedName,
-          component: formElement.component,
-        }
-      }
-
-      return undefined
-    })
-    .filter(x => x !== undefined)
-
-  const emptySubmission = parsedFormStructure.reduce((acc, curr) => {
-    acc[curr.name] =
-      curr.component === 'CheckboxGroup' || curr.component === 'LinksInput'
-        ? []
-        : ''
-    return {
-      ...acc,
-    }
-  }, {})
+  const emptySubmission = getEmptySubmission(groupId)
 
   // TODO this is a very inefficient way of finding keyword matches
   const newManuscripts = withoutDuplicates

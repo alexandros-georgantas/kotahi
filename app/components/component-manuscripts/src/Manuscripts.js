@@ -56,6 +56,20 @@ const FlexRowWithSmallGapAbove = styled(FlexRow)`
   margin-top: 10px;
 `
 
+/** Return a map of field names to field definitions, compiled from all active submission forms */
+const getAllFieldDefinitionsFromSubmissionForms = submissionForms => {
+  if (!submissionForms) return []
+  const fieldDefinitions = {}
+
+  submissionForms.forEach(form => {
+    form.structure.children.forEach(field => {
+      if (fieldDefinitions[field.name]) return // We already have a definition for this field; skip.
+      fieldDefinitions[field.name] = field
+    })
+  })
+  return fieldDefinitions
+}
+
 const Manuscripts = ({ history, ...props }) => {
   const {
     applyQueryParams,
@@ -146,7 +160,7 @@ const Manuscripts = ({ history, ...props }) => {
 
     const hasInvalidFields = await validateManuscriptSubmission(
       manuscript.submission,
-      data.formForPurposeAndCategory?.structure,
+      data.submissionForms,
       validateDoi,
       validateSuffix,
     )
@@ -180,11 +194,9 @@ const Manuscripts = ({ history, ...props }) => {
     }
   })
 
-  const fieldDefinitions = {}
-  const fields = data.formForPurposeAndCategory?.structure?.children ?? []
-  fields.forEach(field => {
-    if (field.name) fieldDefinitions[field.name] = field // Incomplete fields in the formbuilder may not have a name specified. Ignore these
-  })
+  const fieldDefinitions = getAllFieldDefinitionsFromSubmissionForms(
+    data.submissionForms,
+  )
 
   const { totalCount } = data.paginatedManuscripts
 

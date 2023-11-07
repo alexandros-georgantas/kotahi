@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import ReadonlyFormTemplate from '../metadata/ReadonlyFormTemplate'
+import { ReadonlyFormTemplate } from '../../../../component-form/src'
 import { ensureJsonIsParsed } from '../../../../../shared/objectUtils'
 
 const Heading = styled.h4``
@@ -23,12 +23,12 @@ const filesToAttachment = file => ({
 */
 
 const Review = ({
+  customComponents,
   review,
   reviewForm,
   user,
   showEditorOnlyFields,
   showUserInfo = true,
-  threadedDiscussionProps,
 }) => (
   <Container>
     {review && !review?.isHiddenReviewerName && showUserInfo && (
@@ -49,13 +49,13 @@ const Review = ({
     )}
 
     <ReadonlyFormTemplate
+      customComponents={customComponents}
       form={reviewForm}
       formData={ensureJsonIsParsed(review?.jsonData) ?? {}}
       hideSpecialInstructions
       showEditorOnlyFields={
         showEditorOnlyFields || user.groupRoles.includes('groupManager')
       }
-      threadedDiscussionProps={threadedDiscussionProps}
     />
   </Container>
 )

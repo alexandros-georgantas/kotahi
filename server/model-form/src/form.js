@@ -37,12 +37,16 @@ class Form extends BaseModel {
   static get schema() {
     return {
       properties: {
-        purpose: { type: 'string' },
+        /** @deprecated Use structure.purpose instead. */
+        purpose: { type: ['string', 'null'] },
         category: { type: 'string' },
+        isActive: { type: 'boolean' },
+        isDefault: { type: 'boolean' },
         structure: {
           type: 'object',
           properties: {
             name: { type: ['string', 'null'] },
+            purpose: { type: ['string', 'null'] },
             description: { type: ['string', 'null'] },
             haspopup: { type: 'string' },
             popuptitle: { type: ['string', 'null'] },
@@ -63,6 +67,7 @@ class Form extends BaseModel {
                     },
                     type: ['array', 'null'],
                   },
+                  children: { type: ['array', 'null'] },
                   title: { type: ['string', 'null'] },
                   shortDescription: { type: ['string', 'null'] },
                   id: { type: 'string', format: 'uuid' },

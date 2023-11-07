@@ -1,18 +1,24 @@
 import React from 'react'
 import { get } from 'lodash'
-import SimpleWaxEditor from '../../../../wax-collab/src/SimpleWaxEditor'
-import { Affiliation, Email, BadgeContainer } from '../style'
-import { Attachment, ColorBadge } from '../../../../shared'
-import ThreadedDiscussion from '../../../../component-formbuilder/src/components/builderComponents/ThreadedDiscussion/ThreadedDiscussion'
+import SimpleWaxEditor from '../../wax-collab/src/SimpleWaxEditor'
+import {
+  Affiliation,
+  Email,
+  BadgeContainer,
+} from '../../component-review/src/components/style'
+import { Attachment, ColorBadge } from '../../shared'
 
-const ReadonlyFieldData = ({
-  fieldName,
-  form,
-  formData,
-  threadedDiscussionProps,
-}) => {
+const ReadonlyFieldData = ({ customComponents, fieldName, form, formData }) => {
   const data = get(formData, fieldName)
-  const fieldDefinition = form.children?.find(field => field.name === fieldName)
+
+  const fieldDefinition = form.structure?.children?.find(
+    field => field.name === fieldName,
+  )
+
+  const CustomComponent =
+    customComponents[fieldDefinition?.component]?.component
+
+  if (CustomComponent) return <CustomComponent readonly value={data} />
 
   if (fieldDefinition?.component === 'AuthorsInput' && Array.isArray(data)) {
     return (data || []).map((author, i) => {
@@ -39,28 +45,6 @@ const ReadonlyFieldData = ({
         </a>
       </p>
     ))
-  }
-
-  if (fieldDefinition?.component === 'ThreadedDiscussion' && data) {
-    // data should be the threadedDiscussion ID
-    const discussion = threadedDiscussionProps.threadedDiscussions.find(
-      d => d.id === data,
-    ) || {
-      threads: [],
-    }
-
-    const augmentedThreadedDiscussionProps = {
-      ...threadedDiscussionProps,
-      threadedDiscussion: discussion,
-      threadedDiscussions: undefined,
-      shouldRenderSubmitButton: true,
-    }
-
-    return (
-      <ThreadedDiscussion
-        threadedDiscussionProps={augmentedThreadedDiscussionProps}
-      />
-    )
   }
 
   if (
@@ -138,7 +122,7 @@ const ReadonlyFieldData = ({
                   {option.label}
                 </ColorBadge>
               )
-            return <div>{option.label}</div>
+            return <div key={option.id}>{option.label}</div>
           }
 
           return <span key={item}>{item}</span> // Fallback for data not matching any option

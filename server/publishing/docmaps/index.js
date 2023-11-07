@@ -79,13 +79,13 @@ const tryPublishDocMaps = async manuscript => {
 
   const activeConfig = await models.Config.getCached(group.id)
 
-  const { submissionForm, reviewForm, decisionForm } = await getActiveForms(
+  const { submissionForms, reviewForm, decisionForm } = await getActiveForms(
     group.id,
   )
 
   const fields = getFieldsMapForTemplating(
     manuscript,
-    submissionForm,
+    submissionForms,
     reviewForm,
     decisionForm,
   )

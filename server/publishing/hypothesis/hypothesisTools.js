@@ -122,7 +122,9 @@ const getPublishableFields = (manuscript, forms, threadedDiscussions) => {
     ...getPublishableFieldsForObject(
       manuscript.formFieldsToPublish.find(ff => ff.objectId === manuscript.id),
       manuscript,
-      forms.submissionForm,
+      forms.submissionForms.find(
+        form => form.structure.purpose === manuscript.submission.$$formPurpose,
+      ),
       threadedDiscussions,
       manuscript.id,
       manuscript.publishedArtifacts,

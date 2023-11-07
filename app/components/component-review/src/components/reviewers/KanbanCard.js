@@ -73,6 +73,7 @@ const KanbanCard = ({
   removeReviewer,
   status,
   reviewForm,
+  reviewFormComponents,
   review,
   isCurrentVersion,
   updateSharedStatusForInvitedReviewer,
@@ -94,6 +95,7 @@ const KanbanCard = ({
         review={review}
         reviewerTeamMember={reviewer}
         reviewForm={reviewForm}
+        reviewFormComponents={reviewFormComponents}
         status={status}
         updateReview={updateReview}
         updateSharedStatusForInvitedReviewer={

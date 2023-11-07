@@ -1,10 +1,17 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import ReadonlyFieldData from './ReadonlyFieldData'
-import { Title, SectionHeader, SectionRowGrid, Heading, Cell } from '../style'
-import { SectionContent } from '../../../../shared'
+import {
+  Title,
+  SectionHeader,
+  SectionRowGrid,
+  Heading,
+  Cell,
+} from '../../component-review/src/components/style'
+import { SectionContent } from '../../shared'
 
 const ReadonlyFormTemplate = ({
+  customComponents,
   form,
   formData,
   hideSpecialInstructions,
@@ -12,7 +19,6 @@ const ReadonlyFormTemplate = ({
   showEditorOnlyFields,
   title,
   displayShortIdAsIdentifier,
-  threadedDiscussionProps,
   allowAuthorsSubmitNewVersion,
 }) => {
   return (
@@ -31,7 +37,7 @@ const ReadonlyFormTemplate = ({
           </SectionRowGrid>
         )}
 
-      {form.children
+      {form.structure.children
         .filter(element => {
           return (
             (showEditorOnlyFields || element.hideFromAuthors !== 'true') &&
@@ -44,10 +50,10 @@ const ReadonlyFormTemplate = ({
             <Cell>
               <ReadonlyFieldData
                 allowAuthorsSubmitNewVersion={allowAuthorsSubmitNewVersion}
+                customComponents={customComponents}
                 fieldName={element.name}
                 form={form}
                 formData={formData}
-                threadedDiscussionProps={threadedDiscussionProps}
               />
             </Cell>
           </SectionRowGrid>
@@ -57,16 +63,23 @@ const ReadonlyFormTemplate = ({
 }
 
 ReadonlyFormTemplate.propTypes = {
+  customComponents: PropTypes.objectOf(
+    PropTypes.shape({ component: PropTypes.func.isRequired }),
+  ).isRequired,
   form: PropTypes.shape({
-    children: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string,
-        component: PropTypes.string,
-        title: PropTypes.string,
-        shortDescription: PropTypes.string,
-      }).isRequired,
-    ).isRequired,
+    category: PropTypes.string.isRequired,
+    structure: PropTypes.shape({
+      purpose: PropTypes.string.isRequired,
+      children: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.string.isRequired,
+          name: PropTypes.string,
+          component: PropTypes.string,
+          title: PropTypes.string,
+          shortDescription: PropTypes.string,
+        }).isRequired,
+      ).isRequired,
+    }).isRequired,
   }).isRequired,
   manuscript: PropTypes.shape({
     meta: PropTypes.shape({ source: PropTypes.string }).isRequired,

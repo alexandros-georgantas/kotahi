@@ -126,10 +126,7 @@ const SubmitPage = ({ currentUser, match, history }) => {
   if (loading) return <Spinner />
   if (error) return <CommsErrorBanner error={error} />
 
-  const manuscript = data?.manuscript
-  const submissionForm = data?.submissionForm?.structure
-  const decisionForm = data?.decisionForm?.structure
-  const reviewForm = data?.reviewForm?.structure
+  const { manuscript, submissionForms, decisionForm, reviewForm } = data
 
   const updateManuscript = (versionId, manuscriptDelta) => {
     return update({
@@ -156,6 +153,14 @@ const SubmitPage = ({ currentUser, match, history }) => {
     debouncers[path] = debouncers[path] || debounce(updateManuscript, 3000)
     return debouncers[path](versionId, manuscriptDelta)
   }
+
+  /** The form used for submission, or undefined
+   *  if submission.$$formPurpose is not yet set. */
+  const submissionForm = submissionForms.find(
+    form =>
+      JSON.parse(manuscript?.submission || '{}').$$formPurpose ===
+      form.structure.purpose,
+  )
 
   const republish = async (manuscriptId, groupId) => {
     const fieldErrors = await validateManuscriptSubmission(
@@ -224,8 +229,6 @@ const SubmitPage = ({ currentUser, match, history }) => {
 
   const versions = gatherManuscriptVersions(manuscript)
 
-  const manuscriptLatestVersionId = versions[0].manuscript.id
-
   const threadedDiscussionProps = {
     threadedDiscussions: data.threadedDiscussions,
     updatePendingComment,
@@ -245,7 +248,6 @@ const SubmitPage = ({ currentUser, match, history }) => {
       currentUser={currentUser}
       decisionForm={decisionForm}
       deleteFile={deleteFile}
-      manuscriptLatestVersionId={manuscriptLatestVersionId}
       match={match}
       onChange={handleChange}
       onSubmit={onSubmit}
@@ -258,6 +260,7 @@ const SubmitPage = ({ currentUser, match, history }) => {
           : null
       }
       submissionForm={submissionForm}
+      submissionForms={submissionForms}
       threadedDiscussionProps={threadedDiscussionProps}
       updateManuscript={updateManuscript}
       validateDoi={validateDoi(client)}

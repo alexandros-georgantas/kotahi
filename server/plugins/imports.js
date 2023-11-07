@@ -4,30 +4,36 @@ const { chunk } = require('lodash')
 
 const importWorkersByGroup = {}
 
+/** Save new manuscripts 10 at a time */
+const saveImportedManuscripts = async (
+  allNewManuscripts,
+  groupId,
+  submitterId,
+) => {
+  try {
+    const chunks = chunk(allNewManuscripts, 10)
+    for (let i = 0; i < chunks.length; i += 1)
+      await models.Manuscript.query().upsertGraphAndFetch(chunks[i], {
+        relate: true,
+      })
+  } catch (e) {
+    console.error(e)
+  }
+
+  console.info(
+    `Imported ${allNewManuscripts.length} manuscripts into group ${groupId} using plugins, with ${submitterId} as submitterId.`,
+  )
+}
+
+/** Perform plugin imports for the group. If submitterId is supplied,
+ * this will perform imports of type 'manual' and 'any'; if not,
+ * it will perform imports of type 'automatic' and 'any'.
+ */
 const runImports = async (groupId, submitterId = null) => {
   const importType = submitterId ? 'manual' : 'automatic'
   const urisAlreadyImporting = []
   const doisAlreadyImporting = []
   const importWorkers = importWorkersByGroup[groupId] || []
-
-  const saveImportedManuscripts = async allNewManuscripts => {
-    try {
-      const chunks = chunk(allNewManuscripts, 10)
-      await Promise.all(
-        chunks.map(async ch => {
-          await models.Manuscript.query().upsertGraphAndFetch(ch, {
-            relate: true,
-          })
-        }),
-      )
-    } catch (e) {
-      console.error(e)
-    }
-
-    console.info(
-      `Imported ${allNewManuscripts.length} manuscripts into group ${groupId} using plugins, with ${submitterId} as submitterId.`,
-    )
-  }
 
   for (let i = 0; i < importWorkers.length; i += 1) {
     const allNewManuscripts = []
@@ -124,7 +130,7 @@ const runImports = async (groupId, submitterId = null) => {
 
     console.log('Total Manuscripts to save in DB => ', allNewManuscripts.length)
 
-    saveImportedManuscripts(allNewManuscripts)
+    saveImportedManuscripts(allNewManuscripts, groupId, submitterId)
 
     if (lastImportDate) {
       await models.ArticleImportHistory.query()

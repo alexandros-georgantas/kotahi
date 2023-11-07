@@ -1,7 +1,7 @@
 const he = require('he')
 const ArticleImportSources = require('../model-article-import-sources/src/articleImportSources')
 const ArticleImportHistory = require('../model-article-import-history/src/articleImportHistory')
-const { getSubmissionForm } = require('../model-review/src/reviewCommsUtils')
+const { getSubmissionForms } = require('../model-review/src/reviewCommsUtils')
 
 const getServerId = async serverLabel => {
   let [server] = await ArticleImportSources.query().where({
@@ -27,32 +27,37 @@ const getLastImportDate = async (serverId, groupId) => {
 }
 
 const getEmptySubmission = async groupId => {
-  const submissionForm = await getSubmissionForm(groupId)
+  const submissionForms = await getSubmissionForms(groupId)
 
-  const parsedFormStructure = submissionForm.structure.children
-    .map(formElement => {
-      const parsedName = formElement.name && formElement.name.split('.')[1]
+  const submissionForm =
+    submissionForms.find(f => f.isDefault) ?? submissionForms[0]
 
-      if (parsedName) {
-        return {
-          name: parsedName,
-          component: formElement.component,
-        }
-      }
+  const fieldNamesFound = new Set()
+  const allFields = []
+  submissionForm.structure.children.forEach(field => {
+    if (!field.name.startsWith('submission.')) return
+    if (fieldNamesFound.has(field.name)) return
+    fieldNamesFound.add(field.name)
+    allFields.push(field)
+  })
 
-      return undefined
-    })
-    .filter(x => x !== undefined)
-
-  return parsedFormStructure.reduce((acc, curr) => {
-    acc[curr.name] =
-      curr.component === 'CheckboxGroup' || curr.component === 'LinksInput'
-        ? []
-        : ''
+  const emptySubmission = allFields.reduce((acc, curr) => {
+    const [, nameInSubmission] = curr.name.split('submission.')
+    acc[nameInSubmission] = [
+      'CheckboxGroup',
+      'LinksInput',
+      'AuthorsInput',
+    ].includes(curr.component)
+      ? []
+      : ''
     return {
       ...acc,
     }
   }, {})
+
+  emptySubmission.$$formPurpose = submissionForm.structure.purpose
+
+  return emptySubmission
 }
 
 const getDate2WeeksAgo = () =>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useMemo } from 'react'
 import { useQuery, useMutation, gql } from '@apollo/client'
 import { cloneDeep, omitBy } from 'lodash'
 import { ConfigContext } from '../../../config/src'
@@ -10,51 +10,18 @@ const formFieldsSegment = `
 id
 created
 updated
-purpose
 category
+isActive
+isDefault
 groupId
 structure {
   name
+  purpose
   description
   haspopup
   popuptitle
   popupdescription
-  children {
-    title
-    shortDescription
-    id
-    component
-    name
-    description
-    doiValidation
-    doiUniqueSuffixValidation
-    placeholder
-    inline
-    sectioncss
-    parse
-    format
-    options {
-      id
-      label
-      labelColor
-      value
-    }
-    validate {
-      id
-      label
-      value
-    }
-    validateValue {
-      minChars
-      maxChars
-      minSize
-    }
-    hideFromReviewers
-    hideFromAuthors
-    permitPublishing
-    publishingTag
-    readonly
-  }
+  children
 }
 `
 
@@ -75,8 +42,12 @@ const updateFormMutation = gql`
 `
 
 const updateFormElementMutation = gql`
-  mutation($element: FormElementInput!, $formId: ID!) {
-    updateFormElement(element: $element, formId: $formId) {
+  mutation($element: JSON!, $formId: ID!, $parentElementId: ID) {
+    updateFormElement(
+      element: $element
+      formId: $formId
+      parentElementId: $parentElementId
+    ) {
       id
     }
   }
@@ -92,20 +63,19 @@ const deleteFormElementMutation = gql`
 
 const deleteFormMutation = gql`
   mutation($formId: ID!) {
-    deleteForm(formId: $formId) {
-      query {
-        forms {
-          id
-        }
-      }
-    }
+    deleteForm(formId: $formId)
   }
 `
 
 const query = gql`
-  query GET_FORM($category: String!, $groupId: ID) {
-    formsByCategory(category: $category, groupId: $groupId) {
+  query GET_FORMS($category: String!, $groupId: ID!) {
+    allFormsInCategory(category: $category, groupId: $groupId) {
       ${formFieldsSegment}
+    }
+
+    submissionFormUseCounts(groupId: $groupId) {
+      purpose
+      manuscriptsCount
     }
   }
 `
@@ -115,6 +85,14 @@ const prepareForSubmit = values => {
   return cleanedValues
 }
 
+const getFormUseCountsMap = (countsArray = []) => {
+  const result = {}
+  countsArray.forEach(x => {
+    result[x.purpose] = x.manuscriptsCount
+  })
+  return result
+}
+
 const FormBuilderPage = ({ category }) => {
   const config = useContext(ConfigContext)
 
@@ -122,7 +100,7 @@ const FormBuilderPage = ({ category }) => {
     variables: { category, groupId: config.groupId },
   })
 
-  const cleanedForms = pruneEmpty(data?.formsByCategory)
+  const cleanedForms = pruneEmpty(data?.allFormsInCategory)
 
   // TODO Structure forms for graphql and retrieve IDs from these mutations to allow Apollo Cache to do its magic, rather than forcing refetch.
   const [deleteForm] = useMutation(deleteFormMutation, {
@@ -155,13 +133,13 @@ const FormBuilderPage = ({ category }) => {
     ],
   })
 
-  const [selectedFormId, setSelectedFormId] = useState()
+  const [selectedFormId, setSelectedFormId] = useState(null)
   const [selectedFieldId, setSelectedFieldId] = useState()
   const [formFields, setFormFields] = useState(cleanedForms)
 
   useEffect(() => {
     setFormFields(cleanedForms)
-  }, [data?.formsByCategory])
+  }, [data?.allFormsInCategory])
 
   const moveFieldUp = (form, fieldId) => {
     const fields = form.structure.children
@@ -205,7 +183,7 @@ const FormBuilderPage = ({ category }) => {
 
   const dragField = event => {
     const form = pruneEmpty(
-      data.formsByCategory.find(f => f.id === selectedFormId),
+      data.allFormsInCategory.find(f => f.id === selectedFormId),
     )
 
     const fields = form.structure.children
@@ -238,21 +216,20 @@ const FormBuilderPage = ({ category }) => {
   }
 
   useEffect(() => {
-    if (data?.formsByCategory?.length) {
+    if (data?.allFormsInCategory?.length) {
       setSelectedFormId(
         prevFormId =>
-          prevFormId ??
-          data.formsByCategory.find(
-            f =>
-              f.purpose ===
-              (f.category === 'submission' ? 'submit' : f.category),
-          ).id ??
-          data.formsByCategory[0].id,
+          data.allFormsInCategory.find(f => f.id === prevFormId)?.id ??
+          data.allFormsInCategory.find(f => f.isDefault)?.id ??
+          data.allFormsInCategory[0]?.id,
       )
-    } else {
-      setSelectedFormId(null)
     }
   }, [data])
+
+  const submissionFormUseCounts = useMemo(
+    () => getFormUseCountsMap(data?.submissionFormUseCounts),
+    [data],
+  )
 
   if (loading) return <Spinner />
   if (error) return <CommsErrorBanner error={error} />
@@ -277,6 +254,7 @@ const FormBuilderPage = ({ category }) => {
       shouldAllowHypothesisTagging={
         config?.publishing?.hypothesis?.shouldAllowTagging
       }
+      submissionFormUseCounts={submissionFormUseCounts}
       updateField={updateFormElement}
       updateForm={updateForm}
     />

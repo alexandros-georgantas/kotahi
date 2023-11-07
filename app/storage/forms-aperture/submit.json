@@ -1,5 +1,6 @@
 {
   "name": "Research Object Submission Form",
+  "purpose": "submit",
   "children": [
     {
       "title": "Type of Research Object",

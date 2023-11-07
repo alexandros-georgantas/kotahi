@@ -150,7 +150,7 @@ export const Columns = styled.div`
 export const Manuscript = styled.div`
   background: ${color.gray97};
   grid-area: manuscript;
-  overflow-y: scroll;
+  overflow-y: auto;
   padding: ${grid(2)};
 `
 

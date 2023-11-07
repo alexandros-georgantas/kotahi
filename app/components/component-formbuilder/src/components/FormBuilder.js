@@ -187,7 +187,7 @@ const FormBuilder = ({
             <div
               {...provided.droppableProps}
               ref={provided.innerRef}
-              style={{ overflowY: 'scroll', flex: '1 1 0%', minHeight: '0' }}
+              style={{ overflowY: 'auto', flex: '1 1 0%', minHeight: '0' }}
             >
               {form.structure.children?.map((element, index) => (
                 <BuilderElement
@@ -217,8 +217,8 @@ FormBuilder.propTypes = {
   selectedFieldId: PropTypes.string,
   form: PropTypes.shape({
     id: PropTypes.string,
-    purpose: PropTypes.string,
     structure: PropTypes.shape({
+      purpose: PropTypes.string,
       children: PropTypes.arrayOf(
         PropTypes.shape({
           id: PropTypes.string.isRequired,

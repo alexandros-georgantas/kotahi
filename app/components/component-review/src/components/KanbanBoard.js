@@ -60,6 +60,7 @@ const KanbanBoard = ({
   removeReviewer,
   reviews,
   reviewForm,
+  reviewFormComponents,
   isCurrentVersion,
   manuscript,
   updateSharedStatusForInvitedReviewer,
@@ -145,6 +146,7 @@ const KanbanBoard = ({
                           }
                           reviewer={reviewer}
                           reviewForm={reviewForm}
+                          reviewFormComponents={reviewFormComponents}
                           showEmailInvitation={
                             reviewer.isEmail && status.value === 'invited'
                           }

@@ -364,40 +364,6 @@ const userIsAuthor = rule({ cache: 'strict' })(
   },
 )
 
-const userIsAuthorOfFilesAssociatedManuscript = rule({
-  cache: 'no_cache',
-})(async (parent, args, ctx, info) => {
-  if (!ctx.user) return false
-  let manuscriptId
-
-  if (args.meta && args.meta.manuscriptId) {
-    // Meta is supplied for createFile
-    // eslint-disable-next-line prefer-destructuring
-    manuscriptId = args.meta.manuscriptId
-  } else if (args.id) {
-    // id is supplied for deletion
-    const file = await ctx.connectors.File.model.query().findById(args.id)
-    const manuscript = await getManuscriptOfFile(file, ctx)
-    manuscriptId = manuscript && manuscript.id
-  }
-
-  if (!manuscriptId) return false
-
-  const team = await ctx.connectors.Team.model
-    .query()
-    .where({
-      objectId: manuscriptId,
-      objectType: 'manuscript',
-      role: 'author',
-    })
-    .first()
-
-  if (!team) return false
-  const members = await team.$relatedQuery('members').where('userId', ctx.user)
-  if (members && members[0]) return true
-  return false
-})
-
 const userIsAuthorOfTheManuscriptOfTheFile = rule({ cache: 'strict' })(
   async (parent, args, ctx, info) => {
     if (!ctx.user) return false
@@ -489,9 +455,10 @@ const permissions = {
     files: deny, // Never used
     findByDOI: deny, // Never used
     form: isAuthenticated,
-    formForPurposeAndCategory: allow,
-    forms: allow,
-    formsByCategory: userIsGmOrAdmin,
+    allFormsInCategory: userIsGmOrAdmin,
+    activeFormInCategory: allow,
+    activeFormsInCategory: allow,
+    submissionFormUseCounts: userIsGmOrAdmin,
     getBlacklistInformation: or(userIsEditor, userIsGmOrAdmin),
     getEntityFiles: isAuthenticated,
     getInvitationsForManuscript: or(userIsEditor, userIsGmOrAdmin),
@@ -638,9 +605,6 @@ const permissions = {
   ),
   Form: allow,
   FormStructure: allow,
-  FormElement: allow,
-  FormElementOption: allow,
-  FormElementValidation: allow,
   UploadResult: isAuthenticated,
   Review: or(
     isPublicReviewFromPublishedManuscript,
@@ -656,6 +620,7 @@ const permissions = {
   Note: isAuthenticated,
   Identity: isAuthenticated,
   PublishedManuscript: allow,
+  SubmissionFormUseCount: userIsGmOrAdmin,
 }
 
 module.exports = permissions

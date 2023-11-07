@@ -26,10 +26,10 @@ const getReviewerTeamMember = (manuscript, currentUser) => {
 const DecisionReviews = ({
   reviewers,
   reviewForm,
+  reviewFormComponents,
   manuscript,
   updateReview,
   canHideReviews,
-  threadedDiscussionProps,
   invitations,
   urlFrag,
   updateSharedStatusForInvitedReviewer,
@@ -82,8 +82,8 @@ const DecisionReviews = ({
                   review.user,
                 )}
                 reviewForm={reviewForm}
+                reviewFormComponents={reviewFormComponents}
                 teams={manuscript.teams}
-                threadedDiscussionProps={threadedDiscussionProps}
                 updateReview={updateReview}
                 updateSharedStatusForInvitedReviewer={
                   updateSharedStatusForInvitedReviewer

@@ -11,6 +11,7 @@ import {
   Chat,
 } from '../../../shared'
 import MessageContainer from '../../../component-chat/src/MessageContainer'
+import { getComponentsForManuscriptVersions } from '../../../component-form/src'
 
 const DecisionVersions = ({
   allUsers,
@@ -18,7 +19,7 @@ const DecisionVersions = ({
   roles,
   currentUser,
   decisionForm,
-  form,
+  submissionForms,
   handleChange,
   updateManuscript,
   manuscript,
@@ -94,7 +95,11 @@ const DecisionVersions = ({
     },
   ]
 
-  const manuscriptLatestVersionId = versions[0].manuscript.id
+  const componentsMap = getComponentsForManuscriptVersions(
+    versions,
+    threadedDiscussionProps,
+    true,
+  )
 
   return (
     <Columns>
@@ -112,18 +117,17 @@ const DecisionVersions = ({
                 currentDecisionData={initialValue}
                 currentUser={currentUser}
                 decisionForm={decisionForm}
+                decisionFormComponents={componentsMap[version.manuscript.id]}
                 deleteFile={deleteFile}
                 deleteTaskNotification={deleteTaskNotification}
                 displayShortIdAsIdentifier={displayShortIdAsIdentifier}
                 dois={dois}
                 emailTemplates={emailTemplates}
                 externalEmail={externalEmail}
-                form={form}
                 invitations={version.manuscript.invitations || []}
                 isCurrentVersion={index === 0}
                 key={version.manuscript.id}
                 makeDecision={makeDecision}
-                manuscriptLatestVersionId={manuscriptLatestVersionId}
                 onChange={handleChange}
                 parent={firstVersion.manuscript}
                 publishManuscript={publishManuscript}
@@ -131,6 +135,7 @@ const DecisionVersions = ({
                 removeReviewer={removeReviewer}
                 reviewers={reviewers}
                 reviewForm={reviewForm}
+                reviewFormComponents={componentsMap[version.manuscript.id]}
                 roles={roles}
                 selectedEmail={selectedEmail}
                 selectedEmailIsBlacklisted={selectedEmailIsBlacklisted}
@@ -139,9 +144,9 @@ const DecisionVersions = ({
                 setExternalEmail={setExternalEmail}
                 setSelectedEmail={setSelectedEmail}
                 setShouldPublishField={setShouldPublishField}
+                submissionFormComponents={componentsMap[version.manuscript.id]}
+                submissionForms={submissionForms}
                 teamLabels={teamLabels}
-                teams={teams}
-                threadedDiscussionProps={threadedDiscussionProps}
                 updateManuscript={updateManuscript}
                 updateReview={updateReview}
                 updateReviewJsonData={(value, path) =>

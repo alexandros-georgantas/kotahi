@@ -23,11 +23,16 @@ const RightLooseRow = styled(LooseRow)`
   width: unset;
 `
 
-const FormSummary = ({ form, isActive, openFormSettingsDialog }) => {
+const FormSummary = ({ form, openFormSettingsDialog }) => {
   return (
     <DetailPane>
       <RightLooseRow>
-        {isActive && <LabelBadge color={th('colorPrimary')}>Active</LabelBadge>}
+        {form.isDefault && form.category === 'submission' && (
+          <LabelBadge color={th('colorSecondary')}>Default</LabelBadge>
+        )}
+        {form.isActive && (
+          <LabelBadge color={th('colorPrimary')}>Active</LabelBadge>
+        )}
         <Action onClick={openFormSettingsDialog} title="Edit form settings">
           <Icon noPadding>edit</Icon>
         </Action>

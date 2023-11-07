@@ -36,34 +36,12 @@ invitations {
 }
 `
 
-const formForPurposeAndCategoryFragment = `formForPurposeAndCategory(purpose: "submit", category: "submission", groupId: $groupId) {
+const activeFormsInCategoryFragment = `activeFormsInCategory(category: "submission", groupId: $groupId) {
+  id
+  category
   structure {
-    children {
-      id
-      component
-      name
-      title
-      shortDescription
-      validate {
-        id
-        label
-        value
-        labelColor
-      }
-      validateValue {
-        minChars
-        maxChars
-        minSize
-      }
-      doiValidation
-      options {
-        id
-        label
-        labelColor
-        value
-      }
-      readonly
-    }
+    purpose
+    children
   }
 }
 `
@@ -91,7 +69,7 @@ export default {
             searchSnippet
           }
         }
-      ${formForPurposeAndCategoryFragment}
+      submissionForms: ${activeFormsInCategoryFragment}
     }
   `,
 }

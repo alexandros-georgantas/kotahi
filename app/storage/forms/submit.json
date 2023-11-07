@@ -1,5 +1,6 @@
 {
   "name": "eLife Submission Form",
+  "purpose": "submit",
   "children": [
     {
       "id": "bf66a4ed-427b-4329-b6f7-6c53eeec5ac6",

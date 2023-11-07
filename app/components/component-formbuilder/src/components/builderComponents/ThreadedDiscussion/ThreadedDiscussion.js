@@ -80,20 +80,18 @@ const getExistingOrInitialComments = (
 }
 
 const ThreadedDiscussion = ({
-  threadedDiscussionProps: {
-    threadedDiscussion,
-    currentUser,
-    firstVersionManuscriptId,
-    updatePendingComment,
-    completeComment,
-    deletePendingComment,
-    userCanAddThread,
-    commentsToPublish: commsToPublish,
-    setShouldPublishComment,
-    shouldRenderSubmitButton,
-    selectedManuscriptVersionId,
-    manuscriptLatestVersionId,
-  },
+  threadedDiscussion,
+  currentUser,
+  firstVersionManuscriptId,
+  updatePendingComment,
+  completeComment,
+  deletePendingComment,
+  userCanAddThread,
+  commentsToPublish: commsToPublish,
+  setShouldPublishComment,
+  shouldRenderSubmitButton,
+  selectedManuscriptVersionId,
+  manuscriptLatestVersionId,
   onChange,
   ...SimpleWaxEditorProps
 }) => {

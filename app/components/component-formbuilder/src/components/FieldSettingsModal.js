@@ -246,7 +246,7 @@ const FieldSettingsModal = ({
               </Section>
               {fieldOption && fieldOption.componentOptions.length > 1 && (
                 <Section>
-                  <Legend space>Component</Legend>
+                  <Legend space>Data type</Legend>
                   <ValidatedField
                     component={Select}
                     name="component"

@@ -1,5 +1,6 @@
 {
   "name": "Decision",
+  "purpose": "decision",
   "children": [
     {
       "id": "1600fcc9-ebf4-42f5-af97-c242ea04ae21",

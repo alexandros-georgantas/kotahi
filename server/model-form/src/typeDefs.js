@@ -3,7 +3,8 @@ const typeDefs = `
     id: ID!
     created: DateTime
     updated: DateTime
-    purpose: String!
+    isActive: Boolean
+    isDefault: Boolean
     structure: FormStructureInput!
     category: String!
     groupId: ID!
@@ -11,63 +12,29 @@ const typeDefs = `
 
   input CreateFormInput {
     created: DateTime
-    purpose: String!
+    isActive: Boolean!,
+    isDefault: Boolean!,
     structure: FormStructureInput!
     category: String!
     groupId: ID!
   }
 
   input FormStructureInput {
-    name: String
+    name: String!
+    purpose: String!
     description: String
     haspopup: String!
     popuptitle: String
     popupdescription: String
-    children: [FormElementInput!]!
-  }
-
-  input FormElementInput {
-    options: [FormElementOptionInput!]
-    title: String
-    shortDescription: String
-    id: ID!
-    component: String
-    name: String
-    description: String
-    doiValidation: String
-    doiUniqueSuffixValidation: String
-    placeholder: String
-    parse: String
-    format: String
-    inline: String
-    sectioncss: String
-    validate: [FormElementOptionInput!]
-    validateValue: FormElementValidationInput
-    hideFromReviewers: String
-    hideFromAuthors: String
-    permitPublishing: String
-    publishingTag: String
-    readonly: Boolean
-  }
-
-  input FormElementOptionInput {
-    label: String!
-    value: String!
-    labelColor: String
-    id: ID!
-  }
-
-  input FormElementValidationInput {
-    minChars: String
-    maxChars: String
-    minSize: String
+    children: JSON!
   }
 
   type Form {
     id: ID!
     created: DateTime!
     updated: DateTime
-    purpose: String!
+    isActive: Boolean!
+    isDefault: Boolean!
     structure: FormStructure!
     category: String!
     groupId: ID
@@ -75,67 +42,33 @@ const typeDefs = `
 
   type FormStructure {
     name: String
+    purpose: String
     description: String
     haspopup: String!
     popuptitle: String
     popupdescription: String
-    children: [FormElement!]!
+    children: JSON!
   }
 
-  type FormElement {
-    options: [FormElementOption!]
-    title: String
-    shortDescription: String
-    id: ID!
-    component: String
-    name: String
-    description: String
-    doiValidation: String
-    doiUniqueSuffixValidation: String
-    placeholder: String
-    parse: String
-    format: String
-    inline: String
-    sectioncss: String
-    validate: [FormElementOption!]
-    validateValue: FormElementValidation
-    hideFromReviewers: String
-    hideFromAuthors: String
-    permitPublishing: String
-    publishingTag: String
-    readonly: Boolean
-  }
-
-  type FormElementOption {
-    label: String!
-    value: String!
-    labelColor: String
-    id: ID!
-  }
-
-  type FormElementValidation {
-    minChars: String
-    maxChars: String
-    minSize: String
-  }
-
-  type DeleteFormPayload {
-    query: Query
+  type SubmissionFormUseCount {
+    purpose: String!
+    manuscriptsCount: Int!
   }
 
   extend type Query {
     form(formId: ID!): Form
-    forms: [Form]
-    formsByCategory(category: String!, groupId: ID): [Form]
-    formForPurposeAndCategory(purpose: String!, category: String!, groupId: ID): Form
+    allFormsInCategory(category: String!, groupId: ID!): [Form!]!
+    activeFormInCategory(category: String!, groupId: ID!): Form
+    activeFormsInCategory(category: String!, groupId: ID!): [Form!]!
+    submissionFormUseCounts(groupId: ID!): [SubmissionFormUseCount!]!
   }
 
   extend type Mutation {
-    createForm(form: CreateFormInput!): Form
-    updateForm(form: FormInput!): Form
-    updateFormElement(element: FormElementInput!, formId: ID!): Form
+    createForm(form: CreateFormInput!): Form!
+    updateForm(form: FormInput!): Form!
+    updateFormElement(element: JSON!, formId: ID!, parentElementId: ID): Form!
     deleteFormElement(formId: ID!, elementId: ID!): Form
-    deleteForm(formId: ID!): DeleteFormPayload
+    deleteForm(formId: ID!): Boolean
   }
 `
 

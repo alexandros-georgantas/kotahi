@@ -64,7 +64,7 @@ const DashboardEditsPage = ({ currentUser, history }) => {
       applyQueryParams={applyQueryParams}
       currentUser={currentUser}
       manuscriptsUserHasCurrentRoleIn={data.manuscriptsUserHasCurrentRoleIn}
-      submissionForm={data.formForPurposeAndCategory}
+      submissionForms={data.submissionForms}
       uriQueryParams={uriQueryParams}
     />
   )

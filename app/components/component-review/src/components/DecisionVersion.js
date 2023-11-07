@@ -1,13 +1,13 @@
 import React, { useContext, useRef, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
-import { set, debounce } from 'lodash'
+import { debounce } from 'lodash'
 import { useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 import DecisionReviews from './decision/DecisionReviews'
 import AssignEditorsReviewers from './assignEditors/AssignEditorsReviewers'
 import AssignEditor from './assignEditors/AssignEditor'
 import EmailNotifications from './emailNotifications'
-import ReadonlyFormTemplate from './metadata/ReadonlyFormTemplate'
+import { FormTemplate, ReadonlyFormTemplate } from '../../../component-form/src'
 import EditorSection from './decision/EditorSection'
 import Publish from './Publish'
 import { AdminSection } from './style'
@@ -19,7 +19,6 @@ import {
   Title,
 } from '../../../shared'
 import DecisionAndReviews from '../../../component-submit/src/components/DecisionAndReviews'
-import FormTemplate from '../../../component-submit/src/components/FormTemplate'
 import TaskList from '../../../component-task-manager/src/TaskList'
 import KanbanBoard from './KanbanBoard'
 import InviteReviewer from './reviewers/InviteReviewer'
@@ -30,19 +29,14 @@ const TaskSectionRow = styled(SectionRow)`
   padding: 12px 0 18px;
 `
 
-const createBlankSubmissionBasedOnForm = form => {
-  const allBlankedFields = {}
-  const fieldNames = form?.children?.map(field => field.name)
-  fieldNames.forEach(fieldName => set(allBlankedFields, fieldName, ''))
-  return allBlankedFields.submission ?? {}
-}
-
 const DecisionVersion = ({
   allUsers,
   addReviewer,
   roles,
   decisionForm,
-  form,
+  decisionFormComponents,
+  submissionForms,
+  submissionFormComponents,
   currentDecisionData,
   currentUser,
   version,
@@ -59,6 +53,7 @@ const DecisionVersion = ({
   createTeam,
   updateReview,
   reviewForm,
+  reviewFormComponents,
   reviewers,
   teamLabels,
   canHideReviews,
@@ -92,12 +87,6 @@ const DecisionVersion = ({
   emailTemplates,
 }) => {
   const config = useContext(ConfigContext)
-
-  const threadedDiscussionExtendedProps = {
-    ...threadedDiscussionProps,
-    manuscriptLatestVersionId,
-    selectedManuscriptVersionId: version.id,
-  }
 
   const debouncedSave = useCallback(
     debounce(source => {
@@ -150,18 +139,14 @@ const DecisionVersion = ({
     currentUser,
   )
 
+  const submissionForm =
+    submissionForms.find(
+      f => f.structure.purpose === version.submission.$$formPurpose,
+    ) ??
+    submissionForms.find(f => f.isDefault) ??
+    submissionForms[0]
+
   const metadataSection = () => {
-    const submissionValues = isCurrentVersion
-      ? createBlankSubmissionBasedOnForm(form)
-      : {}
-
-    Object.assign(submissionValues, version.submission)
-
-    const versionValues = {
-      ...version,
-      submission: submissionValues,
-    }
-
     const versionId = version.id
 
     return {
@@ -169,17 +154,18 @@ const DecisionVersion = ({
         <>
           {!isCurrentVersion ? (
             <ReadonlyFormTemplate
+              customComponents={submissionFormComponents}
               displayShortIdAsIdentifier={displayShortIdAsIdentifier}
-              form={form}
+              form={submissionForm}
               formData={version}
               manuscript={version}
               showEditorOnlyFields
-              threadedDiscussionProps={threadedDiscussionExtendedProps}
             />
           ) : (
             <SectionContent>
               <FormTemplate
                 createFile={createFile}
+                customComponents={submissionFormComponents}
                 deleteFile={deleteFile}
                 displayShortIdAsIdentifier={displayShortIdAsIdentifier}
                 fieldsToPublish={
@@ -187,8 +173,8 @@ const DecisionVersion = ({
                     ff => ff.objectId === version.id,
                   )?.fieldsToPublish ?? []
                 }
-                form={form}
-                initialValues={versionValues}
+                form={submissionForm}
+                formData={version}
                 isSubmission
                 manuscriptId={version.id}
                 manuscriptShortId={version.shortId}
@@ -210,8 +196,6 @@ const DecisionVersion = ({
                 }
                 shouldShowOptionToPublish
                 showEditorOnlyFields
-                threadedDiscussionProps={threadedDiscussionExtendedProps}
-                urlFrag={urlFrag}
                 validateDoi={validateDoi}
                 validateSuffix={validateSuffix}
               />
@@ -318,6 +302,7 @@ const DecisionVersion = ({
             manuscript={version}
             removeReviewer={removeReviewer}
             reviewForm={reviewForm}
+            reviewFormComponents={reviewFormComponents}
             reviews={reviewers}
             updateReview={updateReview}
             updateSharedStatusForInvitedReviewer={
@@ -372,12 +357,13 @@ const DecisionVersion = ({
             <DecisionAndReviews
               currentUser={currentUser}
               decisionForm={decisionForm}
+              decisionFormComponents={decisionFormComponents}
               isControlPage
               manuscript={version}
               readOnly
               reviewForm={reviewForm}
+              reviewFormComponents={reviewFormComponents}
               showEditorOnlyFields
-              threadedDiscussionProps={threadedDiscussionExtendedProps}
             />
           )}
           {isCurrentVersion && (
@@ -388,7 +374,7 @@ const DecisionVersion = ({
               manuscript={version}
               reviewers={reviewers}
               reviewForm={reviewForm}
-              threadedDiscussionProps={threadedDiscussionExtendedProps}
+              reviewFormComponents={reviewFormComponents}
               updateReview={updateReview}
               updateSharedStatusForInvitedReviewer={
                 updateSharedStatusForInvitedReviewer
@@ -402,6 +388,7 @@ const DecisionVersion = ({
               <SectionContent>
                 <FormTemplate
                   createFile={createFile}
+                  customComponents={decisionFormComponents}
                   deleteFile={deleteFile}
                   fieldsToPublish={
                     version.formFieldsToPublish.find(
@@ -409,11 +396,7 @@ const DecisionVersion = ({
                     )?.fieldsToPublish ?? []
                   }
                   form={decisionForm}
-                  initialValues={
-                    currentDecisionData?.jsonData
-                      ? JSON.parse(currentDecisionData?.jsonData)
-                      : { comment: '', $verdict: '', discussion: '' } // TODO this should just be {}, but needs testing.
-                  }
+                  formData={currentDecisionData?.jsonData}
                   isSubmission={false}
                   manuscriptId={version.id}
                   manuscriptShortId={version.shortId}
@@ -444,8 +427,6 @@ const DecisionVersion = ({
                   showEditorOnlyFields
                   submissionButtonText="Submit"
                   tagForFiles="decision"
-                  threadedDiscussionProps={threadedDiscussionExtendedProps}
-                  urlFrag={urlFrag}
                   validateDoi={validateDoi}
                   validateSuffix={validateSuffix}
                 />
@@ -525,16 +506,22 @@ const DecisionVersion = ({
 DecisionVersion.propTypes = {
   addReviewer: PropTypes.func.isRequired,
   updateManuscript: PropTypes.func.isRequired,
-  form: PropTypes.shape({
-    children: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string,
-        title: PropTypes.string,
-        shortDescription: PropTypes.string,
+  submissionForms: PropTypes.arrayOf(
+    PropTypes.shape({
+      category: PropTypes.string.isRequired,
+      structure: PropTypes.shape({
+        purpose: PropTypes.string.isRequired,
+        children: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            name: PropTypes.string,
+            title: PropTypes.string,
+            shortDescription: PropTypes.string,
+          }).isRequired,
+        ).isRequired,
       }).isRequired,
-    ).isRequired,
-  }).isRequired,
+    }).isRequired,
+  ).isRequired,
   onChange: PropTypes.func.isRequired,
   isCurrentVersion: PropTypes.bool.isRequired,
   version: PropTypes.shape({

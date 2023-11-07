@@ -14,7 +14,12 @@ import {
   CancelButton,
   CommentContainer,
 } from '../../style'
-import { FieldPublishingSelector, Icon } from '../../../../../shared'
+import {
+  FieldPublishingSelector,
+  Icon,
+  LooseRowCentered,
+  MediumColumn,
+} from '../../../../../shared'
 import { UserAvatar } from '../../../../../component-avatar/src'
 import Modal from '../../../../../component-modal/src/ConfirmationModal'
 import SimpleWaxEditor from '../../../../../wax-collab/src/SimpleWaxEditor'
@@ -147,32 +152,36 @@ const ThreadedComment = ({
         </SimpleWaxEditorWrapper>
         <Modal isOpen={openModal}>
           <ModalContainer>
-            <SimpleWaxEditor
-              {...simpleWaxEditorProps}
-              onChange={data => {
-                setModalFieldValue(data)
-                onChange(data)
-              }}
-              value={modalFieldValue}
-            />
-            <Button
-              onClick={event => {
-                onSubmitClick()
-              }}
-              primary
-            >
-              Edit
-            </Button>
-            &nbsp;
-            <CancelButton
-              onClick={() => {
-                setOpenModal(false)
-                setModalFieldValue(existingComment?.comment || value)
-                onCancel()
-              }}
-            >
-              Cancel
-            </CancelButton>
+            <MediumColumn>
+              <SimpleWaxEditor
+                {...simpleWaxEditorProps}
+                onChange={data => {
+                  setModalFieldValue(data)
+                  onChange(data)
+                }}
+                value={modalFieldValue}
+              />
+              <LooseRowCentered>
+                <Button
+                  onClick={event => {
+                    onSubmitClick()
+                  }}
+                  primary
+                >
+                  Edit
+                </Button>
+                &nbsp;
+                <CancelButton
+                  onClick={() => {
+                    setOpenModal(false)
+                    setModalFieldValue(existingComment?.comment || value)
+                    onCancel()
+                  }}
+                >
+                  Cancel
+                </CancelButton>
+              </LooseRowCentered>
+            </MediumColumn>
           </ModalContainer>
         </Modal>
       </CommentContainer>

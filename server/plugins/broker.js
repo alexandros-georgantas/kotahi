@@ -1,6 +1,9 @@
 const models = require('@pubsweet/models')
-const { getSubmissionForm } = require('../model-review/src/reviewCommsUtils')
+
+const { getSubmissionForms } = require('../model-review/src/reviewCommsUtils')
+
 const { importWorkersByGroup } = require('./imports')
+const { getEmptySubmission } = require('../import-articles/importTools')
 
 const assertArgTypes = (args, ...typeSpecs) => {
   for (let i = 0; i < args.length; i += 1) {
@@ -15,31 +18,6 @@ const assertArgTypes = (args, ...typeSpecs) => {
         )}.`,
       )
   }
-}
-
-const getEmptySubmission = async groupId => {
-  const submissionForm = await getSubmissionForm(groupId)
-  if (!submissionForm) throw new Error('No submission form was found!')
-
-  const fields = submissionForm.structure.children.filter(field =>
-    field.name.startsWith('submission.'),
-  )
-
-  const emptySubmission = fields.reduce((acc, curr) => {
-    const [, nameInSubmission] = curr.name.split('submission.')
-    acc[nameInSubmission] = [
-      'CheckboxGroup',
-      'LinksInput',
-      'AuthorsInput',
-    ].includes(curr.component)
-      ? []
-      : ''
-    return {
-      ...acc,
-    }
-  }, {})
-
-  return emptySubmission
 }
 
 const getBroker = (groupId, workerName) => {
@@ -92,7 +70,7 @@ const getBroker = (groupId, workerName) => {
       reviews: [],
       teams: [],
     }),
-    getSubmissionForm: () => getSubmissionForm(groupId),
+    getSubmissionForms: () => getSubmissionForms(groupId),
     groupId,
     logger: console, // TODO modify console to include group and plugin name identifier
   }

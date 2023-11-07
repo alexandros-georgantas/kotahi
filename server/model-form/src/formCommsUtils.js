@@ -1,16 +1,17 @@
 const models = require('@pubsweet/models')
 const { ref } = require('objection')
 
+/** Returns ALL active submission forms, a SINGLE active review form (if any), and a SINGLE active decision form (if any) */
 const getActiveForms = async groupId => {
   const forms = await models.Form.query()
-    .where({ category: 'submission', purpose: 'submit', groupId })
-    .orWhere({ category: 'review', purpose: 'review', groupId })
-    .orWhere({ category: 'decision', purpose: 'decision', groupId })
+    .where({ category: 'submission', isActive: true, groupId })
+    .orWhere({ category: 'review', isActive: true, groupId })
+    .orWhere({ category: 'decision', isActive: true, groupId })
 
   return {
-    submissionForm: forms.find(f => f.purpose === 'submit'),
-    reviewForm: forms.find(f => f.purpose === 'review'),
-    decisionForm: forms.find(f => f.purpose === 'decision'),
+    submissionForms: forms.filter(f => f.category === 'submission'),
+    reviewForm: forms.find(f => f.category === 'review'),
+    decisionForm: forms.find(f => f.category === 'decision'),
   }
 }
 
@@ -39,7 +40,7 @@ const migrateFieldName = async (formId, oldFieldName, newFieldName) => {
     )
 
   const nameValidationRegex =
-    form.purpose === 'submit'
+    form.category === 'submission'
       ? /^(?:submission\.\$?[a-zA-Z]\w*|fileName|visualAbstract|manuscriptFile)$/
       : /^[a-zA-Z]\w*$/
 
@@ -53,7 +54,7 @@ const migrateFieldName = async (formId, oldFieldName, newFieldName) => {
 
   const { groupId } = form
 
-  if (form.purpose === 'submit') {
+  if (form.category === 'submission') {
     const pgOldField = oldFieldName.replace('.', ':')
     const pgNewField = newFieldName.replace('.', ':')
 
@@ -63,7 +64,7 @@ const migrateFieldName = async (formId, oldFieldName, newFieldName) => {
         [pgOldField]: null,
       })
       .where({ groupId })
-  } else if (form.purpose === 'review') {
+  } else if (form.category === 'review') {
     await models.Manuscript.relatedQuery('reviews')
       .for(models.Manuscript.query().where({ groupId }))
       .patch({
@@ -72,7 +73,7 @@ const migrateFieldName = async (formId, oldFieldName, newFieldName) => {
       })
       .whereNot({ isDecision: true })
   } else {
-    // form.purpose === 'decision'
+    // form.category === 'decision'
     await models.Manuscript.relatedQuery('reviews')
       .for(models.Manuscript.query().where({ groupId }))
       .patch({

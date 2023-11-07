@@ -219,39 +219,13 @@ export const GET_MANUSCRIPTS_AND_FORM = gql`
       }
     }
 
-    formForPurposeAndCategory(
-      purpose: "submit"
+    submissionForms: activeFormsInCategory(
       category: "submission"
       groupId: $groupId
     ) {
+      id
       structure {
-        children {
-          id
-          component
-          name
-          title
-          shortDescription
-          validate {
-            id
-            label
-            value
-            labelColor
-          }
-          validateValue {
-            minChars
-            maxChars
-            minSize
-          }
-          doiValidation
-          doiUniqueSuffixValidation
-          options {
-            id
-            label
-            labelColor
-            value
-          }
-          readonly
-        }
+        children
       }
     }
   }

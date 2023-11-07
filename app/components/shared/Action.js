@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { grid, rotate360 } from '@pubsweet/ui-toolkit'
 import { Check, AlertCircle } from 'react-feather'
@@ -85,8 +85,16 @@ const Action = ({
   onClick,
   title,
 }) => {
+  const isMounted = useRef(true)
   const [resultStatus, setResultStatus] = useState(null)
   const [isInProgress, setIsInProgress] = useState(false)
+
+  useEffect(
+    () => () => {
+      isMounted.current = false
+    },
+    [],
+  )
 
   return (
     <>
@@ -96,9 +104,13 @@ const Action = ({
         onClick={async () => {
           setIsInProgress(true)
           const result = await onClick()
-          if (onActionCompleted)
-            setResultStatus(await onActionCompleted(result))
-          setIsInProgress(false)
+
+          if (onActionCompleted) {
+            const tempStatus = await onActionCompleted(result)
+            if (isMounted.current) setResultStatus(tempStatus)
+          }
+
+          if (isMounted.current) setIsInProgress(false)
         }}
         title={title}
         type="button"

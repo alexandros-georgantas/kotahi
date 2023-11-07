@@ -63,7 +63,23 @@ const makeApolloClient = (makeConfig, connectToWebSocket) => {
     return forward(operation)
   })
 
-  let link = ApolloLink.from([removeTypename, authLink, groupLink, uploadLink])
+  const formStructureParseLink = new ApolloLink((operation, forward) => {
+    return forward(operation).map(response => {
+      const { data } = response
+      // eslint-disable-next-line no-underscore-dangle
+      if (data?.__typename === 'FormStructure')
+        data.children = JSON.parse(data.children)
+      return response
+    })
+  })
+
+  let link = ApolloLink.from([
+    removeTypename,
+    authLink,
+    groupLink,
+    formStructureParseLink,
+    uploadLink,
+  ])
 
   if (connectToWebSocket) {
     const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws'

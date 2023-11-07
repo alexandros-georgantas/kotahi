@@ -1,10 +1,14 @@
 import React, { useCallback, useContext, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { set, debounce } from 'lodash'
+import { debounce } from 'lodash'
+import styled from 'styled-components'
 import { ConfigContext } from '../../../config/src'
 import DecisionAndReviews from './DecisionAndReviews'
 import CreateANewVersion from './CreateANewVersion'
-import ReadonlyFormTemplate from '../../../component-review/src/components/metadata/ReadonlyFormTemplate'
+import {
+  ReadonlyFormTemplate,
+  getComponentsForManuscriptVersions,
+} from '../../../component-form/src'
 import MessageContainer from '../../../component-chat/src/MessageContainer'
 
 import {
@@ -14,6 +18,7 @@ import {
   Chat,
   Manuscript,
   ErrorBoundary,
+  Select,
 } from '../../../shared'
 
 // TODO: Improve the import, perhaps a shared component?
@@ -22,17 +27,16 @@ import AssignEditorsReviewers from './assignEditors/AssignEditorsReviewers'
 import AssignEditor from './assignEditors/AssignEditor'
 import SubmissionForm from './SubmissionForm'
 
-export const createBlankSubmissionBasedOnForm = form => {
-  const allBlankedFields = {}
-  const fieldNames = form.children.map(field => field.name)
-  fieldNames.forEach(fieldName => set(allBlankedFields, fieldName, ''))
-  return allBlankedFields.submission ?? {}
-}
+const SubmissionSelect = styled(Select)`
+  margin: 40px auto;
+  width: 300px;
+`
 
 const Submit = ({
   versions = [],
   decisionForm,
   reviewForm,
+  submissionForms,
   submissionForm,
   createNewVersion,
   currentUser,
@@ -46,18 +50,20 @@ const Submit = ({
   deleteFile,
   setShouldPublishField,
   threadedDiscussionProps,
-  manuscriptLatestVersionId,
   validateDoi,
   validateSuffix,
 }) => {
   const config = useContext(ConfigContext)
 
+  const componentsMap = getComponentsForManuscriptVersions(
+    versions,
+    threadedDiscussionProps,
+  )
+
   const allowAuthorsSubmitNewVersion =
     config?.submission?.allowAuthorsSubmitNewVersion
 
   const decisionSections = []
-
-  const submissionValues = createBlankSubmissionBasedOnForm(submissionForm)
 
   const handleSave = (source, versionId) =>
     updateManuscript(versionId, { meta: { source } })
@@ -65,15 +71,24 @@ const Submit = ({
   const debouncedSave = useCallback(debounce(handleSave, 2000), [])
   useEffect(() => {
     debouncedSave.flush()
-    return () => debouncedSave.flush()
+
+    // If there is only one submission form, set the $$formPurpose immediately to use that one
+    if (
+      versions.length &&
+      submissionForms.length === 1 &&
+      !versions[0].manuscript.submission.$$formPurpose
+    ) {
+      updateManuscript(versions[0].manuscript.id, {
+        submission: { $$formPurpose: submissionForms[0].structure.purpose },
+      })
+    }
+
+    return debouncedSave.flush
   }, [versions.length])
 
   versions.forEach(({ manuscript: version, label }, index) => {
     const userCanEditManuscriptAndFormData =
-      index === 0 &&
-      (['new', 'revising'].includes(version.status) ||
-        (currentUser.groupRoles.includes('groupManager') &&
-          version.status !== 'rejected'))
+      index === 0 && ['new', 'revising'].includes(version.status)
 
     const editorSection = {
       content: (
@@ -92,25 +107,11 @@ const Submit = ({
 
     let decisionSection
 
-    const selectedManuscriptVersionId = version.id
-
-    const threadedDiscussionExtendedProps = {
-      ...threadedDiscussionProps,
-      manuscriptLatestVersionId,
-      selectedManuscriptVersionId,
-    }
-
     if (userCanEditManuscriptAndFormData) {
-      Object.assign(submissionValues, version.submission)
-
-      const versionValues = {
-        ...version,
-        submission: submissionValues,
-      }
-
       const submissionProps = {
-        versionValues,
-        form: submissionForm,
+        version,
+        submissionForm,
+        submissionFormComponents: componentsMap[version.id],
         onSubmit,
         onChange,
         republish,
@@ -119,9 +120,9 @@ const Submit = ({
         createFile,
         deleteFile,
         setShouldPublishField,
-        threadedDiscussionExtendedProps,
         validateDoi,
         validateSuffix,
+        canChangeForm: version.status === 'new' && submissionForms.length > 1,
       }
 
       decisionSection = {
@@ -137,16 +138,17 @@ const Submit = ({
               allowAuthorsSubmitNewVersion={allowAuthorsSubmitNewVersion}
               currentUser={currentUser}
               decisionForm={decisionForm}
+              decisionFormComponents={componentsMap[version.id]}
               manuscript={version}
               reviewForm={reviewForm}
-              threadedDiscussionProps={threadedDiscussionExtendedProps}
+              reviewFormComponents={componentsMap[version.id]}
             />
             <ReadonlyFormTemplate
+              customComponents={componentsMap[version.id]}
               form={submissionForm}
               formData={version}
               manuscript={version}
               showEditorOnlyFields={false}
-              threadedDiscussionProps={threadedDiscussionExtendedProps}
               title="Metadata"
             />
           </>
@@ -196,10 +198,25 @@ const Submit = ({
     <Columns>
       <Manuscript>
         <ErrorBoundary>
-          <VersionSwitcher
-            key={decisionSections.length}
-            versions={decisionSections}
-          />
+          {submissionForm ? (
+            <VersionSwitcher
+              key={decisionSections.length}
+              versions={decisionSections}
+            />
+          ) : (
+            <SubmissionSelect
+              onChange={opt =>
+                updateManuscript(versions[0].manuscript.id, {
+                  submission: { $$formPurpose: opt.value },
+                })
+              }
+              options={submissionForms.map(form => ({
+                label: form.structure.name,
+                value: form.structure.purpose,
+              }))}
+              placeholder="Choose a submission type..."
+            />
+          )}
         </ErrorBoundary>
       </Manuscript>
       <Chat>
@@ -210,30 +227,34 @@ const Submit = ({
 }
 
 const formPropTypes = PropTypes.shape({
-  name: PropTypes.string.isRequired,
-  description: PropTypes.string,
-  children: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      sectioncss: PropTypes.string,
-      id: PropTypes.string.isRequired,
-      component: PropTypes.string.isRequired,
-      group: PropTypes.string,
-      placeholder: PropTypes.string,
-      validate: PropTypes.arrayOf(PropTypes.object.isRequired),
-      validateValue: PropTypes.objectOf(
-        PropTypes.oneOfType([
-          PropTypes.string.isRequired,
-          PropTypes.number.isRequired,
-        ]).isRequired,
-      ),
-      readonly: PropTypes.bool,
-    }).isRequired,
-  ).isRequired,
-  popuptitle: PropTypes.string,
-  popupdescription: PropTypes.string,
-  haspopup: PropTypes.string.isRequired, // bool as string
+  category: PropTypes.string.isRequired,
+  structure: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    purpose: PropTypes.string,
+    description: PropTypes.string,
+    children: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+        sectioncss: PropTypes.string,
+        id: PropTypes.string.isRequired,
+        component: PropTypes.string.isRequired,
+        group: PropTypes.string,
+        placeholder: PropTypes.string,
+        validate: PropTypes.arrayOf(PropTypes.object.isRequired),
+        validateValue: PropTypes.objectOf(
+          PropTypes.oneOfType([
+            PropTypes.string.isRequired,
+            PropTypes.number.isRequired,
+          ]).isRequired,
+        ),
+        readonly: PropTypes.bool,
+      }).isRequired,
+    ).isRequired,
+    popuptitle: PropTypes.string,
+    popupdescription: PropTypes.string,
+    haspopup: PropTypes.string.isRequired, // bool as string
+  }).isRequired,
 })
 
 Submit.propTypes = {

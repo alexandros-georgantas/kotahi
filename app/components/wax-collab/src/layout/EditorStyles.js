@@ -88,6 +88,7 @@ export const EditorDiv = styled.div`
   grid-column-start: editorCol;
   grid-row-start: editorRow;
   ${props => !props.hideComments && 'min-width: 800px'};
+  overflow: hidden;
   padding: 16px;
   position: relative;
 

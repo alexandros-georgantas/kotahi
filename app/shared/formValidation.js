@@ -11,6 +11,7 @@ export const validateFormField = (
   validateDoi,
   validateSuffix,
   componentType,
+  customValidate,
   threadedDiscussionProps,
 ) => async value => {
   const validator = vld || []
@@ -22,6 +23,10 @@ export const validateFormField = (
     )
       return 'Required'
     return validateAuthors(value)
+  }
+
+  if (customValidate) {
+    return customValidate(value, validator)
   }
 
   if (

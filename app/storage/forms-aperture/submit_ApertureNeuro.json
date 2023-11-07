@@ -1,5 +1,6 @@
 {
   "name": "Research Object Submission Form",
+  "purpose": "submit",
   "description": "<p>Aperture is now accepting Research Object Submissions. Please fill out the form below to complete your submission.</p>",
   "haspopup": "true",
   "popuptitle": "By submitting the manuscript, you agree to the following statements.",

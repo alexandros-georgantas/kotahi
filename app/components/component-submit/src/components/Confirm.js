@@ -44,9 +44,13 @@ const Confirm = ({ toggleConfirming, form, submit, errors }) => (
         </>
       ) : (
         <>
-          <Heading1 dangerouslySetInnerHTML={createMarkup(form.popuptitle)} />
+          <Heading1
+            dangerouslySetInnerHTML={createMarkup(form.structure.popuptitle)}
+          />
           <Paragraph
-            dangerouslySetInnerHTML={createMarkup(form.popupdescription)}
+            dangerouslySetInnerHTML={createMarkup(
+              form.structure.popupdescription,
+            )}
           />
           <Button onClick={submit} primary type="submit">
             Submit
@@ -64,8 +68,10 @@ const Confirm = ({ toggleConfirming, form, submit, errors }) => (
 Confirm.propTypes = {
   toggleConfirming: PropTypes.func.isRequired,
   form: PropTypes.shape({
-    popuptitle: PropTypes.string.isRequired,
-    popupdescription: PropTypes.string.isRequired,
+    structure: PropTypes.shape({
+      popuptitle: PropTypes.string.isRequired,
+      popupdescription: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
   submit: PropTypes.func.isRequired,
   errors: PropTypes.objectOf(PropTypes.any).isRequired,

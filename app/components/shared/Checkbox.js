@@ -26,26 +26,30 @@ const CheckboxContainer = styled.div`
       border: none;
     }
   }
+`
 
-  label {
-    margin-left: ${space.e};
-  }
+const Label = styled.label`
+  color: ${({ disabled }) => (disabled ? color.gray50 : color.text)};
+  padding-left: ${space.e};
 `
 
 // eslint-disable-next-line import/prefer-default-export
 export const Checkbox = props => {
-  const { checked, id, label, value, handleChange } = props
+  const { checked, className, disabled, id, label, value, handleChange } = props
 
   return (
-    <CheckboxContainer>
+    <CheckboxContainer className={className}>
       <input
         checked={checked}
+        disabled={disabled}
         id={id}
         name={value}
         onChange={handleChange}
         type="checkbox"
       />
-      <label htmlFor={id}>{label}</label>
+      <Label disabled={disabled} htmlFor={id}>
+        {label}
+      </Label>
     </CheckboxContainer>
   )
 }

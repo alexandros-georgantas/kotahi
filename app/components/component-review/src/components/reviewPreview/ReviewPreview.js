@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { useHistory } from 'react-router-dom'
 import { grid } from '@pubsweet/ui-toolkit'
-import ReadonlyFormTemplate from '../metadata/ReadonlyFormTemplate'
+import { ReadonlyFormTemplate } from '../../../../component-form/src'
 import { Heading, Title, Icon, PlainOrRichText } from '../../../../shared'
 import { color } from '../../../../../theme'
 
@@ -24,11 +24,7 @@ const IconLink = styled.div`
   width: fit-content;
 `
 
-const ReviewPreview = ({
-  manuscript,
-  submissionForm,
-  threadedDiscussionProps,
-}) => {
+const ReviewPreview = ({ manuscript, submissionForm, customComponents }) => {
   const history = useHistory()
   return (
     <Page>
@@ -37,12 +33,12 @@ const ReviewPreview = ({
         <PlainOrRichText value={manuscript.submission.$title} />
       </Title>
       <ReadonlyFormTemplate
+        customComponents={customComponents}
         form={submissionForm}
         formData={manuscript}
         hideSpecialInstructions
         manuscript={manuscript}
         showEditorOnlyFields={false}
-        threadedDiscussionProps={threadedDiscussionProps}
       />
       <IconLink onClick={() => history.goBack()}>
         <Icon color={color.brand1.base()} inline size={2}>
@@ -63,15 +59,19 @@ ReviewPreview.propTypes = {
     }).isRequired,
   }).isRequired,
   submissionForm: PropTypes.shape({
-    children: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string,
-        title: PropTypes.string,
-        shortDescription: PropTypes.string,
-        includeInReveiwPreview: PropTypes.string,
-      }).isRequired,
-    ).isRequired,
+    category: PropTypes.string.isRequired,
+    structure: PropTypes.shape({
+      purpose: PropTypes.string,
+      children: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.string.isRequired,
+          name: PropTypes.string,
+          title: PropTypes.string,
+          shortDescription: PropTypes.string,
+          includeInReveiwPreview: PropTypes.string,
+        }).isRequired,
+      ).isRequired,
+    }).isRequired,
   }).isRequired,
 }
 

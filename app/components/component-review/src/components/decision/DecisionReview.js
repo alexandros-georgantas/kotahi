@@ -177,6 +177,7 @@ const Root = styled.div`
 const DecisionReview = ({
   review,
   reviewForm,
+  reviewFormComponents,
   reviewer,
   manuscriptId,
   teams,
@@ -184,7 +185,6 @@ const DecisionReview = ({
   updateReview,
   canHideReviews,
   showEditorOnlyFields,
-  threadedDiscussionProps,
   reviewerTeamMember,
   readOnly,
   updateSharedStatusForInvitedReviewer,
@@ -239,9 +239,9 @@ const DecisionReview = ({
         review={review}
         reviewerTeamMember={reviewerTeamMember}
         reviewForm={reviewForm}
+        reviewFormComponents={reviewFormComponents}
         showEditorOnlyFields={showEditorOnlyFields}
         showUserInfo
-        threadedDiscussionProps={threadedDiscussionProps}
         updateReview={updateReview}
         updateSharedStatusForInvitedReviewer={
           updateSharedStatusForInvitedReviewer

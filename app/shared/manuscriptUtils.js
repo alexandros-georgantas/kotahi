@@ -12,7 +12,7 @@ export const validateManuscriptSubmission = async (
   validateDoi,
   validateSuffix,
 ) => {
-  const fieldDefinitions = submissionForm?.children ?? []
+  const fieldDefinitions = submissionForm?.structure?.children ?? []
 
   const promiseArr = fieldDefinitions
     .filter(element => element?.name)

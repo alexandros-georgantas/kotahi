@@ -55,20 +55,17 @@ const WidthLimiter = styled.div`
   min-height: 0;
 `
 
-const formIsActive = form => {
-  if (!form.category) return false
+const TabLabel = styled.div`
+  color: ${({ isActive }) => (isActive ? color.text : color.gray50)};
+`
 
-  if (form.category === 'submission') {
-    if (form.purpose === 'submit') return true
-  } else if (form.purpose === form.category) return true
-
-  return false
-}
-
+/** Order by default first, then active forms first, then alphabetically */
 const getFormsOrderedActiveFirstThenAlphabetical = forms =>
   forms?.toSorted((a, b) => {
-    if (formIsActive(a)) return -1
-    if (formIsActive(b)) return 1
+    const isDefaultComparison = (a.isDefault ? 0 : 1) - (b.isDefault ? 0 : 1)
+    if (isDefaultComparison) return isDefaultComparison
+    const isActiveComparison = (a.isActive ? 0 : 1) - (b.isActive ? 0 : 1)
+    if (isActiveComparison) return isActiveComparison
     const nameA = a?.structure?.name?.toUpperCase()
     const nameB = b?.structure?.name?.toUpperCase()
     // eslint-disable-next-line no-nested-ternary
@@ -91,6 +88,7 @@ const FormBuilderLayout = ({
   setSelectedFieldId,
   setSelectedFormId,
   shouldAllowHypothesisTagging,
+  submissionFormUseCounts,
 }) => {
   const [openModal, setOpenModal] = useState(false)
   const [formId, setFormId] = useState()
@@ -107,20 +105,10 @@ const FormBuilderLayout = ({
     setOpenModal(false)
   }
 
-  const makeFormActive = async form => {
-    let purpose = form.category
-    if (purpose === 'submission') purpose = 'submit'
-
-    await updateForm({ variables: { form: { ...form, purpose } } })
-    // The server will enforce that other forms of the same category are not simultaneously active
-  }
-
   const orderedForms = getFormsOrderedActiveFirstThenAlphabetical(forms)
 
   const sections = []
   forEach(orderedForms, form => {
-    const isActive = formIsActive(form)
-
     sections.push({
       content: (
         <SectionContent
@@ -146,7 +134,6 @@ const FormBuilderLayout = ({
             >
               <FormSummary
                 form={form}
-                isActive={isActive}
                 openFormSettingsDialog={() => setIsEditingFormSettings(true)}
               />
               <FormBuilder
@@ -179,8 +166,10 @@ const FormBuilderLayout = ({
       key: `${form.id}`,
       label: (
         <TightRow>
-          {form.structure.name || 'Unnamed form'}
-          {!isActive && (
+          <TabLabel isActive={form.isActive}>
+            {form.structure.name || 'Unnamed form'}
+          </TabLabel>
+          {!form.isActive && (
             <IconAction
               key="delete-form"
               onClick={e => {
@@ -201,11 +190,13 @@ const FormBuilderLayout = ({
   })
 
   const selectedForm = forms?.find(f => f.id === selectedFormId) ?? {
-    purpose: '',
     category,
     structure: {
       children: [],
+      isActive: false,
+      isDefault: false,
       name: '',
+      purpose: category === 'submission' ? '' : category,
       description: '',
       haspopup: 'false',
     },
@@ -218,6 +209,15 @@ const FormBuilderLayout = ({
   const reservedFieldNames = selectedForm.structure.children
     .filter(field => field.id !== selectedFieldId)
     .map(field => field.name)
+
+  const isLastActiveFormInCategory =
+    selectedForm.isActive &&
+    !forms.some(
+      f =>
+        f.id !== selectedForm.id &&
+        f.category === selectedForm.category &&
+        f.isActive,
+    )
 
   return (
     <>
@@ -268,9 +268,8 @@ const FormBuilderLayout = ({
 
       <FormSettingsModal
         form={selectedForm}
-        isActive={formIsActive(selectedForm)}
+        isLastActiveFormInCategory={isLastActiveFormInCategory}
         isOpen={isEditingFormSettings}
-        makeFormActive={() => makeFormActive(selectedForm)}
         onClose={() => setIsEditingFormSettings(false)}
         onSubmit={async updatedForm => {
           const payload = {
@@ -280,6 +279,7 @@ const FormBuilderLayout = ({
           if (selectedForm.id) await updateForm(payload)
           else await createForm(payload)
         }}
+        submissionFormUseCounts={submissionFormUseCounts}
       />
 
       <FieldSettingsModal
@@ -314,8 +314,8 @@ FormBuilderLayout.propTypes = {
   forms: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      purpose: PropTypes.string,
       structure: PropTypes.shape({
+        purpose: PropTypes.string,
         children: PropTypes.arrayOf(
           PropTypes.shape({
             id: PropTypes.string.isRequired,
