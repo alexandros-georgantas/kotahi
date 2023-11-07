@@ -54,15 +54,15 @@ const Production = ({
     [],
   )
 
-  const [cssValue, setCssValue] = useState(articleTemplate.cssTemplate)
+  const [cssValue, setCssValue] = useState(articleTemplate.css)
 
-  const [htmlValue, setHtmlValue] = useState(articleTemplate.articleTemplate)
+  const [htmlValue, setHtmlValue] = useState(articleTemplate.article)
 
   const onChangeCss = useCallback(
-    debounce(cssTemplate => {
-      setCssValue(cssTemplate)
+    debounce(cssContent => {
+      setCssValue(cssContent)
       updateTemplate(articleTemplate.id, {
-        cssTemplate,
+        css: cssContent,
       })
     }, 2000),
     [],
@@ -71,7 +71,7 @@ const Production = ({
   const onChangeHtml = useCallback(
     debounce(article => {
       setHtmlValue(article)
-      updateTemplate(articleTemplate.id, { articleTemplate: article })
+      updateTemplate(articleTemplate.id, { article })
     }, 2000),
     [],
   )

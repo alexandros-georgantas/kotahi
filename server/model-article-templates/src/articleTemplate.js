@@ -56,8 +56,8 @@ class ArticleTemplate extends BaseModel {
     return {
       properties: {
         name: { type: ['string', 'null'] },
-        articleTemplate: { instanceof: 'Buffer' },
-        cssTemplate: { instanceof: 'Buffer' },
+        article: { instanceof: 'Buffer' },
+        css: { instanceof: 'Buffer' },
         groupId: { type: ['string', 'null'], format: 'uuid' },
       },
     }

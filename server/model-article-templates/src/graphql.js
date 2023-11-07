@@ -10,14 +10,14 @@ const resolvers = {
   },
   Mutation: {
     async updateTemplate(_, { id, input }) {
-      if (input.cssTemplate) {
+      if (input.css) {
         // eslint-disable-next-line no-param-reassign
-        input.cssTemplate = Buffer.from(input.cssTemplate, 'utf8')
+        input.css = Buffer.from(input.css, 'utf8')
       }
 
-      if (input.articleTemplate) {
+      if (input.article) {
         // eslint-disable-next-line no-param-reassign
-        input.articleTemplate = Buffer.from(input.articleTemplate, 'utf8')
+        input.article = Buffer.from(input.article, 'utf8')
       }
 
       return models.ArticleTemplate.query().patchAndFetchById(id, input)
@@ -31,11 +31,11 @@ const resolvers = {
         ),
       )
     },
-    async cssTemplate(articleTemplate) {
-      return articleTemplate.cssTemplate.toString()
+    async css(articleTemplate) {
+      return articleTemplate.css.toString()
     },
-    async articleTemplate(articleTemplate) {
-      return articleTemplate.articleTemplate.toString()
+    async article(articleTemplate) {
+      return articleTemplate.article.toString()
     },
   },
 }
@@ -54,15 +54,15 @@ const typeDefs = `
     created: DateTime!
     updated: DateTime
     name: String
-    articleTemplate: String!
-    cssTemplate: String!
+    article: String!
+    css: String!
     groupId: ID!
     files: [File!]
   }
 
   input updateTemplateInput {
-    articleTemplate: String
-    cssTemplate: String
+    article: String
+    css: String
   }
 `
 

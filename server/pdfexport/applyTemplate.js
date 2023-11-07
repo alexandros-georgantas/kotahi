@@ -94,8 +94,8 @@ const applyTemplate = async ({ articleData, groupData }, includeFontLinks) => {
 
   try {
     // if there is a group template use that
-    if (groupData.articleTemplate) {
-      template.tmplStr = groupData.articleTemplate.toString()
+    if (groupData.article) {
+      template.tmplStr = groupData.article.toString()
     } else {
       // If there is a user template, use that instead
       template = userTemplateEnv.getTemplate('article.njk')

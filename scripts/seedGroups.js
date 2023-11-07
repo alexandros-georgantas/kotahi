@@ -154,8 +154,8 @@ const createGroupAndRelatedData = async (groupName, instanceName, index) => {
     }
 
     await ArticleTemplate.query().insertGraph({
-      articleTemplate: Buffer.from(articleTemplate),
-      cssTemplate: Buffer.from(cssTemplate),
+      article: Buffer.from(articleTemplate),
+      css: Buffer.from(cssTemplate),
       groupId: group.id,
     })
 

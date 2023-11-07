@@ -123,9 +123,9 @@ const pdfHandler = async manuscriptId => {
 
   let css = ''
 
-  if (groupData.cssTemplate) {
+  if (groupData.css) {
     css = await generateCss(true)
-    css += groupData.cssTemplate.toString()
+    css += groupData.css.toString()
   } else {
     css = await generateCss()
   }

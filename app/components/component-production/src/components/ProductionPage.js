@@ -138,8 +138,8 @@ const templateQuery = gql`
       name
       groupId
       ${fileFragment}
-      articleTemplate
-      cssTemplate
+      article
+      css
     }
 }
 `
@@ -175,8 +175,8 @@ export const updateTemplateMutation = gql`
       name
       groupId
       ${fileFragment}
-      articleTemplate
-      cssTemplate
+      article
+      css
     }
   }
 `
