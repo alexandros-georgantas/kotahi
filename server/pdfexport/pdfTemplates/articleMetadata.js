@@ -1,4 +1,6 @@
 const striptags = require('striptags')
+const QRCode = require('qrcode-svg')
+
 // const fs = require('fs')
 
 // This should return an object with front matter from the form that should be sent to the PDF or to JATS.
@@ -99,6 +101,41 @@ const articleMetadata = manuscript => {
 
     if (manuscript.submission.topics) {
       meta.topics = manuscript.submission.topics
+    }
+
+    if (manuscript.submission.DOI) {
+      meta.doi = manuscript.submission.DOI
+
+      // make the qrcode
+      const qrcode = new QRCode({
+        content: `https://dx.doi.org/${manuscript.submission.DOI}`,
+        padding: 4,
+        width: 80,
+        height: 80,
+        color: '#000000',
+        background: '#ffffff',
+        ecl: 'M',
+        pretty: false,
+        xmlDeclaration: false,
+      }).svg()
+
+      meta.qrcode = qrcode
+    } else {
+      meta.doi = 'DOI will be available soon.'
+
+      const qrcode = new QRCode({
+        content: `DOI&nbsp;will be available soon.`,
+        padding: 4,
+        width: 80,
+        height: 80,
+        color: '#000000',
+        background: '#ffffff',
+        ecl: 'M',
+        pretty: false,
+        xmlDeclaration: false,
+      }).svg()
+
+      meta.qrcode = qrcode
     }
 
     if (manuscript.submission.DOI) {
