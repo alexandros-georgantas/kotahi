@@ -15,7 +15,8 @@ class ArticleTemplate extends BaseModel {
     return new AjvValidator({
       onCreateAjv: ajv => {
         ajv.addKeyword('instanceof', {
-          compile: schema => data => data instanceof CLASSES[schema],
+          compile: schema => data =>
+            data instanceof CLASSES[schema] || data === null || data === '',
         })
       },
     })
