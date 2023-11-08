@@ -57,7 +57,7 @@ export const FileTableStyled = styled.div`
   width: 100%;
 `
 
-export const FilesRow = styled.div`
+export const FilesHeading = styled.div`
   align-items: center;
   background-color: ${color.backgroundA};
   border-top: 1px solid ${color.gray90};
@@ -239,11 +239,11 @@ const UploadAsset = ({ files, groupTemplateId }) => {
         </SectionRow>
         <SectionRow key="files">
           <FileTableStyled>
-            <FilesRow>
+            <FilesHeading>
               {columnsProps.map(info => (
                 <HeadingCell key={info.name}>{info.title}</HeadingCell>
               ))}
-            </FilesRow>
+            </FilesHeading>
             {filesState.length === 0 ? (
               <Placeholder>No Files found</Placeholder>
             ) : (

@@ -133,7 +133,7 @@ const fragmentFields = `
 
 const templateQuery = gql`
   query($groupId: ID!) {
-    templateByGroupId(groupId: $groupId) {
+    articleTemplate(groupId: $groupId) {
       id
       name
       groupId
@@ -234,8 +234,6 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
 
   const { manuscript, submissionForm } = data
 
-  const { templateByGroupId: articleTemplate } = templateData
-
   const form = submissionForm?.structure ?? {
     name: '',
     children: [],
@@ -245,7 +243,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
 
   return (
     <Composed
-      articleTemplate={articleTemplate}
+      articleTemplate={templateData.articleTemplate}
       client={client}
       currentUser={currentUser}
       form={form}
@@ -278,7 +276,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
             />
           ) : null}
           <Production
-            articleTemplate={articleTemplate}
+            articleTemplate={templateData.articleTemplate}
             client={client}
             currentUser={currentUser}
             displayShortIdAsIdentifier={controlPanel?.displayManuscriptShortId}

@@ -96,6 +96,7 @@ const pdfHandler = async manuscriptId => {
   }
 
   // get article from Id
+
   const articleData = await getManuscriptById(manuscriptId)
   const groupData = await getGroupAssets(articleData.groupId)
 

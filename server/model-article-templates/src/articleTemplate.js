@@ -1,25 +1,8 @@
 const { BaseModel } = require('@coko/server')
 
-const { AjvValidator } = require('objection')
-
-const CLASSES = {
-  Buffer,
-}
-
 class ArticleTemplate extends BaseModel {
   static get tableName() {
     return 'article_templates'
-  }
-
-  static createValidator() {
-    return new AjvValidator({
-      onCreateAjv: ajv => {
-        ajv.addKeyword('instanceof', {
-          compile: schema => data =>
-            data instanceof CLASSES[schema] || data === null || data === '',
-        })
-      },
-    })
   }
 
   constructor(properties) {
@@ -57,8 +40,8 @@ class ArticleTemplate extends BaseModel {
     return {
       properties: {
         name: { type: ['string', 'null'] },
-        article: { instanceof: 'Buffer' },
-        css: { instanceof: 'Buffer' },
+        article: { type: ['string', 'null'] },
+        css: { type: ['string', 'null'] },
         groupId: { type: ['string', 'null'], format: 'uuid' },
       },
     }

@@ -5,6 +5,6 @@ CREATE TABLE article_templates (
     group_id UUID REFERENCES groups(id),
     type TEXT NOT NULL,
     name TEXT DEFAULT null,
-    article bytea DEFAULT null,
-    css bytea DEFAULT null
+    article TEXT DEFAULT null,
+    css TEXT DEFAULT null
 );
