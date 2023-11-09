@@ -120,22 +120,6 @@ const articleMetadata = manuscript => {
       }).svg()
 
       meta.qrcode = qrcode
-    } else {
-      meta.doi = 'DOI will be available soon.'
-
-      const qrcode = new QRCode({
-        content: `DOI&nbsp;will be available soon.`,
-        padding: 4,
-        width: 80,
-        height: 80,
-        color: '#000000',
-        background: '#ffffff',
-        ecl: 'M',
-        pretty: false,
-        xmlDeclaration: false,
-      }).svg()
-
-      meta.qrcode = qrcode
     }
 
     if (manuscript.submission.DOI) {
