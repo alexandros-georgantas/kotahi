@@ -59,16 +59,6 @@ const Production = ({
 
   const [htmlValue, setHtmlValue] = useState(articleTemplate.article)
 
-  const onCopyHandleBarsCode = name => {
-    return () =>
-      navigator.clipboard.writeText(
-        `<span>{{ article.${name.replace(
-          'submission.',
-          'articleMetadata.',
-        )} | safe }}</span>`,
-      )
-  }
-
   const onChangeCss = useCallback(
     debounce(cssContent => {
       setCssValue(cssContent)
@@ -182,6 +172,7 @@ const Production = ({
       <SectionContent>
         <FormTemplateStyled>
           <ReadonlyFormTemplate
+            copyHandleBarsCode
             displayShortIdAsIdentifier={displayShortIdAsIdentifier}
             form={form}
             formData={{
@@ -189,7 +180,6 @@ const Production = ({
               submission: JSON.parse(manuscript.submission),
             }}
             manuscript={manuscript}
-            onCopyHandleBarsCode={onCopyHandleBarsCode}
             // threadedDiscussionProps={threadedDiscussionExtendedProps}
             showEditorOnlyFields
           />

@@ -15,8 +15,18 @@ const ReadonlyFormTemplate = ({
   displayShortIdAsIdentifier,
   threadedDiscussionProps,
   allowAuthorsSubmitNewVersion,
-  onCopyHandleBarsCode,
+  copyHandleBarsCode,
 }) => {
+  const onCopyHandleBarsCode = name => {
+    return () =>
+      navigator.clipboard.writeText(
+        `<span>{{ article.${name.replace(
+          'submission.',
+          'articleMetadata.',
+        )} | safe }}</span>`,
+      )
+  }
+
   return (
     <SectionContent>
       {title ? (
@@ -52,7 +62,7 @@ const ReadonlyFormTemplate = ({
                 threadedDiscussionProps={threadedDiscussionProps}
               />
             </Cell>
-            {onCopyHandleBarsCode && (
+            {copyHandleBarsCode && (
               <Cell>
                 {element.name}
                 <Action onClick={onCopyHandleBarsCode(element.name)} primary>
@@ -92,12 +102,12 @@ ReadonlyFormTemplate.propTypes = {
     ),
   }),
   showEditorOnlyFields: PropTypes.bool,
-  onCopyHandleBarsCode: PropTypes.func,
+  copyHandleBarsCode: PropTypes.bool,
 }
 
 ReadonlyFormTemplate.defaultProps = {
   manuscript: null,
-  onCopyHandleBarsCode: null,
+  copyHandleBarsCode: false,
   showEditorOnlyFields: false,
 }
 
