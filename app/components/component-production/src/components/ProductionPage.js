@@ -131,19 +131,6 @@ const fragmentFields = `
   }
 `
 
-const templateQuery = gql`
-  query($groupId: ID!) {
-    articleTemplate(groupId: $groupId) {
-      id
-      name
-      groupId
-      ${fileFragment}
-      article
-      css
-    }
-}
-`
-
 const query = gql`
   query($id: ID!, $groupId: ID!) {
     manuscript(id: $id) {
@@ -155,6 +142,15 @@ const query = gql`
 
     submissionForm: formForPurposeAndCategory(purpose: "submit", category: "submission", groupId: $groupId) {
       ${formFields}
+    }
+
+    articleTemplate(groupId: $groupId) {
+      id
+      name
+      groupId
+      ${fileFragment}
+      article
+      css
     }
 	}
 `
@@ -218,21 +214,10 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
     },
   })
 
-  const {
-    data: templateData,
-    loading: templateLoading,
-    error: templateError,
-  } = useQuery(templateQuery, {
-    variables: {
-      groupId,
-    },
-  })
+  if (loading) return <Spinner />
+  if (error) return <CommsErrorBanner error={error} />
 
-  if (loading || templateLoading) return <Spinner />
-  if (error || templateError)
-    return <CommsErrorBanner error={error || templateError} />
-
-  const { manuscript, submissionForm } = data
+  const { manuscript, submissionForm, articleTemplate } = data
 
   const form = submissionForm?.structure ?? {
     name: '',
@@ -243,7 +228,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
 
   return (
     <Composed
-      articleTemplate={templateData.articleTemplate}
+      articleTemplate={articleTemplate}
       client={client}
       currentUser={currentUser}
       form={form}
@@ -276,7 +261,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
             />
           ) : null}
           <Production
-            articleTemplate={templateData.articleTemplate}
+            articleTemplate={articleTemplate}
             client={client}
             currentUser={currentUser}
             displayShortIdAsIdentifier={controlPanel?.displayManuscriptShortId}
