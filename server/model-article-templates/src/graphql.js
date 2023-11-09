@@ -34,7 +34,7 @@ const typeDefs = `
   }
 
   extend type Mutation {
-    updateTemplate(id: ID!, input: UpdateTemplateInput!): ArticleTemplate
+    updateTemplate(id: ID!, input: UpdateTemplateInput!): ArticleTemplate!
   }
 
   type ArticleTemplate {
