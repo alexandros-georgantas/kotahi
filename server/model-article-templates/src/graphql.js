@@ -30,11 +30,11 @@ const resolvers = {
 
 const typeDefs = `
   extend type Query {
-    articleTemplate(groupId: ID!): ArticleTemplate
+    articleTemplate(groupId: ID!): ArticleTemplate!
   }
 
   extend type Mutation {
-    updateTemplate(id: ID!, input: updateTemplateInput!): ArticleTemplate
+    updateTemplate(id: ID!, input: UpdateTemplateInput!): ArticleTemplate
   }
 
   type ArticleTemplate {
@@ -48,7 +48,7 @@ const typeDefs = `
     files: [File!]
   }
 
-  input updateTemplateInput {
+  input UpdateTemplateInput {
     article: String
     css: String
   }

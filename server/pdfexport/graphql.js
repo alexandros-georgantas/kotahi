@@ -122,14 +122,8 @@ const pdfHandler = async manuscriptId => {
 
   await fsPromised.appendFile(`${dirName}/index.html`, outHtml)
 
-  let css = ''
-
-  if (groupData.css) {
-    css = await generateCss(true)
-    css += groupData.css.toString()
-  } else {
-    css = await generateCss()
-  }
+  let css = await generateCss()
+  if (groupData.css) css += groupData.css
 
   await fsPromised.appendFile(`${dirName}/styles.css`, css)
 

@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import ReadonlyFieldData from './ReadonlyFieldData'
+import { color } from '../../../../../theme'
 import { Title, SectionHeader, SectionRowGrid, Heading, Cell } from '../style'
-import { SectionContent } from '../../../../shared'
+import { SectionContent, Action, Icon } from '../../../../shared'
 
 const ReadonlyFormTemplate = ({
   form,
@@ -14,6 +15,7 @@ const ReadonlyFormTemplate = ({
   displayShortIdAsIdentifier,
   threadedDiscussionProps,
   allowAuthorsSubmitNewVersion,
+  onCopyHandleBarsCode,
 }) => {
   return (
     <SectionContent>
@@ -50,6 +52,17 @@ const ReadonlyFormTemplate = ({
                 threadedDiscussionProps={threadedDiscussionProps}
               />
             </Cell>
+            {onCopyHandleBarsCode && (
+              <Cell>
+                {element.name}
+                <Action onClick={onCopyHandleBarsCode(element.name)} primary>
+                  {' '}
+                  <Icon color={color.brand1.base()} inline>
+                    file-plus
+                  </Icon>
+                </Action>
+              </Cell>
+            )}
           </SectionRowGrid>
         ))}
     </SectionContent>
@@ -79,10 +92,12 @@ ReadonlyFormTemplate.propTypes = {
     ),
   }),
   showEditorOnlyFields: PropTypes.bool,
+  onCopyHandleBarsCode: PropTypes.func,
 }
 
 ReadonlyFormTemplate.defaultProps = {
   manuscript: null,
+  onCopyHandleBarsCode: null,
   showEditorOnlyFields: false,
 }
 

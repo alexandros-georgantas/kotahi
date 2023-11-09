@@ -169,7 +169,7 @@ export const updateMutation = gql`
 `
 
 export const updateTemplateMutation = gql`
-  mutation($id: ID!, $input: updateTemplateInput!) {
+  mutation($id: ID!, $input: UpdateTemplateInput!) {
     updateTemplate(id: $id, input: $input) {
       id
       name

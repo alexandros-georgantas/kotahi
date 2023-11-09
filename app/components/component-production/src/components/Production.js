@@ -21,7 +21,8 @@ import {
 import { Info } from './styles'
 import { ControlsContainer } from '../../../component-manuscripts/src/style'
 import UploadAsset from './UploadAsset'
-import ReadonlyFormTemplate from './ReadonlyFormTemplate'
+// import ReadonlyFormTemplate from './ReadonlyFormTemplate'
+import ReadonlyFormTemplate from '../../../component-review/src/components/metadata/ReadonlyFormTemplate'
 
 const FlexRow = styled.div`
   display: flex;
@@ -30,7 +31,7 @@ const FlexRow = styled.div`
 `
 
 const FormTemplateStyled = styled.div`
-  height: 800px;
+  max-height: calc(100vh - 150px);
 `
 
 const Production = ({
@@ -58,6 +59,16 @@ const Production = ({
 
   const [htmlValue, setHtmlValue] = useState(articleTemplate.article)
 
+  const onCopyHandleBarsCode = name => {
+    return () =>
+      navigator.clipboard.writeText(
+        `<span>{{ article.${name.replace(
+          'submission.',
+          'articleMetadata.',
+        )} | safe }}</span>`,
+      )
+  }
+
   const onChangeCss = useCallback(
     debounce(cssContent => {
       setCssValue(cssContent)
@@ -76,7 +87,14 @@ const Production = ({
     [],
   )
 
-  useEffect(() => debouncedSave.flush, [])
+  useEffect(
+    () => () => {
+      debouncedSave.flush()
+      onChangeCss.flush()
+      onChangeHtml.flush()
+    },
+    [],
+  )
 
   const { t } = useTranslation()
 
@@ -171,8 +189,9 @@ const Production = ({
               submission: JSON.parse(manuscript.submission),
             }}
             manuscript={manuscript}
-            showEditorOnlyFields
+            onCopyHandleBarsCode={onCopyHandleBarsCode}
             // threadedDiscussionProps={threadedDiscussionExtendedProps}
+            showEditorOnlyFields
           />
         </FormTemplateStyled>
       </SectionContent>
