@@ -52,12 +52,12 @@ const makeFormattedAuthors = (authors, correspondingAuthor) => {
     // thisAuthor += ` <small>(${authors[i].email})</small>`
 
     if (affliationList.length) {
-      thisAuthor += `<sup><small>${affliationList.join(', ')}</small></sup>`
+      thisAuthor += `<sup><small class="author-list-separation">${affliationList.join(', ')}</small></sup>`
     }
 
     if (correspondingAuthor && correspondingAuthor === authors[i].email) {
       // check if there is a corresponding author; if there is one, add a star to the author's name
-      thisAuthor += `<sup>*</sup>`
+      thisAuthor += `<sup class="author-corresponding-symbol">*</sup>`
     }
 
     outAuthors.push(thisAuthor)
@@ -69,9 +69,9 @@ const makeFormattedAuthors = (authors, correspondingAuthor) => {
   outHtml += `<ul class="formattedAffiliations">${affiliationMemo
     .map(
       affiliation =>
-        `<li><small>${affiliation.label}:</small> ${affiliation.value}</li>`,
+        `<li><small>${affiliation.label}<span class="affiliation-decoration">:</span></small> ${affiliation.value}</li>`,
     )
-    .join(', ')}</ul>`
+    .join(' ')}</ul>`
   // console.log('\n\n\nFormatted authors: \n\n', outHtml, '\n\n\n')
   return outHtml
 }
