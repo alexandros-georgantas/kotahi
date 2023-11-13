@@ -52,7 +52,9 @@ const makeFormattedAuthors = (authors, correspondingAuthor) => {
     // thisAuthor += ` <small>(${authors[i].email})</small>`
 
     if (affliationList.length) {
-      thisAuthor += `<sup><small class="author-list-separation">${affliationList.join(', ')}</small></sup>`
+      thisAuthor += `<sup><small class="author-list-separation">${affliationList.join(
+        ', ',
+      )}</small></sup>`
     }
 
     if (correspondingAuthor && correspondingAuthor === authors[i].email) {
