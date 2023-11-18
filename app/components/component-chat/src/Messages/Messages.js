@@ -53,6 +53,7 @@ const Messages = ({
   manuscriptId = null,
   currentUser,
 }) => {
+  // testing
   const { loading, error, data } = queryData
 
   const [openDropdown, setOpenDropdown] = useState(false)
