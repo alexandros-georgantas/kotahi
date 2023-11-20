@@ -51,13 +51,15 @@ services:
     command:
       [
         'node_modules/.bin/nodemon',
+        '--ignore',
+        'tmp/',
         'startServer.js',
         '--',
         'server',
         '--',
         'config',
         '--ext',
-        'js,graphql',
+        'js,graphql', 
       ]
     ports:
       - ${SERVER_PORT:-3000}:3000

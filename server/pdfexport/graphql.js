@@ -7,7 +7,7 @@ const axios = require('axios')
 const config = require('config')
 const { promisify } = require('util')
 const models = require('@pubsweet/models')
-const { createFile, File } = require('@coko/server')
+const { createFile, File, fileStorage } = require('@coko/server')
 const { applyTemplate, generateCss } = require('./applyTemplate')
 const makeZip = require('./ziputils.js')
 const publicationMetadata = require('./pdfTemplates/publicationMetadata')
@@ -132,6 +132,17 @@ const pdfHandler = async manuscriptId => {
   }
 
   await fsPromised.appendFile(`${dirName}/styles.css`, css)
+
+  await Promise.all(
+    groupData.files
+      .filter(f => f.storedObjects[0].extension === 'js')
+      .map(file =>
+        fileStorage.download(
+          file.storedObjects[0].key,
+          `${dirName}/${file.name}`,
+        ),
+      ),
+  )
 
   // Manually copy the two fonts to the folder that will be zipped. This is a temporary fix!
   publicationMetadata.fonts.forEach(async fontPath => {
