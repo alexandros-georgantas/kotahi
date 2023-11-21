@@ -59,7 +59,7 @@ services:
         '--',
         'config',
         '--ext',
-        'js,graphql', 
+        'js,graphql',
       ]
     ports:
       - ${SERVER_PORT:-3000}:3000

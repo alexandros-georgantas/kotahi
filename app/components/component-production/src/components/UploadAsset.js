@@ -93,6 +93,7 @@ const UploadAsset = ({ files, groupTemplateId }) => {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
       },
       body,
     })
@@ -101,6 +102,26 @@ const UploadAsset = ({ files, groupTemplateId }) => {
     setFilesState([...result])
     setShowSpinner(false)
   }, [])
+
+  const onDelete = id => {
+    return async () => {
+      setShowSpinner(true)
+
+      let result = await fetch(`/api/deleteAsset`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
+      })
+
+      result = await result.json()
+      setFilesState([...result])
+      setShowSpinner(false)
+    }
+  }
 
   const onDrop = useCallback(async acceptedFiles => {
     setShowSpinner(true)
@@ -211,6 +232,14 @@ const UploadAsset = ({ files, groupTemplateId }) => {
       title: 'Copy as Url',
       component: ({ file }) => (
         <Action onClick={onCopyAsUrl(file)}>Create URL</Action>
+      ),
+    },
+    {
+      name: 'delete',
+      centered: false,
+      title: 'Delete',
+      component: ({ file }) => (
+        <Action onClick={onDelete(file.id)}>Delete</Action>
       ),
     },
   ]

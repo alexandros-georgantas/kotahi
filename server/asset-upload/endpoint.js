@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const multer = require('multer')
 const passport = require('passport')
 const path = require('path')
-const { createFile } = require('@coko/server')
+const { createFile, fileStorage, File } = require('@coko/server')
 const { getFilesWithUrl } = require('../utils/fileStorageUtils')
 
 const authBearer = passport.authenticate('bearer', { session: false })
@@ -56,4 +56,27 @@ module.exports = app => {
       )
     },
   )
+
+  app.post('/api/deleteAsset', authBearer, async (req, res, next) => {
+    // eslint-disable-next-line no-plusplus
+
+    const { id } = req.body
+    const file = await File.query().findOne({ id })
+    const keys = file.storedObjects.map(f => f.key)
+
+    try {
+      if (keys.length > 0) {
+        await fileStorage.deleteFiles(keys)
+        await File.query().deleteById(id)
+      }
+
+      return res.send(
+        await getFilesWithUrl(
+          await ArticleTemplate.relatedQuery('files').for(file.objectId),
+        ),
+      )
+    } catch (e) {
+      throw new Error('The was a problem deleting the file')
+    }
+  })
 }
