@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import { color } from '../../../../theme'
 import { convertTimestampToRelativeDateString } from '../../../../shared/dateUtils'
 import { Placeholder } from '../../../component-dashboard/src/style'
+import { ConfirmationModal } from '../../../component-modal/src/ConfirmationModal'
 import FileRow from './FileRow'
 import {
   Container,
@@ -81,6 +82,7 @@ export const FilesHeading = styled.div`
 const UploadAsset = ({ files, groupTemplateId }) => {
   const { t } = useTranslation()
   const [showSpinner, setShowSpinner] = useState(false)
+  const [isDeletingFile, setIsDeletingFile] = useState(false)
   const [filesState, setFilesState] = useState(files)
 
   const uploadAssetsFn = useCallback(async acceptedFiles => {
@@ -93,7 +95,6 @@ const UploadAsset = ({ files, groupTemplateId }) => {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json',
       },
       body,
     })
@@ -239,7 +240,22 @@ const UploadAsset = ({ files, groupTemplateId }) => {
       centered: false,
       title: 'Delete',
       component: ({ file }) => (
-        <Action onClick={onDelete(file.id)}>Delete</Action>
+        <>
+          <Action onClick={() => setIsDeletingFile(true)}>Delete</Action>
+          <ConfirmationModal
+            closeModal={() => setIsDeletingFile(false)}
+            confirmationAction={onDelete(file.id)}
+            confirmationButtonText={t('chat.delete')}
+            isOpen={isDeletingFile}
+            message={
+              <>
+                {t(
+                  'modals.deleteFile.Are you sure you want to delete this file?',
+                )}
+              </>
+            }
+          />
+        </>
       ),
     },
   ]
