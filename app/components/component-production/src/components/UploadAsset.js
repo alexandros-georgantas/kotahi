@@ -34,7 +34,10 @@ const Message = styled.div`
 const UploadAssetContainer = styled(Container)`
   display: flex;
   flex-direction: column;
+  height: 850px;
   justify-content: space-between;
+  overflow: auto;
+  padding: calc(8px * 2) calc(8px * 3);
 `
 
 const DropZoneContainer = styled.div`

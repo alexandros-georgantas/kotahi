@@ -130,7 +130,6 @@ const Production = ({
           height="850px"
           onChange={onChangeCss}
           value={cssValue}
-          width="1680px"
         />
       </SectionContent>
     ),
@@ -146,7 +145,6 @@ const Production = ({
           height="850px"
           onChange={onChangeHtml}
           value={htmlValue}
-          width="1680px"
         />
       </SectionContent>
     ),
