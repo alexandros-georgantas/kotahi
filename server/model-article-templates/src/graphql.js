@@ -49,8 +49,8 @@ const typeDefs = `
   }
 
   input UpdateTemplateInput {
-    article: String!
-    css: String!
+    article: String
+    css: String
   }
 `
 
