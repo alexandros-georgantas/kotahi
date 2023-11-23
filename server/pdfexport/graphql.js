@@ -126,7 +126,8 @@ const pdfHandler = async manuscriptId => {
 
   if (groupData.css) {
     css = await generateCss(true)
-    css += groupData.css.toString()
+    // eslint-disable-next-line operator-assignment
+    css = css + groupData.css.toString()
   } else {
     css = await generateCss()
   }
