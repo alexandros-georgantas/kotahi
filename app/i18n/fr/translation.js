@@ -87,10 +87,10 @@ const fr = {
       Tasks: 'Tâches',
       Users: 'Utilisateurs',
       Configuration: 'Configuration',
-      Emails: 'Emails',
+      Emails: 'E-mails',
       CMS: 'CMS',
       Pages: 'Pages',
-      Layout: 'Disposition',
+      Layout: 'Mise en page',
       'Go to your profile': 'Accéder à votre profil',
     },
 
@@ -392,6 +392,8 @@ const fr = {
         'Pages de contrôle visibles aux éditeurs',
       Team: 'Équipe',
       Submission: 'Soumission',
+      coarNotify: 'COAR-Notifier',
+      acceptedIPs: 'IP acceptées',
       allowToSubmitNewVersion:
         'Permettre à un auteur de soumettre une nouvelle version de son manuscrit à tout moment',
       'Review page': "Page d'évaluation",
@@ -444,7 +446,8 @@ const fr = {
       'User Management': 'Gestion des utilisateurs',
       userIsAdmin:
         "Tous les utilisateurs sont assignés les rôles de gestionnaire de groupe et d'administrateur",
-      kotahiApiTokens: 'Jetons API Kotahi',
+      kotahiApis: 'API Kotahi',
+      tokens: 'Jetons',
       Submit: 'Soumettre',
       article: 'article',
       'peer review': 'évaluation par les pairs',
@@ -475,14 +478,16 @@ const fr = {
         'Select locale for citations':
           'Sélectionnez la langue pour les citations',
       },
+      allowedIPs: 'Liste des adresses IP du référentiel autorisées à accéder',
+      api: 'API Kotahi',
     },
     reportsPage: {
       Reports: 'Rapports',
       Show: 'Afficher',
       activityForManuscripts: 'activité pour les manuscrits arrivant',
-      activityForManuscriptsTooltip: `Les métriques sont montrées pour les manuscrits qui ont été ajoutés en premier 
+      activityForManuscriptsTooltip: `Les métriques sont montrées pour les manuscrits qui ont été ajoutés en premier
                     <br />
-                    entre ces dates. Les limites de date sont 
+                    entre ces dates. Les limites de date sont
                     <br />
                     à minuit en temps universel.`,
       'Editors workflow': 'Flux de travail des éditeurs',
@@ -575,11 +580,26 @@ const fr = {
         },
       },
     },
-    emailtemplatesPage: {
+    emailTemplate: {
       'Email Templates': "Modèles d'email",
-      Subject: 'Sujet',
-      CC: 'CC',
-      Body: 'Corps',
+      'New Email Template': "Nouveau modèle d'email",
+      subject: 'Sujet',
+      cc: 'CC',
+      ccEditorsCheckboxDescription:
+        "Ajouter automatiquement les éditeurs de manuscrit en « CC » lors de l'envoi de cet e-mail (si applicable)",
+      body: 'Corps',
+      description: 'Description',
+      save: 'Enregistrer',
+      update: 'Mettre à jour',
+      addANewEmailTemplate: "Ajouter un nouveau modèle d'email",
+      'Edited on': 'Modifié le {{date}}',
+      delete: 'Supprimer',
+      permanentlyDelete:
+        "La suppression de ce modèle d'email entraînera également la suppression de son affectation aux tâches et aux paramètres de configuration. Cette action est irréversible. Êtes-vous sûr de vouloir supprimer ?",
+      validationMessages: {
+        invalidEmail: "L'adresse email est invalide",
+        duplicateDescription: 'Un modèle avec la même description existe déjà.',
+      },
     },
     loginPage: {
       kotahiUses:
@@ -686,6 +706,9 @@ const fr = {
       'Hide Chat': 'Masquer le chat',
       'Discussion with author': "Discussion avec l'auteur",
       'Editorial discussion': 'Discussion éditoriale',
+      'Discussion with editorial team': "Discussion avec l'équipe éditoriale",
+      'Discussion with editor': "Discussion avec l'éditeur",
+      'Show Chat': 'Afficher le chat',
       edit: 'Modifier',
       delete: 'Supprimer',
       Edited: 'Modifié',
@@ -789,6 +812,7 @@ const fr = {
       taskEdit: {
         'Task details': 'Détails de la tâche',
         'Task title': 'Titre de la tâche',
+        'Task description': 'Description de la tâche',
         Save: 'Enregistrer',
         'Give your task a name': 'Donnez un nom à votre tâche...',
         Assignee: 'Attributaire',
@@ -853,6 +877,10 @@ const fr = {
         'Some targets failed to publish':
           'Échec de la publication de certaines cibles.',
         'Publishing error': 'Erreur de publication',
+      },
+      deleteFile: {
+        'Are you sure you want to delete this file?':
+          'Êtes-vous sûr de vouloir supprimer ce fichier ?',
       },
     },
 

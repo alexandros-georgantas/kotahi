@@ -287,6 +287,7 @@ created
 updated
 manuscriptId
 groupId
+description
 title
 assigneeUserId
 assignee {
@@ -413,7 +414,9 @@ export const GET_EMAIL_TEMPLATES = gql`
         subject
         body
         description
+        ccEditors
       }
+      groupId
     }
   }
 `

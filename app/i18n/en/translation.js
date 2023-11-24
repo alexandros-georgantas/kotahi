@@ -330,7 +330,7 @@ const en = {
       Remove: 'Remove',
     },
     productionPage: {
-      Production: 'Productionn',
+      Production: 'Production',
       'No supported view of the file': 'No supported view of the file',
       Download: 'Download',
     },
@@ -428,7 +428,8 @@ const en = {
       reportShowInMenu: 'Group Manager and admin can access Reports',
       'User Management': 'User Management',
       userIsAdmin: 'All users are assigned Group Manager and Admin roles',
-      kotahiApiTokens: 'Kotahi API tokens',
+      kotahiApis: 'Kotahi APIs',
+      tokens: 'Tokens',
       Submit: 'Submit',
       article: 'article',
       'peer review': 'peer review',
@@ -456,6 +457,8 @@ const en = {
         cse: 'Council of Science Editors (CSE)',
         'Select locale for citations': 'Select locale for citations',
       },
+      allowedIPs: 'List of repository IPs allowed access',
+      api: 'COAR Notify',
     },
     reportsPage: {
       Reports: 'Reports',
@@ -554,11 +557,27 @@ const en = {
         },
       },
     },
-    emailtemplatesPage: {
+    emailTemplate: {
       'Email Templates': 'Email Templates',
-      Subject: 'Subject',
-      CC: 'CC',
-      Body: 'Body',
+      'New Email Template': 'New Email Template',
+      subject: 'Subject',
+      cc: 'CC',
+      ccEditorsCheckboxDescription:
+        'Automatically add manuscript editors in "cc" when sending this email (if applicable)',
+      body: 'Body',
+      description: 'Description',
+      save: 'Save',
+      update: 'Update',
+      addANewEmailTemplate: 'Add a new email template',
+      'Edited on': 'Edited on {{date}}',
+      delete: 'Delete',
+      permanentlyDelete:
+        'Deleting this email template will also delete its assignment from tasks and configuration settings. This action cannot be undone. Are you sure you want to delete?',
+      validationMessages: {
+        invalidEmail: 'Email is invalid',
+        duplicateDescription:
+          'Template with the Same Description Already Exists.',
+      },
     },
     loginPage: {
       kotahiUses:
@@ -661,6 +680,9 @@ const en = {
       'Group Manager discussion': 'Group Manager discussion',
       'Show admin discussion': 'Show admin discussion',
       'Show group manager discussion': 'Show group manager discussion',
+      'Discussion with editorial team': 'Discussion with editorial team',
+      'Discussion with editor': 'Discussion with editor',
+      'Show Chat': 'Show Chat',
       'Hide Chat': 'Hide Chat',
       'Discussion with author': 'Discussion with author',
       'Editorial discussion': 'Editorial discussion',
@@ -767,6 +789,7 @@ const en = {
       taskEdit: {
         'Task details': 'Task details',
         'Task title': 'Task title',
+        'Task description': 'Task description',
         Save: 'Save',
         'Give your task a name': 'Give your task a name...',
         Assignee: 'Assignee',
@@ -828,6 +851,10 @@ const en = {
       publishError: {
         'Some targets failed to publish': 'Some targets failed to publish.',
         'Publishing error': 'Publishing error',
+      },
+      deleteFile: {
+        'Are you sure you want to delete this file?':
+          'Are you sure you want to delete this file?',
       },
     },
 

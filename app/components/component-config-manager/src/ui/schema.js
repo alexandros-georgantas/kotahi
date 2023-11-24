@@ -825,32 +825,6 @@ const generateSchema = (
                         title: t('configPage.useSandbox'),
                         default: false,
                       },
-                      crossrefRetrievalEmail: {
-                        type: ['string', 'null'],
-                        description: t('configPage.crossrefRetrievalEmail'),
-                        default: '',
-                      },
-                      crossrefSearchResultCount: {
-                        type: 'number',
-                        description: t('configPage.crossrefSearchResultCount'),
-                        default: 3,
-                      },
-                      styleName: {
-                        type: ['string', 'null'],
-                        description: t('configPage.crossrefStyleName'),
-                        enum: [
-                          'apa',
-                          'chicago-note-bibliogrpahy',
-                          'counctil-of-science-editors-alphabetical',
-                        ],
-                        default: 'apa',
-                      },
-                      localeName: {
-                        type: ['string', 'null'],
-                        description: t('configPage.crossrefLocaleName'),
-                        enum: ['en-US', 'en-GB'],
-                        default: 'en-US',
-                      },
                     },
                   },
                   webhook: {
@@ -955,9 +929,25 @@ const generateSchema = (
                     title: t('configPage.userIsAdmin'),
                     default: false,
                   },
-                  kotahiApiTokens: {
+                },
+              },
+              kotahiApis: {
+                type: 'object',
+                title: t('configPage.kotahiApis'),
+                properties: {
+                  tokens: {
                     type: ['string', 'null'],
-                    description: t('configPage.kotahiApiTokens'),
+                    description: t('configPage.tokens'),
+                  },
+                },
+              },
+              coarNotify: {
+                type: 'object',
+                title: t('configPage.api'),
+                properties: {
+                  repoIpAddress: {
+                    type: ['string', 'null'],
+                    description: t('configPage.allowedIPs'),
                   },
                 },
               },
@@ -1347,32 +1337,6 @@ const generateSchema = (
                         title: t('configPage.useSandbox'),
                         default: false,
                       },
-                      crossrefRetrievalEmail: {
-                        type: ['string', 'null'],
-                        description: t('configPage.crossrefRetrievalEmail'),
-                        default: '',
-                      },
-                      crossrefSearchResultCount: {
-                        type: 'number',
-                        description: t('configPage.crossrefSearchResultCount'),
-                        default: 3,
-                      },
-                      styleName: {
-                        type: ['string', 'null'],
-                        description: t('configPage.crossrefStyleName'),
-                        enum: [
-                          'apa',
-                          'chicago-note-bibliogrpahy',
-                          'counctil-of-science-editors-alphabetical',
-                        ],
-                        default: 'apa',
-                      },
-                      localeName: {
-                        type: ['string', 'null'],
-                        description: t('configPage.crossrefLocaleName'),
-                        enum: ['en-US', 'en-GB'],
-                        default: 'en-US',
-                      },
                     },
                   },
                   webhook: {
@@ -1477,9 +1441,25 @@ const generateSchema = (
                     title: t('configPage.userIsAdmin'),
                     default: false,
                   },
-                  kotahiApiTokens: {
+                },
+              },
+              kotahiApis: {
+                type: 'object',
+                title: t('configPage.kotahiApis'),
+                properties: {
+                  tokens: {
                     type: ['string', 'null'],
-                    description: t('configPage.kotahiApiTokens'),
+                    description: t('configPage.tokens'),
+                  },
+                },
+              },
+              coarNotify: {
+                type: 'object',
+                title: t('configPage.api'),
+                properties: {
+                  repoIpAddress: {
+                    type: ['string', 'null'],
+                    description: t('configPage.allowedIPs'),
                   },
                 },
               },
@@ -1865,32 +1845,6 @@ const generateSchema = (
                         title: t('configPage.useSandbox'),
                         default: false,
                       },
-                      crossrefRetrievalEmail: {
-                        type: ['string', 'null'],
-                        description: t('configPage.crossrefRetrievalEmail'),
-                        default: '',
-                      },
-                      crossrefSearchResultCount: {
-                        type: 'number',
-                        description: t('configPage.crossrefSearchResultCount'),
-                        default: 3,
-                      },
-                      styleName: {
-                        type: ['string', 'null'],
-                        description: t('configPage.crossrefStyleName'),
-                        enum: [
-                          'apa',
-                          'chicago-note-bibliogrpahy',
-                          'counctil-of-science-editors-alphabetical',
-                        ],
-                        default: 'apa',
-                      },
-                      localeName: {
-                        type: ['string', 'null'],
-                        description: t('configPage.crossrefLocaleName'),
-                        enum: ['en-US', 'en-GB'],
-                        default: 'en-US',
-                      },
                     },
                   },
                   webhook: {
@@ -1995,9 +1949,25 @@ const generateSchema = (
                     title: t('configPage.userIsAdmin'),
                     default: false,
                   },
-                  kotahiApiTokens: {
+                },
+              },
+              kotahiApis: {
+                type: 'object',
+                title: t('configPage.kotahiApis'),
+                properties: {
+                  tokens: {
                     type: ['string', 'null'],
-                    description: t('configPage.kotahiApiTokens'),
+                    description: t('configPage.tokens'),
+                  },
+                },
+              },
+              coarNotify: {
+                type: 'object',
+                title: t('configPage.api'),
+                properties: {
+                  repoIpAddress: {
+                    type: ['string', 'null'],
+                    description: t('configPage.allowedIPs'),
                   },
                 },
               },
@@ -2384,32 +2354,6 @@ const generateSchema = (
                         title: t('configPage.useSandbox'),
                         default: false,
                       },
-                      crossrefRetrievalEmail: {
-                        type: ['string', 'null'],
-                        description: t('configPage.crossrefRetrievalEmail'),
-                        default: '',
-                      },
-                      crossrefSearchResultCount: {
-                        type: 'number',
-                        description: t('configPage.crossrefSearchResultCount'),
-                        default: 3,
-                      },
-                      styleName: {
-                        type: ['string', 'null'],
-                        description: t('configPage.crossrefStyleName'),
-                        enum: [
-                          'apa',
-                          'chicago-note-bibliogrpahy',
-                          'counctil-of-science-editors-alphabetical',
-                        ],
-                        default: 'apa',
-                      },
-                      localeName: {
-                        type: ['string', 'null'],
-                        description: t('configPage.crossrefLocaleName'),
-                        enum: ['en-US', 'en-GB'],
-                        default: 'en-US',
-                      },
                     },
                   },
                   webhook: {
@@ -2536,9 +2480,25 @@ const generateSchema = (
                     title: t('configPage.userIsAdmin'),
                     default: false,
                   },
-                  kotahiApiTokens: {
+                },
+              },
+              kotahiApis: {
+                type: 'object',
+                title: t('configPage.kotahiApis'),
+                properties: {
+                  tokens: {
                     type: ['string', 'null'],
-                    description: t('configPage.kotahiApiTokens'),
+                    description: t('configPage.tokens'),
+                  },
+                },
+              },
+              coarNotify: {
+                type: 'object',
+                title: t('configPage.api'),
+                properties: {
+                  repoIpAddress: {
+                    type: ['string', 'null'],
+                    description: t('configPage.allowedIPs'),
                   },
                 },
               },

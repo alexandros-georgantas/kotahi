@@ -2,6 +2,7 @@ import styled, { css } from 'styled-components'
 import { th, grid } from '@pubsweet/ui-toolkit'
 import { Button } from '@pubsweet/ui'
 import theme, { color } from '../../../../theme'
+import { RoundIconButton } from '../../../shared'
 
 export const AdminSection = styled.div`
   margin-bottom: calc(${th('gridUnit')} * 3);
@@ -91,7 +92,7 @@ export const Heading = styled.span`
 `
 
 export const Cell = styled.span`
-  grid-column: span 2 / span 2;
+  grid-column: span 1 / span 1;
   padding: 0;
 `
 
@@ -109,6 +110,20 @@ export const BadgeContainer = styled.div`
   display: flex;
   flex-flow: row wrap;
   gap: 4px 18px;
+`
+export const ChatButton = styled(RoundIconButton)`
+  margin-top: 16px;
+  position: absolute;
+  right: 18px;
+`
+
+export const CollapseButton = styled(RoundIconButton)`
+  height: 33px;
+  margin-top: 0;
+  min-width: 0;
+  position: absolute;
+  right: 0;
+  width: 33px;
 `
 
 export const AssignedAuthorForProofingLogsContainer = styled.div`

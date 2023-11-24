@@ -519,7 +519,7 @@ const AdminPage = () => {
           <PrivateRoute
             component={EmailTemplatesPage}
             key="email-templates"
-            path={`${urlFrag}/admin/email-templates`}
+            path={`${emailTemplatesLink}/:pageId?`}
             redirectLink={redirectLink}
           />,
         ]}

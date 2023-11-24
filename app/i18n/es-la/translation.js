@@ -89,7 +89,7 @@ const esLa = {
       Users: 'Usuarios',
       Configuration: 'Configuración',
       Emails: 'Correos Electrónicos',
-      CMS: 'CMS',
+      CMS: 'Gestor de Contenidos',
       Pages: 'Páginas',
       Layout: 'Diseño',
       'Go to your profile': 'Ir a tu perfil',
@@ -445,7 +445,8 @@ const esLa = {
       'User Management': 'Gestión de Usuarios',
       userIsAdmin:
         'Todos los usuarios tienen roles de Gerente de Grupo y Administrador',
-      kotahiApiTokens: 'Tokens de API de Kotahi',
+      kotahiApis: 'API de Kotahi',
+      tokens: 'Tokens',
       Submit: 'Enviar',
       article: 'artículo',
       'peer review': 'revisión de pares',
@@ -475,6 +476,8 @@ const esLa = {
         'Select locale for citations':
           'Seleccionar configuración regional para citas',
       },
+      allowedIPs: 'Lista de IP del repositorio a las que se permite el acceso',
+      api: 'API de Kotahi',
     },
     reportsPage: {
       Reports: 'Reportes',
@@ -575,11 +578,27 @@ const esLa = {
         },
       },
     },
-    emailtemplatesPage: {
+    emailTemplate: {
       'Email Templates': 'Plantillas de Correo Electrónico',
-      Subject: 'Asunto',
-      CC: 'CC',
-      Body: 'Cuerpo',
+      'New Email Template': 'Nueva Plantilla de Correo Electrónico',
+      subject: 'Asunto',
+      cc: 'CC',
+      ccEditorsCheckboxDescription:
+        'Agregar automáticamente editores de manuscritos en "CC" al enviar este correo electrónico (si corresponde)',
+      body: 'Cuerpo',
+      description: 'Descripción',
+      save: 'Guardar',
+      update: 'Actualizar',
+      addANewEmailTemplate: 'Agregar una nueva plantilla de correo electrónico',
+      'Edited on': 'Editado el {{date}}',
+      delete: 'Eliminar',
+      permanentlyDelete:
+        'Eliminar esta plantilla de correo electrónico también eliminará su asignación de tareas y configuraciones. Esta acción no se puede deshacer. ¿Estás seguro de que quieres eliminar?',
+      validationMessages: {
+        invalidEmail: 'Email no válido',
+        duplicateDescription:
+          'Ya existe una plantilla con la misma descripción.',
+      },
     },
     loginPage: {
       kotahiUses:
@@ -682,6 +701,9 @@ const esLa = {
       'Group Manager discussion': 'Discusión de Gerente de Grupo',
       'Show admin discussion': 'Mostrar discusión de Administrador',
       'Show group manager discussion': 'Mostrar discusión de Gerente de Grupo',
+      'Discussion with editorial team': 'Discusión con el equipo editorial',
+      'Discussion with editor': 'Discusión con el editor',
+      'Show Chat': 'Mostrar Chat',
       'Hide Chat': 'Ocultar Chat',
       'Discussion with author': 'Discusión con el autor',
       'Editorial discussion': 'Discusión Editorial',
@@ -788,6 +810,7 @@ const esLa = {
       taskEdit: {
         'Task details': 'Detalles de la Tarea',
         'Task title': 'Título de la Tarea',
+        'Task description': 'Descripción de la tarea',
         Save: 'Guardar',
         'Give your task a name': 'Dale un nombre a tu tarea...',
         Assignee: 'Asignatario',
@@ -854,6 +877,10 @@ const esLa = {
         'Some targets failed to publish':
           'Algunos objetivos no pudieron publicarse.',
         'Publishing error': 'Error de publicación',
+      },
+      deleteFile: {
+        'Are you sure you want to delete this file?':
+          '¿Estás seguro/a de que deseas eliminar este archivo?',
       },
     },
     newSubmission: {

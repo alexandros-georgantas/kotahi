@@ -89,8 +89,8 @@ const ru = {
       Tasks: 'Задачи',
       Users: 'Пользователи',
       Configuration: 'Настройки',
-      Emails: 'Emails',
-      CMS: 'CMS',
+      Emails: 'Почта',
+      CMS: 'Система управления контентом',
       Pages: 'Страницы',
       Layout: 'Макет',
       'Go to your profile': 'Перейти в ваш профиль',
@@ -392,6 +392,8 @@ const ru = {
       'Control pages visible to editors':
         'Редакторам доступен просмотр разделов управления',
       Team: 'Исполнители',
+      coarNotify: 'COAR-Уведомить',
+      acceptedIPs: 'Принятые IP-адреса',
       Submission: 'Подача',
       allowToSubmitNewVersion:
         'Авторам доступна возможность подачи новой версии статьи в любое время',
@@ -442,7 +444,8 @@ const ru = {
       'User Management': 'Управление пользователями',
       userIsAdmin:
         'Всем пользователям назначаются роли администратора и редактора',
-      kotahiApiTokens: 'Токены Kotahi API',
+      kotahiApis: 'Котахи API',
+      tokens: 'Токены',
       Submit: 'Подтвердить',
       article: 'Статья',
       'peer review': 'Рецензия',
@@ -472,6 +475,8 @@ const ru = {
         cse: 'Совет редакторов науки (CSE)',
         'Select locale for citations': 'Выберите локаль для цитирования',
       },
+      allowedIPs: 'Список IP-адресов репозитория, которым разрешен доступ',
+      api: 'Один API',
     },
     reportsPage: {
       Reports: 'Аналитика',
@@ -576,11 +581,26 @@ const ru = {
         },
       },
     },
-    emailtemplatesPage: {
+    emailTemplate: {
       'Email Templates': 'Шаблоны писем',
-      Subject: 'Тема письма',
-      CC: 'Копия письма',
-      Body: 'Текст',
+      'New Email Template': 'Новый шаблон письма',
+      subject: 'Тема письма',
+      cc: 'Копия письма',
+      ccEditorsCheckboxDescription:
+        'Автоматически включить редакторов рукописей в «Копию» при отправке этого письма (при необходимости)',
+      body: 'Текст',
+      description: 'Описание',
+      save: 'Сохранить',
+      update: 'Обновить',
+      addANewEmailTemplate: 'Добавить новый шаблон письма',
+      'Edited on': 'Изменено {{date}}',
+      delete: 'Удалить',
+      permanentlyDelete:
+        'Удаление этого шаблона письма также приведет к удалению его назначения из задач и настроек конфигурации. Это действие нельзя отменить. Вы уверены, что хотите удалить?',
+      validationMessages: {
+        invalidEmail: 'Некорректный адрес электронной почты',
+        duplicateDescription: 'Шаблон с таким же описанием уже существует.',
+      },
     },
     loginPage: {
       kotahiUses:
@@ -683,6 +703,9 @@ const ru = {
       'Hide Chat': 'Скрыть чат',
       'Discussion with author': 'Чат с Автором',
       'Editorial discussion': 'Чат редакции',
+      'Discussion with editorial team': 'Обсуждение с редакцией',
+      'Discussion with editor': 'Обсуждение с редактором',
+      'Show Chat': 'Показать чат',
       edit: 'Редактировать',
       delete: 'Удалить',
       Edited: 'Отредактировано',
@@ -786,6 +809,7 @@ const ru = {
       taskEdit: {
         'Task details': 'Детали задачи',
         'Task title': 'Название задачи',
+        'Task description': 'Описание задания',
         Save: 'Сохранить',
         'Give your task a name': 'Дайте название задаче',
         Assignee: 'Исполнитель',
@@ -848,6 +872,10 @@ const ru = {
         'Some targets failed to publish':
           'Не удалось опубликовать некоторые цели.',
         'Publishing error': 'Ошибка публикации',
+      },
+      deleteFile: {
+        'Are you sure you want to delete this file?':
+          'Вы уверены, что хотите удалить этот файл?',
       },
     },
     newSubmission: {

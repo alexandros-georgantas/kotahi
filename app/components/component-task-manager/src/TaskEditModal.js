@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { grid } from '@pubsweet/ui-toolkit'
 import { v4 as uuid } from 'uuid'
 import { debounce } from 'lodash'
 import { useTranslation } from 'react-i18next'
+import { grid } from '@pubsweet/ui-toolkit'
 import { ActionButton, TextInput } from '../../shared'
-
+import FormWaxEditor from '../../component-formbuilder/src/components/FormWaxEditor'
 import TaskNotificationDetails from './TaskNotificationDetails'
 import AssigneeDropdown from './AssigneeDropdown'
 import DueDateField from './DueDateField'
@@ -41,16 +41,15 @@ const TaskRecipientsContainer = styled.div`
 `
 
 const TaskSectionContainer = styled.div`
-  border-bottom: 2px solid rgba(191, 191, 191, 0.5);
-  padding: ${grid(5)} 0 ${grid(5)} 0;
+  margin-bottom: ${grid(4)};
 
   &:first-child {
     padding-top: 0;
   }
 
   &:last-child {
-    border-bottom: none;
     padding-bottom: 0;
+    padding-top: 0;
   }
 `
 
@@ -80,6 +79,14 @@ const TitleFieldContainer = styled(BaseFieldContainer)`
 
 const AssigneeFieldContainer = styled(BaseFieldContainer)`
   flex: 1 1 290px;
+`
+
+const DescriptionFieldContainer = styled(BaseFieldContainer)`
+  margin-top: ${grid(5)};
+
+  & .wax-surface-scroll {
+    height: 100px;
+  }
 `
 
 const DueDateFieldContainer = styled(BaseFieldContainer)`
@@ -137,6 +144,8 @@ const TaskEditModal = ({
   onCancel,
   emailTemplates,
 }) => {
+  const { t } = useTranslation()
+
   const [taskEmailNotifications, setTaskNotifications] = useState(
     task.emailNotifications ?? [],
   )
@@ -147,29 +156,34 @@ const TaskEditModal = ({
 
   const [taskTitle, setTaskTitle] = useState(task?.title || '')
 
-  const updateTaskTitleDebounce = useCallback(
-    debounce(updateTask ?? (() => {}), 1000),
-    [],
+  const [taskDescription, setTaskDescription] = useState(
+    task?.description || '',
   )
 
-  const { t } = useTranslation()
-
   useEffect(() => {
-    return updateTaskTitleDebounce.flush()
-  }, [])
+    setTaskTitle(task.title)
+  }, [task])
 
   useEffect(() => {
     setTaskNotifications(task.emailNotifications ?? [])
   }, [isOpen, task])
 
-  const updateTaskTitle = value => {
-    setTaskTitle(value)
-    updateTaskTitleDebounce(task.id, { ...task, title: value })
-  }
-
   useEffect(() => {
-    setTaskTitle(task.title)
+    setTaskDescription(task.description)
   }, [task])
+
+  const updateTaskDescriptionDebounce = useCallback(
+    debounce(updateTask ?? (() => {}), 1000),
+    [],
+  )
+
+  const updateTaskTitleDebounce = useCallback(
+    debounce(updateTask ?? (() => {}), 1000),
+    [],
+  )
+
+  useEffect(() => updateTaskTitleDebounce.flush, [])
+  useEffect(() => updateTaskDescriptionDebounce.flush, [])
 
   const repackageTaskNotification = taskNotification => ({
     id: taskNotification.id,
@@ -181,6 +195,16 @@ const TaskEditModal = ({
     recipientName: taskNotification.recipientName || null,
     recipientEmail: taskNotification.recipientEmail || null,
   })
+
+  const updateTaskTitle = value => {
+    setTaskTitle(value)
+    updateTaskTitleDebounce(task.id, { ...task, title: value })
+  }
+
+  const updateTaskDescription = value => {
+    setTaskDescription(value)
+    updateTaskDescriptionDebounce(task.id, { ...task, description: value })
+  }
 
   const updateTaskNotification = async updatedTaskNotification => {
     if (
@@ -275,6 +299,7 @@ const TaskEditModal = ({
                 autoFocus={!taskTitle}
                 onChange={event => updateTaskTitle(event.target.value)}
                 placeholder={t('modals.taskEdit.Give your task a name')}
+                title={taskTitle}
                 value={taskTitle}
               />
             </TitleCell>
@@ -321,6 +346,13 @@ const TaskEditModal = ({
             </div>
           )}
         </TaskPrimaryFieldsContainer>
+        <DescriptionFieldContainer>
+          <TaskTitle>{t('modals.taskEdit.Task description')}</TaskTitle>
+          <FormWaxEditor
+            onChange={value => updateTaskDescription(value)}
+            value={taskDescription}
+          />
+        </DescriptionFieldContainer>
       </TaskSectionContainer>
       <TaskSectionContainer>
         <TaskRecipientsContainer>

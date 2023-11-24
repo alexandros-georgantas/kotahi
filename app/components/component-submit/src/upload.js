@@ -18,6 +18,69 @@ const stripTags = file => {
   return file.match(reg)[1]
 }
 
+const cleanOutInlineImages = file => {
+  // If we have content like this: <p>[text]<figure />[text]</p> we want to output
+  // <p>[text]</p>
+  // <figure />
+  // <p>[text]</p>
+  // where the <p>...</p> is the original tag – effectively we're splitting at figures
+  const $ = cheerio.load(file)
+
+  const getOuterHtml = element => {
+    let out = ''
+    $(element).each((index, elem) => {
+      const $this = $(elem)
+      out += $.html($this)
+    })
+    return out
+  }
+
+  const wrappedFigureTags = $(
+    'p figure, h1 figure, h2 figure, h3 figure, h4 figure, h5 figure, h6 figure',
+  )
+
+  $(wrappedFigureTags).each((index, el) => {
+    const parent = $(el)[0].parentNode
+    // This function is being used because the block tags are coming in with attributes; I want to keep them.
+    const parentOuterHtml = getOuterHtml(parent) // This is the parent (<p />, <h2 />, etc.) outerhtml
+
+    const [parentStartTag, parentEndTag] = parentOuterHtml
+      .replace($(parent).html(), '@@@')
+      .split('@@@')
+
+    let remainingFigureHtml = $(parent).html() // this is the inner html of the parent
+    let outHtml = ''
+
+    while (remainingFigureHtml.length) {
+      const [paragraphText, ...figurePlus] = remainingFigureHtml.split(
+        '<figure',
+      )
+
+      const stringFigurePlus = [...figurePlus].join('<figure')
+
+      // If there is text before a figure, send it with parent tag
+      if (paragraphText.length) {
+        outHtml += `\n${parentStartTag}${paragraphText}${parentEndTag}`
+      }
+
+      if (stringFigurePlus.length) {
+        // figure out the figure html and what's after it
+        const [figureHtml, ...remnant] = stringFigurePlus.split('</figure')
+        const stringRemnant = [...remnant].join('</figure')
+        outHtml += `\n<figure${figureHtml}</figure>`
+        // if there's anything left, keep going
+        remainingFigureHtml = stringRemnant.substring(1, stringRemnant.length) // snip off leftover ">"
+      } else {
+        remainingFigureHtml = ''
+      }
+    }
+
+    $(el).replaceWith(outHtml) // Replace original parent with generated html
+  })
+
+  return $.html()
+}
+
 const cleanOutWmfs = file => {
   const wmfRegex = /"data:image\/[ew]mf;base64,[0-9a-zA-Z/+=]*"/g
 
@@ -169,88 +232,19 @@ const doubleBackSlashReplace = groups => {
 }
 
 const cleanMath = file => {
-  // PROBLEMATIC FIX FOR XSWEET
-  //
-  // Sometimes math comes in in the form <h4><h4><math-display>...math...</math-display></h4></h4>
-  // It should not be coming in like this! If the duplicated <h4>s are replaced by <p>, math processing works correctly
-  // console.log('Coming in:\n\n\n', file, '\n\n\n')
-  let cleanedFile = file
-
-  const thirdNewMathErrorRegex = /<h[1-6]><math-display class="math-node">([\s\S]*?)<\/math-display><\/h[1-6]>/g
-
-  while (cleanedFile.match(thirdNewMathErrorRegex)) {
-    // If we have this pattern, we also need to replace double backslashes inside of the latex
-    // This needs to be run before the other error-finding regexes--it substitutes for some of them.
-    const thisOne = cleanedFile.match(thirdNewMathErrorRegex)[0]
-
-    const replacement = thisOne
-      .replace(
-        thirdNewMathErrorRegex,
-        `<p><math-display class="math-node">$1</math-display></p>`,
-      ) // First I am replacing the header math with correct math syntax
-      .replace(/\\\\/g, '\\') // This is replacing the double backslashes with a single backslash
-
-    cleanedFile = cleanedFile.replace(thisOne, replacement)
-  }
-
-  const fourthNewMathErrorRegex = /<h[1-6]><math-inline class="math-node">([\s\S]*?)<\/math-inline><\/h[1-6]>/g
-
-  while (cleanedFile.match(fourthNewMathErrorRegex)) {
-    // If we have this pattern, we also need to replace double backslashes inside of the latex
-    // This needs to be run before the other error-finding regexes--it substitutes for some of them.
-    const thisOne = cleanedFile.match(fourthNewMathErrorRegex)[0]
-
-    const replacement = thisOne
-      .replace(
-        fourthNewMathErrorRegex,
-        `<p><math-inline class="math-node">$1</math-inline></p>`,
-      ) // First I am replacing the header math with correct math syntax
-      .replace(/\\\\/g, '\\') // This is replacing the double backslashes with a single backslash
-
-    cleanedFile = cleanedFile.replace(thisOne, replacement)
-  }
-
-  const dupedHeaderMathRegex = /<h[1-6]>\s*<\/h[1-6]>\s*<h[1-6]>(<math-(?:inline|display)[^>]*>)([\s\S]*?)(<\/math-(?:inline|display)>)\s*<\/h[1-6]>/g
-
-  // A second fix: math was coming in like this: <h3></h3><h3><math-display>...math...</math-display></h3>
-
-  const dupedHeaderMathRegex2 = /<h[1-6]>\s*<h[1-6]>(<math-(?:inline|display)[^>]*>)([\s\S]*?)(<\/math-(?:inline|display)>)\s*<\/h[1-6]>\s*<\/h[1-6]>/g
-
-  cleanedFile = cleanedFile
-    .replaceAll(dupedHeaderMathRegex, `<p>$1$2$3</p>`)
-    .replaceAll(dupedHeaderMathRegex2, `<p>$1$2$3</p>`)
-
-  // Note: both inline and display equations were coming in from xSweet with
-  // $$ around them. This code removes them.
-
-  const displayStart = /<math-display class="math-node">\s*\$\$/g
-  const displayEnd = /\$\$\s*<\/math-display>/g
-  const inlineStart = /<math-inline class="math-node">\s*\$\$/g
-  const inlineEnd = /\$\$\s*<\/math-inline>/g
-
-  cleanedFile = cleanedFile
-    .replaceAll(displayStart, `<math-display class="math-node">`)
-    .replaceAll(inlineStart, `<math-inline class="math-node">`)
-    .replaceAll(displayEnd, `</math-display>`)
-    .replaceAll(inlineEnd, `</math-inline>`)
-
-  const thisRegex = /(<math-(?:inline|display)[\s\S]*?>)([\s\S]*?)(<\/math-(?:inline|display)[\s\S\\]*?>)/g
-  cleanedFile = regexCustomReplace(
-    thisRegex,
-    cleanedFile,
-    doubleBackSlashReplace,
+  // We are getting back math-display in the form <[block-tag]><math-display>[equation]</math-display></>
+  // Wax sees math-display as a block-level node; if it is nested in a paragraph, we get <p>[equotion]</p>
+  // This looks for math-display inside of a paragraph and replaces it with <math-display>[equation]</math-display>
+  const $ = cheerio.load(file)
+  $('p math-display, h2 math-display, h3 math-display, h4 math-display').each(
+    (index, el) => {
+      const interior = $(el).html()
+      $($(el)[0].parentNode).replaceWith(
+        String.raw`<math-display class="math-node">${interior}</math-display>`,
+      ) // String.raw is to make sure there are no escapes
+    },
   )
-
-  const newMathErrorRegex = /<h[1-6]>\$(.*)\$<\/h[1-6]>/g
-
-  cleanedFile = cleanedFile.replaceAll(
-    newMathErrorRegex,
-    `<p><math-display class="math-node">$1</math-display></p>`,
-  )
-
-  // console.log('Coming out:\n\n\n', cleanedFile, '\n\n\n')
-
-  return cleanedFile
+  return $.html()
 }
 
 const generateTitle = name =>
@@ -470,7 +464,7 @@ const DocxToHTMLPromise = (file, data, client) => {
         }
       }
 
-      console.error('Server-side error: ', result.data.docxToHtml.error)
+      console.error('Server-side error: ', result?.data?.docxToHtml?.error)
       return file
     })
 }
@@ -598,15 +592,18 @@ export default ({
       } else {
         uploadResponse = await DocxToHTMLPromise(file, data, client)
         // console.log('uploadResponse before cleaning: ', uploadResponse.response)
-        uploadResponse.response = cleanOutWmfs(
-          cleanMath(
-            stripTags(
-              stripTrackChanges(checkForEmptyBlocks(uploadResponse.response)),
+
+        uploadResponse.response = cleanOutInlineImages(
+          cleanOutWmfs(
+            cleanMath(
+              stripTags(
+                stripTrackChanges(checkForEmptyBlocks(uploadResponse.response)),
+              ),
             ),
           ),
         )
-        // console.log('uploadResponse after cleaning: ', uploadResponse.response)
         images = base64Images(uploadResponse.response)
+        // console.log('uploadResponse after cleaning: ', uploadResponse.response)
       }
 
       manuscriptData = await createManuscriptPromise(

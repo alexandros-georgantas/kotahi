@@ -1,9 +1,10 @@
 /* eslint-disable no-shadow */
-import React from 'react'
+import React, { useContext } from 'react'
 import { useQuery, useMutation, gql, useApolloClient } from '@apollo/client'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { adopt } from 'react-adopt'
 import Production from './Production'
+import { ConfigContext } from '../../../config/src'
 import { Spinner, CommsErrorBanner } from '../../../shared'
 import { getSpecificFilesQuery } from '../../../asset-manager/src/queries'
 import withModal from '../../../asset-manager/src/ui/Modal/withModal'
@@ -60,6 +61,62 @@ const mapProps = args => ({
 
 const Composed = adopt(mapper, mapProps)
 
+const fileFragment = `
+  files {
+    id
+    name
+    tags
+    created
+    storedObjects {
+      type
+      key
+      mimetype
+      size
+      url
+    }
+  }
+`
+
+const formFields = `
+  structure {
+    name
+    description
+    haspopup
+    popuptitle
+    popupdescription
+    children {
+      title
+      shortDescription
+      id
+      component
+      name
+      description
+      doiValidation
+      doiUniqueSuffixValidation
+      placeholder
+      permitPublishing
+      parse
+      format
+      options {
+        id
+        label
+        labelColor
+        value
+      }
+      validate {
+        id
+        label
+        value
+      }
+      validateValue {
+        minChars
+        maxChars
+        minSize
+      }
+    }
+  }
+`
+
 const fragmentFields = `
   id
   created
@@ -81,6 +138,7 @@ const fragmentFields = `
       mimetype
     }
   }
+  ${fileFragment}
 	submission
   meta {
     title
@@ -115,9 +173,25 @@ const fragmentFields = `
 `
 
 const query = gql`
-  query($id: ID!) {
+  query($id: ID!, $groupId: ID!) {
     manuscript(id: $id) {
       ${fragmentFields}
+      manuscriptVersions {
+        ${fragmentFields}
+      }
+    }
+
+    submissionForm: formForPurposeAndCategory(purpose: "submit", category: "submission", groupId: $groupId) {
+      ${formFields}
+    }
+
+    articleTemplate(groupId: $groupId) {
+      id
+      name
+      groupId
+      ${fileFragment}
+      article
+      css
     }
 	}
 `
@@ -147,7 +221,21 @@ const showAuthorProofingMode = (manuscript, currentUser) => {
   )
 }
 
+export const updateTemplateMutation = gql`
+  mutation($id: ID!, $input: UpdateTemplateInput!) {
+    updateTemplate(id: $id, input: $input) {
+      id
+      name
+      groupId
+      ${fileFragment}
+      article
+      css
+    }
+  }
+`
+
 const ProductionPage = ({ currentUser, match, ...props }) => {
+  const { groupId, controlPanel } = useContext(ConfigContext)
   const client = useApolloClient()
   const [makingPdf, setMakingPdf] = React.useState(false)
   const [makingJats, setMakingJats] = React.useState(false)
@@ -160,6 +248,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
   // })
 
   const [update] = useMutation(updateMutation)
+  const [updateTempl] = useMutation(updateTemplateMutation)
 
   const updateManuscript = async (versionId, manuscriptDelta) => {
     const newQuery = await update({
@@ -172,16 +261,20 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
     return newQuery
   }
 
+  const updateTemplate = (id, input) =>
+    updateTempl({ variables: { id, input } })
+
   const { data, loading, error } = useQuery(query, {
     variables: {
       id: match.params.version,
+      groupId,
     },
   })
 
   if (loading) return <Spinner />
   if (error) return <CommsErrorBanner error={error} />
 
-  const { manuscript } = data
+  const { manuscript, submissionForm, articleTemplate } = data
 
   const isAuthorProofingMode = showAuthorProofingMode(manuscript, currentUser) // If true, we are in author proofing mode
 
@@ -191,14 +284,24 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
   // console.log('Author proofing mode: ', isAuthorProofingMode)
   // console.log('Read only mode: ', isReadOnlyMode)
 
+  const form = submissionForm?.structure ?? {
+    name: '',
+    children: [],
+    description: '',
+    haspopup: 'false',
+  }
+
   return (
     <Composed
+      articleTemplate={articleTemplate}
       client={client}
       currentUser={currentUser}
+      form={form}
       manuscript={manuscript}
       setMakingJats={setMakingJats}
       setMakingPdf={setMakingPdf}
       updateManuscript={updateManuscript}
+      updateTemplate={updateTemplate}
     >
       {({ onAssetManager }) => (
         <div>
@@ -223,13 +326,16 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
             />
           ) : null}
           <Production
+            articleTemplate={articleTemplate}
             client={client}
             currentUser={currentUser}
+            displayShortIdAsIdentifier={controlPanel?.displayManuscriptShortId}
             file={manuscript.files.find(file =>
               file.tags.includes('manuscript'),
             )}
             isAuthorProofingVersion={isAuthorProofingMode}
             isReadOnlyVersion={isReadOnlyMode}
+            form={form}
             makeJats={setMakingJats}
             makePdf={setMakingPdf}
             manuscript={manuscript}
@@ -240,6 +346,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
               // console.log('in update manuscript!')
               updateManuscript(a, b)
             }}
+            updateTemplate={updateTemplate}
           />
         </div>
       )}

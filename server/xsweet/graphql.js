@@ -6,6 +6,7 @@ const FormData = require('form-data')
 const crypto = require('crypto')
 const { promisify } = require('util')
 const config = require('config')
+const { logger } = require('@coko/server')
 
 // To test:
 // POST http://localhost:3004/healthCheck
@@ -87,6 +88,7 @@ const getXsweet = async url => {
   // 1 pass docx to xsweet
   const form = new FormData()
   form.append('docx', fs.createReadStream(`${docxPath}`))
+  form.append('useMath', 'true')
   // eslint-disable-next-line
   // console.log('DOCX path: ', docxPath)
   return new Promise((resolve, reject) => {
@@ -98,6 +100,9 @@ const getXsweet = async url => {
       // – that's different from what's in the README, which is wrong.
       headers: {
         authorization: `Bearer ${xsweetAccessToken}`,
+        'Content-Type': 'application/json', // This might be important for LaTeX because JSON uses \ as an escape.
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
         ...form.getHeaders(),
       },
       data: form,
@@ -121,7 +126,7 @@ const getXsweet = async url => {
         }
 
         const { status, data } = response
-        const { msg } = data
+        const { msg, error } = data
 
         if (status === 401 && msg === 'expired token') {
           await serviceHandshake()
@@ -130,7 +135,9 @@ const getXsweet = async url => {
 
         return reject(
           new Error(
-            `XSweet request failed with status ${status} and message: ${msg}`,
+            `XSweet request failed with status ${status} and message: ${
+              error || msg
+            }`,
           ),
         )
       })
@@ -146,12 +153,13 @@ const resolvers = {
       try {
         outHtml = await getXsweet(url)
       } catch (e) {
-        error = e
+        error = e.message
+        logger.error(e)
       }
 
       return {
         html: outHtml || '',
-        error: error ? JSON.stringify(error) : '',
+        error: error || '',
       }
     },
   },
