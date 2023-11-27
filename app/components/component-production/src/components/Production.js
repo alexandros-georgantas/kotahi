@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
 import styled from 'styled-components'
 import { grid } from '@pubsweet/ui-toolkit'
 import { withRouter } from 'react-router-dom'
@@ -21,7 +21,6 @@ import {
 import { Info } from './styles'
 import { ControlsContainer } from '../../../component-manuscripts/src/style'
 import UploadAsset from './UploadAsset'
-// import ReadonlyFormTemplate from './ReadonlyFormTemplate'
 import ReadonlyFormTemplate from '../../../component-review/src/components/metadata/ReadonlyFormTemplate'
 
 const FlexRow = styled.div`
@@ -48,6 +47,11 @@ const Production = ({
   updateTemplate,
   onAssetManager,
 }) => {
+  const ref = useRef(null)
+
+  // const dimensions = useRefDimensions(ref)
+  const [maxWidth, setMaxWidth] = useState('1680px')
+
   const debouncedSave = useCallback(
     debounce(source => {
       updateManuscript(manuscript.id, { meta: { source } })
@@ -77,14 +81,26 @@ const Production = ({
     [],
   )
 
-  useEffect(
-    () => () => {
-      debouncedSave.flush()
-      onChangeCss.flush()
-      onChangeHtml.flush()
-    },
-    [],
-  )
+  useEffect(() => {
+    debouncedSave.flush()
+    onChangeCss.flush()
+    onChangeHtml.flush()
+  }, [])
+
+  useEffect(() => {
+    if (!ref.current) return
+
+    const resizeObserver = new ResizeObserver(
+      debounce(() => {
+        // Do what you want to do when the size of the element changes
+        setMaxWidth(`${ref.current.offsetWidth - 60}px`)
+      }),
+    )
+
+    resizeObserver.observe(ref.current)
+    // eslint-disable-next-line consistent-return
+    return () => resizeObserver.disconnect() // clean up
+  }, [])
 
   const { t } = useTranslation()
 
@@ -127,7 +143,8 @@ const Production = ({
       <SectionContent>
         <CodeMirror
           extensions={[css()]}
-          height="850px"
+          height="840px"
+          maxWidth={maxWidth}
           onChange={onChangeCss}
           value={cssValue}
         />
@@ -142,7 +159,8 @@ const Production = ({
       <SectionContent>
         <CodeMirror
           extensions={[html()]}
-          height="850px"
+          height="840px"
+          maxWidth={maxWidth}
           onChange={onChangeHtml}
           value={htmlValue}
         />
@@ -189,7 +207,7 @@ const Production = ({
   }
 
   return (
-    <Manuscript>
+    <Manuscript ref={ref}>
       <HeadingWithAction>
         <FlexRow>
           <Heading>{t('productionPage.Production')}</Heading>
