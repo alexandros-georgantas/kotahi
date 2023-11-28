@@ -115,7 +115,7 @@ const AuthorFeedbackForm = ({
 
   const submit = async formData => {
     await updateManuscript(manuscript.id, {
-      isAuthorProofingEnabled: false,
+      status: 'completed',
       authorFeedback: {
         text: formData.text,
         fileIds: formData.fileIds,

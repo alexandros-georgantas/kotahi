@@ -208,12 +208,25 @@ const Production = ({
     label: 'PagedJs Metadata',
   }
 
+  const tabSections = isAuthorProofingVersion
+    ? [editorSection, feedbackSection]
+    : [
+        editorSection,
+        feedbackSection,
+        cssPagedJS,
+        htmlTemplate,
+        uploadAssets,
+        manuscriptMetadata,
+      ]
+
   return (
     <Manuscript>
       <HeadingWithAction>
         <FlexRow>
           <Heading>
-            {isAuthorProofingVersion ? 'Author Proofing' : t('productionPage.Production')}
+            {isAuthorProofingVersion
+              ? t('productionPage.AuthorProofing')
+              : t('productionPage.Production')}
           </Heading>
           <ControlsContainer>
             <DownloadDropdown
@@ -227,17 +240,7 @@ const Production = ({
         </FlexRow>
       </HeadingWithAction>
       <ErrorBoundary>
-        <HiddenTabs
-          defaultActiveKey="editor"
-          sections={[
-            editorSection,
-            feedbackSection,
-            cssPagedJS,
-            htmlTemplate,
-            uploadAssets,
-            manuscriptMetadata,
-          ]}
-        />
+        <HiddenTabs defaultActiveKey="editor" sections={tabSections} />
       </ErrorBoundary>
     </Manuscript>
   )

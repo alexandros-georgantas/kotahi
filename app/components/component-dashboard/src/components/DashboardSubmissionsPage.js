@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import React, { useEffect, useContext } from 'react'
 import { ConfigContext } from '../../../config/src'
 import {
@@ -11,6 +11,16 @@ import mutations from '../graphql/mutations'
 import queries from '../graphql/queries'
 import SubmissionsTable from './sections/SubmissionsTable'
 import { CommsErrorBanner, Spinner } from '../../../shared'
+import { fragmentFields } from '../../../component-submit/src/userManuscriptFormQuery'
+
+const updateManuscriptMutation = gql`
+  mutation($id: ID!, $input: String) {
+    updateManuscript(id: $id, input: $input) {
+      id 
+      ${fragmentFields}
+    }
+  }
+`
 
 const DashboardSubmissionsPage = ({ currentUser, history }) => {
   const config = useContext(ConfigContext)
@@ -42,6 +52,7 @@ const DashboardSubmissionsPage = ({ currentUser, history }) => {
   })
 
   const [updateTab] = useMutation(mutations.updateTab)
+  const [updateManuscript] = useMutation(updateManuscriptMutation)
 
   useEffect(() => {
     updateTab({
@@ -60,6 +71,7 @@ const DashboardSubmissionsPage = ({ currentUser, history }) => {
       currentUser={currentUser}
       manuscriptsUserHasCurrentRoleIn={data.manuscriptsUserHasCurrentRoleIn}
       submissionForm={data.formForPurposeAndCategory}
+      updateManuscript={updateManuscript}
       uriQueryParams={uriQueryParams}
     />
   ) : null

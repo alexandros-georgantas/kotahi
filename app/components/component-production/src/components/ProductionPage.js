@@ -121,7 +121,6 @@ const fragmentFields = `
   id
   created
   status
-	isAuthorProofingEnabled
 	teams {
 		role
 		members {
@@ -216,7 +215,7 @@ const showAuthorProofingMode = (manuscript, currentUser) => {
     )
 
   return (
-    manuscript.isAuthorProofingEnabled &&
+    manuscript.status === 'inProgress' &&
     sortedAuthors[0]?.user?.id === currentUser.id
   )
 }
@@ -279,7 +278,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
   const isAuthorProofingMode = showAuthorProofingMode(manuscript, currentUser) // If true, we are in author proofing mode
 
   const isReadOnlyMode =
-    manuscript.isAuthorProofingEnabled && !isAuthorProofingMode // If author proofing is enabled, but we are not the author, we go read-only
+    manuscript.status === 'inProgress' && !isAuthorProofingMode // If author proofing is enabled, but we are not the author, we go read-only
 
   // console.log('Author proofing mode: ', isAuthorProofingMode)
   // console.log('Read only mode: ', isReadOnlyMode)
@@ -333,9 +332,9 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
             file={manuscript.files.find(file =>
               file.tags.includes('manuscript'),
             )}
+            form={form}
             isAuthorProofingVersion={isAuthorProofingMode}
             isReadOnlyVersion={isReadOnlyMode}
-            form={form}
             makeJats={setMakingJats}
             makePdf={setMakingPdf}
             manuscript={manuscript}

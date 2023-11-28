@@ -9,6 +9,9 @@ const en = {
       revise: 'Revise',
       revising: 'Revising',
       published: 'Published',
+      assigned: 'Author proof assigned',
+      inProgress: 'Author proofing in progress',
+      completed: 'Author proof completed',
       unknown: 'Unknown',
     },
     reviewerStatus: {
@@ -331,6 +334,7 @@ const en = {
     },
     productionPage: {
       Production: 'Production',
+      AuthorProofing: 'Author Proofing',
       'No supported view of the file': 'No supported view of the file',
       Download: 'Download',
     },

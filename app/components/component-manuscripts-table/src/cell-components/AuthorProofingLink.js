@@ -18,11 +18,8 @@ const AuthorProofingLink = ({
   manuscript,
   urlFrag,
   currentUser,
-  getIsAuthorProofingEnabled,
+  updateManuscript,
 }) => {
-  const isAuthorProofingEnabled =
-    getIsAuthorProofingEnabled && getIsAuthorProofingEnabled(manuscript)
-
   const authorTeam = manuscript.teams.find(team => team.role === 'author')
 
   const sortedAuthors = authorTeam?.members
@@ -33,7 +30,7 @@ const AuthorProofingLink = ({
     )
 
   if (
-    isAuthorProofingEnabled &&
+    ['assigned', 'inProgress'].includes(manuscript.status) &&
     sortedAuthors[0]?.user?.id === currentUser.id
   ) {
     return (
@@ -41,6 +38,14 @@ const AuthorProofingLink = ({
         <StyledAction
           data-testid="control-panel-decision"
           onClick={e => {
+            updateManuscript({
+              variables: {
+                id: manuscript.id,
+                input: JSON.stringify({
+                  status: 'inProgress',
+                }),
+              },
+            })
             e.stopPropagation()
           }}
           to={{

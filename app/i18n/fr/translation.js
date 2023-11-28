@@ -9,6 +9,9 @@ const fr = {
       revise: 'Réviser',
       revising: 'En révision',
       published: 'Publié',
+      assigned: "Epreuve d'auteur attribuée",
+      inProgress: "Révision de l'auteur en cours",
+      completed: "Epreuve d'auteur complétée",
       unknown: 'Inconnu',
     },
     reviewerStatus: {
@@ -335,6 +338,7 @@ const fr = {
     },
     productionPage: {
       Production: 'Production',
+      AuthorProofing: "Vérification de l'auteur",
       'No supported view of the file': 'Aucune vue supportée du fichier',
       Download: 'Télécharger',
     },

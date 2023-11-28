@@ -22,6 +22,7 @@ const SubmissionsTable = ({
   manuscriptsUserHasCurrentRoleIn,
   submissionForm,
   applyQueryParams,
+  updateManuscript,
   uriQueryParams,
 }) => {
   const config = useContext(ConfigContext)
@@ -46,14 +47,10 @@ const SubmissionsTable = ({
   const limit = config?.manuscript?.paginationCount || 10
   const { totalCount } = manuscriptsUserHasCurrentRoleIn
 
-  const getIsAuthorProofingEnabled = manuscript => {
-    return manuscript.isAuthorProofingEnabled
-  }
-
   const specialComponentValues = {
     urlFrag,
     currentUser,
-    getIsAuthorProofingEnabled,
+    updateManuscript,
   }
 
   const displayProps = {

@@ -13,6 +13,10 @@ import { ActionButton, SectionContent } from '../../../../shared'
 const AssignAuthorForProofing = ({ assignAuthorForProofing, manuscript }) => {
   const [isToggled, setToggled] = useState(false)
 
+  const isAuthorProofingEnabled = ['assigned', 'inProgress'].includes(
+    manuscript.status,
+  )
+
   const [submitAuthorProofingStatus, setSubmitAuthorProofingStatus] = useState(
     null,
   )
@@ -34,10 +38,7 @@ const AssignAuthorForProofing = ({ assignAuthorForProofing, manuscript }) => {
       <SectionRowGrid>
         <ActionButton
           dataTestid="submit-author-proofing"
-          disabled={
-            authorTeam?.members.length === 0 ||
-            manuscript.isAuthorProofingEnabled
-          }
+          disabled={authorTeam?.members.length === 0 || isAuthorProofingEnabled}
           onClick={async () => {
             setSubmitAuthorProofingStatus('pending')
 
@@ -59,7 +60,7 @@ const AssignAuthorForProofing = ({ assignAuthorForProofing, manuscript }) => {
             'Requires an author to be invited!'}
         </AssignedAuthorForProofingInfo>
       </SectionRowGrid>
-      {manuscript.isAuthorProofingEnabled ? (
+      {isAuthorProofingEnabled ? (
         <AssignedAuthorForProofingLogsContainer>
           <AssignedAuthorForProofingLogsToggle
             onClick={() => setToggled(!isToggled)}

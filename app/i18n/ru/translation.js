@@ -10,6 +10,9 @@ const ru = {
       revising: 'На исправлении',
       published: 'Опубликовано',
       unknown: 'Неизвестный статус',
+      assigned: 'Доказательство автора присвоено',
+      inProgress: 'Авторская проверка в процессе',
+      completed: 'Доказательство автора завершено',
     },
     reviewerStatus: {
       invited: 'Приглашен',
@@ -338,6 +341,7 @@ const ru = {
     },
     productionPage: {
       Production: 'Редактирование',
+      AuthorProofing: 'Авторская проверка',
       'No supported view of the file':
         'Нет поддерживаемого представления файла',
       Download: 'Загрузить',

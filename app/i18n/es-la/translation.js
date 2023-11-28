@@ -10,6 +10,9 @@ const esLa = {
       revise: 'Revisar',
       revising: 'Revisando',
       published: 'Publicado',
+      assigned: 'Prueba de autor asignada',
+      inProgress: 'Revisión del autor en curso',
+      completed: 'Prueba de autor completada',
       unknown: 'Desconocido',
     },
     reviewerStatus: {
@@ -336,6 +339,7 @@ const esLa = {
     },
     productionPage: {
       Production: 'Producción',
+      AuthorProofing: 'Revisión del autor',
       'No supported view of the file': 'No hay una vista admitida del archivo',
       Download: 'Descargar',
     },

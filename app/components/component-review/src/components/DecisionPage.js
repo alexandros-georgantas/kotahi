@@ -184,8 +184,7 @@ const DecisionPage = ({ currentUser, match }) => {
           id: assignAuthoForProofingManuscript.id,
         }),
         fields: {
-          isAuthorProofingEnabled: () =>
-            assignAuthoForProofingManuscript.isAuthorProofingEnabled,
+          status: () => assignAuthoForProofingManuscript.status,
         },
       })
     },

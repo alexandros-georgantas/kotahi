@@ -542,8 +542,6 @@ const resolvers = {
     async assignAuthoForProofingManuscript(_, { id }, ctx) {
       const manuscript = await models.Manuscript.find(id)
 
-      manuscript.isAuthorProofingEnabled = true
-
       if (manuscript.authorFeedback.submitted) {
         delete manuscript.authorFeedback.submitted
       }
@@ -551,7 +549,7 @@ const resolvers = {
       const updated = await models.Manuscript.query().patchAndFetchById(
         manuscript.id,
         {
-          isAuthorProofingEnabled: true,
+          status: 'assigned',
           authorFeedback: {
             ...manuscript.authorFeedback,
           },
@@ -1969,7 +1967,6 @@ const typeDefs = `
     tasks: [Task!]
     hasOverdueTasksForUser: Boolean
     invitations: [Invitation]
-    isAuthorProofingEnabled: Boolean
     authorFeedback: ManuscriptAuthorFeeback
   }
 

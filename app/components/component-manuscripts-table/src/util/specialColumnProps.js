@@ -39,7 +39,7 @@ const buildSpecialColumnProps = (specialComponentValues, config) => {
     getMainActionLink,
     currentUser,
     updateReviewerStatus,
-    getIsAuthorProofingEnabled,
+    updateManuscript,
   } = specialComponentValues
 
   const LocalizedReviewFilterOptions = localizeReviewFilterOptions(
@@ -84,12 +84,36 @@ const buildSpecialColumnProps = (specialComponentValues, config) => {
             { label: i18next.t('msStatus.revise'), value: 'revise' },
             { label: i18next.t('msStatus.revising'), value: 'revising' },
             { label: i18next.t('msStatus.published'), value: 'published' },
+            {
+              label: i18next.t('msStatus.assigned'),
+              value: 'assigned',
+            },
+            {
+              label: i18next.t('msStatus.inProgress'),
+              value: 'inprogress',
+            },
+            {
+              label: i18next.t('msStatus.completed'),
+              value: 'completed',
+            },
           ]
         : [
             { label: i18next.t('msStatus.new'), value: 'new' },
             { label: i18next.t('msStatus.submitted'), value: 'submitted' },
             { label: i18next.t('msStatus.evaluated'), value: 'evaluated' },
             { label: i18next.t('msStatus.published'), value: 'published' },
+            {
+              label: i18next.t('msStatus.assigned'),
+              value: 'assigned',
+            },
+            {
+              label: i18next.t('msStatus.inProgress'),
+              value: 'inprogress',
+            },
+            {
+              label: i18next.t('msStatus.completed'),
+              value: 'completed',
+            },
           ],
       flex: '0.25 1 10em',
       component: FilterableStatusBadge,
@@ -166,7 +190,7 @@ const buildSpecialColumnProps = (specialComponentValues, config) => {
       extraProps: {
         urlFrag,
         currentUser,
-        getIsAuthorProofingEnabled,
+        updateManuscript,
       },
     },
     reviewerLinks: {

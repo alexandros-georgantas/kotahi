@@ -414,7 +414,6 @@ class Manuscript extends BaseModel {
         doi: { type: ['string', 'null'] },
         searchableText: { type: 'string' },
         groupId: { type: ['string', 'null'], format: 'uuid' },
-        isAuthorProofingEnabled: { type: ['boolean', 'null'] },
         authorFeedback: {
           type: 'object',
           properties: {
