@@ -19,7 +19,6 @@ teams {
   }
 }
 status
-isAuthorProofingEnabled
 meta {
   manuscriptId
   title

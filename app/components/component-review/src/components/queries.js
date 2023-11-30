@@ -90,7 +90,6 @@ const manuscriptFields = `
     }
   }
   status
-  isAuthorProofingEnabled
   authorFeedback {
     text
     fileIds

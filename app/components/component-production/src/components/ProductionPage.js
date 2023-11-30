@@ -130,13 +130,6 @@ const fragmentFields = `
 			}
 		}
 	}
-  files {
-    id
-    tags
-    storedObjects {
-      mimetype
-    }
-  }
   ${fileFragment}
 	submission
   meta {
@@ -148,17 +141,7 @@ const fragmentFields = `
   authorFeedback {
     text
     fileIds
-    files {
-      id
-      name
-      tags
-      storedObjects {
-        mimetype
-        key
-        url
-        type
-      }
-    }
+    ${fileFragment}
     edited
     submitted
     submitter {
