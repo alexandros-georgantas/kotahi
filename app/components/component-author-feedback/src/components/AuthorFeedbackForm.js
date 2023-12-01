@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import { Formik } from 'formik'
 import { useMutation } from '@apollo/client'
 import { ValidatedFieldFormik } from '@pubsweet/ui'
@@ -80,6 +81,7 @@ const AuthorFeedbackForm = ({
   updateManuscript,
   isReadOnlyVersion,
 }) => {
+  const history = useHistory()
   const config = useContext(ConfigContext)
   const { urlFrag } = config
   const { authorFeedback } = manuscript
@@ -126,7 +128,7 @@ const AuthorFeedbackForm = ({
     setReadOnly(true)
 
     setTimeout(() => {
-      window.location.href = `${urlFrag}/dashboard`
+      history.push(`${urlFrag}/dashboard`)
     }, 2000)
   }
 

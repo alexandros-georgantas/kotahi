@@ -51,6 +51,8 @@ const Production = ({
   isAuthorProofingVersion,
   isReadOnlyVersion,
 }) => {
+  const { authorFeedback } = manuscript
+
   const debouncedSave = useCallback(
     debounce(source => {
       updateManuscript(manuscript.id, { meta: { source } })
@@ -208,16 +210,21 @@ const Production = ({
     label: 'PagedJs Metadata',
   }
 
-  const tabSections = isAuthorProofingVersion
-    ? [editorSection, feedbackSection]
-    : [
-        editorSection,
-        feedbackSection,
-        cssPagedJS,
-        htmlTemplate,
-        uploadAssets,
-        manuscriptMetadata,
-      ]
+  const tabSections = []
+
+  if (isAuthorProofingVersion) {
+    tabSections.push(editorSection, feedbackSection)
+  } else {
+    tabSections.push(
+      editorSection,
+      cssPagedJS,
+      htmlTemplate,
+      uploadAssets,
+      manuscriptMetadata,
+    )
+
+    if (authorFeedback.submitted) tabSections.push(feedbackSection)
+  }
 
   return (
     <Manuscript>

@@ -90,7 +90,7 @@ const buildSpecialColumnProps = (specialComponentValues, config) => {
             },
             {
               label: i18next.t('msStatus.inProgress'),
-              value: 'inprogress',
+              value: 'inProgress',
             },
             {
               label: i18next.t('msStatus.completed'),
@@ -108,7 +108,7 @@ const buildSpecialColumnProps = (specialComponentValues, config) => {
             },
             {
               label: i18next.t('msStatus.inProgress'),
-              value: 'inprogress',
+              value: 'inProgress',
             },
             {
               label: i18next.t('msStatus.completed'),

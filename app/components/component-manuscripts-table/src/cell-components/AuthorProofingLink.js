@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { useHistory } from 'react-router-dom'
 import { Action, ActionGroup } from '@pubsweet/ui'
 import { Edit } from 'react-feather'
 import styled from 'styled-components'
@@ -20,6 +21,7 @@ const AuthorProofingLink = ({
   currentUser,
   updateManuscript,
 }) => {
+  const history = useHistory()
   const authorTeam = manuscript.teams.find(team => team.role === 'author')
 
   const sortedAuthors = authorTeam?.members
@@ -37,8 +39,9 @@ const AuthorProofingLink = ({
       <StyledActionGroup>
         <StyledAction
           data-testid="control-panel-decision"
-          onClick={e => {
-            updateManuscript({
+          onClick={async e => {
+            e.stopPropagation()
+            await updateManuscript({
               variables: {
                 id: manuscript.id,
                 input: JSON.stringify({
@@ -46,10 +49,7 @@ const AuthorProofingLink = ({
                 }),
               },
             })
-            e.stopPropagation()
-          }}
-          to={{
-            pathname: `${urlFrag}/versions/${manuscript.id}/production`,
+            history.push(`${urlFrag}/versions/${manuscript.id}/production`)
           }}
         >
           <Edit />

@@ -198,7 +198,7 @@ const showAuthorProofingMode = (manuscript, currentUser) => {
     )
 
   return (
-    manuscript.status === 'inProgress' &&
+    ['inProgress', 'completed'].includes(manuscript.status) &&
     sortedAuthors[0]?.user?.id === currentUser.id
   )
 }
@@ -261,7 +261,8 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
   const isAuthorProofingMode = showAuthorProofingMode(manuscript, currentUser) // If true, we are in author proofing mode
 
   const isReadOnlyMode =
-    manuscript.status === 'inProgress' && !isAuthorProofingMode // If author proofing is enabled, but we are not the author, we go read-only
+    ['assigned', 'inProgress'].includes(manuscript.status) &&
+    !isAuthorProofingMode // If author proofing is enabled, but we are not the author, we go read-only
 
   // console.log('Author proofing mode: ', isAuthorProofingMode)
   // console.log('Read only mode: ', isReadOnlyMode)
