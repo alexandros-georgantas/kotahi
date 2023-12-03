@@ -255,7 +255,7 @@ const Manuscripts = ({ history, ...props }) => {
 
   const adjustedColumnNames = [...configuredColumnNames]
   adjustedColumnNames.push('actions')
-  if (['ncrc', 'colab'].includes(config.instanceName))
+  if (['preprint2', 'prc'].includes(config.instanceName))
     adjustedColumnNames.splice(0, 0, 'newItemCheckbox')
 
   // Source of truth for columns
@@ -284,7 +284,7 @@ const Manuscripts = ({ history, ...props }) => {
     }
   }
 
-  const shouldAllowBulkDelete = ['ncrc', 'colab'].includes(config.instanceName)
+  const shouldAllowBulkDelete = ['preprint2', 'prc'].includes(config.instanceName)
 
   const topRightControls = (
     <ControlsContainer>
@@ -416,7 +416,7 @@ const Manuscripts = ({ history, ...props }) => {
           />
         )}
       </Columns>
-      {['ncrc', 'colab'].includes(config.instanceName) && (
+      {['preprint2', 'prc'].includes(config.instanceName) && (
         <Modal
           isOpen={isOpenBulkArchiveModal}
           onRequestClose={closeModalBulkArchiveConfirmation}

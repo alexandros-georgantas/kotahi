@@ -12,7 +12,7 @@ const existingEmailTemplates = async () => {
         emailTemplateKey: 'reviewInvitationEmailTemplate',
         description: 'Peer-Review Invitation Assignment notification',
         subject: 'Aperture Neuro Peer-Reviewer Invitation Email',
-        cc: 'aperture@humanbrainmapping.org',
+        cc: 'journal@humanbrainmapping.org',
         ccEditors: false,
         body: `<p>
         <p>Dear {{ recipientName }},</p>
@@ -23,7 +23,7 @@ const existingEmailTemplates = async () => {
           <li>Complete this Survey at <a href="https://www.surveymonkey.com/r/ApertureInvite" target="_blank">https://www.surveymonkey.com/r/ApertureInvite</a> indicating whether you accept the review.</li>
           <li>Log into {{{ loginLink }}} with your Orcid ID and set up your profile. Once your profile is set up, you will receive a notification that the submission is ready to review.</li>
         </ol>
-        <p>If you have questions about Aperture, the review process, or the submission, please contact the journal manager at <a href="mailto:aperture@humanbrainmapping.org">aperture@humanbrainmapping.org</a>.</p>
+        <p>If you have questions about Aperture, the review process, or the submission, please contact the journal manager at <a href="mailto:journal@humanbrainmapping.org">journal@humanbrainmapping.org</a>.</p>
         <p>Thank you,</p>
         <p>{{ senderName }}</p>
         <p>Handling Editor <br>
@@ -35,14 +35,14 @@ const existingEmailTemplates = async () => {
         emailTemplateKey: 'adhocEditorAssignmentEmailTemplate',
         description: 'Adhoc EIC - Handling Editor Assignment notification',
         subject: 'Aperture Neuro Submission Ready for Handling Editor',
-        cc: 'aperture@humanbrainmapping.org',
+        cc: 'journal@humanbrainmapping.org',
         ccEditors: false,
         body: `<p>
         <p>Dear {{ recipientName }},</p>
         <p>You have been assigned the following Research Object to Handle:</p>
         <p>“{{ manuscriptNumber }}; {{ manuscriptTitle }}, {{ authorName }}”</p>
         <p>To access the submission please log onto the Aperture Submission Kotahi platform at {{{ loginLink }}}.</p>
-        <p>If you have any questions or trouble accessing the submission, please contact the Journal Manager at <a href="mailto:aperture@humanbrainmapping.org">aperture@humanbrainmapping.org</a>.</p>
+        <p>If you have any questions or trouble accessing the submission, please contact the Journal Manager at <a href="mailto:journal@humanbrainmapping.org">journal@humanbrainmapping.org</a>.</p>
         <p>Sincerely,</p>
         <p>Ad-hoc Editor-in-Chief <br>
         Aperture Neuro
@@ -87,14 +87,14 @@ const existingEmailTemplates = async () => {
         description:
           'Mallar Chakravarty - Handling Editor Assignment notification template',
         subject: 'Aperture Neuro Submission Ready for Handling Editor',
-        cc: 'aperture@humanbrainmapping.org',
+        cc: 'journal@humanbrainmapping.org',
         ccEditors: false,
         body: `<p>
         <p>Dear {{ recipientName }},</p>
         <p>You have been assigned the following Research Object to Handle:</p>
         <p>“{{ manuscriptNumber }}; {{ manuscriptTitle }}, {{ authorName }}”</p>
         <p>To access the submission please log onto the Aperture Submission Kotahi platform at {{{ loginLink }}}.</p>
-        <p>If you have any questions or trouble accessing the submission, please contact the Journal Manager at <a href="mailto:aperture@humanbrainmapping.org">aperture@humanbrainmapping.org</a>.</p>
+        <p>If you have any questions or trouble accessing the submission, please contact the Journal Manager at <a href="mailto:journal@humanbrainmapping.org">journal@humanbrainmapping.org</a>.</p>
         <p>Thank you,</p>
         <p>Mallar Chakravarty, PhD</p>
         <p>Deputy Editor-in-Chief <br>
@@ -106,7 +106,7 @@ const existingEmailTemplates = async () => {
         emailTemplateKey: 'messageNotificationEmailTemplate',
         description: 'Message notification',
         subject: 'Aperture Neuro – Message Notification',
-        cc: 'aperture@humanbrainmapping.org',
+        cc: 'journal@humanbrainmapping.org',
         ccEditors: false,
         body: `<p>
         <p>Dear {{ recipientName }},</p>
@@ -121,14 +121,14 @@ const existingEmailTemplates = async () => {
         emailTemplateKey: 'reviewAssignmentEmailTemplate',
         description: 'Review Assignment notification',
         subject: 'Aperture Neuro – Submission Ready for Review',
-        cc: 'aperture@humanbrainmapping.org',
+        cc: 'journal@humanbrainmapping.org',
         ccEditors: false,
         body: `<p>
         <p>Dear {{ recipientName }},</p>
         <p>Thank you for agreeing to review for Aperture Neuro. You have now been assigned to the following submission:</p>
         <p>“{{ manuscriptNumber }}; {{ manuscriptTitle }}, {{ authorName }}”</p>
         <p>You can access the full manuscript to review by logging into your dashboard at {{{ loginLink }}}.</p>
-        <p>For any questions please contact the journal manager at <a href="mailto:aperture@humanbrainmapping.org">aperture@humanbrainmapping.org</a>.</p>
+        <p>For any questions please contact the journal manager at <a href="mailto:journal@humanbrainmapping.org">journal@humanbrainmapping.org</a>.</p>
         <p>Thank you,</p>
         <p>Journal Manager <br>
         Aperture Neuro
@@ -139,7 +139,7 @@ const existingEmailTemplates = async () => {
         emailTemplateKey: 'reviewCompleteEmailTemplate',
         description: 'Review Complete notification',
         subject: 'Aperture Neuro – Review Process Complete',
-        cc: 'aperture@humanbrainmapping.org',
+        cc: 'journal@humanbrainmapping.org',
         ccEditors: false,
         body: `<p>
         <p>Dear {{ recipientName }},</p>
@@ -180,14 +180,14 @@ const existingEmailTemplates = async () => {
         emailTemplateKey: 'editorAssignmentEmailTemplate',
         description: 'Tonya White - Handling Editor Assignment notification',
         subject: 'Aperture Neuro Submission Ready for Handling Editor',
-        cc: 'aperture@humanbrainmapping.org',
+        cc: 'journal@humanbrainmapping.org',
         ccEditors: false,
         body: `<p>
         <p>Dear {{ recipientName }},</p>
         <p>You have been assigned the following Research Object to Handle:</p>
         <p>“{{ manuscriptNumber }}; {{ manuscriptTitle }}, {{ authorName }}”</p>
         <p>To access the submission please log onto the Aperture Submission Kotahi platform at {{{ loginLink }}}.</p>
-        <p>If you have any questions or trouble accessing the submission, please contact the Journal Manager at <a href="mailto:aperture@humanbrainmapping.org">aperture@humanbrainmapping.org</a>.</p>
+        <p>If you have any questions or trouble accessing the submission, please contact the Journal Manager at <a href="mailto:journal@humanbrainmapping.org">journal@humanbrainmapping.org</a>.</p>
         <p>Sincerely,</p>
         <p>Ad-hoc Editor-in-Chief <br>
         Aperture Neuro
@@ -198,7 +198,7 @@ const existingEmailTemplates = async () => {
         emailTemplateKey: 'reviewRejecEmailTemplate',
         description: 'Reviewer Rejected',
         subject: 'Reviewer has rejected review invitation',
-        cc: 'aperture@humanbrainmapping.org',
+        cc: 'journal@humanbrainmapping.org',
         ccEditors: false,
         type: 'systemEmail',
         body: `<p>
@@ -213,7 +213,7 @@ const existingEmailTemplates = async () => {
         emailTemplateKey: 'evaluationCompleteEmailTemplate',
         description: 'Evaluation Completed',
         subject: 'The review of “{{ manuscriptTitle }}” is complete.',
-        cc: 'aperture@humanbrainmapping.org',
+        cc: 'journal@humanbrainmapping.org',
         ccEditors: false,
         type: 'systemEmail',
         body: `<p>
@@ -230,7 +230,7 @@ const existingEmailTemplates = async () => {
         emailTemplateKey: 'submissionConfirmationEmailTemplate',
         description: 'Submission Confirmation',
         subject: 'Aperture Neuro – Received Research Object Submission',
-        cc: 'aperture@humanbrainmapping.org',
+        cc: 'journal@humanbrainmapping.org',
         ccEditors: false,
         type: 'systemEmail',
         body: `<p>
@@ -238,7 +238,7 @@ const existingEmailTemplates = async () => {
         <p>Thank you for your submission.</p>
         <p>“{{ manuscriptNumber }}; {{ manuscriptTitle }}, {{ authorName }}”</p>
         <p>We have successfully received your Research Object, and it is currently under review. You can check the status of your submission at any time by logging into the publishing platform and navigating to your dashboard.</p>
-        <p>If you have any questions, please contact the Aperture Neuro Journal Manager, at <a href="mailto:aperture@humanbrainmapping.org">aperture@humanbrainmapping.org</a>.</p>
+        <p>If you have any questions, please contact the Aperture Neuro Journal Manager, at <a href="mailto:journal@humanbrainmapping.org">journal@humanbrainmapping.org</a>.</p>
         <p>Thank you,</p>
         </p>Journal Manager <br>
         Aperture Neuro

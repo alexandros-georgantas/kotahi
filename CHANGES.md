@@ -4,7 +4,7 @@
 
 #### Citation manager
 
-Instances affected: **All with `aperture` or `colab` groups, that use the Production page**
+Instances affected: **All with `journal` or `prc` groups, that use the Production page**
 
 A citation manager has been introduced to the Production page, for correcting and formatting citations and to faciliate better export to JATS. It uses AnyStyle and CrossRef services to provide suggested structured matches to existing citations, and CiteProc to format the citations.
 
@@ -31,9 +31,9 @@ For a non-local AnyStyle server, the host will be `subdomain.domain`, and protoc
 
 Instances affected: **Colab Biophysics organization _only_**
 
-Set `USE_COLAB_BIOPHYSICS_IMPORT=true` in the `.env` file. Without this, imports specific to the Colab Biophysics organization will now be disabled. Note that for these imports to run, the group archetype must also be `colab`.
+Set `USE_COLAB_BIOPHYSICS_IMPORT=true` in the `.env` file. Without this, imports specific to the Colab Biophysics organization will now be disabled. Note that for these imports to run, the group archetype must also be `prc`.
 
-Previously, all groups using the `colab` archetype performed these imports, despite them being intended for one organization only.
+Previously, all groups using the `prc` archetype performed these imports, despite them being intended for one organization only.
 
 In future we intend to move all imports into plugins, using the import [plugin architecture](https://docs.coko.foundation/s/f961fad5-f903-4561-9d22-b723129edf15).
 
@@ -47,9 +47,9 @@ Instances affected: **all**.<br/>
 
 `INSTANCE_GROUPS` is a required setting, which determines what multitenanted "groups" should run within a single instance of Kotahi. Typically, when upgrading an existing instance to 2.0.0, `INSTANCE_GROUPS` should specify a single group, though you may subsequently add further groups separated by commas to create new mulitenanted groups, each with their own data, workflow, branding and other settings (see the [FAQ](https://gitlab.coko.foundation/kotahi/kotahi/-/blob/main/FAQ.md#instance_groups-and-multitenancy) for details).
 
-`INSTANCE_GROUPS` must contain one or more _group specifications_ separated by commas. Each _group specification_ consists of a _group name_ followed by a colon followed by a _group type_, e.g. `ourjournal:aperture`. The _group name_ (before the colon) may only contain lowercase `a`-`z`, `0`-`9` and the `_` character. The _group type_ (after the colon) must be either 'aperture', 'colab', 'elife' or 'ncrc'. (These [_group types_](https://docs.coko.foundation/doc/instance-archetypes-LFnzu7leM7) will be given more descriptive and generic names in the near future.)
+`INSTANCE_GROUPS` must contain one or more _group specifications_ separated by commas. Each _group specification_ consists of a _group name_ followed by a colon followed by a _group type_, e.g. `ourjournal:journal`. The _group name_ (before the colon) may only contain lowercase `a`-`z`, `0`-`9` and the `_` character. The _group type_ (after the colon) must be either 'journal', 'prc', 'preprint1' or 'preprint2'. (These [_group types_](https://docs.coko.foundation/doc/instance-archetypes-LFnzu7leM7) will be given more descriptive and generic names in the near future.)
 
-Typically, to keep URLs to pages unchanged it is recommended that the _group name_ "kotahi" be used: thus, if you had `INSTANCE_NAME=aperture`, you would set `INSTANCE_GROUPS=kotahi:aperture`.
+Typically, to keep URLs to pages unchanged it is recommended that the _group name_ "kotahi" be used: thus, if you had `INSTANCE_NAME=journal`, you would set `INSTANCE_GROUPS=kotahi:journal`.
 
 #### Flax CMS
 
@@ -81,13 +81,13 @@ USE_APERTURE_EMAIL=true
 Instances affected: **all**.<br/>
 `TEAM_TIMEZONE` should be set to the [tz database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) of your team's main timezone (e.g. `Europe/London` if your head office is in UK). This allows correct calculation of days remaining on tasks in your task list, and will have other uses in future.
 
-For colab instance archetype:
+For prc instance archetype:
 
 1. Set `SEMANTIC_SCHOLAR_IMPORTS_RECENCY_PERIOD_DAYS=42` in ENV to configure the recency period of Semantic Scholar recommended preprints
 
 ### 2022-10-14
 
-For colab instance archetype:
+For prc instance archetype:
 
 1. Set `ALLOW_MANUAL_IMPORT=true` to make the 'Refresh' button appear on the manuscripts page, allowing editors and admins to manually start an import of preprints from bioRxiv.
 2. Set `AUTO_IMPORT_HOUR_UTC` to an integer from `0 to 23` to cause a daily automatic import of preprints at that hour UTC.
@@ -146,7 +146,7 @@ HYPOTHESIS_ALLOW_TAGGING=true
 
 ### 2022-05-26
 
-- Instances affected: **elife** and **Colab Biophysics** <br />
+- Instances affected: **preprint1** and **Colab Biophysics** <br />
   `HYPOTHESIS_GROUP=`(this is the Hypothe.is group id) <br />
   `HYPOTHESIS_PUBLISH_FIELDS=`(submission form and endpoint field mapping)
 
