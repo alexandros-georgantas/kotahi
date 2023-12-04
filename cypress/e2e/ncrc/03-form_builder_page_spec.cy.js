@@ -5,6 +5,7 @@ import { ManuscriptsPage } from '../../page-object/manuscripts-page'
 import { NewSubmissionPage } from '../../page-object/new-submission-page'
 import { SubmissionFormPage } from '../../page-object/submission-form-page'
 
+// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('form builder tests', () => {
   context('check form builder elements visibility', () => {
     beforeEach(() => {
@@ -246,7 +247,8 @@ describe.skip('form builder tests', () => {
           data.preprint2.subTopicTypes
             .nonPharmaceuticalInterventionsSymptomScreening,
           data.preprint2.subTopicTypes.vaccinesTrialResults,
-          data.preprint2.subTopicTypes.vaccinesOtherVaccineAndVirologyRelatedTopics,
+          data.preprint2.subTopicTypes
+            .vaccinesOtherVaccineAndVirologyRelatedTopics,
           data.preprint2.subTopicTypes.vaccinesTrialProtocol,
           data.preprint2.subTopicTypes
             .clinicalPresentationPrognosticRiskFactorsAceInhibitors,

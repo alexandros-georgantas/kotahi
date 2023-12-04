@@ -5,6 +5,7 @@ import { Checkbox } from '@pubsweet/ui'
 import { grid } from '@pubsweet/ui-toolkit'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+// eslint-disable-next-line import/no-unresolved
 import { Trans, useTranslation } from 'react-i18next'
 import { articleStatuses } from '../../../globals'
 import { validateManuscriptSubmission } from '../../../shared/manuscriptUtils'
@@ -284,7 +285,9 @@ const Manuscripts = ({ history, ...props }) => {
     }
   }
 
-  const shouldAllowBulkDelete = ['preprint2', 'prc'].includes(config.instanceName)
+  const shouldAllowBulkDelete = ['preprint2', 'prc'].includes(
+    config.instanceName,
+  )
 
   const topRightControls = (
     <ControlsContainer>
