@@ -4,6 +4,7 @@ import { Formik } from 'formik'
 import { useMutation } from '@apollo/client'
 import { ValidatedFieldFormik } from '@pubsweet/ui'
 import styled from 'styled-components'
+import _ from 'lodash'
 import {
   ActionButton,
   PaddedContent,
@@ -84,7 +85,12 @@ const AuthorFeedbackForm = ({
   const history = useHistory()
   const config = useContext(ConfigContext)
   const { urlFrag } = config
-  const { authorFeedback } = manuscript
+  const { authorFeedback, files: allFiles } = manuscript
+
+  const authorFeedbackFiles = _(allFiles)
+    .keyBy('id')
+    .at(authorFeedback.fileIds)
+    .value()
 
   const [readOnly, setReadOnly] = useState(
     !!authorFeedback.submitted || isReadOnlyVersion,
@@ -141,7 +147,8 @@ const AuthorFeedbackForm = ({
     initialData.fileIds = authorFeedbackData.fileIds
       ? authorFeedbackData.fileIds
       : []
-    initialData.files = authorFeedbackData.files ? authorFeedbackData.files : []
+
+    initialData.files = authorFeedbackFiles
     return initialData
   }
 
@@ -198,7 +205,7 @@ const AuthorFeedbackForm = ({
               <PaddedContent key={filesInput.name}>
                 <Legend>Attachments</Legend>
                 {readOnly ? (
-                  authorFeedback.files.map(file => (
+                  authorFeedbackFiles.map(file => (
                     <Attachment
                       file={file}
                       key={file.storedObjects[0].url}

@@ -141,7 +141,6 @@ const fragmentFields = `
   authorFeedback {
     text
     fileIds
-    ${fileFragment}
     edited
     submitted
     submitter {

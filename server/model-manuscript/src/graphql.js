@@ -1692,19 +1692,12 @@ const resolvers = {
       return createdDate.created
     },
     async authorFeedback(parent) {
-      let files = parent.authorFeedback.fileIds
-        ? await models.File.query().findByIds(parent.authorFeedback.fileIds)
-        : []
-
       const submitter = parent.authorFeedback.submitterId
         ? await models.User.query().findById(parent.authorFeedback.submitterId)
         : null
 
-      files = await getFilesWithUrl(files)
-
       return {
         ...(parent.authorFeedback || {}),
-        files,
         submitter,
       }
     },
@@ -2040,7 +2033,6 @@ const typeDefs = `
   type ManuscriptAuthorFeeback {
     text: String
     fileIds: [String]
-    files: [File]
     submitter: User
     edited: DateTime
     submitted: DateTime

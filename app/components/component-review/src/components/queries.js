@@ -93,17 +93,6 @@ const manuscriptFields = `
   authorFeedback {
     text
     fileIds
-    files {
-      id
-      name
-      tags
-      storedObjects {
-        mimetype
-        key
-        url
-        type
-      }
-    }
     edited
     submitted
     submitter {
