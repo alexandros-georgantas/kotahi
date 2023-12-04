@@ -539,7 +539,7 @@ const publishReviewsToCrossref = async manuscript => {
     templateCopy.doi_batch.head[0].depositor[0].depositor_name[0] =
       'eLife Kotahi'
     templateCopy.doi_batch.head[0].depositor[0].email_address[0] =
-      'preprint1-kotahi@kotahi.cloud'
+      'elife-kotahi@kotahi.cloud'
     templateCopy.doi_batch.head[0].registrant[0] = 'eLife'
     templateCopy.doi_batch.head[0].timestamp[0] = +new Date()
     templateCopy.doi_batch.head[0].doi_batch_id[0] = String(+new Date()).slice(
