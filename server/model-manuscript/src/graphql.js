@@ -1692,14 +1692,18 @@ const resolvers = {
       return createdDate.created
     },
     async authorFeedback(parent) {
-      const submitter = parent.authorFeedback.submitterId
-        ? await models.User.query().findById(parent.authorFeedback.submitterId)
-        : null
+      if (parent.authorFeedback && parent.authorFeedback.submitterId) {
+        const submitter = await models.User.query().findById(
+          parent.authorFeedback.submitterId,
+        )
 
-      return {
-        ...(parent.authorFeedback || {}),
-        submitter,
+        return {
+          ...parent.authorFeedback,
+          submitter,
+        }
       }
+
+      return parent.authorFeedback || {}
     },
   },
   PublishedManuscript: {
