@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { grid } from '@pubsweet/ui-toolkit'
+import { grid, th } from '@pubsweet/ui-toolkit'
 import { withRouter } from 'react-router-dom'
 import { debounce } from 'lodash'
 import { useTranslation } from 'react-i18next'
@@ -22,8 +22,8 @@ import { Info } from './styles'
 import { ControlsContainer } from '../../../component-manuscripts/src/style'
 import AuthorFeedbackForm from '../../../component-author-feedback/src/components/AuthorFeedbackForm'
 import UploadAsset from './UploadAsset'
-// import ReadonlyFormTemplate from './ReadonlyFormTemplate'
 import ReadonlyFormTemplate from '../../../component-review/src/components/metadata/ReadonlyFormTemplate'
+import { color } from '../../../../theme'
 
 const FlexRow = styled.div`
   display: flex;
@@ -33,6 +33,24 @@ const FlexRow = styled.div`
 
 const FormTemplateStyled = styled.div`
   max-height: calc(100vh - 150px);
+`
+
+const StyledManuscript = styled(Manuscript)`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  width: 100%;
+`
+
+const ScrollableTabContent = styled.section`
+  background-color: ${color.backgroundA};
+  border-radius: ${th('borderRadius')};
+  border-top-left-radius: ${th('borderRadius')};
+  box-shadow: ${({ theme }) => theme.boxShadow.shades[200]};
+  height: calc(100vh - 108px);
+  overflow: auto;
+  width: calc(100vw - 232px);
 `
 
 const Production = ({
@@ -82,14 +100,11 @@ const Production = ({
     [],
   )
 
-  useEffect(
-    () => () => {
-      debouncedSave.flush()
-      onChangeCss.flush()
-      onChangeHtml.flush()
-    },
-    [],
-  )
+  useEffect(() => {
+    debouncedSave.flush()
+    onChangeCss.flush()
+    onChangeHtml.flush()
+  }, [])
 
   const { t } = useTranslation()
 
@@ -118,12 +133,12 @@ const Production = ({
               <Spinner />
             )}
           </SectionContent>
-        ) : (
-          <SectionContent>
-            <Info>{t('productionPage.No supported view of the file')}</Info>
-          </SectionContent>
-        )}
-      </>
+      ) : (
+        <SectionContent>
+          <Info>{t('productionPage.No supported view of the file')}</Info>
+        </SectionContent>
+      )}
+    </>
     ),
     key: 'editor',
     label: `Editor ${isReadOnlyVersion ? ' (read-only)' : ''}`,
@@ -146,14 +161,13 @@ const Production = ({
 
   const cssPagedJS = {
     content: (
-      <SectionContent>
+      <ScrollableTabContent>
         <CodeMirror
           extensions={[css()]}
-          height="850px"
           onChange={onChangeCss}
           value={cssValue}
         />
-      </SectionContent>
+      </ScrollableTabContent>
     ),
     key: 'cssPagedJs',
     label: 'PagedJs Css',
@@ -161,14 +175,13 @@ const Production = ({
 
   const htmlTemplate = {
     content: (
-      <SectionContent>
+      <ScrollableTabContent>
         <CodeMirror
           extensions={[html()]}
-          height="850px"
           onChange={onChangeHtml}
           value={htmlValue}
         />
-      </SectionContent>
+      </ScrollableTabContent>
     ),
     key: 'html-template',
     label: 'PagedJs Html Template',
@@ -176,12 +189,12 @@ const Production = ({
 
   const uploadAssets = {
     content: (
-      <SectionContent>
+      <ScrollableTabContent>
         <UploadAsset
           files={articleTemplate.files}
           groupTemplateId={articleTemplate.id}
         />
-      </SectionContent>
+      </ScrollableTabContent>
     ),
     key: 'template-assets',
     label: 'PagedJs Template Assets',
@@ -189,7 +202,7 @@ const Production = ({
 
   const manuscriptMetadata = {
     content: (
-      <SectionContent>
+      <ScrollableTabContent>
         <FormTemplateStyled>
           <ReadonlyFormTemplate
             copyHandleBarsCode
@@ -204,7 +217,7 @@ const Production = ({
             showEditorOnlyFields
           />
         </FormTemplateStyled>
-      </SectionContent>
+      </ScrollableTabContent>
     ),
     key: 'manuscript-metadata',
     label: 'PagedJs Metadata',
@@ -227,7 +240,7 @@ const Production = ({
   }
 
   return (
-    <Manuscript>
+    <StyledManuscript>
       <HeadingWithAction>
         <FlexRow>
           <Heading>
@@ -249,7 +262,7 @@ const Production = ({
       <ErrorBoundary>
         <HiddenTabs defaultActiveKey="editor" sections={tabSections} />
       </ErrorBoundary>
-    </Manuscript>
+    </StyledManuscript>
   )
 }
 
