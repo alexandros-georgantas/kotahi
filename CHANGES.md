@@ -162,3 +162,15 @@ HYPOTHESIS_ALLOW_TAGGING=true
 For dev instances, remove the old `minio/minio` image and container:
 `docker image rm -f minio/minio`
 Then rebuild containers.
+
+### 2023-12-05
+
+- The following instance archtypes used in the codebase have been renamed
+1. aperture -> journal
+2. colab -> prc
+3. elife -> preprint1
+4. ncrc -> preprint2
+
+Prior upgrading Kotahi, please ensure the instance archetypes have been renamed in the .env file. 
+
+- `NOTIFICATION_EMAIL_CC_ENABLED=` variable to enable/disable carbon copies (CC) has now been deprecated. Group Managers are able to manual add a CC from the Emails>Email template page
