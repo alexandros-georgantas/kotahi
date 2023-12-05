@@ -133,12 +133,12 @@ const Production = ({
               <Spinner />
             )}
           </SectionContent>
-      ) : (
-        <SectionContent>
-          <Info>{t('productionPage.No supported view of the file')}</Info>
-        </SectionContent>
-      )}
-    </>
+        ) : (
+          <SectionContent>
+            <Info>{t('productionPage.No supported view of the file')}</Info>
+          </SectionContent>
+        )}
+      </>
     ),
     key: 'editor',
     label: `Editor ${isReadOnlyVersion ? ' (read-only)' : ''}`,
