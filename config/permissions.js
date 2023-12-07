@@ -8,30 +8,31 @@ const {
   deny,
 } = require('@coko/server/authorization')
 
-const userIsEditorQuery = async (ctx, manuscriptId) => {
-  if (!ctx.user) return false
-  const user = await ctx.connectors.User.model.query().findById(ctx.user)
-
-  if (!user) {
-    return false
-  }
+const getUserTeamsWithRole = async (user, roles, manuscriptId) => {
+  if (!user) return []
 
   let query = user
     .$relatedQuery('teams')
-    .where(builder =>
-      builder
-        .where({ role: 'seniorEditor' })
-        .orWhere({ role: 'handlingEditor' })
-        .orWhere({ role: 'editor' }),
-    )
+    .where(builder => builder.whereIn('role', roles))
 
-  // Manuscript is optional...
   if (manuscriptId) {
     query = query.where({ objectId: manuscriptId })
   }
 
-  const rows = await query.resultSize()
-  return !!rows
+  const teams = await query
+  return teams
+}
+
+const userIsEditorQuery = async (ctx, manuscriptId) => {
+  if (!ctx.user) return false
+
+  const user = await ctx.connectors.User.model.query().findById(ctx.user)
+  if (!user) return false
+
+  const roles = ['seniorEditor', 'handlingEditor', 'editor']
+  const teams = await getUserTeamsWithRole(user, roles, manuscriptId)
+
+  return teams.length > 0
 }
 
 const userOwnsMessage = rule({ cache: 'contextual' })(
@@ -52,29 +53,26 @@ const getManuscriptOfFile = async (file, ctx) => {
     return null
   }
 
-  // The file may belong to a review or directly to a manuscript
-  const review = await ctx.connectors.Review.model
-    .query()
-    .findById(file.objectId)
+  const { objectId } = file
+  const review = await ctx.connectors.Review.model.query().findById(objectId)
 
   const manuscript = await ctx.connectors.Manuscript.model
     .query()
-    .findById(review ? review.manuscriptId : file.objectId)
+    .findById(review ? review.manuscriptId : objectId)
 
-  if (!manuscript)
+  if (!manuscript) {
     console.error('File without owner manuscript encountered:', file)
+  }
 
   return manuscript
 }
 
 const getLatestVersionOfManuscriptOfFile = async (file, ctx) => {
   const manuscript = await getManuscriptOfFile(file, ctx)
-
   if (!manuscript) return null
 
-  const firstVersionId = manuscript.parentId || manuscript.id
-
-  const latestVersion = await getLatestVersionOfManuscript(ctx, firstVersionId)
+  const manuscriptId = manuscript.parentId || manuscript.id
+  const latestVersion = await getLatestVersionOfManuscript(ctx, manuscriptId)
 
   return latestVersion
 }
@@ -111,10 +109,22 @@ const userIsGroupManagerQuery = async ctx => {
 
   const groupId = ctx.req.headers['group-id']
 
+  // Check if the result is already cached
+  if (ctx.userGroupManagerCache && ctx.userGroupManagerCache[ctx.user]) {
+    return ctx.userGroupManagerCache[ctx.user]
+  }
+
   const groupManagerRecord = await ctx.connectors.Team.model
     .query()
     .withGraphJoined('members')
     .findOne({ role: 'groupManager', objectId: groupId, userId: ctx.user })
+
+  // Cache the result
+  if (!ctx.userGroupManagerCache) {
+    ctx.userGroupManagerCache = {}
+  }
+
+  ctx.userGroupManagerCache[ctx.user] = !!groupManagerRecord
 
   return !!groupManagerRecord
 }
@@ -122,10 +132,22 @@ const userIsGroupManagerQuery = async ctx => {
 const userIsAdminQuery = async ctx => {
   if (!ctx.user) return false
 
+  // Check if the result is already cached
+  if (ctx.userAdminCache && ctx.userAdminCache[ctx.user]) {
+    return ctx.userAdminCache[ctx.user]
+  }
+
   const adminRecord = await ctx.connectors.Team.model
     .query()
     .withGraphJoined('members')
     .findOne({ role: 'admin', global: true, userId: ctx.user })
+
+  // Cache the result
+  if (!ctx.userAdminCache) {
+    ctx.userAdminCache = {}
+  }
+
+  ctx.userAdminCache[ctx.user] = !!adminRecord
 
   return !!adminRecord
 }
