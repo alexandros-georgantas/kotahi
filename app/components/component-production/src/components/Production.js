@@ -63,6 +63,7 @@ const Production = ({
   currentUser,
   makePdf,
   makeJats,
+  submitAuthorProofingFeedback,
   updateManuscript,
   updateTemplate,
   onAssetManager,
@@ -151,7 +152,7 @@ const Production = ({
           currentUser={currentUser}
           isReadOnlyVersion={isReadOnlyVersion}
           manuscript={manuscript}
-          updateManuscript={updateManuscript}
+          submitAuthorProofingFeedback={submitAuthorProofingFeedback}
         />
       </SectionContent>
     ),

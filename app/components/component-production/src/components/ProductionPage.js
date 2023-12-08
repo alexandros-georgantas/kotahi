@@ -186,6 +186,15 @@ export const updateMutation = gql`
   }
 `
 
+const submitAuthorProofingFeedbackMutation = gql`
+  mutation($id: ID!, $input: String) {
+    submitAuthorProofingFeedback(id: $id, input: $input) {
+      id
+      ${fragmentFields}
+    }
+  }
+`
+
 const showAuthorProofingMode = (manuscript, currentUser) => {
   const authorTeam = manuscript.teams.find(team => team.role === 'author')
 
@@ -229,6 +238,11 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
   // })
 
   const [update] = useMutation(updateMutation)
+
+  const [submitAuthorProofingFeedback] = useMutation(
+    submitAuthorProofingFeedbackMutation,
+  )
+
   const [updateTempl] = useMutation(updateTemplateMutation)
 
   const updateManuscript = async (versionId, manuscriptDelta) => {
@@ -322,6 +336,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
             makePdf={setMakingPdf}
             manuscript={manuscript}
             onAssetManager={onAssetManager}
+            submitAuthorProofingFeedback={submitAuthorProofingFeedback}
             updateManuscript={(a, b) => {
               // TODO: This might need to be different based on value of isAuthorProofingMode?
               // eslint-disable-next-line

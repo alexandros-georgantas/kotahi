@@ -556,6 +556,8 @@ const resolvers = {
         },
       )
 
+      // TODO: Trigger notifications after assgined WIP
+
       return updated
     },
 
@@ -783,7 +785,13 @@ const resolvers = {
     async updateManuscript(_, { id, input }, ctx) {
       return commonUpdateManuscript(id, input, ctx)
     },
+    async submitAuthorProofingFeedback(_, { id, input }, ctx) {
+      if (config['notification-email'].automated === 'true') {
+        // TODO: Automated email author proofing feedback submission WIP
+      }
 
+      return commonUpdateManuscript(id, input, ctx)
+    },
     async createNewVersion(_, { id }, ctx) {
       const manuscript = await models.Manuscript.query().findById(id)
       return manuscript.createNewVersion()
@@ -1920,6 +1928,7 @@ const typeDefs = `
     createManuscript(input: ManuscriptInput): Manuscript!
     updateManuscript(id: ID!, input: String): Manuscript!
     submitManuscript(id: ID!, input: String): Manuscript!
+    submitAuthorProofingFeedback(id: ID!, input: String): Manuscript!
     makeDecision(id: ID!, decision: String): Manuscript!
     deleteManuscript(id: ID!): ID!
     deleteManuscripts(ids: [ID]!): [ID]!

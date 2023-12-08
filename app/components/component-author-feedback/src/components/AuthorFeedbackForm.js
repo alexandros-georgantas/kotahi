@@ -79,7 +79,7 @@ const required = value => {
 const AuthorFeedbackForm = ({
   currentUser,
   manuscript,
-  updateManuscript,
+  submitAuthorProofingFeedback,
   isReadOnlyVersion,
 }) => {
   const history = useHistory()
@@ -113,22 +113,32 @@ const AuthorFeedbackForm = ({
   })
 
   const triggerAutoSave = async formData => {
-    await updateManuscript(manuscript.id, {
-      authorFeedback: {
-        ...formData,
-        edited: new Date(),
+    await submitAuthorProofingFeedback({
+      variables: {
+        id: manuscript.id,
+        input: JSON.stringify({
+          authorFeedback: {
+            ...formData,
+            edited: new Date(),
+          },
+        }),
       },
     })
   }
 
   const submit = async formData => {
-    await updateManuscript(manuscript.id, {
-      status: 'completed',
-      authorFeedback: {
-        text: formData.text,
-        fileIds: formData.fileIds,
-        submitterId: currentUser.id,
-        submitted: new Date(),
+    await submitAuthorProofingFeedback({
+      variables: {
+        id: manuscript.id,
+        input: JSON.stringify({
+          status: 'completed',
+          authorFeedback: {
+            text: formData.text,
+            fileIds: formData.fileIds,
+            submitterId: currentUser.id,
+            submitted: new Date(),
+          },
+        }),
       },
     })
     setReadOnly(true)

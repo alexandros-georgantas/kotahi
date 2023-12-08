@@ -186,7 +186,6 @@ const Submit = ({
             currentUser={currentUser}
             isReadOnlyVersion
             manuscript={version}
-            updateManuscript={updateManuscript}
           />
         </SectionContent>
       ),
