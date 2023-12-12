@@ -8,33 +8,173 @@ const {
   deny,
 } = require('@coko/server/authorization')
 
-const getUserTeamsWithRole = async (user, roles, manuscriptId) => {
-  if (!user) return []
+const LRUCache = require('lru-cache')
+
+const cache = new LRUCache({
+  max: 500,
+  ttl: 10000,
+})
+
+// eslint-disable-next-line consistent-return
+const fetchMethod = async (key, ctx) => {
+  const [queryType, ...params] = key.split(':')
+
+  switch (queryType) {
+    case 'userIsGM':
+      if (!params[0] || !params[1]) return false
+      // eslint-disable-next-line no-return-await
+      return await userIsGroupManagerQuery(params[0], params[1], ctx)
+    case 'msOfFile':
+      if (!params[0]) return false
+      // eslint-disable-next-line no-return-await
+      return await getManuscriptOfFile(params[0], ctx)
+    case 'userIsAdmin':
+      if (!params[0]) return false
+      // eslint-disable-next-line no-return-await
+      return await userIsAdminQuery(params[0], ctx)
+    case 'userIsEditor':
+      if (!params[0]) return false
+      // eslint-disable-next-line no-return-await
+      return await userIsEditorQuery(params[0], ctx)
+    default:
+      break
+  }
+}
+
+const cachedGet = async (key, ctx) => {
+  const cachedResult = cache.get(key)
+
+  if (cachedResult !== undefined) {
+    return cachedResult
+  }
+
+  const fetchResult = await fetchMethod(key, ctx)
+  cache.set(key, fetchResult)
+  return fetchResult
+}
+
+const userIsGroupManagerQuery = async (userId, groupId, ctx) => {
+  const cacheKey = `userIsGM:${userId}:${groupId}`
+  const cachedResult = cache.get(cacheKey)
+
+  if (cachedResult !== undefined) {
+    return cachedResult
+  }
+
+  if (!ctx.user) return false
+
+  const groupManagerRecord = await ctx.connectors.Team.model
+    .query()
+    .withGraphJoined('members')
+    .findOne({ role: 'groupManager', objectId: groupId, userId: ctx.user })
+
+  return !!groupManagerRecord
+}
+
+const userIsEditorQuery = async (manuscriptId, ctx) => {
+  const cacheKey = `userIsEditor:${ctx.user}:${manuscriptId}`
+  const cachedResult = cache.get(cacheKey)
+
+  if (cachedResult !== undefined) {
+    return cachedResult
+  }
+
+  if (!ctx.user) return false
+  const user = await ctx.connectors.User.model.query().findById(ctx.user)
+
+  if (!user) {
+    return false
+  }
 
   let query = user
     .$relatedQuery('teams')
-    .where(builder => builder.whereIn('role', roles))
+    .where(builder =>
+      builder
+        .where({ role: 'seniorEditor' })
+        .orWhere({ role: 'handlingEditor' })
+        .orWhere({ role: 'editor' }),
+    )
 
   if (manuscriptId) {
     query = query.where({ objectId: manuscriptId })
   }
 
-  const teams = await query
-  return teams
+  const rows = await query.resultSize()
+  const isEditor = !!rows
+  cache.set(cacheKey, isEditor)
+  return isEditor
 }
 
-const userIsEditorQuery = async (ctx, manuscriptId) => {
+const getManuscriptOfFile = async (fileId, ctx) => {
+  const cacheKey = `msOfFile:${fileId}`
+  const cachedResult = cache.get(cacheKey)
+  const file = await ctx.connectors.File.model.query().findById(fileId)
+
+  if (cachedResult !== undefined) {
+    return cachedResult
+  }
+
+  if (!file || !file.objectId) {
+    console.error('File without objectId encountered:', file)
+    return null
+  }
+
+  // The file may belong to a review or directly to a manuscript
+  const review = await ctx.connectors.Review.model
+    .query()
+    .findById(file.objectId)
+
+  const manuscript = await ctx.connectors.Manuscript.model
+    .query()
+    .findById(review ? review.manuscriptId : file.objectId)
+
+  if (!manuscript)
+    console.error('File without owner manuscript encountered:', file)
+
+  cache.set(cacheKey, manuscript)
+  return manuscript
+}
+
+const userIsEditor = rule({
+  cache: 'contextual',
+})(async (parent, args, ctx, info) => cachedGet(`userIsEditor:`, ctx))
+
+const userIsAdminQuery = async ctx => {
+  const cacheKey = 'userIsAdmin'
+  const cachedResult = cache.get(cacheKey)
+
+  if (cachedResult !== undefined) {
+    return cachedResult
+  }
+
   if (!ctx.user) return false
 
-  const user = await ctx.connectors.User.model.query().findById(ctx.user)
-  if (!user) return false
+  const adminRecord = await ctx.connectors.Team.model
+    .query()
+    .withGraphJoined('members')
+    .findOne({ role: 'admin', global: true, userId: ctx.user })
 
-  const roles = ['seniorEditor', 'handlingEditor', 'editor']
-  const teams = await getUserTeamsWithRole(user, roles, manuscriptId)
-
-  return teams.length > 0
+  const isAdmin = !!adminRecord
+  cache.set(cacheKey, isAdmin)
+  return isAdmin
 }
 
+/** Is the current user a Group Manager of the current group or an Admin? */
+const userIsGmOrAdmin = rule({
+  cache: 'contextual',
+})(
+  async (parent, args, ctx, info) =>
+    (await cachedGet(
+      `userIsGM:${ctx.user}:${ctx.req.headers['group-id']}`,
+      ctx,
+    )) || cachedGet(`userIsAdmin:${ctx.user}`, ctx),
+)
+
+const userIsAdmin = rule({
+  cache: 'contextual',
+})(async (parent, args, ctx, info) => cachedGet(`userIsAdmin:${ctx.user}`, ctx))
+
+// code above this line would get changed
 const userOwnsMessage = rule({ cache: 'contextual' })(
   async (parent, args, ctx, info) => {
     if (!ctx.user) return false
@@ -47,32 +187,14 @@ const userOwnsMessage = rule({ cache: 'contextual' })(
   },
 )
 
-const getManuscriptOfFile = async (file, ctx) => {
-  if (!file || !file.objectId) {
-    console.error('File without objectId encountered:', file)
-    return null
-  }
-
-  const { objectId } = file
-  const review = await ctx.connectors.Review.model.query().findById(objectId)
-
-  const manuscript = await ctx.connectors.Manuscript.model
-    .query()
-    .findById(review ? review.manuscriptId : objectId)
-
-  if (!manuscript) {
-    console.error('File without owner manuscript encountered:', file)
-  }
-
-  return manuscript
-}
-
 const getLatestVersionOfManuscriptOfFile = async (file, ctx) => {
-  const manuscript = await getManuscriptOfFile(file, ctx)
+  const manuscript = await cachedGet(`msOfFile:${file.id}`, ctx)
+
   if (!manuscript) return null
 
-  const manuscriptId = manuscript.parentId || manuscript.id
-  const latestVersion = await getLatestVersionOfManuscript(ctx, manuscriptId)
+  const firstVersionId = manuscript.parentId || manuscript.id
+
+  const latestVersion = await getLatestVersionOfManuscript(ctx, firstVersionId)
 
   return latestVersion
 }
@@ -88,10 +210,6 @@ const getLatestVersionOfManuscript = async (ctx, manuscriptVersionId) => {
   return latestVersion[0]
 }
 
-const userIsEditor = rule({
-  cache: 'contextual',
-})(async (parent, args, ctx, info) => userIsEditorQuery(ctx))
-
 const userIsMemberOfTeamWithRoleQuery = async (user, manuscriptId, role) => {
   if (!user) return false
 
@@ -104,70 +222,10 @@ const userIsMemberOfTeamWithRoleQuery = async (user, manuscriptId, role) => {
   return !!rows
 }
 
-const userIsGroupManagerQuery = async ctx => {
-  if (!ctx.user) return false
-
-  const groupId = ctx.req.headers['group-id']
-
-  // Check if the result is already cached
-  if (ctx.userGroupManagerCache && ctx.userGroupManagerCache[ctx.user]) {
-    return ctx.userGroupManagerCache[ctx.user]
-  }
-
-  const groupManagerRecord = await ctx.connectors.Team.model
-    .query()
-    .withGraphJoined('members')
-    .findOne({ role: 'groupManager', objectId: groupId, userId: ctx.user })
-
-  // Cache the result
-  if (!ctx.userGroupManagerCache) {
-    ctx.userGroupManagerCache = {}
-  }
-
-  ctx.userGroupManagerCache[ctx.user] = !!groupManagerRecord
-
-  return !!groupManagerRecord
-}
-
-const userIsAdminQuery = async ctx => {
-  if (!ctx.user) return false
-
-  // Check if the result is already cached
-  if (ctx.userAdminCache && ctx.userAdminCache[ctx.user]) {
-    return ctx.userAdminCache[ctx.user]
-  }
-
-  const adminRecord = await ctx.connectors.Team.model
-    .query()
-    .withGraphJoined('members')
-    .findOne({ role: 'admin', global: true, userId: ctx.user })
-
-  // Cache the result
-  if (!ctx.userAdminCache) {
-    ctx.userAdminCache = {}
-  }
-
-  ctx.userAdminCache[ctx.user] = !!adminRecord
-
-  return !!adminRecord
-}
-
-/** Is the current user a Group Manager of the current group or an Admin? */
-const userIsGmOrAdmin = rule({
-  cache: 'contextual',
-})(
-  async (parent, args, ctx, info) =>
-    (await userIsGroupManagerQuery(ctx)) || userIsAdminQuery(ctx),
-)
-
-const userIsAdmin = rule({
-  cache: 'contextual',
-})(async (parent, args, ctx, info) => userIsAdminQuery(ctx))
-
 const isPublicFileFromPublishedManuscript = rule({ cache: 'contextual' })(
   async (parent, args, ctx, info) => {
     if (parent.tags && parent.tags.includes('confidential')) return false
-    const manuscript = await getManuscriptOfFile(parent, ctx)
+    const manuscript = await cachedGet(`msOfFile:${parent.id}`, ctx)
     return !!(manuscript && manuscript.published)
   },
 )
@@ -175,6 +233,12 @@ const isPublicFileFromPublishedManuscript = rule({ cache: 'contextual' })(
 const isCMSFile = rule({ cache: 'contextual' })(
   async (parent, args, ctx, info) => {
     return parent.tags && parent.tags.includes('cms')
+  },
+)
+
+const isLogoFile = rule({ cache: 'contextual' })(
+  async (parent, args, ctx, info) => {
+    return parent.tags && parent.tags.includes('brandLogo')
   },
 )
 
@@ -257,7 +321,7 @@ const userIsAllowedToChat = rule({ cache: 'strict' })(
       'reviewer',
     )
 
-    const isEditor = await userIsEditorQuery(ctx, manuscript.id)
+    const isEditor = await cachedGet(`userIsEditor:${manuscript.id}`, ctx)
 
     if (channel.type === 'all') {
       return isAuthor || isReviewer || isEditor
@@ -329,7 +393,8 @@ const userIsEditorOfTheManuscriptOfTheReview = rule({
     manuscriptId = args.input.manuscriptId
   }
 
-  return userIsEditorQuery(ctx, manuscriptId)
+  // eslint-disable-next-line no-return-await
+  return cachedGet(`userIsEditor:${manuscriptId}`, ctx)
 })
 
 const userIsInvitedReviewer = rule({ cache: 'strict' })(
@@ -405,7 +470,7 @@ const userIsAuthorOfFilesAssociatedManuscript = rule({
   } else if (args.id) {
     // id is supplied for deletion
     const file = await ctx.connectors.File.model.query().findById(args.id)
-    const manuscript = await getManuscriptOfFile(file, ctx)
+    const manuscript = await cachedGet(`msOfFile:${file.id}`, ctx)
     manuscriptId = manuscript && manuscript.id
   }
 
@@ -433,7 +498,7 @@ const userIsAuthorOfTheManuscriptOfTheFile = rule({ cache: 'strict' })(
     if (parent.storedObjects && !parent.id) return true // only on uploading manuscript docx this will be validated
 
     const file = await ctx.connectors.File.model.query().findById(parent.id)
-    const manuscript = await getManuscriptOfFile(file, ctx)
+    const manuscript = await cachedGet(`msOfFile:${file.id}`, ctx)
     if (!manuscript) return false
 
     const team = await ctx.connectors.Team.model
@@ -658,6 +723,7 @@ const permissions = {
   File: or(
     isExportTemplatingFile,
     isCMSFile,
+    isLogoFile,
     isPublicFileFromPublishedManuscript,
     userIsAuthorOfTheManuscriptOfTheFile,
     userIsTheReviewerOfTheManuscriptOfTheFileAndReviewNotComplete,
