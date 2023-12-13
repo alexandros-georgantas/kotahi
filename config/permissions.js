@@ -54,13 +54,6 @@ const cachedGet = async (key, ctx) => {
 }
 
 const userIsGroupManagerQuery = async (userId, groupId, ctx) => {
-  const cacheKey = `userIsGM:${userId}:${groupId}`
-  const cachedResult = cache.get(cacheKey)
-
-  if (cachedResult !== undefined) {
-    return cachedResult
-  }
-
   if (!ctx.user) return false
 
   const groupManagerRecord = await ctx.connectors.Team.model
@@ -72,13 +65,6 @@ const userIsGroupManagerQuery = async (userId, groupId, ctx) => {
 }
 
 const userIsEditorQuery = async (manuscriptId, ctx) => {
-  const cacheKey = `userIsEditor:${ctx.user}:${manuscriptId}`
-  const cachedResult = cache.get(cacheKey)
-
-  if (cachedResult !== undefined) {
-    return cachedResult
-  }
-
   if (!ctx.user) return false
   const user = await ctx.connectors.User.model.query().findById(ctx.user)
 
@@ -101,18 +87,11 @@ const userIsEditorQuery = async (manuscriptId, ctx) => {
 
   const rows = await query.resultSize()
   const isEditor = !!rows
-  cache.set(cacheKey, isEditor)
   return isEditor
 }
 
 const getManuscriptOfFile = async (fileId, ctx) => {
-  const cacheKey = `msOfFile:${fileId}`
-  const cachedResult = cache.get(cacheKey)
   const file = await ctx.connectors.File.model.query().findById(fileId)
-
-  if (cachedResult !== undefined) {
-    return cachedResult
-  }
 
   if (!file || !file.objectId) {
     console.error('File without objectId encountered:', file)
@@ -131,22 +110,18 @@ const getManuscriptOfFile = async (fileId, ctx) => {
   if (!manuscript)
     console.error('File without owner manuscript encountered:', file)
 
-  cache.set(cacheKey, manuscript)
   return manuscript
 }
 
 const userIsEditor = rule({
   cache: 'contextual',
-})(async (parent, args, ctx, info) => cachedGet(`userIsEditor:`, ctx))
+})(async (parent, args, ctx, info) => {
+  const isEditor = cachedGet(`userIsEditor:`, ctx)
+
+  return isEditor
+})
 
 const userIsAdminQuery = async ctx => {
-  const cacheKey = 'userIsAdmin'
-  const cachedResult = cache.get(cacheKey)
-
-  if (cachedResult !== undefined) {
-    return cachedResult
-  }
-
   if (!ctx.user) return false
 
   const adminRecord = await ctx.connectors.Team.model
@@ -155,24 +130,28 @@ const userIsAdminQuery = async ctx => {
     .findOne({ role: 'admin', global: true, userId: ctx.user })
 
   const isAdmin = !!adminRecord
-  cache.set(cacheKey, isAdmin)
   return isAdmin
 }
 
 /** Is the current user a Group Manager of the current group or an Admin? */
 const userIsGmOrAdmin = rule({
   cache: 'contextual',
-})(
-  async (parent, args, ctx, info) =>
-    (await cachedGet(
-      `userIsGM:${ctx.user}:${ctx.req.headers['group-id']}`,
-      ctx,
-    )) || cachedGet(`userIsAdmin:${ctx.user}`, ctx),
-)
+})(async (parent, args, ctx, info) => {
+  const isUserGM = await cachedGet(
+    `userIsGM:${ctx.user}:${ctx.req.headers['group-id']}`,
+    ctx,
+  )
+
+  const isUserAdmin = await cachedGet(`userIsAdmin:${ctx.user}`, ctx)
+  return isUserGM || isUserAdmin
+})
 
 const userIsAdmin = rule({
   cache: 'contextual',
-})(async (parent, args, ctx, info) => cachedGet(`userIsAdmin:${ctx.user}`, ctx))
+})(async (parent, args, ctx, info) => {
+  const isAdmin = await cachedGet(`userIsAdmin:${ctx.user}`, ctx)
+  return isAdmin
+})
 
 // code above this line would get changed
 const userOwnsMessage = rule({ cache: 'contextual' })(
