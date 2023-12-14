@@ -121,13 +121,13 @@ const userIsEditor = rule({
   return isEditor
 })
 
-const userIsAdminQuery = async ctx => {
+const userIsAdminQuery = async (userId, ctx) => {
   if (!ctx.user) return false
 
   const adminRecord = await ctx.connectors.Team.model
     .query()
     .withGraphJoined('members')
-    .findOne({ role: 'admin', global: true, userId: ctx.user })
+    .findOne({ role: 'admin', global: true, userId })
 
   const isAdmin = !!adminRecord
   return isAdmin
