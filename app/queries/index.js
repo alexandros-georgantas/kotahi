@@ -281,6 +281,18 @@ export const GET_SYSTEM_WIDE_DISCUSSION_CHANNEL = gql`
   }
 `
 
+const fileFields = `
+    id
+    name
+    tags
+    storedObjects {
+      mimetype
+      key
+      url
+      type
+    }
+`
+
 const taskFields = `
 id
 created
@@ -388,6 +400,14 @@ export const GET_CONFIG = gql`
       formData
       active
       groupId
+      logo {
+        ${fileFields}
+      }
+      icon {
+        ${fileFields}
+      }
+
+      logoId
     }
   }
 `
@@ -448,6 +468,12 @@ export const GET_GROUPS = gql`
         id
         formData
         active
+        logo {
+          ${fileFields}
+        }
+        icon {
+          ${fileFields}
+        }
       }
     }
   }

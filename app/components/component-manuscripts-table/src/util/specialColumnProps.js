@@ -25,7 +25,12 @@ import localizeReviewFilterOptions from '../../../../shared/localizeReviewFilter
  * @param {object} specialComponentValues values needed for specific components
  * @returns {object} The built special components
  */
-const buildSpecialColumnProps = (specialComponentValues, config) => {
+const buildSpecialColumnProps = (
+  specialComponentValues,
+  config,
+  fieldDefinitions,
+  doUpdateManuscript,
+) => {
   const {
     deleteManuscript,
     tryPublishManuscript,
@@ -73,7 +78,7 @@ const buildSpecialColumnProps = (specialComponentValues, config) => {
     },
     status: {
       title: i18next.t('manuscriptsTable.Status'),
-      filterOptions: ['aperture', 'colab'].includes(config?.instanceName)
+      filterOptions: ['journal', 'prc'].includes(config?.instanceName)
         ? [
             { label: i18next.t('msStatus.new'), value: 'new' },
             { label: i18next.t('msStatus.submitted'), value: 'submitted' },
@@ -183,21 +188,26 @@ const buildSpecialColumnProps = (specialComponentValues, config) => {
       flex: '0 1 10em',
       extraProps: { setReadyToEvaluateLabel },
       component: config?.manuscript?.labelColumn
-        ? LabelsOrSelectButton
+        ? props =>
+            LabelsOrSelectButton({
+              ...props,
+              options: fieldDefinitions['submission.labels']?.options,
+              doUpdateManuscript,
+            })
         : DefaultField,
     },
     'submission.label': { flex: '0.2 1 10em' },
     'submission.journal': { flex: '0.2 1 12em' },
     'submission.articleDescription': {
       component:
-        config?.instanceName === 'ncrc'
+        config?.instanceName === 'preprint2'
           ? TitleWithAbstractAsTooltip
           : DefaultField,
     },
     'meta.title': {
       title: i18next.t('manuscriptsTable.Title'),
       component:
-        config?.instanceName === 'colab'
+        config?.instanceName === 'prc'
           ? TitleWithAbstractAsTooltip
           : DefaultField,
     },

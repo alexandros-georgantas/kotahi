@@ -5,6 +5,7 @@ import { Checkbox } from '@pubsweet/ui'
 import { grid } from '@pubsweet/ui-toolkit'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+// eslint-disable-next-line import/no-unresolved
 import { Trans, useTranslation } from 'react-i18next'
 import { articleStatuses } from '../../../globals'
 import { validateManuscriptSubmission } from '../../../shared/manuscriptUtils'
@@ -86,6 +87,7 @@ const Manuscripts = ({ history, ...props }) => {
     chatProps,
     groupManagerDiscussionChannel,
     channels,
+    doUpdateManuscript,
   } = props
 
   const { t } = useTranslation()
@@ -255,7 +257,7 @@ const Manuscripts = ({ history, ...props }) => {
 
   const adjustedColumnNames = [...configuredColumnNames]
   adjustedColumnNames.push('actions')
-  if (['ncrc', 'colab'].includes(config.instanceName))
+  if (['preprint2', 'prc'].includes(config.instanceName))
     adjustedColumnNames.splice(0, 0, 'newItemCheckbox')
 
   // Source of truth for columns
@@ -265,6 +267,7 @@ const Manuscripts = ({ history, ...props }) => {
     fieldDefinitions,
     specialComponentValues,
     displayProps,
+    doUpdateManuscript,
   )
 
   const hideChat = async () => {
@@ -284,7 +287,9 @@ const Manuscripts = ({ history, ...props }) => {
     }
   }
 
-  const shouldAllowBulkDelete = ['ncrc', 'colab'].includes(config.instanceName)
+  const shouldAllowBulkDelete = ['preprint2', 'prc'].includes(
+    config.instanceName,
+  )
 
   const topRightControls = (
     <ControlsContainer>
@@ -416,7 +421,7 @@ const Manuscripts = ({ history, ...props }) => {
           />
         )}
       </Columns>
-      {['ncrc', 'colab'].includes(config.instanceName) && (
+      {['preprint2', 'prc'].includes(config.instanceName) && (
         <Modal
           isOpen={isOpenBulkArchiveModal}
           onRequestClose={closeModalBulkArchiveConfirmation}
