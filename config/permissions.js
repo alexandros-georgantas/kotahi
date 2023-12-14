@@ -8,7 +8,7 @@ const {
   deny,
 } = require('@coko/server/authorization')
 
-const LRUCache = require('lru-cache')
+const { LRUCache } = require('lru-cache')
 
 const cache = new LRUCache({
   max: 500,
