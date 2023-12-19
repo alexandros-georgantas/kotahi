@@ -10,6 +10,11 @@ const decisionFileName = 'test-pdf.pdf'
 const decisinFilePath = 'cypress/fixtures/test-pdf.pdf'
 
 describe('checking manuscript version', () => {
+  before(() => {
+    // Add an 11-second delay before running the tests, due to caching in permission queries
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(11000)
+  })
   it('editor checks for new manuscript version', () => {
     cy.task('restore', 'commons/bootstrap')
     cy.task('seed', 'three_reviews_completed')

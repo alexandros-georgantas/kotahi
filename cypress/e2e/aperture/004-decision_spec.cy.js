@@ -10,6 +10,11 @@ const decisionFileName = 'test-pdf.pdf'
 const decisinFilePath = 'cypress/fixtures/test-pdf.pdf'
 
 describe('Completing a review', () => {
+  before(() => {
+    // Add an 11-second delay before running the tests, due to caching in permission queries
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(11000)
+  })
   it('accept and do a review', () => {
     cy.task('restore', 'commons/bootstrap')
     cy.task('seed', 'three_reviews_completed') // restore the database as per dumps/three_reviews_completed.sql

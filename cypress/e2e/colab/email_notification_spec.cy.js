@@ -6,6 +6,11 @@ import { ManuscriptsPage } from '../../page-object/manuscripts-page'
 
 // eslint-disable-next-line jest/no-disabled-tests
 describe('Email Notification Tests', () => {
+  before(() => {
+    // Add an 11-second delay before running the tests, due to caching in permission queries
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(11000)
+  })
   it('can send existing user email notifications', () => {
     cy.task('restore', 'email_notification')
 

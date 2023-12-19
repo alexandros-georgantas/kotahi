@@ -11,6 +11,8 @@ describe('Editor assigning reviewers', () => {
     // Restore Database (dumps/senior_editor_assigned.sql)
     cy.task('restore', 'commons/bootstrap')
     cy.task('seed', 'senior_editor_assigned')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(11000) // 11 seconds in milliseconds
   })
   it('can assign 3 reviewers', () => {
     // login as seniorEditor

@@ -6,6 +6,12 @@ import { Menu } from '../../page-object/page-component/menu'
 import { FormsPage } from '../../page-object/forms-page'
 
 describe('Submission with errors test', () => {
+  before(() => {
+    // Add an 11-second delay before running the tests, due to caching in permission queries
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(11000)
+  })
+
   describe('Form builder', () => {
     it('views a form field', () => {
       // task to restore the database as per the  dumps/commons/bootstrap.sql
