@@ -242,11 +242,11 @@ describe('control page tests', () => {
         DashboardPage.clickSubmit()
         NewSubmissionPage.clickSubmitUrlAndWaitPageLoad()
         cy.fixture('submission_form_data').then(data => {
-          SubmissionFormPage.fillInDoiColab(data.doi)
+          SubmissionFormPage.fillInDoi(data.doi)
           SubmissionFormPage.getWaxInputBox(0).fillInput(data.abstract)
           SubmissionFormPage.fillInFirstAuthor(data.creator)
           SubmissionFormPage.fillInDatePublished(data.date)
-          SubmissionFormPage.fillInLink(data.doi)
+          SubmissionFormPage.fillInPreprintUri(data.doi)
           SubmissionFormPage.fillInOurTake(data.ourTake)
           SubmissionFormPage.fillInMainFindings(data.mainFindings)
           SubmissionFormPage.fillInStudyStrengths(data.studyStrengths)
@@ -276,13 +276,16 @@ describe('control page tests', () => {
         cy.wait(2000)
         DashboardPage.clickDoReview()
         cy.fixture('submission_form_data').then(data => {
+          // eslint-disable-next-line cypress/no-unnecessary-waiting
+          cy.wait(500)
+          cy.get('[class*=HiddenTabs__Tab]').contains('Review').invoke('click')
           ReviewPage.fillInReviewComment(data.review1)
           ReviewPage.clickAcceptRadioButton()
           ReviewPage.clickSubmitButton()
           ReviewPage.clickConfirmSubmitButton()
           // eslint-disable-next-line cypress/no-unnecessary-waiting
           cy.wait(2000)
-          cy.get('[name="meta.title"]').contains('New submission')
+          cy.get('[name="submission.$title"]').contains('New submission')
         })
         cy.login(name.role.admin, manuscripts)
         cy.awaitDisappearSpinner()
@@ -294,7 +297,8 @@ describe('control page tests', () => {
       })
       cy.fixture('role_names').then(name => {
         cy.login(name.role.reviewers[1], dashboard)
-        cy.get('[name="meta.title"]:last').click()
+        cy.get('[name="submission.$title"]:last').click()
+        cy.get('[class*=TabsContainer]').contains('Review').click()
         ControlPage.getReviewerName().should('contain', name.role.reviewers[1])
       })
     })
@@ -311,7 +315,8 @@ describe('control page tests', () => {
       ControlPage.clickHideReviewerNameToAuthor()
       cy.fixture('role_names').then(name => {
         cy.login(name.role.reviewers[1], dashboard)
-        cy.get('[name="meta.title"]:last').click()
+        cy.get('[name="submission.$title"]:last').click()
+        cy.get('[class*=TabsContainer]').contains('Review').click()
         ControlPage.getReviewerName().should(
           'not.contain',
           name.role.reviewers[1],

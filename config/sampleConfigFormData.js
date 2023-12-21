@@ -1,5 +1,5 @@
 module.exports = {
-  instanceName: 'aperture',
+  instanceName: 'journal',
   user: { isAdmin: false, kotahiApiTokens: 'test:123456' },
   report: { showInMenu: true },
   review: { showSummary: false },
@@ -10,7 +10,7 @@ module.exports = {
   manuscript: {
     labelColumn: false,
     tableColumns:
-      'shortId, meta.title, created, updated, status, submission.labels, author',
+      'shortId, titleAndAbstract, created, updated, status, submission.$customStatus, author',
     manualImport: false,
     newSubmission: false,
     autoImportHourUtc: 21,

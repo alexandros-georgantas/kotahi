@@ -1,8 +1,14 @@
 /* eslint-disable no-unused-vars */
 import React from 'react'
+import BrandIcon from './BrandIcon'
 
 const generateSchema = (
   emailNotificationOptions,
+  setLogoId,
+  setFavicon,
+  deleteFile,
+  createFile,
+  config,
   defaultReviewerInvitationEmail,
   t,
 ) => {
@@ -434,8 +440,8 @@ const generateSchema = (
     properties: {
       instanceName: {
         type: 'string',
-        enum: ['elife', 'ncrc', 'colab', 'aperture'],
-        default: 'aperture',
+        enum: ['preprint1', 'preprint2', 'prc', 'journal'],
+        default: 'journal',
       },
     },
     required: ['instanceName'],
@@ -445,7 +451,7 @@ const generateSchema = (
           {
             properties: {
               instanceName: {
-                enum: ['elife'],
+                enum: ['preprint1'],
               },
               groupIdentity: {
                 type: 'object',
@@ -466,10 +472,19 @@ const generateSchema = (
                     description: t('configPage.Brand secondary colour'),
                     default: '#9e9e9e',
                   },
+                  // Default logo
                   logoPath: {
-                    description: t('configPage.Logo'),
                     type: 'string',
                     default: '/assets/logo-kotahi.png',
+                  },
+                  logoId: {
+                    description: t('configPage.Logo'),
+                    type: ['string', 'null'],
+                  },
+
+                  favicon: {
+                    description: t('configPage.Favicon'),
+                    type: ['string', 'null'],
                   },
                 },
               },
@@ -526,7 +541,7 @@ const generateSchema = (
                       'configPage.List columns to display on the Manuscripts page',
                     ),
                     default:
-                      'shortId, meta.title, created, updated, status, submission.labels, author',
+                      'shortId, titleAndAbstract, created, updated, status, submission.$customStatus, author',
                   },
                   paginationCount: {
                     type: 'number',
@@ -956,7 +971,7 @@ const generateSchema = (
           {
             properties: {
               instanceName: {
-                enum: ['ncrc'],
+                enum: ['preprint2'],
               },
               groupIdentity: {
                 type: 'object',
@@ -977,10 +992,18 @@ const generateSchema = (
                     description: t('configPage.Brand secondary colour'),
                     default: '#9e9e9e',
                   },
+                  // Default logo
                   logoPath: {
-                    description: t('configPage.Logo'),
                     type: 'string',
                     default: '/assets/logo-kotahi.png',
+                  },
+                  logoId: {
+                    description: t('configPage.Logo'),
+                    type: ['string', 'null'],
+                  },
+                  favicon: {
+                    description: t('configPage.Favicon'),
+                    type: ['string', 'null'],
                   },
                 },
               },
@@ -1039,7 +1062,7 @@ const generateSchema = (
                       'configPage.List columns to display on the Manuscripts page',
                     ),
                     default:
-                      'shortId, meta.title, created, updated, status, submission.labels, author',
+                      'shortId, titleAndAbstract, created, updated, status, submission.$customStatus, author',
                   },
                   paginationCount: {
                     type: 'number',
@@ -1468,7 +1491,7 @@ const generateSchema = (
           {
             properties: {
               instanceName: {
-                enum: ['colab'],
+                enum: ['prc'],
               },
               groupIdentity: {
                 type: 'object',
@@ -1489,10 +1512,18 @@ const generateSchema = (
                     description: t('configPage.Brand secondary colour'),
                     default: '#9e9e9e',
                   },
+                  // Default logo
                   logoPath: {
-                    description: t('configPage.Logo'),
                     type: 'string',
                     default: '/assets/logo-kotahi.png',
+                  },
+                  logoId: {
+                    description: t('configPage.Logo'),
+                    type: ['string', 'null'],
+                  },
+                  favicon: {
+                    description: t('configPage.Favicon'),
+                    type: ['string', 'null'],
                   },
                 },
               },
@@ -1551,7 +1582,7 @@ const generateSchema = (
                       'configPage.List columns to display on the Manuscripts page',
                     ),
                     default:
-                      'shortId, meta.title, created, updated, status, submission.labels, author',
+                      'shortId, titleAndAbstract, created, updated, status, submission.$customStatus, author',
                   },
                   paginationCount: {
                     type: 'number',
@@ -1976,7 +2007,7 @@ const generateSchema = (
           {
             properties: {
               instanceName: {
-                enum: ['aperture'],
+                enum: ['journal'],
               },
               groupIdentity: {
                 type: 'object',
@@ -1997,10 +2028,18 @@ const generateSchema = (
                     description: t('configPage.Brand secondary colour'),
                     default: '#9e9e9e',
                   },
+                  // Default logo
                   logoPath: {
-                    description: t('configPage.Logo'),
                     type: 'string',
                     default: '/assets/logo-kotahi.png',
+                  },
+                  logoId: {
+                    description: t('configPage.Logo'),
+                    type: ['string', 'null'],
+                  },
+                  favicon: {
+                    description: t('configPage.Favicon'),
+                    type: ['string', 'null'],
                   },
                 },
               },
@@ -2059,7 +2098,7 @@ const generateSchema = (
                       'configPage.List columns to display on the Manuscripts page',
                     ),
                     default:
-                      'shortId, meta.title, created, updated, status, submission.labels, author',
+                      'shortId, titleAndAbstract, created, updated, status, submission.$customStatus, author',
                   },
                   paginationCount: {
                     type: 'number',
@@ -2546,6 +2585,48 @@ const generateSchema = (
               value={props.value}
             />
           )
+        },
+      },
+      // Default logo
+      logoPath: {
+        'ui:widget': 'hidden',
+      },
+      logoId: {
+        'ui:widget': props => {
+          return (
+            <BrandIcon
+              config={config}
+              createFile={createFile}
+              deleteFile={deleteFile}
+              fieldName="logo"
+              fileType="brandLogo"
+              inputProps={props}
+              mimeTypesToAccept={'image/*'}
+              setFileId={setLogoId}
+            />
+          )
+        },
+        'ui:options': {
+          accept: 'image/*',
+        },
+      },
+      favicon: {
+        'ui:widget': props => {
+          return (
+            <BrandIcon
+              config={config}
+              createFile={createFile}
+              deleteFile={deleteFile}
+              fieldName="icon"
+              fileType="favicon"
+              inputProps={props}
+              mimeTypesToAccept="image/png,image/gif"
+              setFileId={setFavicon}
+            />
+          )
+        },
+        'ui:options': {
+          accept: 'image/png,image/gif',
         },
       },
     },

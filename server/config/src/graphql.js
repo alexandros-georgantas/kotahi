@@ -1,4 +1,5 @@
 const models = require('@pubsweet/models')
+const File = require('@coko/server/src/models/file/file.model')
 const { getConfigJsonString } = require('./configObject')
 
 const {
@@ -7,12 +8,29 @@ const {
   rescheduleJobsOnChange,
 } = require('../../utils/configUtils')
 
+const { setFileUrls } = require('../../utils/fileStorageUtils')
+
+const getFile = async (config, fieldName) => {
+  try {
+    const { groupIdentity } = JSON.parse(config.formData)
+    const file = await File.find(groupIdentity[fieldName])
+
+    const updatedStoredObjects = await setFileUrls(file.storedObjects)
+
+    file.storedObjects = updatedStoredObjects
+    return file
+  } catch (error) {
+    return null
+  }
+}
+
 const resolvers = {
   Query: {
     config: async (_, { id }, ctx) => {
       let config = await models.Config.query().findById(id)
       config = await hideSensitiveInformation(config)
       config.formData = JSON.stringify(config.formData)
+
       return config
     },
     oldConfig: async () => getConfigJsonString(),
@@ -42,6 +60,17 @@ const resolvers = {
       return config
     },
   },
+
+  Config: {
+    async logo(parent) {
+      const logo = getFile(parent, 'logoId')
+      return logo
+    },
+    async icon(parent) {
+      const icon = getFile(parent, 'favicon')
+      return icon
+    },
+  },
 }
 
 const typeDefs = `
@@ -60,6 +89,8 @@ const typeDefs = `
     updated: DateTime
     formData: String!
     active: Boolean!
+    logo: File
+    icon: File
     groupId: ID!
   }
 

@@ -26,6 +26,12 @@ const en = {
     common: {
       OK: 'OK',
       Cancel: 'Cancel',
+      Yes: 'Yes',
+      No: 'No',
+      Save: 'Save',
+      Update: 'Update',
+      Confirm: 'Confirm',
+      Delete: 'Delete',
       'Enter search terms...': 'Enter search terms...',
       surroundMultiword:
         'Surround multi-word phrases with quotes "". Exclude a term by prefixing with -. Specify alternate matches using OR. Use * as wildcard for word endings. Wrap subexpressions in parentheses ().',
@@ -191,6 +197,7 @@ const en = {
       importPending: 'pending',
       Refreshing: 'Refreshing',
       Refresh: 'Refresh',
+      Select: 'Select',
       'Select All': 'Select All',
       selectedArticles: '{{count}} articles selected',
       Archive: 'Archive',
@@ -268,6 +275,13 @@ const en = {
       noFileLoaded: 'No manuscript file loaded',
       noSupportedView: 'No supported view of the file',
     },
+    reviewDecisionSection: {
+      noDecisionUpdated: 'No decision has been updated for this manuscript yet',
+    },
+    otherReviewsSection: {
+      noSharedReviews:
+        'No collaborative reviews are available for this manuscript yet',
+    },
     cmsPage: {
       pages: {
         addNew: 'Add a new page',
@@ -277,7 +291,6 @@ const en = {
         'Saving data': 'Saving data',
         Rebuilding: 'Rebuilding...',
         Published: 'Published',
-        Save: 'Save',
         Delete: 'Delete',
         fields: {
           title: 'Page title*',
@@ -304,6 +317,10 @@ const en = {
         useCheckbox:
           'Use checkbox to show and hide the page in the menu. Click and Drag to order them.',
         Footer: 'Footer',
+        Status: 'Status',
+        MakeFlaxSitePrivate:
+          'Your publishing website will only be visible to those who have access to the Draft link',
+        DraftCheckbox: 'Draft',
         Partners: 'Partners',
         'Footer Text': 'Footer Text',
         'Footer Page links': 'Footer Page links',
@@ -354,6 +371,7 @@ const en = {
       'Brand primary colour': 'Brand primary colour',
       'Brand secondary colour': 'Brand secondary colour',
       Logo: 'Logo',
+      Favicon: 'Favicon',
       Dashboard: 'Dashboard',
       landingPage: 'Landing page for Group Manager users upon login',
       'Dashboard Page': 'Dashboard Page',
@@ -570,8 +588,6 @@ const en = {
         'Automatically add manuscript editors in "cc" when sending this email (if applicable)',
       body: 'Body',
       description: 'Description',
-      save: 'Save',
-      update: 'Update',
       addANewEmailTemplate: 'Add a new email template',
       'Edited on': 'Edited on {{date}}',
       delete: 'Delete',
@@ -794,7 +810,6 @@ const en = {
         'Task details': 'Task details',
         'Task title': 'Task title',
         'Task description': 'Task description',
-        Save: 'Save',
         'Give your task a name': 'Give your task a name...',
         Assignee: 'Assignee',
         'Due date': 'Due date',
@@ -817,13 +832,9 @@ const en = {
       },
       deleteField: {
         'Permanently delete this field': 'Permanently delete this field?',
-        Ok: 'Ok',
-        Cancel: 'Cancel',
       },
       deleteForm: {
         'Permanently delete this form': 'Permanently delete this form?',
-        Ok: 'Ok',
-        Cancel: 'Cancel',
       },
       assignUserRole: {
         text:
@@ -849,7 +860,6 @@ const en = {
       },
       editMessage: {
         'Edit message': 'Edit message',
-        save: 'Save',
         cancel: 'Cancel',
       },
       publishError: {
@@ -877,12 +887,12 @@ const en = {
       'New Form': 'New Form',
       'Create Form': 'Create Form',
       'Update Form': 'Update Form',
+      'Add new form': 'Add new form',
       'Form purpose identifier': 'Form purpose identifier',
       'Form Name': 'Form Name',
+      'Form title': 'Form title',
       Description: 'Description',
-      'Submit on Popup': 'Submit on Popup',
-      submitYes: 'Yes',
-      submitNo: 'No',
+      submitConfirmPage: 'Show confirmation page when submitting?',
       'Popup Title': 'Popup Title',
       'Field Properties': 'Field Properties',
       'Field type': 'Field type',
@@ -890,7 +900,7 @@ const en = {
       'Field name': 'Name (internal field name)',
       'Field placeholder': 'Field placeholder',
       internalNameDescription:
-        'Use either "submission.yourFieldNameHere", or one of the following: "meta.title" for manuscript title, "meta.abstract" for abstract, "fileName" for SupplementaryFiles, or "visualAbstract" for a VisualAbstract, or "manuscriptFile" for a ManuscriptFile.',
+        'Enter "submission." followed by a name including only letters, numbers or underscores, e.g. "submission.yourFieldNameHere"',
       'Field description': 'Field description',
       'Field options': 'Field options',
       'Field shortDescription':
@@ -918,10 +928,45 @@ const en = {
       'Update Field': 'Update Field',
       'Correct invalid values before updating':
         'Correct invalid values before updating',
-      'Add Field': 'Add Field',
-      'New Field': 'New Field',
       'Field inline': 'Field inline',
       'Field sectioncss': 'Field sectioncss',
+      'Please give the form a name.': 'Please give the form a name.',
+      'Give the form a title': 'Give the form a title',
+      'Edit form settings': 'Edit form settings',
+      'Add a field': 'Add a field...',
+      'Make this the active form': 'Make this the active form',
+      confirmMakeActiveForm: 'Make this the active {{name}} form?',
+      mustBePositiveInteger: 'Must be an integer > 0',
+      correctBeforeSaving: 'Correct invalid values before saving',
+      genericFields: 'Generic field types',
+      specialFields: 'Special fields',
+      dataType: 'Data type',
+      nameInUse: 'This name is already in use for another field',
+      fallbackFieldLabel: 'Field {{name}}',
+      Active: 'Active',
+      unnamedForm: 'Unnamed form',
+      fieldOpts: {
+        title: 'Title',
+        authors: 'Authors',
+        abstract: 'Abstract',
+        visualAbstract: 'Single image attachment',
+        attachments: 'Attachments',
+        doi: 'DOI',
+        doiSuffix: 'DOI suffix',
+        sourceUri: 'Manuscript source URI',
+        customStatus: 'Custom status',
+        editDate: 'Last edit date — read-only',
+        attachedManuscript: 'Attached manuscript — read-only',
+        text: 'Text',
+        richText: 'Rich text',
+        select: 'Dropdown selection',
+        radioGroup: 'Radio buttons',
+        checkboxes: 'Checkboxes',
+        contributors: 'List of contributors',
+        links: 'List of links (URLs)',
+        verdict: 'Verdict',
+        discussion: 'Discussion',
+      },
       typeOptions: {
         Select: 'Select',
         ManuscriptFile: 'Manuscript file',

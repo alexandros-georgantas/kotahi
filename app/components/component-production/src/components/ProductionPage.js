@@ -133,9 +133,7 @@ const fragmentFields = `
   ${fileFragment}
 	submission
   meta {
-    title
     source
-		abstract
     manuscriptId
   }
   authorFeedback {
@@ -269,7 +267,12 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
   if (loading) return <Spinner />
   if (error) return <CommsErrorBanner error={error} />
 
-  const { manuscript, submissionForm, articleTemplate } = data
+  const manuscript = {
+    ...data.manuscript,
+    submission: JSON.parse(data.manuscript.submission),
+  }
+
+  const { submissionForm, articleTemplate } = data
 
   const isAuthorProofingMode = showAuthorProofingMode(manuscript, currentUser) // If true, we are in author proofing mode
 

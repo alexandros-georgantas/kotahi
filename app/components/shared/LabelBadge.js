@@ -1,9 +1,14 @@
+import React from 'react'
 import styled, { css } from 'styled-components'
 import Color from 'color'
 import { th, grid } from '@pubsweet/ui-toolkit'
 
+const BadgeDiv = ({ color, children, ...rest }) => (
+  <div {...rest}>{children}</div>
+)
+
 /** Displays a badge with rounded corners colored according to props.color */
-export const ColorBadge = styled.div`
+export const ColorBadge = styled(BadgeDiv)`
   border-radius: 8px;
   display: inline-block;
   line-height: 1.1em;
@@ -24,6 +29,8 @@ export const ColorBadge = styled.div`
 
 /** Displays the label as a badge colored according to props.color, with small all-caps font */
 export const LabelBadge = styled(ColorBadge)`
+  align-items: center;
+  display: flex;
   font-size: ${th('fontSizeBaseSmall')};
   font-variant: all-small-caps;
   line-height: 1.1em;

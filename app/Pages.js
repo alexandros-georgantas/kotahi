@@ -8,6 +8,7 @@ import { DynamicThemeProvider } from './components/theme/src'
 import theme, { setBrandColors } from './theme'
 import GlobalStyle from './theme/elements/GlobalStyle'
 import { Spinner, CommsErrorBanner } from './components/shared'
+import DynamicFavicon from './dynamicFavicon'
 
 import { GET_GROUPS } from './queries'
 
@@ -87,7 +88,10 @@ const Pages = () => {
     id: activeConfig?.id,
     groupId: currentGroup?.id,
     groupName: currentGroup?.name,
+    formData: activeConfig?.formData,
     urlFrag: `/${currentGroup?.name}`,
+    logo: activeConfig?.logo,
+    icon: activeConfig?.icon,
     ...oldConfig,
     ...JSON.parse(activeConfig?.formData || '{}'),
   }
@@ -102,6 +106,7 @@ const Pages = () => {
 
   return (
     <DynamicThemeProvider theme={theme}>
+      <DynamicFavicon config={config} />
       <GlobalStyle />
       <ConfigProvider config={config}>
         <Switch>

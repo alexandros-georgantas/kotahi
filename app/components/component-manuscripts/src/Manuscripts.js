@@ -86,6 +86,7 @@ const Manuscripts = ({ history, ...props }) => {
     chatProps,
     groupManagerDiscussionChannel,
     channels,
+    doUpdateManuscript,
   } = props
 
   const { t } = useTranslation()
@@ -113,7 +114,7 @@ const Manuscripts = ({ history, ...props }) => {
     const newManuscriptsFromCurrentPage = manuscripts.filter(
       manuscript =>
         manuscript.status === articleStatuses.new &&
-        !manuscript.submission.labels,
+        !manuscript.submission.$customStatus,
     )
 
     const newManuscriptsFromCurrentPageIds = newManuscriptsFromCurrentPage.map(
@@ -138,7 +139,7 @@ const Manuscripts = ({ history, ...props }) => {
                 .filter(
                   manuscript =>
                     manuscript.status === articleStatuses.new &&
-                    !manuscript.submission.labels,
+                    !manuscript.submission.$customStatus,
                 )
                 .map(manuscript => manuscript.id),
             ]),
@@ -255,7 +256,7 @@ const Manuscripts = ({ history, ...props }) => {
 
   const adjustedColumnNames = [...configuredColumnNames]
   adjustedColumnNames.push('actions')
-  if (['ncrc', 'colab'].includes(config.instanceName))
+  if (['preprint2', 'prc'].includes(config.instanceName))
     adjustedColumnNames.splice(0, 0, 'newItemCheckbox')
 
   // Source of truth for columns
@@ -265,6 +266,7 @@ const Manuscripts = ({ history, ...props }) => {
     fieldDefinitions,
     specialComponentValues,
     displayProps,
+    doUpdateManuscript,
   )
 
   const hideChat = async () => {
@@ -284,7 +286,9 @@ const Manuscripts = ({ history, ...props }) => {
     }
   }
 
-  const shouldAllowBulkDelete = ['ncrc', 'colab'].includes(config.instanceName)
+  const shouldAllowBulkDelete = ['preprint2', 'prc'].includes(
+    config.instanceName,
+  )
 
   const topRightControls = (
     <ControlsContainer>
@@ -354,7 +358,7 @@ const Manuscripts = ({ history, ...props }) => {
                     manuscripts.filter(
                       manuscript =>
                         manuscript.status === articleStatuses.new &&
-                        !manuscript.submission.labels,
+                        !manuscript.submission.$customStatus,
                     ).length ===
                       manuscripts.filter(manuscript =>
                         selectedNewManuscripts.includes(manuscript.id),
@@ -416,7 +420,7 @@ const Manuscripts = ({ history, ...props }) => {
           />
         )}
       </Columns>
-      {['ncrc', 'colab'].includes(config.instanceName) && (
+      {['preprint2', 'prc'].includes(config.instanceName) && (
         <Modal
           isOpen={isOpenBulkArchiveModal}
           onRequestClose={closeModalBulkArchiveConfirmation}

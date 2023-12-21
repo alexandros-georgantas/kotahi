@@ -144,7 +144,7 @@ const ReviewHeading = ({
           {(currentUserIsEditor ||
             currentUser.groupRoles.includes('groupManager')) &&
             canBePublishedPublicly &&
-            config.instanceName === 'colab' && (
+            config.instanceName === 'prc' && (
               <>
                 &nbsp;
                 <ShareIcon />
@@ -208,7 +208,7 @@ const DecisionReview = ({
     canBePublishedPublicly,
   } = review
 
-  const recommendation = ensureJsonIsParsed(review.jsonData)?.verdict
+  const recommendation = ensureJsonIsParsed(review.jsonData)?.$verdict
 
   const { user, ordinal } = reviewer
 

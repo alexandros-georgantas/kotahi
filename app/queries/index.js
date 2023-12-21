@@ -147,8 +147,6 @@ export const GET_MANUSCRIPTS_AND_FORM = gql`
         shortId
         meta {
           manuscriptId
-          abstract
-          title
         }
         submission
         created
@@ -173,8 +171,6 @@ export const GET_MANUSCRIPTS_AND_FORM = gql`
           shortId
           meta {
             manuscriptId
-            abstract
-            title
           }
           submission
           created
@@ -254,6 +250,7 @@ export const GET_MANUSCRIPTS_AND_FORM = gql`
             labelColor
             value
           }
+          readonly
         }
       }
     }
@@ -279,6 +276,18 @@ export const GET_SYSTEM_WIDE_DISCUSSION_CHANNEL = gql`
       type
     }
   }
+`
+
+const fileFields = `
+    id
+    name
+    tags
+    storedObjects {
+      mimetype
+      key
+      url
+      type
+    }
 `
 
 const taskFields = `
@@ -388,6 +397,14 @@ export const GET_CONFIG = gql`
       formData
       active
       groupId
+      logo {
+        ${fileFields}
+      }
+      icon {
+        ${fileFields}
+      }
+
+      logoId
     }
   }
 `
@@ -448,6 +465,12 @@ export const GET_GROUPS = gql`
         id
         formData
         active
+        logo {
+          ${fileFields}
+        }
+        icon {
+          ${fileFields}
+        }
       }
     }
   }

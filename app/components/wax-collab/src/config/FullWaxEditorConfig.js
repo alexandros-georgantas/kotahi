@@ -1,33 +1,21 @@
 import { emDash, ellipsis } from 'prosemirror-inputrules'
 import {
   InlineAnnotationsService,
-  AnnotationToolGroupService,
   ImageService,
-  ImageToolGroupService,
   LinkService,
   ListsService,
-  ListToolGroupService,
   BaseService,
-  BaseToolGroupService,
   DisplayBlockLevelService,
-  DisplayToolGroupService,
   TextBlockLevelService,
-  TextToolGroupService,
   NoteService,
-  NoteToolGroupService,
   TrackChangeService,
-  // CommentsService,
+  // TrackOptionsService,
+  CommentsService,
   MathService,
   FindAndReplaceService,
   FullScreenService,
-  FullScreenToolGroupService,
   SpecialCharactersService,
-  SpecialCharactersToolGroupService,
-  EditorInfoToolGroupServices,
   BottomInfoService,
-  TrackOptionsToolGroupService,
-  TrackCommentOptionsToolGroupService,
-  TrackingAndEditingToolGroupService,
   EditingSuggestingService,
 } from 'wax-prosemirror-services'
 import {
@@ -74,7 +62,10 @@ const fullWaxEditorConfig = handleAssetManager => ({
   },
 
   SchemaService: KotahiSchema,
-  CommentsService: { readOnly: false },
+  CommentsService: {
+    showTitle: true,
+    readOnly: false,
+  },
   MenuService: [
     {
       templateArea: 'topBar',
@@ -134,43 +125,27 @@ const fullWaxEditorConfig = handleAssetManager => ({
   },
 
   services: [
-    new AnnotationToolGroupService(),
     new BaseService(),
-    new BaseToolGroupService(),
     new BottomInfoService(),
-    new DisplayToolGroupService(),
-    new EditorInfoToolGroupServices(),
     new FindAndReplaceService(),
     new ImageService(),
-    new ImageToolGroupService(),
     new InlineAnnotationsService(),
     new LinkService(),
     new ListsService(),
-    new ListToolGroupService(),
     new MathService(),
     new NoteService(),
-    new NoteToolGroupService(),
     new SpecialCharactersService(),
-    new SpecialCharactersToolGroupService(),
     new TablesService(),
     new TextBlockLevelService(),
-    new TextToolGroupService(),
-    // needed for track changes
     new EditingSuggestingService(),
-    new TrackingAndEditingToolGroupService(),
-    // these are added for paragraph dropdown:
-    new KotahiBlockDropDownToolGroupService(),
     new DisplayBlockLevelService(),
-    // these are added for full screen
     new FullScreenService(),
-    new FullScreenToolGroupService(),
-    // needed for comments
     new TrackChangeService(),
+    // new TrackOptionsService(),
     new CommentsService(),
-    new TrackCommentOptionsToolGroupService(),
-    new TrackOptionsToolGroupService(),
     new JatsTagsService(),
     new CitationService(),
+    new KotahiBlockDropDownToolGroupService(),
   ],
 })
 

@@ -77,7 +77,7 @@ const PrivateRoute = ({ component: Component, redirectLink, ...rest }) => {
   const { urlFrag, instanceName } = config
 
   if (
-    ['aperture', 'colab'].includes(instanceName) &&
+    ['journal', 'prc'].includes(instanceName) &&
     rest.currentUser &&
     !rest.currentUser.email &&
     rest.path !== `${urlFrag}/profile` // TODO configure this url via config manager
@@ -151,7 +151,7 @@ const AdminPage = () => {
   journal.textStyles = data?.builtCss.css
   const hasAlert = data?.userHasTaskAlerts
 
-  if (currentUser.preferredLanguage) {
+  if (currentUser?.preferredLanguage) {
     i18next.changeLanguage(currentUser.preferredLanguage)
   }
 
@@ -204,7 +204,7 @@ const AdminPage = () => {
   if (
     currentUser &&
     (isUser || isGroupManager || isAdmin) &&
-    ['aperture', 'colab', 'ncrc'].includes(instanceName) // TODO: remove instance based logic and refactor it to be enabled and disabled from config manager
+    ['journal', 'prc', 'preprint2'].includes(instanceName) // TODO: remove instance based logic and refactor it to be enabled and disabled from config manager
   ) {
     links.push({
       link: homeLink,
@@ -388,7 +388,7 @@ const AdminPage = () => {
             exact
             key="submit"
             path={`${urlFrag}/versions/:version/${
-              ['elife', 'ncrc'].includes(config.instanceName)
+              ['preprint1', 'preprint2'].includes(config.instanceName)
                 ? 'evaluation'
                 : 'submit'
             }`} // TODO: Remove instance based custom submit page and refactor it use config manager flag in future

@@ -1,12 +1,11 @@
 const models = require('@pubsweet/models')
 
-const { fileStorage } = require('@coko/server')
-
 const File = require('@coko/server/src/models/file/file.model')
 
 const {
   replaceImageSrc,
   getFilesWithUrl,
+  setFileUrls,
 } = require('../../utils/fileStorageUtils')
 
 const setInitialLayout = async groupId => {
@@ -43,18 +42,6 @@ const getFlaxPageConfig = async (configKey, groupId) => {
       if (page1.sequenceIndex > page2.sequenceIndex) return 1
       return 0
     })
-}
-
-const setFileUrls = storedObjects => {
-  const updatedStoredObjects = []
-  /* eslint-disable no-await-in-loop */
-  Object.keys(storedObjects).forEach(async key => {
-    const storedObject = storedObjects[key]
-    storedObject.url = await fileStorage.getURL(storedObject.key)
-    updatedStoredObjects.push(storedObject)
-  })
-
-  return updatedStoredObjects
 }
 
 const addSlashes = inputString => {
@@ -195,7 +182,11 @@ const resolvers = {
   CMSPage: {
     async meta(parent) {
       if (parent.meta) {
-        return JSON.stringify(parent.meta)
+        return JSON.stringify({
+          ...parent.meta,
+          title: parent.submission.$title,
+          abstract: parent.submission.$abstract,
+        }) // TODO update flax so we can remove these bogus title and abstract fields
       }
 
       return null
@@ -229,7 +220,7 @@ const resolvers = {
         .for(parent.id)
         .first()
 
-      const updatedStoredObjects = setFileUrls(logoFile.storedObjects)
+      const updatedStoredObjects = await setFileUrls(logoFile.storedObjects)
 
       logoFile.storedObjects = updatedStoredObjects
       return logoFile
@@ -256,7 +247,7 @@ const resolvers = {
     async file(parent) {
       try {
         const file = await File.find(parent.id)
-        const updatedStoredObjects = setFileUrls(file.storedObjects)
+        const updatedStoredObjects = await setFileUrls(file.storedObjects)
         file.storedObjects = updatedStoredObjects
         return file
       } catch (err) {
@@ -323,6 +314,8 @@ const typeDefs = `
     logo: File
     partners: [StoredPartner!]
     footerText: String
+    isPrivate:Boolean
+    hexCode: String
     published: DateTime
     edited: DateTime!
     created: DateTime!
@@ -368,6 +361,8 @@ const typeDefs = `
     primaryColor: String
     secondaryColor: String
     logoId: String
+    isPrivate: Boolean
+    hexCode: String
     partners: [StoredPartnerInput]
     footerText: String
     published: DateTime

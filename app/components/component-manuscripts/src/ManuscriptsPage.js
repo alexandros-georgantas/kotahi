@@ -32,15 +32,17 @@ import {
 } from '../../../shared/urlParamUtils'
 import { validateDoi, validateSuffix } from '../../../shared/commsUtils'
 import useChat from '../../../hooks/useChat'
+import { updateManuscriptMutation } from '../../component-review/src/components/DecisionPage'
 
 const ManuscriptsPage = ({ currentUser, history }) => {
   const { t } = useTranslation()
+  const [doUpdateManuscript] = useMutation(updateManuscriptMutation)
   const config = useContext(ConfigContext)
   const { urlFrag } = config
   const chatRoomId = fnv.hash(config.baseUrl).hex()
 
   /** Returns an array of column names, e.g.
-   *  ['shortId', 'created', 'meta.title', 'submission.topic', 'status'] */
+   *  ['shortId', 'created', 'titleAndAbstract', 'submission.topic', 'status'] */
   const configuredColumnNames = (config?.manuscript?.tableColumns || '')
     .split(',')
     .map(columnName => columnName.trim())
@@ -97,9 +99,10 @@ const ManuscriptsPage = ({ currentUser, history }) => {
 
   const [importManuscripts] = useMutation(IMPORT_MANUSCRIPTS)
 
-  const importManuscriptsAndRefetch = () => {
+  const importManuscriptsAndRefetch = async () => {
     setIsImporting(true)
-    importManuscripts({
+
+    await importManuscripts({
       variables: {
         groupId: config.groupId,
       },
@@ -153,7 +156,7 @@ const ManuscriptsPage = ({ currentUser, history }) => {
         id,
         input: JSON.stringify({
           submission: {
-            labels: 'readyToEvaluate',
+            $customStatus: 'readyToEvaluate',
           },
         }),
       },
@@ -202,6 +205,7 @@ const ManuscriptsPage = ({ currentUser, history }) => {
       confirmBulkArchive={confirmBulkArchive}
       currentUser={currentUser}
       deleteManuscriptMutations={deleteManuscriptMutations}
+      doUpdateManuscript={doUpdateManuscript}
       groupManagerDiscussionChannel={groupManagerDiscussionChannel}
       history={history}
       importManuscripts={importManuscriptsAndRefetch}

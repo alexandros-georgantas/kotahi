@@ -1,22 +1,33 @@
 import React from 'react'
-import DefaultField from './DefaultField'
+import { useTranslation } from 'react-i18next'
 import { StyledButton } from '../style'
+import LabelDropdown from './LabelDropdown'
 
 const LabelsOrSelectButton = ({
   values,
-  applyFilter,
   manuscript,
   setReadyToEvaluateLabel,
+  options,
+  doUpdateManuscript,
 }) => {
+  const { t } = useTranslation()
+
   if (values?.length)
-    return <DefaultField applyFilter={applyFilter} values={values} />
+    return (
+      <LabelDropdown
+        doUpdateManuscript={doUpdateManuscript}
+        manuscript={manuscript}
+        options={options}
+        values={values}
+      />
+    )
 
   return (
     <StyledButton
       onClick={() => setReadyToEvaluateLabel(manuscript.id)}
       primary
     >
-      Select
+      {t('manuscriptsPage.Select')}
     </StyledButton>
   )
 }

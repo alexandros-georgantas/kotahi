@@ -58,6 +58,7 @@ const formFields = `
       }
       hideFromAuthors
       permitPublishing
+      readonly
     }
   }
 `
@@ -114,9 +115,7 @@ export const fragmentFields = `
   }
   meta {
     manuscriptId
-    title
     source
-    abstract
     history {
       type
       date

@@ -317,7 +317,6 @@ const createManuscriptMutation = gql`
       meta {
         source
         manuscriptId
-        title
         history {
           type
           date
@@ -507,10 +506,8 @@ const createManuscriptPromise = (
 
   const manuscript = {
     files,
-    meta: {
-      title,
-      source,
-    },
+    meta: { source },
+    submission: JSON.stringify({ $title: title }),
     groupId: config.groupId,
   }
 
@@ -551,7 +548,9 @@ const redirectPromise = (
 
   // redirect after a new submission path
   const route = `${urlFrag}/versions/${data.createManuscript.id}/${
-    ['elife', 'ncrc'].includes(config.instanceName) ? 'evaluation' : 'submit'
+    ['preprint1', 'preprint2'].includes(config.instanceName)
+      ? 'evaluation'
+      : 'submit'
   }`
 
   // redirect after a short delay

@@ -26,6 +26,12 @@ const fr = {
     common: {
       OK: 'Ok',
       Cancel: 'Annuler',
+      Yes: 'Oui',
+      No: 'Non',
+      Save: 'Enregistrer',
+      Update: 'Mettre à jour',
+      Confirm: 'Confirmer',
+      Delete: 'Supprimer',
       'Enter search terms...': 'Saisissez des termes de recherche...',
       surroundMultiword:
         'Entourez les expressions à plusieurs mots avec des guillemets "". Excluez un terme en le préfixant avec -. Spécifiez des correspondances alternatives en utilisant OU. Utilisez * comme joker pour les fins de mots. Enveloppez les sous-expressions entre parenthèses ().',
@@ -192,6 +198,7 @@ const fr = {
       importPending: 'en attente',
       Refreshing: 'Actualisation',
       Refresh: 'Actualiser',
+      Select: 'Sélectionner',
       'Select All': 'Sélectionner tout',
       selectedArticles: '{{count}} articles sélectionnés',
       Archive: 'Archiver',
@@ -272,6 +279,14 @@ const fr = {
       noFileLoaded: 'Aucun fichier de manuscrit chargé',
       noSupportedView: 'Aucune vue supportée du fichier',
     },
+    reviewDecisionSection: {
+      noDecisionUpdated:
+        "Aucune décision n'a encore été mise à jour pour ce manuscrit",
+    },
+    otherReviewsSection: {
+      noSharedReviews:
+        "Aucune évaluation collaborative n'est disponible pour ce manuscrit pour le moment",
+    },
     cmsPage: {
       pages: {
         addNew: 'Ajouter une nouvelle page',
@@ -281,7 +296,6 @@ const fr = {
         'Saving data': 'Enregistrement des données',
         Rebuilding: 'Reconstruction en cours...',
         Published: 'Publié',
-        Save: 'Enregistrer',
         Delete: 'Supprimer',
         fields: {
           title: 'Titre de la page*',
@@ -311,6 +325,10 @@ const fr = {
         Partners: 'Partenaires',
         'Footer Text': 'Texte du pied de page',
         'Footer Page links': 'Liens des pages du pied de page',
+        Status: 'Statut',
+        MakeFlaxSitePrivate:
+          'Votre site Web de publication ne sera visible que par ceux qui ont accès au lien Draft.',
+        DraftCheckbox: 'Brouillon',
       },
     },
     authorsInput: {
@@ -358,6 +376,7 @@ const fr = {
       'Brand primary colour': 'Couleur principale de la marque',
       'Brand secondary colour': 'Couleur secondaire de la marque',
       Logo: 'Logo',
+      Favicon: 'Icône de favori',
       Dashboard: 'Tableau de bord',
       landingPage:
         "Page d'accueil pour les utilisateurs du gestionnaire de groupe après la connexion",
@@ -593,8 +612,6 @@ const fr = {
         "Ajouter automatiquement les éditeurs de manuscrit en « CC » lors de l'envoi de cet e-mail (si applicable)",
       body: 'Corps',
       description: 'Description',
-      save: 'Enregistrer',
-      update: 'Mettre à jour',
       addANewEmailTemplate: "Ajouter un nouveau modèle d'email",
       'Edited on': 'Modifié le {{date}}',
       delete: 'Supprimer',
@@ -817,7 +834,6 @@ const fr = {
         'Task details': 'Détails de la tâche',
         'Task title': 'Titre de la tâche',
         'Task description': 'Description de la tâche',
-        Save: 'Enregistrer',
         'Give your task a name': 'Donnez un nom à votre tâche...',
         Assignee: 'Attributaire',
         'Due date': "Date d'échéance",
@@ -840,14 +856,10 @@ const fr = {
       },
       deleteField: {
         'Permanently delete this field': 'Supprimer définitivement ce champ ?',
-        Ok: 'Ok',
-        Cancel: 'Annuler',
       },
       deleteForm: {
         'Permanently delete this form':
           'Supprimer définitivement ce formulaire ?',
-        Ok: 'Ok',
-        Cancel: 'Annuler',
       },
       assignUserRole: {
         text:
@@ -874,7 +886,6 @@ const fr = {
       },
       editMessage: {
         'Edit message': 'Éditer le message',
-        save: 'Sauvegarder',
         cancel: 'Annuler',
       },
       publishError: {
@@ -904,12 +915,13 @@ const fr = {
       'New Form': 'Nouveau formulaire',
       'Create Form': 'Créer un formulaire',
       'Update Form': 'Mettre à jour le formulaire',
+      'Add new form': 'Ajouter un nouveau formulaire',
       'Form purpose identifier': 'Identifiant du but du formulaire',
       'Form Name': 'Nom du formulaire',
+      'Form title': 'Titre du formulaire',
       Description: 'Description',
-      'Submit on Popup': 'Soumettre dans une popup',
-      submitYes: 'Oui',
-      submitNo: 'Non',
+      submitConfirmPage:
+        'Afficher une page de confirmation lors de la soumission ?',
       'Popup Title': 'Titre de la popup',
       'Field Properties': 'Propriétés du champ',
       'Field type': 'Type de champ',
@@ -917,7 +929,7 @@ const fr = {
       'Field name': 'Nom (nom de champ interne)',
       'Field placeholder': 'Espace réservé du champ',
       internalNameDescription:
-        'Utilisez soit "submission.votreNomDeChampIci", soit l\'un des suivants : "meta.title" pour le titre du manuscrit, "meta.abstract" pour le résumé, "fileName" pour les fichiers supplémentaires, "visualAbstract" pour un résumé visuel, ou "manuscriptFile" pour un fichier de manuscrit.',
+        'Entrez "submission." suivi d\'un nom contenant uniquement des lettres, des chiffres ou des traits de soulignement, par exemple "submission.votreNomDeChampIci".',
       'Field description': 'Description du champ',
       'Field options': 'Options du champ',
       'Field shortDescription':
@@ -946,10 +958,45 @@ const fr = {
       'Update Field': 'Mettre à jour le champ',
       'Correct invalid values before updating':
         'Corriger les valeurs invalides avant la mise à jour',
-      'Add Field': 'Ajouter un champ',
-      'New Field': 'Nouveau champ',
       'Field inline': 'Champ en ligne',
       'Field sectioncss': 'CSS de la section du champ',
+      'Please give the form a name.': 'Veuillez donner un nom au formulaire.',
+      'Give the form a title': 'Donnez un titre au formulaire',
+      'Edit form settings': 'Modifier les paramètres du formulaire',
+      'Add a field': 'Ajouter un champ...',
+      'Make this the active form': 'Rendre ce formulaire actif',
+      confirmMakeActiveForm: 'Rendre ce formulaire {{name}} actif ?',
+      mustBePositiveInteger: 'Doit être un entier > 0',
+      correctBeforeSaving: "Corrigez les valeurs invalides avant d'enregistrer",
+      genericFields: 'Types de champ génériques',
+      specialFields: 'Champs spéciaux',
+      dataType: 'Type de données',
+      nameInUse: 'Ce nom est déjà utilisé pour un autre champ',
+      fallbackFieldLabel: 'Champ {{name}}',
+      Active: 'Actif',
+      unnamedForm: 'Formulaire sans nom',
+      fieldOpts: {
+        title: 'Titre',
+        authors: 'Auteurs',
+        abstract: 'Résumé',
+        visualAbstract: 'Pièce jointe : Image unique',
+        attachments: 'Pièces jointes',
+        doi: 'DOI',
+        doiSuffix: 'Suffixe DOI"',
+        sourceUri: 'URI de la source du manuscrit',
+        customStatus: 'Statut personnalisé',
+        editDate: 'Date de dernière modification (lecture seule)',
+        attachedManuscript: 'Manuscrit joint (lecture seule)',
+        text: 'Texte',
+        richText: 'Texte enrichi',
+        select: 'Sélection dans liste déroulante',
+        radioGroup: 'Boutons radio',
+        checkboxes: 'Cases à cocher',
+        contributors: 'Liste des contributeurs',
+        links: 'Liste de liens (URL)',
+        verdict: 'Verdict',
+        discussion: 'Discussion',
+      },
       typeOptions: {
         Select: 'Sélection',
         ManuscriptFile: 'Fichier du manuscrit',

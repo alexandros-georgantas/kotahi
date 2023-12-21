@@ -230,7 +230,7 @@ const sendEmailWithPreparedData = async (input, ctx, emailSender) => {
   let instance
 
   if (config['notification-email'].use_colab === 'true') {
-    instance = 'colab'
+    instance = 'prc'
   } else {
     instance = 'generic'
   }
@@ -242,7 +242,7 @@ const sendEmailWithPreparedData = async (input, ctx, emailSender) => {
       receiverEmail,
       selectedEmailTemplateData,
       {
-        manuscriptTitle: manuscript.meta.title,
+        manuscriptTitle: manuscript.submission.$title,
         authorName,
         senderName: currentUser,
         recipientName: receiverName,
@@ -254,9 +254,7 @@ const sendEmailWithPreparedData = async (input, ctx, emailSender) => {
         instance,
         toEmail,
         invitationId,
-        submissionLink: ctx
-          ? JSON.parse(manuscript.submission).link
-          : manuscript.submission.link,
+        submissionLink: manuscript.submission.$sourceUri,
         purpose,
         status,
         senderId,

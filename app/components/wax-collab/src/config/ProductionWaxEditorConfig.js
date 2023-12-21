@@ -1,41 +1,29 @@
-// import { WaxSelectionPlugin } from 'wax-prosemirror-plugins'
 import { emDash, ellipsis } from 'prosemirror-inputrules'
 import {
   InlineAnnotationsService,
-  AnnotationToolGroupService,
   ImageService,
-  ImageToolGroupService,
   LinkService,
   ListsService,
-  ListToolGroupService,
   BaseService,
-  BaseToolGroupService,
   DisplayBlockLevelService,
-  DisplayToolGroupService,
   TextBlockLevelService,
-  TextToolGroupService,
   NoteService,
-  NoteToolGroupService,
   TrackChangeService,
   // CommentsService,
   MathService,
   FindAndReplaceService,
   FullScreenService,
-  FullScreenToolGroupService,
   SpecialCharactersService,
-  SpecialCharactersToolGroupService,
-  EditorInfoToolGroupServices,
   BottomInfoService,
-  TrackOptionsToolGroupService,
-  TrackCommentOptionsToolGroupService,
   EditingSuggestingService,
-  TrackingAndEditingToolGroupService,
 } from 'wax-prosemirror-services'
 import {
   TablesService,
   /* tableEditing, */ columnResizing,
 } from 'wax-table-service'
-import CommentsService from '../extensions/CommentsService/CommentsService'
+// import CommentsService from '../extensions/CommentsService/CommentsService'
+// import ListsService from '../CustomWaxToolGroups/ListsService/ListsService'
+// import TrackChangeService from '../CustomWaxToolGroups/TrackChangeService/TrackChangeService'
 import {
   KotahiBlockDropDownToolGroupService,
   JatsSideMenuToolGroupService,
@@ -44,7 +32,6 @@ import {
 import JatsTagsService from '../JatsTags'
 import CharactersList from './CharactersList'
 import KotahiSchema from './KotahiSchema'
-// import AnyStyleService from '../CustomWaxToolGroups/AnystyleService/AnyStyleService'
 import CitationService from '../CustomWaxToolGroups/CitationService/CitationService'
 import 'wax-table-service/dist/index.css'
 
@@ -85,7 +72,11 @@ const productionWaxEditorConfig = (
   // If we are in read-only mode, readOnly is set to true. This makes it so that the user cannot add more comments.
   // A little vexingly, however, the interface for adding (or replying to) comments is shown. Maybe this should be
   // changed in CommentsService in the future.
-  CommentsService: { readOnly: isReadOnly || false },
+  // CommentsService: { readOnly: isReadOnly || false },
+  CommentsService: {
+    showTitle: true,
+    readOnly: readOnlyComments || false, // this should make it work though this is not yet in Wax
+  },
   MenuService: [
     {
       templateArea: 'topBar',
@@ -137,7 +128,6 @@ const productionWaxEditorConfig = (
   SpecialCharactersService: CharactersList,
 
   TitleService: { updateTitle },
-  // AnyStyleService: {},
   ImageService: handleAssetManager ? { handleAssetManager } : {},
   CitationService: {
     AnyStyleTransformation: updateAnystyle,
@@ -146,47 +136,29 @@ const productionWaxEditorConfig = (
     readOnly: false,
   },
   services: [
-    new AnnotationToolGroupService(),
     new BaseService(),
-    new BaseToolGroupService(),
-    new BottomInfoService(),
-    new DisplayToolGroupService(),
-    new EditorInfoToolGroupServices(),
-    new FindAndReplaceService(),
     new ImageService(),
-    new ImageToolGroupService(),
     new InlineAnnotationsService(),
-    new LinkService(),
     new ListsService(),
-    new ListToolGroupService(),
-    new MathService(),
-    new NoteService(),
-    new NoteToolGroupService(),
-    new SpecialCharactersService(),
-    new SpecialCharactersToolGroupService(),
-    new TablesService(),
     new TextBlockLevelService(),
-    new TextToolGroupService(),
-    // needed for track changes
-    new EditingSuggestingService(),
-    new TrackingAndEditingToolGroupService(),
-    // these are added for paragraph dropdown:
-    new KotahiBlockDropDownToolGroupService(),
     new DisplayBlockLevelService(),
-    // these are added for full screen
-    new FullScreenService(),
-    new FullScreenToolGroupService(),
-    // needed for comments
-    new TrackChangeService(),
+    new NoteService(),
     new CommentsService(),
-    new TrackCommentOptionsToolGroupService(),
-    new TrackOptionsToolGroupService(),
-    // for side menu
+    new LinkService(),
+    new TrackChangeService(),
+    new MathService(),
+    new FindAndReplaceService(),
+    new FullScreenService(),
+    new SpecialCharactersService(),
+    new BottomInfoService(),
+    new EditingSuggestingService(),
+    // new TrackOptionsService(),
+    new TablesService(),
     new JatsTagsService(),
     new JatsSideMenuToolGroupService(),
     new JatsAnnotationListTooolGroupService(),
-    // new AnyStyleService(),
     new CitationService(),
+    new KotahiBlockDropDownToolGroupService(),
   ],
 })
 
