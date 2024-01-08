@@ -10,7 +10,7 @@ import {
   NoteService,
   TrackChangeService,
   // TrackOptionsService,
-  CommentsService,
+  // CommentsService,
   MathService,
   FindAndReplaceService,
   FullScreenService,
