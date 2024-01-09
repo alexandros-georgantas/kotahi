@@ -21,7 +21,7 @@ import {
 import { Info } from './styles'
 import { ControlsContainer } from '../../../component-manuscripts/src/style'
 import AuthorFeedbackForm from '../../../component-author-feedback/src/components/AuthorFeedbackForm'
-import UploadAsset from './UploadAsset'
+import UploadAsset from './uploadManager/UploadAsset'
 import ReadonlyFormTemplate from '../../../component-review/src/components/metadata/ReadonlyFormTemplate'
 import { color } from '../../../../theme'
 
@@ -142,7 +142,9 @@ const Production = ({
       </>
     ),
     key: 'editor',
-    label: `Editor ${isReadOnlyVersion ? ' (read-only)' : ''}`,
+    label: `${t('productionPage.Editor')} ${
+      isReadOnlyVersion ? ' (read-only)' : ''
+    }`,
   }
 
   const feedbackSection = {
@@ -171,7 +173,7 @@ const Production = ({
       </ScrollableTabContent>
     ),
     key: 'cssPagedJs',
-    label: 'PagedJs Css',
+    label: t('productionPage.PDF CSS'),
   }
 
   const htmlTemplate = {
@@ -185,7 +187,7 @@ const Production = ({
       </ScrollableTabContent>
     ),
     key: 'html-template',
-    label: 'PagedJs Html Template',
+    label: t('productionPage.PDF template'),
   }
 
   const uploadAssets = {
@@ -193,12 +195,13 @@ const Production = ({
       <ScrollableTabContent>
         <UploadAsset
           files={articleTemplate.files}
-          groupTemplateId={articleTemplate.id}
+          groupTemplateId={articleTemplate.groupId}
+          tag="isPdf"
         />
       </ScrollableTabContent>
     ),
     key: 'template-assets',
-    label: 'PagedJs Template Assets',
+    label: t('productionPage.PDF assets'),
   }
 
   const manuscriptMetadata = {
@@ -218,7 +221,7 @@ const Production = ({
       </ScrollableTabContent>
     ),
     key: 'manuscript-metadata',
-    label: 'PagedJs Metadata',
+    label: t('productionPage.PDF metadata'),
   }
 
   const tabSections = []
@@ -228,8 +231,8 @@ const Production = ({
   } else {
     tabSections.push(
       editorSection,
-      cssPagedJS,
       htmlTemplate,
+      cssPagedJS,
       uploadAssets,
       manuscriptMetadata,
     )

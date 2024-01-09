@@ -132,7 +132,7 @@ const DecisionPage = ({ currentUser, match }) => {
     },
     {
       id: editorialChannel?.id,
-      name: t('chat.Editorial discussion'),
+      name: t('chat.Curatorial discussion'),
       type: editorialChannel?.type,
     },
   ]

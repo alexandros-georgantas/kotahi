@@ -24,6 +24,8 @@ const fr = {
       unanswered: 'Sans réponse',
     },
     common: {
+      cms: 'CMS',
+      pdf: 'PDF',
       OK: 'Ok',
       Cancel: 'Annuler',
       Yes: 'Oui',
@@ -69,9 +71,9 @@ const fr = {
       },
       teams: {
         assign: 'Attribuer à {{teamLabel}}...',
-        'Senior Editor': 'Éditeur en chef',
+        'Senior Editor': 'Conservateur-conseil',
         'Handling Editor': 'Éditeur responsable',
-        Editor: 'Éditeur',
+        Editor: 'Conservateur de manutention',
       },
       kanban: {
         'Last updated': 'Dernière mise à jour',
@@ -100,6 +102,7 @@ const fr = {
       CMS: 'CMS',
       Pages: 'Pages',
       Layout: 'Mise en page',
+      Article: "Modèle d' Article",
       'Go to your profile': 'Accéder à votre profil',
     },
 
@@ -170,7 +173,7 @@ const fr = {
       'New Alerts': 'Nouvelles alertes',
       'My Submissions': 'Mes soumissions',
       'To Review': 'À réviser',
-      "Manuscripts I'm Editor of": 'Manuscrits dont je suis éditeur',
+      "Manuscripts I'm Curator of": 'Manuscrits dont je suis conservateur',
       mySubmissions: {
         'My Submissions': 'Mes soumissions',
       },
@@ -178,7 +181,7 @@ const fr = {
         'To Review': 'À réviser',
       },
       edit: {
-        "Manuscripts I'm editor of": 'Manuscrits dont je suis éditeur',
+        "Manuscripts I'm curator of": '',
       },
     },
     reviewPage: {
@@ -288,6 +291,9 @@ const fr = {
         "Aucune évaluation collaborative n'est disponible pour ce manuscrit pour le moment",
     },
     cmsPage: {
+      article: {
+        title: "Modèle d' Article",
+      },
       pages: {
         addNew: 'Ajouter une nouvelle page',
         'New Page': 'Nouvelle Page',
@@ -351,6 +357,8 @@ const fr = {
     },
     dragndrop: {
       'Drag and drop your files here': 'Glissez et déposez vos fichiers ici',
+      'Drag and drop files': 'Glissez-déposez les fichiers {{fileType}} ici',
+      'Drag and drop other files here': "Glissez-déposez d'autres fichiers ici",
       'Your file has been uploaded': 'Votre fichier a été téléchargé.',
       Remove: 'Retirer',
     },
@@ -359,6 +367,11 @@ const fr = {
       AuthorProofing: "Vérification de l'auteur",
       'No supported view of the file': 'Aucune vue supportée du fichier',
       Download: 'Télécharger',
+      Editor: 'Éditeur',
+      'PDF CSS': 'CSS du PDF',
+      'PDF template': 'Modèle PDF',
+      'PDF assets': 'Ressources PDF',
+      'PDF metadata': 'Métadonnées du PDF',
     },
     invitationResults: {
       author: 'auteur',
@@ -726,9 +739,10 @@ const fr = {
         'Afficher la discussion du gestionnaire de groupe',
       'Hide Chat': 'Masquer le chat',
       'Discussion with author': "Discussion avec l'auteur",
-      'Editorial discussion': 'Discussion éditoriale',
-      'Discussion with editorial team': "Discussion avec l'équipe éditoriale",
-      'Discussion with editor': "Discussion avec l'éditeur",
+      'Curatorial discussion': 'Discussion curatoriale',
+      'Discussion with curatorial team':
+        "Discussion avec l'équipe de conservation",
+      'Discussion with curator': 'Discussion avec le conservateur',
       'Show Chat': 'Afficher le chat',
       edit: 'Modifier',
       delete: 'Supprimer',
@@ -750,7 +764,7 @@ const fr = {
         'Registered Users': 'Utilisateurs enregistrés',
         userRoles: {
           Reviewer: 'Évaluateur',
-          Editor: 'Éditeur',
+          Editor: 'Conservateur',
           Author: 'Auteur',
         },
       },

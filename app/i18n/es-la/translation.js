@@ -25,6 +25,8 @@ const esLa = {
       unanswered: 'Sin Respuesta',
     },
     common: {
+      cms: 'CMS',
+      pdf: 'PDF',
       OK: 'OK',
       Cancel: 'Cancelar',
       Yes: 'Sí',
@@ -70,9 +72,9 @@ const esLa = {
       },
       teams: {
         assign: 'Asignar {{teamLabel}}...',
-        'Senior Editor': 'Editor Senior',
+        'Senior Editor': 'Curador Asesor',
         'Handling Editor': 'Editor de Tratamiento',
-        Editor: 'Editor',
+        Editor: 'Curador de manejo',
       },
       kanban: {
         'Last updated': 'Última actualización',
@@ -102,6 +104,7 @@ const esLa = {
       Pages: 'Páginas',
       Layout: 'Diseño',
       'Go to your profile': 'Ir a tu perfil',
+      Article: 'Plantilla de Artículo',
     },
 
     profilePage: {
@@ -171,7 +174,7 @@ const esLa = {
       'New Alerts': 'Nuevas Alertas',
       'My Submissions': 'Mis Presentaciones',
       'To Review': 'Para Revisión',
-      "Manuscripts I'm Editor of": 'Manuscritos en los que soy Editor',
+      "Manuscripts I'm Curator of": 'Manuscritos soy curador de',
       mySubmissions: {
         'My Submissions': 'Mis Presentaciones',
       },
@@ -179,7 +182,7 @@ const esLa = {
         'To Review': 'Para Revisión',
       },
       edit: {
-        "Manuscripts I'm editor of": 'Manuscritos en los que soy editor',
+        "Manuscripts I'm curator of": 'Manuscritos soy curador de',
       },
     },
     reviewPage: {
@@ -289,6 +292,9 @@ const esLa = {
         'No hay revisiones colaborativas disponibles para este manuscrito todavía',
     },
     cmsPage: {
+      article: {
+        title: 'Plantilla de Artículo',
+      },
       pages: {
         addNew: 'Agregar una nueva página',
         'New Page': 'Nueva Página',
@@ -352,6 +358,8 @@ const esLa = {
     },
     dragndrop: {
       'Drag and drop your files here': 'Arrastra y suelta tus archivos aquí',
+      'Drag and drop files': 'Arrastra y suelta tus archivos {{fileType}} aquí',
+      'Drag and drop other files here': 'Arrastra y suelta otros archivos aquí',
       'Your file has been uploaded': 'Tu archivo ha sido cargado.',
       Remove: 'Eliminar',
     },
@@ -360,6 +368,11 @@ const esLa = {
       AuthorProofing: 'Revisión del autor',
       'No supported view of the file': 'No hay una vista admitida del archivo',
       Download: 'Descargar',
+      Editor: 'Editor',
+      'PDF CSS': 'CSS del PDF',
+      'PDF template': 'Plantilla PDF',
+      'PDF assets': 'Recursos del PDF',
+      'PDF metadata': 'Metadatos del PDF',
     },
     invitationResults: {
       author: 'autor',
@@ -722,12 +735,12 @@ const esLa = {
       'Group Manager discussion': 'Discusión de Gerente de Grupo',
       'Show admin discussion': 'Mostrar discusión de Administrador',
       'Show group manager discussion': 'Mostrar discusión de Gerente de Grupo',
-      'Discussion with editorial team': 'Discusión con el equipo editorial',
+      'Discussion with curatorial team': 'Discusión con el equipo curatorial',
       'Discussion with editor': 'Discusión con el editor',
       'Show Chat': 'Mostrar Chat',
       'Hide Chat': 'Ocultar Chat',
       'Discussion with author': 'Discusión con el autor',
-      'Editorial discussion': 'Discusión Editorial',
+      'Curatorial discussion': 'Discusión curatorial',
       edit: 'Editar',
       delete: 'Eliminar',
       Edited: 'Editado',
@@ -748,7 +761,7 @@ const esLa = {
         'Registered Users': 'Usuarios Registrados',
         userRoles: {
           Reviewer: 'Revisor',
-          Editor: 'Editor',
+          Editor: 'Curador',
           Author: 'Autor',
         },
       },

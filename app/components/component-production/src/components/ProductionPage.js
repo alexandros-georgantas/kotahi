@@ -152,7 +152,7 @@ const fragmentFields = `
 `
 
 const query = gql`
-  query($id: ID!, $groupId: ID!) {
+  query($id: ID!, $groupId: ID!, $isCms: Boolean!) {
     manuscript(id: $id) {
       ${fragmentFields}
       manuscriptVersions {
@@ -164,7 +164,7 @@ const query = gql`
       ${formFields}
     }
 
-    articleTemplate(groupId: $groupId) {
+    articleTemplate(groupId: $groupId, isCms: $isCms) {
       id
       name
       groupId
@@ -261,6 +261,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
     variables: {
       id: match.params.version,
       groupId,
+      isCms: false,
     },
   })
 
