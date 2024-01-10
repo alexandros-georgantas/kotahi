@@ -18,13 +18,7 @@ export const Section = styled.div`
 `
 
 export const CompactSection = styled(Section)`
-  display: flex;
-  min-width: 30px;
-  width: fit-content;
-
-  > div {
-    padding: 0 1rem;
-  }
+  width: 24%;
 `
 
 export const Page = styled.div`
