@@ -24,10 +24,11 @@ const ColorPicker = ({ onChange, required, value }) => {
           zIndex: 1,
           width: '100%',
           height: '100%',
-          outline: `${value} 1px solid`,
+          outline: `${value}44 1px solid`,
           outlineOffset: '2px',
           backgroundColor: value,
           borderRadius: '50%',
+          boxShadow: 'inset 0 0 5px #0003, 0 0 5px #0002',
         }}
       />
     </div>
