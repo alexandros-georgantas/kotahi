@@ -3,7 +3,7 @@ import {
   InlineAnnotationsService,
   ImageService,
   LinkService,
-  ListsService,
+  // ListsService,
   BaseService,
   DisplayBlockLevelService,
   TextBlockLevelService,
@@ -21,6 +21,7 @@ import {
   TablesService,
   /* tableEditing, */ columnResizing,
 } from 'wax-table-service'
+import ListsService from '../CustomWaxToolGroups/ListsService/ListsService'
 import CommentsService from '../extensions/CommentsService/CommentsService'
 // import ListsService from '../CustomWaxToolGroups/ListsService/ListsService'
 // import TrackChangeService from '../CustomWaxToolGroups/TrackChangeService/TrackChangeService'

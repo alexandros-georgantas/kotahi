@@ -10,8 +10,7 @@ import { color } from '../../../../../theme'
 
 const useCircles = true // turn this on if you want colors next to annotations
 const showHideCitations = false // turn this on if you want show/hide functionality for citations
-
-const showWaxButton = false // true // This allows Wax debugging
+const showButton = true // turn this on if you want a button that exports current wax context to the console.
 
 const TabWrapper = styled.div`
   border-right: 1px solid white;
@@ -301,7 +300,7 @@ export const BlockLevelTools = ({ groups, view }) => {
             view={view}
           />
         ))}
-      {showWaxButton && (
+      {showButton && (
         <button
           onClick={() => {
             /* eslint-disable-next-line no-console */
