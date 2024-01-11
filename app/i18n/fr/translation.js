@@ -476,6 +476,9 @@ const fr = {
       evaluationCompleteEmailTemplate: 'Évaluation soumise',
       submissionConfirmationEmailTemplate: 'Manuscrit soumis',
       alertUnreadMessageDigestTemplate: 'Message de discussion non lu',
+      authorProofingInvitationEmailTemplate: 'Author proof assigned invitation',
+      authorProofingSubmittedEmailTemplate:
+        'Author proof completed and submitted feedback',
       Reports: 'Rapports',
       reportShowInMenu:
         "Le gestionnaire de groupe et l'administrateur peuvent accéder aux rapports",

@@ -473,6 +473,9 @@ const ru = {
       evaluationCompleteEmailTemplate: 'Рецензия отправлена',
       submissionConfirmationEmailTemplate: 'Рукопись подана',
       alertUnreadMessageDigestTemplate: 'Непрочитанные сообщения в обсуждении',
+      authorProofingInvitationEmailTemplate: 'Author proof assigned invitation',
+      authorProofingSubmittedEmailTemplate:
+        'Author proof completed and submitted feedback',
       Reports: 'Аналитика',
       reportShowInMenu:
         'Администратору и редактору доступен раздел “Аналитика”',

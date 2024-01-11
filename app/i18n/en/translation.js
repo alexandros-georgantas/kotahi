@@ -459,6 +459,9 @@ const en = {
       evaluationCompleteEmailTemplate: 'Submitted review',
       submissionConfirmationEmailTemplate: 'Submitted manuscript',
       alertUnreadMessageDigestTemplate: 'Unread discussion message',
+      authorProofingInvitationEmailTemplate: 'Author proof assigned invitation',
+      authorProofingSubmittedEmailTemplate:
+        'Author proof completed and submitted feedback',
       Reports: 'Reports',
       reportShowInMenu: 'Group Manager and admin can access Reports',
       'User Management': 'User Management',
