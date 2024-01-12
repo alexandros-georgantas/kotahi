@@ -193,7 +193,7 @@ const submitAuthorProofingFeedbackMutation = gql`
   }
 `
 
-const showAuthorProofingMode = (manuscript, currentUser) => {
+const showAuthorProofingMode = (manuscript, currentUser, updateManuscript) => {
   const authorTeam = manuscript.teams.find(team => team.role === 'author')
 
   const sortedAuthors = authorTeam?.members
@@ -203,8 +203,16 @@ const showAuthorProofingMode = (manuscript, currentUser) => {
         Date.parse(new Date(b.created)) - Date.parse(new Date(a.created)),
     )
 
+  const isAuthorProofingAssignedToAuthor =
+    manuscript.status === 'assigned' &&
+    sortedAuthors[0]?.user?.id === currentUser.id
+
+  if (isAuthorProofingAssignedToAuthor) {
+    updateManuscript(manuscript.id, { status: 'inProgress' })
+  }
+
   return (
-    ['inProgress', 'completed'].includes(manuscript.status) &&
+    ['assigned', 'inProgress', 'completed'].includes(manuscript.status) &&
     sortedAuthors[0]?.user?.id === currentUser.id
   )
 }
@@ -275,8 +283,13 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
 
   const { submissionForm, articleTemplate } = data
 
-  const isAuthorProofingMode = showAuthorProofingMode(manuscript, currentUser) // If true, we are in author proofing mode
+  const isAuthorProofingMode = showAuthorProofingMode(
+    manuscript,
+    currentUser,
+    updateManuscript,
+  ) // If true, we are in author proofing mode
 
+  // TODO: limit author from entering suggesting mode after author proof completed using the email link again
   const isReadOnlyMode =
     ['assigned', 'inProgress'].includes(manuscript.status) &&
     !isAuthorProofingMode // If author proofing is enabled, but we are not the author, we go read-only

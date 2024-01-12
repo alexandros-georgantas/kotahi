@@ -96,6 +96,11 @@ const AuthorFeedbackForm = ({
     !!authorFeedback.submitted || isReadOnlyVersion,
   )
 
+  const [
+    submitAuthorProofingFeedbackStatus,
+    setSubmitAuthorProofingFeedbackStatus,
+  ] = useState(null)
+
   const submitButtonText = readOnly ? 'Submitted' : 'Submit'
 
   // Below are the create, delete file and formData save, submit actions
@@ -127,6 +132,7 @@ const AuthorFeedbackForm = ({
   }
 
   const submit = async formData => {
+    setSubmitAuthorProofingFeedbackStatus('pending')
     await submitAuthorProofingFeedback({
       variables: {
         id: manuscript.id,
@@ -141,6 +147,8 @@ const AuthorFeedbackForm = ({
         }),
       },
     })
+
+    setSubmitAuthorProofingFeedbackStatus('success')
     setReadOnly(true)
 
     setTimeout(() => {
@@ -249,6 +257,7 @@ const AuthorFeedbackForm = ({
                     disabled={readOnly}
                     onClick={formikProps.handleSubmit}
                     primary
+                    status={submitAuthorProofingFeedbackStatus}
                     type="button"
                   >
                     {submitButtonText}

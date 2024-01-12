@@ -533,7 +533,9 @@ const resolvers = {
       return archivedManuscript[0].id
     },
     async assignAuthoForProofingManuscript(_, { id }, ctx) {
-      const manuscript = await models.Manuscript.find(id)
+      const manuscript = await models.Manuscript.query()
+        .findById(id)
+        .withGraphFetched('[channels]')
 
       if (manuscript.authorFeedback.submitted) {
         delete manuscript.authorFeedback.submitted
@@ -549,7 +551,78 @@ const resolvers = {
         },
       )
 
-      // TODO: Trigger notifications after assgined WIP
+      if (config['notification-email'].automated === 'true') {
+        const activeConfig = await models.Config.getCached(manuscript.groupId)
+
+        const author = await manuscript.getManuscriptAuthor()
+
+        const authorName = author ? author.username : ''
+
+        const receiverEmail = author.email
+        /* eslint-disable-next-line */
+        const receiverName = authorName
+
+        const selectedTemplate =
+          activeConfig.formData.eventNotification
+            ?.authorProofingInvitationEmailTemplate
+
+        const emailValidationRegexp = /^[^\s@]+@[^\s@]+$/
+        const emailValidationResult = emailValidationRegexp.test(receiverEmail)
+
+        if (!emailValidationResult || !receiverName) {
+          return updated
+        }
+
+        const group = await models.Group.query().findById(manuscript.groupId)
+
+        const appUrl = config['pubsweet-client'].baseUrl
+        const urlFrag = `/${group.name}`
+        const baseUrl = appUrl + urlFrag
+        const manuscriptProductionPageUrl = `${baseUrl}/versions/${manuscript.id}/production`
+
+        const data = {
+          manuscriptTitle: manuscript.submission.$title,
+          authorName,
+          receiverName,
+          recipientName: receiverName,
+          shortId: manuscript.shortId,
+          manuscriptProductionLink: manuscriptProductionPageUrl,
+        }
+
+        if (selectedTemplate) {
+          const selectedEmailTemplate = await models.EmailTemplate.query().findById(
+            selectedTemplate,
+          )
+
+          try {
+            await sendEmailNotification(
+              receiverEmail,
+              selectedEmailTemplate,
+              data,
+              manuscript.groupId,
+            )
+
+            // Get channel ID
+            const channelId = manuscript.channels.find(
+              channel => channel.topic === 'Editorial discussion',
+            ).id
+
+            models.Message.createMessage({
+              content: `Author proof assigned Email sent by Kotahi to ${author.username}`,
+              channelId,
+              userId: ctx.user,
+            })
+          } catch (e) {
+            /* eslint-disable-next-line */
+            console.log('email was not sent', e)
+          }
+        } else {
+          // eslint-disable-next-line no-console
+          console.info(
+            'No email template configured for notifying of author proof assigned. Email not sent.',
+          )
+        }
+      }
 
       return updated
     },
@@ -779,11 +852,105 @@ const resolvers = {
       return commonUpdateManuscript(id, input, ctx)
     },
     async submitAuthorProofingFeedback(_, { id, input }, ctx) {
-      if (config['notification-email'].automated === 'true') {
-        // TODO: Automated email author proofing feedback submission WIP
+      const updated = await commonUpdateManuscript(id, input, ctx)
+
+      if (
+        config['notification-email'].automated === 'true' &&
+        updated.status === 'completed'
+      ) {
+        const manuscript = await models.Manuscript.query()
+          .findById(id)
+          .withGraphFetched(
+            '[teams.[members.[user.[defaultIdentity]]], channels]',
+          )
+
+        const author = await models.User.query().findById(ctx.user)
+
+        const activeConfig = await models.Config.getCached(manuscript.groupId)
+
+        const handlingEditorTeam =
+          manuscript.teams &&
+          !!manuscript.teams.length &&
+          manuscript.teams.find(manuscriptTeam => {
+            return manuscriptTeam.role.includes('handlingEditor')
+          })
+
+        const handlingEditor =
+          handlingEditorTeam && !!handlingEditorTeam.members.length
+            ? handlingEditorTeam.members[0]
+            : null
+
+        if (!handlingEditor) {
+          return updated
+        }
+
+        const receiverEmail = handlingEditor.user.email
+        /* eslint-disable-next-line */
+        const receiverName = handlingEditor.user.username
+
+        const selectedTemplate =
+          activeConfig.formData.eventNotification
+            ?.authorProofingSubmittedEmailTemplate
+
+        const emailValidationRegexp = /^[^\s@]+@[^\s@]+$/
+        const emailValidationResult = emailValidationRegexp.test(receiverEmail)
+
+        if (!emailValidationResult || !receiverName) {
+          return updated
+        }
+
+        const group = await models.Group.query().findById(manuscript.groupId)
+
+        const appUrl = config['pubsweet-client'].baseUrl
+        const urlFrag = `/${group.name}`
+        const baseUrl = appUrl + urlFrag
+        const manuscriptProductionPageUrl = `${baseUrl}/versions/${manuscript.id}/production`
+
+        const data = {
+          manuscriptTitle: manuscript.submission.$title,
+          receiverName,
+          currentUser: author.username,
+          recipientName: receiverName,
+          shortId: manuscript.shortId,
+          manuscriptProductionLink: manuscriptProductionPageUrl,
+        }
+
+        if (selectedTemplate) {
+          const selectedEmailTemplate = await models.EmailTemplate.query().findById(
+            selectedTemplate,
+          )
+
+          try {
+            await sendEmailNotification(
+              receiverEmail,
+              selectedEmailTemplate,
+              data,
+              manuscript.groupId,
+            )
+
+            // Get channel ID
+            const channelId = manuscript.channels.find(
+              channel => channel.topic === 'Editorial discussion',
+            ).id
+
+            models.Message.createMessage({
+              content: `Author proof completed Email sent by Kotahi to ${handlingEditor.user.username}`,
+              channelId,
+              userId: handlingEditor.user.id,
+            })
+          } catch (e) {
+            /* eslint-disable-next-line */
+            console.log('email was not sent', e)
+          }
+        } else {
+          // eslint-disable-next-line no-console
+          console.info(
+            'No email template configured for notifying of author proof completed. Email not sent.',
+          )
+        }
       }
 
-      return commonUpdateManuscript(id, input, ctx)
+      return updated
     },
     async createNewVersion(_, { id }, ctx) {
       const manuscript = await models.Manuscript.query().findById(id)
