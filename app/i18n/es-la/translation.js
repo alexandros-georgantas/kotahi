@@ -102,6 +102,7 @@ const esLa = {
       Layout: 'Diseño',
       'Go to your profile': 'Ir a tu perfil',
       Article: 'Plantilla de Artículo',
+      FileBrowser: 'Explorador de archivos',
     },
 
     profilePage: {

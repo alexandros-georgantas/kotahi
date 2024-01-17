@@ -38,6 +38,7 @@ import EmailTemplatesPage from './component-email-templates/src/EmailTemplatesPa
 import CMSPagesPage from './component-cms-manager/src/CMSPagesPage'
 import CMSLayoutPage from './component-cms-manager/src/CMSLayoutPage'
 import CMSArticlePage from './component-cms-manager/src/CMSArticlePage'
+import CMSFileBrowserPage from './component-cms-manager/src/CMSFileBrowserPage'
 
 import QUERY from './adminPageQueries'
 
@@ -177,6 +178,7 @@ const AdminPage = () => {
   const CMSPagesPageLink = `${urlFrag}/admin/cms/pages`
   const CMSLayoutPageLink = `${urlFrag}/admin/cms/layout`
   const CMSArticlePageLink = `${urlFrag}/admin/cms/article`
+  const CMSFileBrowserLink = `${urlFrag}/admin/cms/filebrowser`
   const loginLink = `${urlFrag}/login?next=${homeLink}`
   const path = `${urlFrag}/versions/:version`
   const redirectLink = `${urlFrag}/login?next=${homeLink}`
@@ -293,6 +295,11 @@ const AdminPage = () => {
             {
               link: CMSArticlePageLink,
               name: i18next.t('leftMenu.Article'),
+              icon: '',
+            },
+            {
+              link: CMSFileBrowserLink,
+              name: i18next.t('leftMenu.FileBrowser'),
               icon: '',
             },
           ],
@@ -515,6 +522,14 @@ const AdminPage = () => {
             currentUser={currentUser}
             key="CMSPagesPage"
             path={`${CMSArticlePageLink}`}
+            redirectLink={redirectLink}
+          />,
+
+          <PrivateRoute
+            component={CMSFileBrowserPage}
+            currentUser={currentUser}
+            key="CMSPagesPage"
+            path={`${CMSFileBrowserLink}`}
             redirectLink={redirectLink}
           />,
 

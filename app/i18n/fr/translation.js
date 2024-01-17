@@ -101,6 +101,7 @@ const fr = {
       Layout: 'Mise en page',
       Article: "Modèle d' Article",
       'Go to your profile': 'Accéder à votre profil',
+      FileBrowser: 'Explorateur de fichiers',
     },
 
     profilePage: {
