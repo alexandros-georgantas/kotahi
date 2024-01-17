@@ -140,7 +140,7 @@
     "react-dropdown": "^1.11.0",
     "react-dropzone": "10.2.2",
     "react-feather": "^1.1.6",
-    "react-folder-tree": "^5.1.1", 
+    "react-folder-tree": "^5.1.1",
     "react-google-charts": "^4.0.0",
     "react-hot-loader": "^4.13.0",
     "react-i18next": "^13.0.3",
@@ -165,7 +165,6 @@
     "superagent": "^3.8.3",
     "supertest": "3.4.2",
     "turndown": "^7.0.0",
-    
     "uuid": "^8.3.2",
     "wax-prosemirror-core": "0.9.4",
     "wax-prosemirror-services": "0.9.4",
