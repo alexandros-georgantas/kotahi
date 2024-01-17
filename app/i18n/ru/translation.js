@@ -106,6 +106,7 @@ const ru = {
       Layout: 'Макет',
       Article: 'Шаблон Статьи',
       'Go to your profile': 'Перейти в ваш профиль',
+      FileBrowser: 'Файловый браузер',
     },
     profilePage: {
       'Your profile': 'Ваш профиль',

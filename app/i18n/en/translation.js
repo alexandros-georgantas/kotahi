@@ -104,6 +104,7 @@ const en = {
       Layout: 'Layout',
       Article: 'Article Template',
       'Go to your profile': 'Go to your profile',
+      FileBrowser: 'File Browser',
     },
 
     profilePage: {
