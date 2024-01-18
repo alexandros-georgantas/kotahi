@@ -94,6 +94,15 @@ const resolvers = {
 
       return layout
     },
+
+    // async getCmsFilesTreeView(_, _vars, ctx) {
+    //   const groupId = ctx.req.headers['group-id']
+
+    //   const AllFiles = await models.CMSFileTemplate.query().where(
+    //     'groupId',
+    //     groupId,
+    //   )
+    // },
   },
   Mutation: {
     async createCMSPage(_, { input }, ctx) {
