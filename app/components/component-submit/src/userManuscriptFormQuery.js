@@ -112,6 +112,10 @@ export const fragmentFields = `
       }
       id
     }
+    assignedAuthors {
+      authorName
+      assignedOnDate
+    }
   }
   meta {
     manuscriptId

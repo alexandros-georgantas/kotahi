@@ -128,6 +128,7 @@ const fragmentFields = `
 				id
 				created
 			}
+      created
 		}
 	}
   ${fileFragment}
@@ -147,6 +148,10 @@ const fragmentFields = `
         name
       }
       id
+    }
+    assignedAuthors {
+      authorName
+      assignedOnDate
     }
   }
 `

@@ -180,6 +180,7 @@ const DecisionPage = ({ currentUser, match }) => {
         }),
         fields: {
           status: () => assignAuthoForProofingManuscript.status,
+          authorFeedback: () => assignAuthoForProofingManuscript.authorFeedback,
         },
       })
     },

@@ -9,6 +9,7 @@ import {
   Title,
 } from '../style'
 import { ActionButton, SectionContent } from '../../../../shared'
+import { convertTimestampToDateTimeString } from '../../../../../shared/dateUtils'
 
 const AssignAuthorForProofing = ({ assignAuthorForProofing, manuscript }) => {
   const [isToggled, setToggled] = useState(false)
@@ -22,13 +23,6 @@ const AssignAuthorForProofing = ({ assignAuthorForProofing, manuscript }) => {
   )
 
   const authorTeam = manuscript.teams.find(team => team.role === 'author')
-
-  const sortedAuthors = authorTeam?.members
-    .slice()
-    .sort(
-      (a, b) =>
-        Date.parse(new Date(b.created)) - Date.parse(new Date(a.created)),
-    )
 
   return (
     <SectionContent>
@@ -71,15 +65,18 @@ const AssignAuthorForProofing = ({ assignAuthorForProofing, manuscript }) => {
           </AssignedAuthorForProofingLogsToggle>
           {isToggled && (
             <AssignedAuthorForProofingLogs>
-              {sortedAuthors.slice(0, 1).map(member => (
-                <>
-                  <span>
-                    {member?.user?.username ||
-                      member?.user?.defaultIdentity?.name}
-                  </span>
-                  <br />
-                </>
-              ))}
+              {manuscript?.authorFeedback?.assignedAuthors &&
+                manuscript?.authorFeedback?.assignedAuthors.map(assignee => (
+                  <>
+                    <span>
+                      {assignee.authorName} assigned on{' '}
+                      {convertTimestampToDateTimeString(
+                        assignee.assignedOnDate,
+                      )}
+                    </span>
+                    <br />
+                  </>
+                ))}
             </AssignedAuthorForProofingLogs>
           )}
         </AssignedAuthorForProofingLogsContainer>

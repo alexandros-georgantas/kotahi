@@ -102,6 +102,10 @@ const manuscriptFields = `
       }
       id
     }
+    assignedAuthors {
+      authorName
+      assignedOnDate
+    }
   }
   meta {
     manuscriptId

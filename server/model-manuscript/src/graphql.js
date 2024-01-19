@@ -537,9 +537,28 @@ const resolvers = {
         .findById(id)
         .withGraphFetched('[channels]')
 
+      const author = await manuscript.getManuscriptAuthor()
+
+      const authorName = author ? author.username : ''
+
       if (manuscript.authorFeedback.submitted) {
         delete manuscript.authorFeedback.submitted
       }
+
+      let assignedAuthors = []
+
+      if (
+        manuscript.authorFeedback.assignedAuthors &&
+        manuscript.authorFeedback.assignedAuthors.length > 0
+      ) {
+        assignedAuthors = [...manuscript.authorFeedback.assignedAuthors]
+      }
+
+      assignedAuthors.push({
+        authorId: author.id,
+        authorName,
+        assignedOnDate: new Date(),
+      })
 
       const updated = await models.Manuscript.query().patchAndFetchById(
         manuscript.id,
@@ -547,16 +566,13 @@ const resolvers = {
           status: 'assigned',
           authorFeedback: {
             ...manuscript.authorFeedback,
+            assignedAuthors,
           },
         },
       )
 
       if (config['notification-email'].automated === 'true') {
         const activeConfig = await models.Config.getCached(manuscript.groupId)
-
-        const author = await manuscript.getManuscriptAuthor()
-
-        const authorName = author ? author.username : ''
 
         const receiverEmail = author.email
         /* eslint-disable-next-line */
@@ -2199,6 +2215,13 @@ const typeDefs = `
     submitter: User
     edited: DateTime
     submitted: DateTime
+    assignedAuthors: [AssignedAuthor]
+  }
+
+  type AssignedAuthor {
+    authorId: ID
+    authorName: String
+    assignedOnDate: DateTime
   }
 
   type Preprint {
