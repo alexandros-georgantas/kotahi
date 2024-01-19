@@ -2185,7 +2185,8 @@ export const generateSchemas = (
 
     const updatedProperties = properties
 
-    // only keep includedSections if some of the values exists on allSections, otherwise return the full properties
+    const updatedProperties = properties
+
     const validSectionsToInclude =
       Array.isArray(sections) &&
       sections.filter(section => allSections.includes(section))
