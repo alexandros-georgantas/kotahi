@@ -207,6 +207,7 @@ const ConfigManagerForm = ({
   updateConfig,
   updateConfigStatus,
   emailTemplates,
+  rememberScrollPosition = true,
 }) => {
   const { t } = useTranslation()
   const [contentVisible, setContentVisible] = useState(true)
