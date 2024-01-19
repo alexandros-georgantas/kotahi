@@ -17,6 +17,10 @@ import {
   CheckboxGroup,
   RichTextEditor,
 } from '../../../shared'
+import {
+  FullWaxField,
+  ThreadedDiscussion,
+} from '../../../component-formbuilder/src/components/builderComponents'
 import { Heading1, Section, Legend, SubNote } from '../style'
 import AuthorsInput from './AuthorsInput'
 import LinksInput from './LinksInput'
@@ -24,7 +28,6 @@ import ValidatedFieldFormik from './ValidatedField'
 import Confirm from './Confirm'
 import { articleStatuses } from '../../../../globals'
 import { validateFormField } from '../../../../shared/formValidation'
-import ThreadedDiscussion from '../../../component-formbuilder/src/components/builderComponents/ThreadedDiscussion/ThreadedDiscussion'
 import ActionButton from '../../../shared/ActionButton'
 import { hasValue } from '../../../../shared/htmlUtils'
 import { ConfigContext } from '../../../config/src'
@@ -123,6 +126,7 @@ const elements = {
   Keywords: TextInput,
   TextField: TextInput,
   AbstractEditor: RichTextEditor,
+  FullWaxField,
   RadioGroup: SafeRadioGroup,
   CheckboxGroup,
   AuthorsInput,
