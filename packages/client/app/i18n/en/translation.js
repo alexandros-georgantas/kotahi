@@ -1107,6 +1107,7 @@ const en = {
         links: 'List of links (URLs)',
         verdict: 'Verdict',
         discussion: 'Discussion',
+        fullWax: 'Full text editor',
       },
       typeOptions: {
         Select: 'Select',

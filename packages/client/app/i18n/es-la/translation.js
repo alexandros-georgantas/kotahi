@@ -1137,6 +1137,7 @@ const esLa = {
         links: 'Lista de enlaces (URL)',
         verdict: 'Veredicto',
         discussion: 'Discusión',
+        fullWax: 'Editor de texto completo',
       },
       typeOptions: {
         Select: 'Selección',

@@ -1130,6 +1130,7 @@ const ru = {
         links: 'Список ссылок (URL)',
         verdict: 'Вердикт',
         discussion: 'Обсуждение',
+        fullWax: 'Расширенный текстовый редактор',
       },
       typeOptions: {
         Select: 'Выбор',
