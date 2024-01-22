@@ -4,10 +4,13 @@ import { Formik } from 'formik'
 import { FilesUpload } from '../../../shared'
 import { CompactSection } from '../../../component-cms-manager/src/style'
 
-const setInitialValues = (existingConfig, selectedFile, fieldName) => {
-  const storedTempFile = localStorage.getItem('storedLogoAndFaviconConfig')
-  const parsedTempFile = JSON.parse(storedTempFile) || {}
-  const initialData = { ...existingConfig, ...parsedTempFile }
+const setInitialValues = (
+  existingConfig,
+  selectedFile,
+  fieldName,
+  tempStoredFiles,
+) => {
+  const initialData = { ...existingConfig, ...tempStoredFiles?.current }
 
   if (selectedFile?.length < 1) {
     initialData[fieldName] = [initialData[fieldName]]
@@ -35,22 +38,23 @@ const BrandIcon = ({
   fileType,
   deleteFile,
   mimeTypesToAccept,
+  tempStoredFiles,
   ...restProps
 }) => {
   const [selectedFile, setSelectedFile] = useState([])
 
   const handleFileChange = file => {
-    const storedTempFile = localStorage.getItem('storedLogoAndFaviconConfig')
-    const parsedTempFile = JSON.parse(storedTempFile) || {}
     setSelectedFile(file)
-    parsedTempFile[fieldName] = file
-    localStorage.setItem(
-      'storedLogoAndFaviconConfig',
-      JSON.stringify(parsedTempFile),
-    )
+    // eslint-disable-next-line no-param-reassign
+    tempStoredFiles.current[fieldName] = file
   }
 
-  const initialData = setInitialValues(config, selectedFile, fieldName)
+  const initialData = setInitialValues(
+    config,
+    selectedFile,
+    fieldName,
+    tempStoredFiles,
+  )
 
   return (
     <Formik
