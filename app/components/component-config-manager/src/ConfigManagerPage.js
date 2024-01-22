@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react'
-import { useMutation, useQuery } from '@apollo/client'
+import React, { useContext, useEffect, useState } from 'react'
+import { useLazyQuery, useMutation } from '@apollo/client'
 import gql from 'graphql-tag'
 import { ConfigContext } from '../../config/src'
 import { UPDATE_CONFIG } from '../../../queries'
@@ -54,15 +54,26 @@ const GET_CONFIG_AND_EMAIL_TEMPLATES = gql`
 
 const ConfigManagerPage = ({ match, ...props }) => {
   const config = useContext(ConfigContext)
-  const [update] = useMutation(UPDATE_CONFIG)
+
+  const [update] = useMutation(UPDATE_CONFIG, {
+    refetchQueries: GET_CONFIG_AND_EMAIL_TEMPLATES,
+  })
+
   const [createFile] = useMutation(createFileMutation)
   const [deleteFile] = useMutation(deleteFileMutation)
   const [updateConfigStatus, setUpdateConfigStatus] = useState(null)
 
-  const { loading, error, data } = useQuery(GET_CONFIG_AND_EMAIL_TEMPLATES, {
-    variables: { id: config?.id },
-    fetchPolicy: 'network-only',
-  })
+  const [getConfig, { loading, error, data }] = useLazyQuery(
+    GET_CONFIG_AND_EMAIL_TEMPLATES,
+    {
+      variables: { id: config?.id },
+      fetchPolicy: 'network-only',
+    },
+  )
+
+  useEffect(() => {
+    getConfig()
+  }, [config.id])
 
   if (loading && !data) return <Spinner />
 
@@ -82,11 +93,11 @@ const ConfigManagerPage = ({ match, ...props }) => {
     })
 
     setUpdateConfigStatus(response.data.updateConfig ? 'success' : 'failure')
-
+    getConfig()
     return response
   }
 
-  return (
+  return data?.config ? (
     <ConfigManagerForm
       config={data.config}
       configId={data.config.id}
@@ -98,6 +109,8 @@ const ConfigManagerPage = ({ match, ...props }) => {
       updateConfig={updateConfig}
       updateConfigStatus={updateConfigStatus}
     />
+  ) : (
+    <Spinner />
   )
 }
 
