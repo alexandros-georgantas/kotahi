@@ -81,6 +81,7 @@ const AuthorFeedbackForm = ({
   manuscript,
   submitAuthorProofingFeedback,
   isReadOnlyVersion,
+  setHideEditorSection,
 }) => {
   const history = useHistory()
   const config = useContext(ConfigContext)
@@ -133,6 +134,7 @@ const AuthorFeedbackForm = ({
 
   const submit = async formData => {
     setSubmitAuthorProofingFeedbackStatus('pending')
+    setHideEditorSection(true)
     await submitAuthorProofingFeedback({
       variables: {
         id: manuscript.id,

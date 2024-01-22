@@ -240,6 +240,7 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
   const client = useApolloClient()
   const [makingPdf, setMakingPdf] = React.useState(false)
   const [makingJats, setMakingJats] = React.useState(false)
+  const [hideEditorSection, setHideEditorSection] = React.useState(false)
   // const [saving, setSaving] = React.useState(false)
   // const [downloading, setDownloading] = React.useState(false)
 
@@ -294,10 +295,10 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
     updateManuscript,
   ) // If true, we are in author proofing mode
 
-  // TODO: limit author from entering suggesting mode after author proof completed using the email link again
   const isReadOnlyMode =
-    ['assigned', 'inProgress'].includes(manuscript.status) &&
-    !isAuthorProofingMode // If author proofing is enabled, but we are not the author, we go read-only
+    (isAuthorProofingMode && ['completed'].includes(manuscript.status)) ||
+    (['assigned', 'inProgress'].includes(manuscript.status) &&
+      !isAuthorProofingMode) // If author proofing is enabled, but we are not the author or author has completed author proofing, we go read-only
 
   // console.log('Author proofing mode: ', isAuthorProofingMode)
   // console.log('Read only mode: ', isReadOnlyMode)
@@ -352,12 +353,14 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
               file.tags.includes('manuscript'),
             )}
             form={form}
+            hideEditorSection={hideEditorSection}
             isAuthorProofingVersion={isAuthorProofingMode}
             isReadOnlyVersion={isReadOnlyMode}
             makeJats={setMakingJats}
             makePdf={setMakingPdf}
             manuscript={manuscript}
             onAssetManager={onAssetManager}
+            setHideEditorSection={setHideEditorSection}
             submitAuthorProofingFeedback={submitAuthorProofingFeedback}
             updateManuscript={(a, b) => {
               // TODO: This might need to be different based on value of isAuthorProofingMode?

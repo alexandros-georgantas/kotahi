@@ -69,6 +69,8 @@ const Production = ({
   onAssetManager,
   isAuthorProofingVersion,
   isReadOnlyVersion,
+  hideEditorSection,
+  setHideEditorSection,
 }) => {
   const { authorFeedback } = manuscript
 
@@ -154,6 +156,7 @@ const Production = ({
           currentUser={currentUser}
           isReadOnlyVersion={isReadOnlyVersion}
           manuscript={manuscript}
+          setHideEditorSection={setHideEditorSection}
           submitAuthorProofingFeedback={submitAuthorProofingFeedback}
         />
       </SectionContent>
@@ -227,7 +230,12 @@ const Production = ({
   const tabSections = []
 
   if (isAuthorProofingVersion) {
-    tabSections.push(editorSection, feedbackSection)
+    // While switching from editing mode to readonly mode the editorSection throws 'Too much recursion' below check avoids the page crash
+    if (hideEditorSection) {
+      tabSections.push(feedbackSection)
+    } else {
+      tabSections.push(editorSection, feedbackSection)
+    }
   } else {
     tabSections.push(
       editorSection,
