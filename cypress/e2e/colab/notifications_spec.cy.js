@@ -30,9 +30,9 @@ describe('notifications tests', () => {
       it('sent notification to user from notification tab', () => {
         ControlPage.clickDecisionTab(4)
         cy.get('[data-testid="choose-receiver"]').click()
-        cy.get('#react-select-10-option-3').click()
+        cy.get('[data-testid="choose-receiver"] > div > div > input').type('Elaine{enter}', { force: true })
         cy.get('[data-testid="Notification_email_select"]').click()
-        cy.get('#react-select-11-option-0').click()
+        cy.get('[data-testid="Notification_email_select"] > div > div > input').type('Invitation{enter}', { force: true })
         cy.contains('Notify').click()
         cy.get('[class*=LabelOnlySpan]:last').click()
         cy.contains('Invitation sent by Sinead Sullivan to Elaine Barnes')
@@ -64,7 +64,7 @@ describe('notifications tests', () => {
         // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(20)
         cy.get('[data-testid="Notification_email_select"]:last').click()
-        cy.get('#react-select-15-option-1').click()
+        cy.get('[data-testid="Notification_email_select"] > div > div > input:last').type('Reviewer{enter}', { force: true })
         cy.contains('Send Now').click()
         cy.get('[class*=TaskEditModal__NotificationLogsToggle]').click()
         cy.contains('Reviewer Invitation sent by Sinead Sullivan to Joane Pilger')
@@ -74,7 +74,7 @@ describe('notifications tests', () => {
         // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(20)
         cy.get('[data-testid="Notification_email_select"]:last').click()
-        cy.get('#react-select-17-option-0').click()
+        cy.get('[data-testid="Notification_email_select"] > div > div > input:last').type('Author{enter}', { force: true })
         cy.get('[class*=SecondaryActionButton__Button]:nth(1)').click()
         // cy.get('[class*=TaskEditModal__NotificationLogsToggle]').click()
         cy.contains('Author Invitation sent by Sinead Sullivan to Sherry Crofoot')
@@ -84,7 +84,7 @@ describe('notifications tests', () => {
         // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(20)
         cy.get('[data-testid="Notification_email_select"]:last').click()
-        cy.get('#react-select-19-option-2').click()
+        cy.get('[data-testid="Notification_email_select"] > div > div > input:last').type('Task{enter}', { force: true })
         cy.get('[class*=SecondaryActionButton__Button]:nth(2)').click()
         // cy.get('[class*=TaskEditModal__NotificationLogsToggle]').click()
         cy.contains('Task notification sent by Sinead Sullivan to Gale Davis')
