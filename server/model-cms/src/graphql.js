@@ -1,3 +1,4 @@
+const axios = require('axios')
 const models = require('@pubsweet/models')
 
 const File = require('@coko/server/src/models/file/file.model')
@@ -5,6 +6,7 @@ const File = require('@coko/server/src/models/file/file.model')
 const {
   replaceImageSrc,
   getFilesWithUrl,
+  getFileWithUrl,
   setFileUrls,
 } = require('../../utils/fileStorageUtils')
 
@@ -95,14 +97,55 @@ const resolvers = {
       return layout
     },
 
-    // async getCmsFilesTreeView(_, _vars, ctx) {
-    //   const groupId = ctx.req.headers['group-id']
+    async getCmsFilesTreeView(_, { folderId }, ctx) {
+      const groupId = ctx.req.headers['group-id']
 
-    //   const AllFiles = await models.CMSFileTemplate.query().where(
-    //     'groupId',
-    //     groupId,
-    //   )
-    // },
+      const AllFiles = await models.CMSFileTemplate.query().where(
+        'groupId',
+        groupId,
+      )
+
+      const getChildren = children =>
+        children.map(child => {
+          const nestedChildren = AllFiles.filter(f => f.parentId === child.id)
+          return {
+            id: child.id,
+            name: child.name,
+            children: getChildren(nestedChildren),
+            fileId: child.fileId,
+          }
+        })
+
+      const rootNode = folderId
+        ? AllFiles.find(f => f.id === folderId)
+        : AllFiles.find(f => f.parentId === null)
+
+      const children = AllFiles.filter(f => f.parentId === rootNode.id)
+
+      return {
+        id: rootNode.id,
+        name: rootNode.name,
+        children: getChildren(children),
+        fileId: null,
+      }
+    },
+    async getCmsFileContent(_, { id }, ctx) {
+      const file = await models.File.query().findById(id)
+
+      const { storedObjects } = await getFileWithUrl(file)
+
+      const fileUrl = storedObjects.find(f => f.type === 'original')
+
+      const fileContent = await axios({
+        method: 'get',
+        url: fileUrl.url,
+      })
+
+      return {
+        id,
+        content: fileContent.data,
+      }
+    },
   },
   Mutation: {
     async createCMSPage(_, { input }, ctx) {
@@ -289,6 +332,8 @@ const typeDefs = `
     cmsPage(id: ID!): CMSPage!
     cmsPages: [CMSPage!]!
     cmsLayout: CMSLayout!
+    getCmsFilesTreeView(folderId: ID): FileTreeView!
+    getCmsFileContent(id: ID!): FileContent!
   }
 
   extend type Mutation {
@@ -352,6 +397,18 @@ const typeDefs = `
     publishConfig: String!
     article: String!
     css: String!
+  }
+
+  type FileTreeView {
+    id: ID!
+    name: String!
+    children: [FileTreeView!]
+    fileId: ID
+  }
+
+  type FileContent {
+    id: ID!
+    content: String!
   }
 
   type FlaxPageHeaderConfig {

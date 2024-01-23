@@ -141,6 +141,34 @@ export const getCMSLayout = gql`
   }
 `
 
+export const getCmsFilesTreeView = gql`
+  query getCmsFilesTreeView($folderId: ID) {
+    getCmsFilesTreeView(folderId: $folderId) {
+      id
+      name
+      children {
+        id
+        name
+        fileId
+        children {
+          id
+          name
+          fileId
+        }
+      }
+    }
+  }
+`
+
+export const getCmsFileContent = gql`
+  query getCmsFileContent($id: ID!) {
+    getCmsFileContent(id: $id) {
+      id
+      content
+    }
+  }
+`
+
 export const updateCMSLayoutMutation = gql`
   mutation updateCMSLayout($input: CMSLayoutInput!) {
     updateCMSLayout(input: $input) {
