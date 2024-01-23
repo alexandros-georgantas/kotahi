@@ -31,15 +31,25 @@ const seed = async group => {
 
   const insertResource = async (name, parentId, isDirectory) =>
     useTransaction(async trx => {
-      const existingFileResource = await CMSFileTemplate.query(trx).where({
+      const baseDirIndex = name.indexOf('cmsTemplateFiles')
+      const relativePath = name.slice(baseDirIndex)
+
+      const savedName =
+        baseDirIndex !== -1
+          ? path.relative('cmsTemplateFiles', relativePath)
+          : name
+
+      const existingFileResource = await CMSFileTemplate.query(trx).findOne({
         groupId: group.id,
-        name,
+        name: savedName,
       })
 
-      if (existingFileResource.length === 0) {
+      let returnedId = existingFileResource ? existingFileResource.id : null
+
+      if (!existingFileResource) {
         const insertedResource = await CMSFileTemplate.query(trx)
           .insertGraph({
-            name,
+            name: savedName,
             parentId,
             groupId: group.id,
           })
@@ -60,9 +70,11 @@ const seed = async group => {
             .update({ fileId: insertedFile.id })
             .where({ id: insertedResource.id })
         }
+
+        returnedId = insertedResource.id
       }
 
-      return existingFileResource.id
+      return returnedId
     })
 
   const insertedFolderId = await insertResource(group.name, null, true)
