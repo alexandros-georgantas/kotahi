@@ -72,7 +72,7 @@ const authorProofingWaxEditorConfig = (
   },
   RejectTrackChangeService: {
     own: {
-      reject: true,
+      reject: false, // true, // Turn this on if we want author to be able to accept/reject their own changes
     },
     others: {
       reject: false,
