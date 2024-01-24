@@ -21,6 +21,7 @@ import {
   TablesService,
   /* tableEditing, */ columnResizing,
 } from 'wax-table-service'
+// import TrackChangeService from '../CustomWaxToolGroups/TrackChangeService/TrackChangeService'
 import CommentsService from '../extensions/CommentsService/CommentsService'
 import ListsService from '../CustomWaxToolGroups/ListsService/ListsService'
 // import TrackChangeService from '../CustomWaxToolGroups/TrackChangeService/TrackChangeService'
@@ -64,7 +65,7 @@ const authorProofingWaxEditorConfig = (
   AcceptTrackChangeService: {
     // n.b. this is also connected to comment functionality!
     own: {
-      accept: true,
+      accept: false, // true,
     },
     others: {
       accept: false,
