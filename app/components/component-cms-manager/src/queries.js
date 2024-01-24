@@ -146,16 +146,14 @@ export const getCmsFilesTreeView = gql`
     getCmsFilesTreeView(folderId: $folderId) {
       id
       name
+      fileId
       children {
         id
         name
         fileId
-        children {
-          id
-          name
-          fileId
-        }
+        parentId
       }
+      parentId
     }
   }
 `
@@ -165,6 +163,57 @@ export const getCmsFileContent = gql`
     getCmsFileContent(id: $id) {
       id
       content
+    }
+  }
+`
+
+export const addResourceToFolder = gql`
+  mutation addResourceToFolder($id: ID!, $type: Boolean!) {
+    addResourceToFolder(id: $id, type: $type) {
+      id
+      name
+      fileId
+      parentId
+    }
+  }
+`
+
+export const deleteResource = gql`
+  mutation deleteResource($id: ID!) {
+    deleteResource(id: $id) {
+      id
+      name
+      fileId
+      parentId
+    }
+  }
+`
+
+export const renameResource = gql`
+  mutation renameResource($id: ID!, $name: String!) {
+    renameResource(id: $id, name: $name) {
+      id
+      name
+      fileId
+      parentId
+    }
+  }
+`
+
+export const updateResource = gql`
+  mutation updateResource($id: ID!, $content: String!) {
+    updateResource(id: $id, content: $content) {
+      id
+      content
+    }
+  }
+`
+
+export const getFoldersList = gql`
+  query getFoldersList {
+    getFoldersList {
+      id
+      name
     }
   }
 `
@@ -184,7 +233,6 @@ export const createFileMutation = gql`
       created
       name
       updated
-      name
       tags
       objectId
       storedObjects {
