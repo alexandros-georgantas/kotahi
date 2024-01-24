@@ -3,7 +3,7 @@ import {
   InlineAnnotationsService,
   ImageService,
   LinkService,
-  ListsService,
+  // ListsService, // Uncomment this when we're using updated Wax
   BaseService,
   DisplayBlockLevelService,
   TextBlockLevelService,
@@ -22,7 +22,7 @@ import {
   /* tableEditing, */ columnResizing,
 } from 'wax-table-service'
 import CommentsService from '../extensions/CommentsService/CommentsService'
-// import ListsService from '../CustomWaxToolGroups/ListsService/ListsService'
+import ListsService from '../CustomWaxToolGroups/ListsService/ListsService'
 // import TrackChangeService from '../CustomWaxToolGroups/TrackChangeService/TrackChangeService'
 import {
   KotahiBlockDropDownToolGroupService,

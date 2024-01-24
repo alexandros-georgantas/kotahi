@@ -3,7 +3,7 @@ import {
   InlineAnnotationsService,
   ImageService,
   LinkService,
-  ListsService,
+  // ListsService,
   BaseService,
   DisplayBlockLevelService,
   TextBlockLevelService,
@@ -23,6 +23,7 @@ import {
   /* tableEditing, */ columnResizing,
 } from 'wax-table-service'
 import CommentsService from '../extensions/CommentsService/CommentsService'
+import ListsService from '../CustomWaxToolGroups/ListsService/ListsService'
 import { KotahiBlockDropDownToolGroupService } from '../CustomWaxToolGroups'
 import JatsTagsService from '../JatsTags'
 import CharactersList from './CharactersList'
