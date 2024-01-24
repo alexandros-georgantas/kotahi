@@ -27,6 +27,7 @@ class CMSFileTemplate extends BaseModel {
         fileId: { type: ['string', 'null'], format: 'uuid' },
         parentId: { type: ['string', 'null'], format: 'uuid' },
         groupId: { type: ['string'], format: 'uuid' },
+        rootFolder: { type: 'boolean' },
       },
     }
   }

@@ -31,59 +31,47 @@ const seed = async group => {
 
   const insertResource = async (name, parentId, isDirectory) =>
     useTransaction(async trx => {
-      const baseDirIndex = name.indexOf('cmsTemplateFiles')
-      const relativePath = name.slice(baseDirIndex)
+      const insertedResource = await CMSFileTemplate.query(trx)
+        .insertGraph({
+          name: path.basename(name),
+          parentId,
+          groupId: group.id,
+        })
+        .returning('id')
 
-      const savedName =
-        baseDirIndex !== -1
-          ? path.relative('cmsTemplateFiles', relativePath)
-          : name
+      if (!isDirectory) {
+        const insertedFile = await createFile(
+          fs.createReadStream(name),
+          path.basename(name),
+          null,
+          null,
+          ['cmsTemplateFile'],
+          insertedResource.id,
+          { trx },
+        )
 
-      const existingFileResource = await CMSFileTemplate.query(trx).findOne({
-        groupId: group.id,
-        name: savedName,
-      })
-
-      let returnedId = existingFileResource ? existingFileResource.id : null
-
-      if (!existingFileResource) {
-        const insertedResource = await CMSFileTemplate.query(trx)
-          .insertGraph({
-            name: savedName,
-            parentId,
-            groupId: group.id,
-          })
-          .returning('id')
-
-        if (!isDirectory) {
-          const insertedFile = await createFile(
-            fs.createReadStream(name),
-            name,
-            null,
-            null,
-            ['cmsTemplateFile'],
-            insertedResource.id,
-            { trx },
-          )
-
-          await CMSFileTemplate.query(trx)
-            .update({ fileId: insertedFile.id })
-            .where({ id: insertedResource.id })
-        }
-
-        returnedId = insertedResource.id
+        await CMSFileTemplate.query(trx)
+          .update({ fileId: insertedFile.id })
+          .where({ id: insertedResource.id })
       }
 
-      return returnedId
+      return insertedResource.id
     })
 
-  const insertedFolderId = await insertResource(group.name, null, true)
+  const existFolder = await CMSFileTemplate.query().findOne({
+    name: group.name,
+    groupId: group.id,
+  })
 
-  await readDirectoryRecursively(
-    `${__dirname}/../config/cmsTemplateFiles`,
-    insertedFolderId,
-    insertResource,
-  )
+  if (!existFolder) {
+    const insertedFolderId = await insertResource(group.name, null, true)
+
+    await readDirectoryRecursively(
+      `${__dirname}/../config/cmsTemplateFiles`,
+      insertedFolderId,
+      insertResource,
+    )
+  }
 }
 
 module.exports = seed
