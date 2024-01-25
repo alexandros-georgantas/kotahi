@@ -424,6 +424,10 @@ class Manuscript extends BaseModel {
               type: ['string', 'object', 'null'],
               format: 'date-time',
             },
+            assignedAuthors: {
+              items: { type: 'object' },
+              type: ['array', 'null'],
+            },
           },
         },
       },
