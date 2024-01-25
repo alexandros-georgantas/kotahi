@@ -11,6 +11,7 @@ const seedForms = require('./scripts/seedForms')
 const dumpFile = name => path.join(__dirname, 'cypress', 'dumps', `${name}.sql`)
 
 module.exports = defineConfig({
+  projectId: 'e4txbi',
   defaultCommandTimeout: 20000,
   viewportWidth: 1200,
   e2e: {
