@@ -1,5 +1,5 @@
 CREATE TABLE cms_file_templates (
-  id UUID NOT NULL DEFAULT public.gen_random_uuid(),
+  id UUID PRIMARY KEY NOT NULL DEFAULT public.gen_random_uuid(),
   name TEXT,
   group_id UUID REFERENCES groups(id) NOT NULL,
   file_id UUID REFERENCES files(id) on delete set null,

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react' // { useContext,
 import { pick, isEmpty, debounce } from 'lodash'
 import styled from 'styled-components'
 
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 // import { useTranslation } from 'react-i18next'
 import FolderTree from 'react-folder-tree'
 import CodeMirror from '@uiw/react-codemirror'
@@ -24,7 +24,8 @@ import {
   deleteResource,
   renameResource,
   updateResource,
-  // getFoldersList,
+  getFoldersList,
+  updateFlaxRootFolder,
 } from './queries'
 
 const EditPageLeftStyled = styled(EditPageLeft)`
@@ -94,7 +95,9 @@ const CMSFileBrowserPage = () => {
   const [renameObject] = useMutation(renameResource)
   const [updateObject] = useMutation(updateResource)
 
-  // const { loadingFolders, data: dataFolders } = useQuery(getFoldersList)
+  const [updateFlaxFolder] = useMutation(updateFlaxRootFolder)
+
+  const { loadingFolders, data: dataFolders } = useQuery(getFoldersList)
 
   const [getFileData] = useLazyQuery(getCmsFileContent, {
     onCompleted: ({ getCmsFileContent: Content }) => {
@@ -219,8 +222,16 @@ const CMSFileBrowserPage = () => {
     }
   }
 
-  if (loading) return <Spinner />
+  if (loading || loadingFolders) return <Spinner />
   if (error) return <CommsErrorBanner error={error} />
+
+  const selectOptions = ((dataFolders || {}).getFoldersList || []).map(fld => ({
+    value: fld.id,
+    label: fld.name,
+    rootFolder: fld.rootFolder,
+  }))
+
+  const selectedOption = selectOptions.find(fld => fld.rootFolder === true)
 
   return (
     <EditPageContainer>
@@ -238,11 +249,11 @@ const CMSFileBrowserPage = () => {
           aria-label="Select Folder"
           isClearable={false}
           label="Select Folder"
-          // onChange={selected => {
-          //   console.log(selected)
-          // }}
-          // options={groups}
-          // value={selectedOption}
+          onChange={selected => {
+            updateFlaxFolder({ variables: { id: selected.value } })
+          }}
+          options={selectOptions}
+          value={selectedOption?.value}
           width="100%"
         />
       </EditPageLeftStyled>

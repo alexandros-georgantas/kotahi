@@ -214,6 +214,17 @@ export const getFoldersList = gql`
     getFoldersList {
       id
       name
+      rootFolder
+    }
+  }
+`
+
+export const updateFlaxRootFolder = gql`
+  mutation updateFlaxRootFolder($id: ID!) {
+    updateFlaxRootFolder(id: $id) {
+      id
+      name
+      rootFolder
     }
   }
 `
