@@ -156,18 +156,29 @@ const resolvers = {
 
       const AllFiles = await models.CMSFileTemplate.query().where({ groupId })
       const folders = AllFiles.filter(file => file.fileId === null)
-      const rootNodes = AllFiles.filter(f => f.parentId === null)
+
+      const rootNodes = AllFiles.filter(f => f.parentId === null).map(f => ({
+        ...f,
+        name: `/${f.name}`,
+      }))
 
       const getChildren = children =>
         children.forEach(child => {
-          const nestedChildren = folders.filter(f => f.parentId === child.id)
+          const nestedChildren = folders
+            .filter(f => f.parentId === child.id)
+            .map(cld => ({
+              ...cld,
+              name: `${child.name}/${cld.name}`,
+            }))
 
           folderArray = folderArray.concat(nestedChildren)
           getChildren(nestedChildren)
         })
 
-      folderArray = folderArray.concat(rootNodes)
-      getChildren(rootNodes)
+      rootNodes.forEach(node => {
+        folderArray.push(node)
+        getChildren([node])
+      })
 
       return folderArray
     },
@@ -360,6 +371,19 @@ const resolvers = {
 
       return { id, content }
     },
+
+    async updateFlaxRootFolder(_, { id }, ctx) {
+      const groupId = ctx.req.headers['group-id']
+
+      await models.CMSFileTemplate.query()
+        .patch({ rootFolder: false })
+        .where({ groupId })
+
+      return models.CMSFileTemplate.query()
+        .patch({ rootFolder: true })
+        .findOne({ id, groupId })
+        .returning('*')
+    },
   },
 
   CMSPage: {
@@ -465,7 +489,7 @@ const typeDefs = `
     cmsLayout: CMSLayout!
     getCmsFilesTreeView(folderId: ID): FileTreeView!
     getCmsFileContent(id: ID!): FileContent!
-    getFoldersList: [FileTreeView!]
+    getFoldersList: [FolderView!]
   }
 
   extend type Mutation {
@@ -477,6 +501,7 @@ const typeDefs = `
     deleteResource(id: ID!): FileTreeView!
     renameResource(id: ID!, name: String!): FileTreeView!
     updateResource(id: ID!, content: String!): FileContent!
+    updateFlaxRootFolder(id: ID!): FolderView!
   }
 
   type CMSPage {
@@ -541,6 +566,12 @@ const typeDefs = `
     children: [FileTreeView!]
     fileId: ID
     parentId: ID
+  }
+
+  type FolderView {
+    id: ID!
+    name: String!
+    rootFolder: Boolean!
   }
 
   type FileContent {
