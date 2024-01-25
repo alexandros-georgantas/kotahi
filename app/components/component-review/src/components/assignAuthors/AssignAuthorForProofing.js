@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   AssignedAuthorForProofingLogsContainer,
   AssignedAuthorForProofingLogsToggle,
@@ -24,10 +25,12 @@ const AssignAuthorForProofing = ({ assignAuthorForProofing, manuscript }) => {
 
   const authorTeam = manuscript.teams.find(team => team.role === 'author')
 
+  const { t } = useTranslation()
+
   return (
     <SectionContent>
       <SectionHeader>
-        <Title>Assign Author for Proofing </Title>
+        <Title>{t('decisionPage.Assign Author for Proofing')}</Title>
       </SectionHeader>
       <SectionRowGrid>
         <ActionButton
@@ -47,11 +50,10 @@ const AssignAuthorForProofing = ({ assignAuthorForProofing, manuscript }) => {
           primary
           status={submitAuthorProofingStatus}
         >
-          Submit for author proofing
+          {t('decisionPage.Submit for author proofing')}
         </ActionButton>
         <AssignedAuthorForProofingInfo>
-          {authorTeam?.members.length === 0 &&
-            'Requires an author to be invited!'}
+          {authorTeam?.members.length === 0 && t('decisionPage.authorRequired')}
         </AssignedAuthorForProofingInfo>
       </SectionRowGrid>
       {isAuthorProofingEnabled ? (
@@ -60,19 +62,21 @@ const AssignAuthorForProofing = ({ assignAuthorForProofing, manuscript }) => {
             onClick={() => setToggled(!isToggled)}
           >
             {isToggled
-              ? `Hide all authors assigned`
-              : `Show all authors assigned`}
+              ? t('decisionPage.hideAssignedAuthors')
+              : t('decisionPage.showAssignedAuthors')}
           </AssignedAuthorForProofingLogsToggle>
           {isToggled && (
             <AssignedAuthorForProofingLogs>
               {manuscript?.authorFeedback?.assignedAuthors &&
-                manuscript?.authorFeedback?.assignedAuthors.map(assignee => (
+                manuscript?.authorFeedback?.assignedAuthors.map(a => (
                   <>
                     <span>
-                      {assignee.authorName} assigned on{' '}
-                      {convertTimestampToDateTimeString(
-                        assignee.assignedOnDate,
-                      )}
+                      {t('decisionPage.assignedOn', {
+                        assigneeName: a.authorName,
+                        date: convertTimestampToDateTimeString(
+                          a.assignedOnDate,
+                        ),
+                      })}
                     </span>
                     <br />
                   </>

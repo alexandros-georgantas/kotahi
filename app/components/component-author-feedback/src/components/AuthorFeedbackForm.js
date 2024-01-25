@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import { Formik } from 'formik'
 import { useMutation } from '@apollo/client'
@@ -87,6 +88,7 @@ const AuthorFeedbackForm = ({
   const config = useContext(ConfigContext)
   const { urlFrag } = config
   const { authorFeedback, files: allFiles } = manuscript
+  const { t } = useTranslation()
 
   const authorFeedbackFiles = _(allFiles)
     .keyBy('id')
@@ -102,7 +104,9 @@ const AuthorFeedbackForm = ({
     setSubmitAuthorProofingFeedbackStatus,
   ] = useState(null)
 
-  const submitButtonText = readOnly ? 'Submitted' : 'Submit'
+  const submitButtonText = readOnly
+    ? t('productionPage.Submitted')
+    : t('productionPage.Submit')
 
   // Below are the create, delete file and formData save, submit actions
   const [createFile] = useMutation(CREATE_FILE_MUTATION)
@@ -208,7 +212,7 @@ const AuthorFeedbackForm = ({
           return (
             <>
               <PaddedContent>
-                <Legend>Feedback</Legend>
+                <Legend>{t('productionPage.Feedback')}</Legend>
                 <ValidatedFieldFormik
                   component={textInput.component}
                   key={textInput.name}
@@ -223,7 +227,7 @@ const AuthorFeedbackForm = ({
                 />
               </PaddedContent>
               <PaddedContent key={filesInput.name}>
-                <Legend>Attachments</Legend>
+                <Legend>{t('productionPage.Attachments')}</Legend>
                 {readOnly ? (
                   authorFeedbackFiles.map(file => (
                     <Attachment

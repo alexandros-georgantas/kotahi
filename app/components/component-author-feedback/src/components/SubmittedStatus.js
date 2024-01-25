@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { th } from '@pubsweet/ui-toolkit'
 import { convertTimestampToDateTimeString } from '../../../../shared/dateUtils'
@@ -22,13 +23,16 @@ export const StatusInfoText = styled.div`
 `
 
 const SubmittedStatus = ({ authorFeedback }) => {
+  const { t } = useTranslation()
   const isSubmitted = () => !!authorFeedback.submitted
 
   return (
     <StatusInfoText>
       {authorFeedback.edited && (
         <FlexCenter>
-          Edited on {convertTimestampToDateTimeString(authorFeedback.edited)}
+          {t('productionPage.Edited on', {
+            date: convertTimestampToDateTimeString(authorFeedback.edited),
+          })}
         </FlexCenter>
       )}
 
@@ -36,12 +40,12 @@ const SubmittedStatus = ({ authorFeedback }) => {
         {isSubmitted() && (
           <>
             <VerticalBar />
-            {`${
-              authorFeedback.submitter?.username ||
-              authorFeedback.submitter?.defaultIdentity?.name
-            } submitted on ${convertTimestampToDateTimeString(
-              authorFeedback.submitted,
-            )}`}
+            {t('productionPage.submittedOn', {
+              submitterName:
+                authorFeedback.submitter?.username ||
+                authorFeedback.submitter?.defaultIdentity?.name,
+              date: convertTimestampToDateTimeString(authorFeedback.submitted),
+            })}
           </>
         )}
       </FlexCenter>

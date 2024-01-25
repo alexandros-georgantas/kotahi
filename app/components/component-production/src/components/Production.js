@@ -145,7 +145,7 @@ const Production = ({
     ),
     key: 'editor',
     label: `${t('productionPage.Editor')} ${
-      isReadOnlyVersion ? ' (read-only)' : ''
+      isReadOnlyVersion ? t('productionPage.read-only') : ''
     }`,
   }
 
@@ -162,7 +162,7 @@ const Production = ({
       </SectionContent>
     ),
     key: 'feedback',
-    label: 'Feedback',
+    label: t('productionPage.Feedback'),
   }
 
   const cssPagedJS = {

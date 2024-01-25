@@ -233,6 +233,13 @@ const fr = {
       declinedInvitation: 'Refusé {{dateString}}',
       'Invited via email': 'Invité par email',
       'View Details': 'Voir les détails',
+      'Assign Author for Proofing': 'Attribuer un auteur pour la vérification',
+      'Submit for author proofing':
+        "Soumettre pour la vérification de l'auteur",
+      authorRequired: "Nécessite qu'un auteur soit invité !",
+      hideAssignedAuthors: 'Masquer tous les auteurs attribués',
+      showAssignedAuthors: 'Afficher tous les auteurs attribués',
+      assignedOn: '{{assigneeName}} attribué le {{date}}',
       decisionTab: {
         'Archived version': 'Version archivée',
         notCurrentVersion:
@@ -365,6 +372,13 @@ const fr = {
     productionPage: {
       Production: 'Production',
       AuthorProofing: "Vérification de l'auteur",
+      Feedback: 'Retour',
+      Attachments: 'Pièces jointes',
+      Submitted: 'Soumis',
+      Submit: 'Soumettre',
+      'Edited on': 'Edité le {{date}}',
+      submittedOn: '{{submitterName}} soumis le {{date}}',
+      'read-only': ' (lecture seulement)',
       'No supported view of the file': 'Aucune vue supportée du fichier',
       Download: 'Télécharger',
       Editor: 'Éditeur',
@@ -476,9 +490,10 @@ const fr = {
       evaluationCompleteEmailTemplate: 'Évaluation soumise',
       submissionConfirmationEmailTemplate: 'Manuscrit soumis',
       alertUnreadMessageDigestTemplate: 'Message de discussion non lu',
-      authorProofingInvitationEmailTemplate: 'Author proof assigned invitation',
+      authorProofingInvitationEmailTemplate:
+        "Invitation attribuée à l'épreuve d'auteur",
       authorProofingSubmittedEmailTemplate:
-        'Author proof completed and submitted feedback',
+        "Preuve d'auteur complétée et commentaires soumis",
       Reports: 'Rapports',
       reportShowInMenu:
         "Le gestionnaire de groupe et l'administrateur peuvent accéder aux rapports",
