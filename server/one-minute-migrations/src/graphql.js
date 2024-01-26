@@ -1,5 +1,4 @@
 const { pubsubManager } = require('@coko/server')
-// const {fil} = require()
 const { startMigration } = require('./oneMinuteMigration')
 
 const { getPubsub } = pubsubManager
