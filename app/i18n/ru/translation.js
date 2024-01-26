@@ -558,6 +558,26 @@ const ru = {
       notice:
         'Примечание. Все предыдущие данные миграции будут удалены, если будет отправлен новый ISSN.',
     },
+    oneMinuteMigrationPage: {
+      pageTitle: 'Одноминутная миграция',
+      issnDescription: 'Журнал ISSN для импорта',
+      startMigration: 'Начать миграцию',
+      goToJournal: 'Перейти в журнал',
+      migratingJournal: 'Миграция журнала',
+      fetchingMetadata: 'Получение метаданных',
+      error: 'Ошибка',
+      notFound: 'Журнал не найден',
+      checkIssn: 'Пожалуйста, проверьте ISSN',
+      tryAgain: 'Попробуйте еще раз',
+      savingMetadata: 'Сохранение метаданных журнала...',
+      sortingJournal: 'Сортировка журнала по томам и выпускам...',
+      metadataSaved: 'Метаданные сохранены',
+      removingPreviousMigration:
+        'Удаление ранее загруженных данных и сгенерированных страниц...',
+      getLogo: 'Ищу логотип...',
+      getTeam: 'Ищу страницу команды...',
+      getAbout: 'Ищу страницу "О нас"...',
+    },
     reportsPage: {
       Reports: 'Аналитика',
       Show: 'Показать',
