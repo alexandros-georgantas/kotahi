@@ -542,6 +542,26 @@ const fr = {
       notice:
         'Remarque : toutes les données de migration précédentes seront effacées si un nouvel ISSN est soumis.',
     },
+    oneMinuteMigrationPage: {
+      pageTitle: 'Migration en Une Minute',
+      issnDescription: 'Revue ISSN à importer',
+      startMigration: 'Démarrer la Migration',
+      goToJournal: 'Aller au journal',
+      migratingJournal: 'Migration du journal',
+      fetchingMetadata: 'Récupérer des métadonnées',
+      error: 'Erreur',
+      notFound: 'Journal introuvable',
+      checkIssn: "Veuillez vérifier l'ISSN",
+      tryAgain: 'Essayer à nouveau',
+      savingMetadata: 'Enregistrement des métadonnées du journal...',
+      sortingJournal: 'Tri du journal par volumes et numéros...',
+      metadataSaved: 'Métadonnées enregistrées',
+      removingPreviousMigration:
+        'Suppression des données précédemment téléchargées et des pages générées...',
+      getLogo: 'Je cherche le logo...',
+      getTeam: "Je recherche la page de l'équipe...",
+      getAbout: 'Je recherche la page à propos...',
+    },
     reportsPage: {
       Reports: 'Rapports',
       Show: 'Afficher',
