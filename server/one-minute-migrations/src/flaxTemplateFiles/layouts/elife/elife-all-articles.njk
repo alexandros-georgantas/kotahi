@@ -1,0 +1,39 @@
+% extends "base.njk" %}
+{% block bodyclass %}
+    articles-list
+{% endblock bodyclass %}
+{% block content %}
+    <ul class="article-list">
+        {% for article in neuroscience | sort(attribute ="versionDate", reverse="true")   %}
+            <li>
+                <p class="article-subjects">
+                    {% for subject in article.subjects %}
+                        <span id="{{ subject.id }}">{{ subject.name }}</span>
+                        {% if not loop.last %},{% endif %}
+                    {% endfor %}
+                </p>
+                <h3>
+                    <a href="/articles/elife-journal/{{ article.id }}">{{ article.title  | safe }}</a>
+                </h3>
+                <p class="article-impact-statement">{{ article.impactStatement | safe }}</p>
+                <section class="article-meta">
+                    <p class="article-authors">{{ article.authorLine }}</p>
+                    <p class="article-publishing-date">{{ article.versionDate | dateWrangler("en", "long") }}</p>
+                </section>
+                <details class="article-abstract">
+                    <summary>Abstract</summary>
+                    {% for block in article.abstract.content  %}
+                        {% if block.type == "paragraph" %}<p>{{ block.text | safe }}</p>{% endif %}
+                    {% endfor %}
+                </details>
+                <p class="epp-features">
+                    <a href="https://elifesciences.org/articles/{{ article.id }}"
+                       class="readmore">Read more on EPP</a>
+                </p>
+                <p class="flax-features">
+                    <a href="/articles/elife-journal/{{ article.id }}" class="readmore">Read more using flax</a>
+                </p>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock  %}

@@ -139,14 +139,15 @@ const resolvers = {
 
       const fileUrl = storedObjects.find(f => f.type === 'original')
 
-      const fileContent = await axios({
+      const { data } = await axios({
         method: 'get',
         url: fileUrl.url,
       })
 
       return {
         id,
-        content: fileContent.data,
+        content:
+          typeof data === 'string' ? data : JSON.stringify(data, null, 2),
         name: file.name,
         url: fileUrl.url,
       }

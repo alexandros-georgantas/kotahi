@@ -1,0 +1,146 @@
+{#were using the alias for the content#}
+<p class="version">{{ article.version }}</p>
+<p class="type">{{ article.type }}</p>
+<p class="doi">{{ article.doi }}</p>
+<p class="authorsLine">{{ article.authorLine }}</p>
+<p class="title">{{ article.title }}</p>
+<p class="">{{ article.published }}</p>
+<p class="">{{ article.volume }}</p>
+<p class="">{{ article.elocationId }}</p>
+<p class="">{{ article.pdf }}</p>
+<p class="">{{ article.xml }}</p>
+<p class="">{{ article.figuresPdf }}</p>
+{# research organisms are arrayd#}
+<ul class="orga">
+    {% for orga in article.researchOrganisms %}<li>{{ orga | safe }}</li>{% endfor %}
+</ul>
+{#copyright#}
+<section class="copyright">
+    <p class="licence">{{ article.copyright.license }}</p>
+    <p class="holder">{{ article.copyright.holder }}</p>
+    <p class="statement">{{ article.copyright.statement | safe }}</p>
+</section>
+{# reviewers #}
+<ul>
+    {% for reviewer in  article.reviewers %}
+        <li>
+            <p class="name">{{ reviewer.name.preferred }}</p>
+            {% for affiliation in  reviewer.affiliations %}
+                <ul class="affilitation">
+                    <li>
+                        <span class="name">{{ affiliation.name }}</span> <span class="address">(
+                            {% for block in affiliation.address.formatted %}
+                                {{ block }}
+                                {% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        )</span>
+                    </li>
+                </ul>
+            {% endfor %}
+        </li>
+    {% endfor %}
+</ul>
+{#funding#}
+{#awards #}
+{% for award in  article.funding.awards %}
+    <p>award id: {{ award.awardId }}</p>
+    <p data-founderid="{{ award.source.funderId }}">award source: {{ award.source.name }}</p>
+    <ul class="recipients">
+        {% for recipient in award.recipients %}<li>{{ recipient.name.preferred }}</li>{% endfor %}
+    </ul>
+{% endfor %}
+{# additional files #}
+<ul class="additionalFiles">
+    {% for file in article.additionalFiles %}
+        <li id="{{ file.id }}">
+            <a href="{{ file.uri }}">
+                {% if file.title %}
+                    {{ file.title }}
+                {% else %}
+                    {{ file.label }}
+                {% endif %}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+{# dataset #}
+<section>
+    <h2>datasets</h2>
+    <ul class="datasets">
+        {% for dataset in article.dataSets.availability %}<li>{{ dataset.text | safe }}</li>{% endfor %}
+    </ul>
+</section>
+{# statement #}
+<section>
+    <h2>Impact statement</h2>
+    <p class="statement">{{ article.impactStatement }}</p>
+</section>
+
+{# body #}
+<section class="body">
+    <h2>body</h2>
+    {% for wrapper in article.body %}
+        <section id="{{ wrapper.id }}">
+            <h2>{{ wrapper.title }}</h2>
+            {% for block in wrapper.content %}
+                {% if block.type == "section" %}
+                    <section id="{{ block.id }}">
+                        <h3>{{ block.title }}</h3>
+                        {% for subblock in block.content %}
+                            {% if subblock.type == "paragraph" %}<p>{{ subblock.text | safe }}</p>{% endif %}
+                            {% if subblock.type == "figure" %}
+                                <figure>
+                                    {% for asset in subblock.assets  %}
+                                        <figure id="{{ asset.id }}">
+                                            <figcaption>
+                                                <p class="label">{{ asset.label }}</p>
+                                                <p class="caption">{{ asset.title }}</p>
+                                            </figcaption>
+                                            {% if asset.type == "image" %}
+                                                <img width="{{ asset.image.size.width }}"
+                                                     height="{{ asset.image.size.height }}"
+                                                     src="{{ asset.image.source.uri }}"
+                                                     alt="{{ asset.image.alt }}">
+                                            {% elif asset.type == "table" %}
+                                                {% for table in asset.tables %}{{ table | safe }}{% endfor %}
+                                            {% endif %}
+                                        </figure>
+                                    {% endfor %}
+                                </figure>
+                                <p>{{ block.text | safe }}</p>
+                            {% endif %}
+                        {% endfor %}
+                    </section>
+                {% endif %}
+                {% if block.type == "paragraph" %}<p>{{ block.text | safe }}</p>{% endif %}
+                {% if block.type == "figure" %}
+                    <figure>
+                        {% for asset in block.assets  %}
+                            <figure id="{{ asset.id }}">
+                                <figcaption>
+                                    <p class="label">{{ asset.label }}</p>
+                                    <p class="caption">{{ asset.title }}</p>
+                                </figcaption>
+                                {% if asset.type == "image" %}
+                                    <img width="{{ asset.image.size.width }}"
+                                         height="{{ asset.image.size.height }}"
+                                         src="{{ asset.image.source.uri }}"
+                                         alt="{{ asset.image.alt }}">
+                                {% elif asset.type == "table" %}
+                                    {% for table in asset.tables %}
+                                        {{ table | safe }}
+                                        <p>table</p>
+                                    {% endfor %}
+                                {% endif %}
+                            </figure>
+                        {% endfor %}
+                    </figure>
+                    <p>{{ block.text | safe }}</p>
+                {% endif %}
+            {% endfor %}
+        </section>
+    {% endfor %}
+</section>
+{# {% set looping %} {# >gv #}}
+a
+{# looping —> check for the type of content and if there is a section, redo  #}

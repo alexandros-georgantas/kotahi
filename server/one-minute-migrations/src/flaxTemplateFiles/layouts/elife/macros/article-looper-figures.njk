@@ -1,0 +1,82 @@
+{# loop in the content and return all the articles #}
+{% from "./article-looper.njk" import articleLoop %}
+{% macro articleLoopFigures(loopable) %}
+    {% for block in loopable %}
+        {% if block.type == "section" %}
+            {% set headingLevel = level + 1 %}
+            {{ articleLoopFigures(block.content) }}
+        {% endif %}
+        {% if block.type == "figure" %}
+            <figure>
+                {% for asset in block.assets  %}
+                    <p class="label">
+                        {{ asset.label }}
+                        {% if loop.length > 1 and loop.index == 1 %}
+                            <span class="suppNum">with {{ loop.length - 1 }} supplements</span>
+                        {% endif %}
+                    </p>
+                    <figure {% if asset.type == "table" %}class="tableblock"{% endif %}
+                            id="fig-{{ asset.id }}">
+                        {% if asset.type == "image" %}
+                            <img width="{{ asset.image.size.width }}"
+                                 height="{{ asset.image.size.height }}"
+                                 src="{{ asset.image.source.uri }}"
+                                 alt="{{ asset.image.alt }}">
+                            <figcaption>
+                                {# <p class="label">{{ asset.label }} {% if loop.length > 1 and loop.index == 1%} <span class="suppNum">with {{loop.length - 1}} supplements</span> {% endif %}</p> #}
+                                <h3>{{ asset.title | safe }}</h3>
+                                {{ articleLoop(asset.caption, level=1) }}
+                                <ul class="source-data">
+                                    {% for source in asset.sourceData  %}
+                                        <li>
+                                            <p class="source-label">{{ source.label }}</p>
+                                            <p class="source-title">{{ source.title }}</p>
+                                            <a href="{{ source.uri }}" download>Download {{ source.filename }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </figcaption>
+                        {% elif asset.type == "table" %}
+                            {% for table in asset.tables %}{{ table | safe }}{% endfor %}
+                        {% endif %}
+                    </figure>
+                {% endfor %}
+            </figure>
+            <p>{{ block.text | safe }}</p>
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+{% macro tocFigureTitle(loopable) %}
+    {% for block in loopable %}
+        {% if block.type == "section" %}
+            {% set headingLevel = level + 1 %}
+            {{ tocFigureTitle(block.content) }}
+        {% endif %}
+        {% if block.type == "figure" %}
+            {% for asset in block.assets  %}
+            {# {{loop.index}} / {{loop.last}} #}
+                {% if loop.length == 1 %}
+                    <li>
+                        <a href="#fig-{{ asset.id }}">{{ asset.label }}</a>
+                    </li>
+                {% endif %}
+                {% if loop.length > 1 and loop.index == 1 %}
+                    <li>
+                        <a href="#fig-{{ asset.id }}">{{ asset.label }}</a>
+                        <details>
+                            <summary>Supplementary</summary>
+                            <ul>
+                            {% elif loop.length > 1 and loop.index > 1 %}
+                                <li>
+                                    <a class="article-toc-figure-link-supp" href="#fig-{{ asset.id }}">{{ asset.label }}</a>
+                                </li>
+                                {% if  loop.last %}
+                                </ul>
+                            </details>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}

@@ -1,0 +1,5 @@
+{% from "../macros/article-looper.njk" import articleLoop %}
+<section  id="article-aknowledgment" class="aknowledgment">
+    <h3>Aknowledgment</h3>
+    {{ articleLoop(article.acknowledgements, level=2) }}
+</section>

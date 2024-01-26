@@ -1,0 +1,14 @@
+{# cite this article: #}
+<p class="citation">
+<span>
+    {% for author in  article.authors %}
+        <span class="cite-author-name">{{- author.name.preferred -}}</span>{% if not loop.last %}{{- ", " }}{% endif %}
+    {% endfor %}
+    <span class="cite-publishing-date">({{ article.versionDate | getYear }})</span>
+    <span class="cite-title"><strong>{{ article.title | safe }}</strong></span>
+    <span class="cite-origin"><em>eLife</em> <strong>{{ article.volume }}</strong>:{{ article.elocationId }}.</span>
+    <a class="cite-doi" href="https://doi.org/{{- article.doi -}}">https://doi.org/{{- article.doi -}}</a>
+</span>
+    <button class="clipboard-cp"
+            onclick="copyToClipboard(document.querySelector('.citation'))">Copy to clipboard</button>
+</p>

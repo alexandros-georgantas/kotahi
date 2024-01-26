@@ -1,0 +1,14 @@
+<p class="article-type"> {% if article.type == "research-article" %}Research Article {%elif article.type == "tools-resources"%} Tools and Resources{%else%} {{article.type}}{% endif %} </p>
+{% include "./elife-subjects.njk" %}
+<h1>{{ article.title | safe }}</h1>
+<div class="article-authors-list">{% include "./elife-article-authors-list.njk" %}</div>
+<div class="article-institution-list">{% include "./elife-authors-affiliations.njk" %}</div>
+<p class="article-meta">
+    <span class="article-publishing-date">{{ article.versionDate | dateWrangler("en", "long") }}</span>
+    <a class="doi" href="https://doi.org/{{- article.doi -}}">https://doi.org/{{- article.doi -}}</a>
+    <span class="licences">
+        <a href="https://https://en.wikipedia.org/wiki/Open_access"
+           class="openaccess">{% include "../svg/lock.njk" %}</a>
+        <a href="https://creativecommons.org/publicdomain/zero/1.0/" class="cc">{% include "../svg/cc.njk" %}</a>
+    </span>
+</p>

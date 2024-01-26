@@ -1,0 +1,7 @@
+{#abstract#}
+<section id="article-abstract" class="abstract">
+    <h2>Abstract</h2>
+    {% for block in article.abstract.content %}
+        {% if "paragraph" in block.type %}<p>{{ block.text | safe }}</p>{% endif %}
+    {% endfor %}
+</section>

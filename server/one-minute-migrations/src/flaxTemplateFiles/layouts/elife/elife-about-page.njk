@@ -1,0 +1,27 @@
+{% extends "base.njk" %}
+{% block content %}
+    <main>
+        <header>
+            <h1>{{ title }}</h1>
+            {% if baseline %}<p class="intro">{{ baseline }}</p>{% endif %}
+        </header>
+        <article>
+            <ul class="about-submenu">
+                {% for item in collections.aboutPages  %}
+                    <li>
+                        <img src="/assets/images/about/{{ item.data.metaimg }}" alt="">
+                        <div class="text">
+                            <h3>
+                                <a href="{{ item.url }}">{{ item.data.metatitle }}</a>
+                            </h3>
+                            <p>{{ item.data.metaintro | safe }}</p>
+                            <p>
+                                <a href="{{ item.url }}">{{ item.data.metalinktext }}</a>{{ item.title }}
+                            </p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </article>
+    </main>
+{% endblock content %}

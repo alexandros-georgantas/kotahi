@@ -1,0 +1,4 @@
+{% from "../macros/article-looper.njk" import articleLoop %}
+<section id="article-content" class="article-content">
+    {{ articleLoop(article.body) }}
+</section>

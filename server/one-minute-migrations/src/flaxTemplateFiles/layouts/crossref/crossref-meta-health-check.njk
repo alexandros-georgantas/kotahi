@@ -1,0 +1,106 @@
+
+{% extends "crossref/crossref-base.njk" %}
+
+{% from "../common/macros/doi.njk" import doi %}
+{% block bodyclass %}
+    meta-health-check
+    crossref
+{% endblock bodyclass %}
+{% set journalid = issn + "meta" %}
+{% set journalmeta = journals[journalid] %}
+{% block content %}
+    <main>
+        <header>
+            <p class="surtitle">Metadata Heath Report</p>
+            <h1>{{ journalmeta.title }}</h1>
+            <p>published by: {{ journalmeta.publisher }}</p>
+        </header>
+        <sections class="coverage">
+        <h2>Coverage data from Crossref</h2>
+        <h3>Current</h3>
+        <ul>
+            <li>"affiliations-current" : {{ journalmeta.coverage["affiliations-current"] * 10  | round(2) }}%</li>
+            <li>"similarity-checking-current" : {{ journalmeta.coverage["similarity-checking-current"] * 10  | round(2) }}%</li>
+            <li>"descriptions-current" : {{ journalmeta.coverage["descriptions-current"] * 10  | round(2) }}%</li>
+            <li>"ror-ids-current" : {{ journalmeta.coverage["ror-ids-current"] * 10  | round(2) }}%</li>
+            <li>"funders-current" : {{ journalmeta.coverage["funders-current"] * 10  | round(2) }}%</li>
+            <li>"update-policies-current" : {{ journalmeta.coverage["update-policies-current"] * 10  | round(2) }}%</li>
+            <li>"orcids-current" : {{ journalmeta.coverage["orcids-current"] * 10  | round(2) }}%</li>
+            <li>"licenses-current" : {{ journalmeta.coverage["licenses-current"] * 10  | round(2) }}%</li>
+            <li>"award-numbers-current" :journalmeta.coverage["award-numbers-current"] * 10  | round(2) }}%</li>
+            <li>"resource-links-current" : {{ journalmeta.coverage["resource-links-current"] * 10  | round(2) }}%</li>
+            <li>"abstracts-current" : {{ journalmeta.coverage["abstracts-current"] * 10  | round(2) }}%</li>
+            <li>"references-current" : {{ journalmeta.coverage["references-current"] * 10  | round(2) }}%</li>
+        </ul>
+        <h3>Previous</h3>
+        <ul>
+            <li>"funders-backfile" : {{ journalmeta.coverage["funders-backfile"] * 10  | round(2) }}%</li>
+            <li>"licenses-backfile" : {{ journalmeta.coverage["licenses-backfile"] * 10  | round(2) }}%</li>
+            <li>"affiliations-backfile" : {{ journalmeta.coverage["affiliations-backfile"] * 10  | round(2) }}%</li>
+            <li>"resource-links-backfile" : {{ journalmeta.coverage["resource-links-backfile"] * 10  | round(2) }}%</li>
+            <li>"orcids-backfile" : {{ journalmeta.coverage["orcids-backfile"] * 10  | round(2) }}%</li>
+            <li>"ror-ids-backfile" : {{ journalmeta.coverage["ror-ids-backfile"] * 10  | round(2) }}%</li>
+            <li>"abstracts-backfile" : {{ journalmeta.coverage["abstracts-backfile"] * 10  | round(2) }}%</li>
+            <li>"similarity-checking-backfile" : {{ journalmeta.coverage["similarity-checking-backfile"] * 10  | round(2) }}%</li>
+            <li>"references-backfile" : {{ journalmeta.coverage["references-backfile"] * 10  | round(2) }}%</li>
+            <li>"descriptions-backfile" : {{ journalmeta.coverage["descriptions-backfile"] * 10  | round(2) }}%</li>
+            <li>"award-numbers-backfile" : {{ journalmeta.coverage["award-numbers-backfile"] * 10  | round(2) }}%</li>
+            <li>"update-policies-backfile" : {{ journalmeta.coverage["update-policies-backfile"] * 10  | round(2) }}%</li>
+        </ul>
+        <h3>Flags</h3>
+        <ul>
+            <li>deposits: {{ journalmeta.flags["deposits"] }}</li>
+            <li>deposits-abstracts-current: {{ journalmeta.flags["deposits-abstracts-current"] }}</li>
+            <li>deposits-orcids-current: {{ journalmeta.flags["deposits-orcids-current"] }}</li>
+            <li>deposits-affiliations-backfile: {{ journalmeta.flags["deposits-affiliations-backfile"] }}</li>
+            <li>deposits-update-policies-backfile: {{ journalmeta.flags["deposits-update-policies-backfile"] }}</li>
+            <li>deposits-similarity-checking-backfile: {{ journalmeta.flags["deposits-similarity-checking-backfile"] }}</li>
+            <li>deposits-award-numbers-current: {{ journalmeta.flags["deposits-award-numbers-current"] }}</li>
+            <li>deposits-resource-links-current: {{ journalmeta.flags["deposits-resource-links-current"] }}</li>
+            <li>deposits-ror-ids-current: {{ journalmeta.flags["deposits-ror-ids-current"] }}</li>
+            <li>deposits-articles: {{ journalmeta.flags["deposits-articles"] }}</li>
+            <li>deposits-affiliations-current: {{ journalmeta.flags["deposits-affiliations-current"] }}</li>
+            <li>deposits-funders-current: {{ journalmeta.flags["deposits-funders-current"] }}</li>
+            <li>deposits-references-backfile: {{ journalmeta.flags["deposits-references-backfile"] }}</li>
+            <li>deposits-ror-ids-backfile: {{ journalmeta.flags["deposits-ror-ids-backfile"] }}</li>
+            <li>deposits-abstracts-backfile: {{ journalmeta.flags["deposits-abstracts-backfile"] }}</li>
+            <li>deposits-licenses-backfile: {{ journalmeta.flags["deposits-licenses-backfile"] }}</li>
+            <li>deposits-award-numbers-backfile: {{ journalmeta.flags["deposits-award-numbers-backfile"] }}</li>
+            <li>deposits-descriptions-current: {{ journalmeta.flags["deposits-descriptions-current"] }}</li>
+            <li>deposits-references-current: {{ journalmeta.flags["deposits-references-current"] }}</li>
+            <li>deposits-resource-links-backfile: {{ journalmeta.flags["deposits-resource-links-backfile"] }}</li>
+            <li>deposits-descriptions-backfile: {{ journalmeta.flags["deposits-descriptions-backfile"] }}</li>
+            <li>deposits-orcids-backfile: {{ journalmeta.flags["deposits-orcids-backfile"] }}</li>
+            <li>deposits-funders-backfile: {{ journalmeta.flags["deposits-funders-backfile"] }}</li>
+            <li>deposits-update-policies-current: {{ journalmeta.flags["deposits-update-policies-current"] }}</li>
+            <li>deposits-similarity-checking-current: {{ journalmeta.flags["deposits-similarity-checking-current"] }}</li>
+            <li>deposits-licenses-current: {{ journalmeta.flags["deposits-licenses-current"] }}</li>
+        </ul>
+        </sections>
+        <section class="doi">
+            <h2>DOI issued per year</h2>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Year</th>
+                        {% for year in journalmeta.breakdowns["dois-by-issued-year"] | sort(true, false, [0]) | reverse %}
+                            <td>{{ year[0]  }}%</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>DOI</th>
+                        {% for year in journalmeta.breakdowns["dois-by-issued-year"] | sort(true, false, [0]) | reverse %}
+                            <td>{{ year[1]  }}%</td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        <sections class="issns">
+        <h2>Available ISSNs</h2>
+        <ul>
+            {% for issn in journalmeta["issn-type"] %}<li>{{ issn.type }}: {{ issn.value }}</li>{% endfor %}
+        </ul>
+        </sections>
+    </main>
+{% endblock content %}
