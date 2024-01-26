@@ -289,6 +289,11 @@ const AdminPage = () => {
             ]
           : []),
         {
+          link: migrationLink,
+          name: i18next.t('leftMenu.OneMinuteMigration'),
+          icon: 'log-in',
+        },
+        {
           menu: 'CMS',
           name: i18next.t('leftMenu.CMS'),
           icon: 'layout',
