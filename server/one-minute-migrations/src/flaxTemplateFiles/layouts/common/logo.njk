@@ -1,0 +1,11 @@
+<div>
+    {% set journalid = issn + "meta" %}
+    {% set journalmeta = journals[journalid] %}
+    {% if issn %}
+        <a class="linkToTitle" href="/articles/{{ issn }}/">{{ journalmeta.title }}</a>
+    {% else %}
+        <a class="linkToTitle" href="/">
+            <img src="/assets/images/{{ site.logourl }}" alt="">
+        </a>
+    {% endif %}
+</div>

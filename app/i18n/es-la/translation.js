@@ -103,6 +103,7 @@ const esLa = {
       'Go to your profile': 'Ir a tu perfil',
       Article: 'Plantilla de Artículo',
       FileBrowser: 'Explorador de archivos',
+      OneMinuteMigration: 'Migración',
     },
 
     profilePage: {
@@ -511,6 +512,26 @@ const esLa = {
       },
       allowedIPs: 'Lista de IP del repositorio a las que se permite el acceso',
       api: 'API de Kotahi',
+    },
+    oneMinuteMigrationPage: {
+      pageTitle: 'Migración en Un Minuto',
+      issnDescription: 'ISSN de revista para importar',
+      startMigration: 'Iniciar la Migración',
+      goToJournal: 'Ir al revista',
+      migratingJournal: 'Revista migratoria',
+      fetchingMetadata: 'Obteniendo metadatos',
+      error: 'Error',
+      notFound: 'Revista no encontrado',
+      checkIssn: 'Por favor verifique el ISSN',
+      tryAgain: 'Intentar otra vez',
+      savingMetadata: 'Guardando metadatos del revista...',
+      sortingJournal: 'Ordenando revista por volúmenes y números...',
+      metadataSaved: 'Metadatos guardados',
+      removingPreviousMigration:
+        'Eliminando datos descargados previamente y páginas generadas...',
+      getLogo: 'Buscando el logo...',
+      getTeam: 'Buscando la página del equipo...',
+      getAbout: 'Buscando la página acerca de...',
     },
     reportsPage: {
       Reports: 'Reportes',

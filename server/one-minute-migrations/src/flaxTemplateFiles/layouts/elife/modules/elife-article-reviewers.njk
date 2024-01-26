@@ -1,0 +1,21 @@
+<section id="article-reviewers" class="reviewers">
+    <ul class="reviewers-list">
+        {% for reviewer in article.reviewers %}
+            <li data-orcid="{{ reviewer.orcid }}">
+                <h3 class="role">{{ reviewer.role }}</h3>
+                <p class="name">
+                    <span class="name">{{ reviewer.name.preferred }}</span><span class="place">
+                        {% for affiliation in reviewer.affiliations %}
+                            <span class="affilitation-name">{{ affiliation.name }}</span>, <span class="address">
+                                {% for block in affiliation.address.formatted %}
+                                    {{- block -}}
+                                    {% if not loop.last %},{% endif %}
+                                {% endfor %}
+                            </span>
+                        {% endfor %}
+                    </span>
+                </p>
+            </li>
+        {% endfor %}
+    </ul>
+</section>

@@ -1,0 +1,14 @@
+
+{% extends "../base.njk" %}
+{% block content %}
+    <main>
+        <header class="background">
+        <img src="/assets/images/{{site.headIllus}}" alt="">
+        <h1 class="site-title">{{ site.title }}</h1>
+        </header>
+        <section class="home-journal-entries">
+            <h2 class="metatitle">Latest research</h2>
+            {% include "../elife/elife-article-list.njk" %}
+        </section>
+    </main>
+{% endblock content %}

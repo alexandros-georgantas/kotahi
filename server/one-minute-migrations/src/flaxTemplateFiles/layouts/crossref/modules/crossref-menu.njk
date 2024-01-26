@@ -1,0 +1,43 @@
+{# get issn for the meta, check if there is a logo. otherwise put the journal name #}
+{% set journalid = issn + "meta" %}
+{% set journalmeta = journals[journalid] %}
+{% set journalscrap = issn + "scrap" %}
+{% set scrapmeta = journals[journalscrap] %}
+
+<aside>
+    <div class="topbar">
+        <a href="/">
+            {% if scrapmeta.logourl != "placeholder" %}
+                <img class="logo-img" src="{{- scrapmeta.logourl }}" alt="">
+            {% else %}
+                <p class="logo-text">{{ journalmeta.title }}</p>
+                <p class="logo-text-publisher">{{ journalmeta.publisher }}</p>
+            {% endif %}
+        </a>
+        <button class="menu-call">MENU</button>
+        <nav class="hide">
+            <ul>
+                {% for item in collections.menu %}
+                    {% if item.data.menu %}
+                        <li>
+                            <a data-instant
+                               class="{% if item.url == page.url %}active{% endif %}"
+                               href="{{ item.url }}"
+                               title="{{ item.data.issn }}: {{ item.data.title }}">{%- if item.data.menu -%}{{ item.data.menu }}
+                            {% else %}
+                                {{- item.data.title }}
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+</div>
+</aside>
+<script>
+    document.querySelector(".menu-call").addEventListener("click", function() {
+        document.querySelector('.topbar nav').classList.toggle('hide');
+    })
+    
+</script>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang }}">
+    <head>
+        <title>{{ site.title }}</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- <link href="/assets/css/main.css" rel="stylesheet"> -->
+        {% include "common/debugcss.njk" %}
+        {% block headscripts %}
+            {#        #}
+        {% endblock headscripts %}
+    </head>
+    <body class="{{ classes }}{% block bodyclass %}{% endblock bodyclass %}">
+        {% block topbar %}
+            {% include "./common/menu.njk" %}
+        {% endblock topbar %}
+        {% block content %}
+            <main>
+                <header>
+                    <h1>{{ title }}</h1>
+                    {% if intro %}<p class="intro">{{ intro }}</p>{% endif %}
+                </header>
+                <article>{{ content | safe }}</article>
+            </main>
+        {% endblock content %}
+        {% block supContent %}
+           {# not  #}
+        {% endblock supContent %}
+        {% block scripts %}
+            {# add some scripts there #}
+        {% endblock scripts %}
+        {% block footer %}
+            {% include "common/footer.njk" %}
+        {% endblock footer %}
+    </body>
+</html>
