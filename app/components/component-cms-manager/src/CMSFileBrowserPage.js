@@ -1,31 +1,29 @@
-import React, { useEffect, useState, useCallback } from 'react' // { useContext, useState }
-import { pick, isEmpty, debounce } from 'lodash'
+import React, { useState, useCallback, useEffect } from 'react' // { useContext, useState }
+import { debounce, isEmpty, pick } from 'lodash'
 import styled from 'styled-components'
 
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-// import { useTranslation } from 'react-i18next'
-import FolderTree from 'react-folder-tree'
+import { useLazyQuery, useMutation } from '@apollo/client'
+import { useTranslation } from 'react-i18next'
+
 import CodeMirror from '@uiw/react-codemirror'
 import { html } from '@codemirror/lang-html'
 import { css } from '@codemirror/lang-css'
 
 import 'react-folder-tree/dist/style.css'
 
-import { Spinner, CommsErrorBanner, Select } from '../../shared'
+import Browser from './browser/browser'
+import { Spinner, CommsErrorBanner } from '../../shared'
+
+import UploadComponent from '../../component-production/src/components/uploadManager/UploadComponent'
 
 // import { ConfigContext } from '../../config/src'
 
 import { EditPageContainer, EditPageLeft, EditPageRight } from './style'
 
 import {
-  getCmsFilesTreeView,
   getCmsFileContent,
-  addResourceToFolder,
-  deleteResource,
-  renameResource,
   updateResource,
-  getFoldersList,
-  updateFlaxRootFolder,
+  getCmsFilesTreeView,
 } from './queries'
 
 const EditPageLeftStyled = styled(EditPageLeft)`
@@ -39,7 +37,6 @@ const EditPageLeftStyled = styled(EditPageLeft)`
 
 const SpanActive = styled.span`
   font-weight: bold;
-  margin-left: 10px;
 `
 
 const searchAddChildren = (treeData, { id, children }) => {
@@ -76,32 +73,38 @@ const searchAddChildren = (treeData, { id, children }) => {
   return treeData
 }
 
-const findClickedFolder = (state, path) => {
-  const currentItem = state.children[path.shift()]
-
-  if (path.length > 0) {
-    return findClickedFolder(currentItem, path)
-  }
-
-  return currentItem || state
-}
-
 const CMSFileBrowserPage = () => {
-  // const { t } = useTranslation()
-  const [activeContent, setActiveContent] = useState({ id: null, content: '' })
+  const { t } = useTranslation()
+
+  const [imageSrc, setImageSrc] = useState('')
   const [treeData, setTreeData] = useState({})
-  const [addObject] = useMutation(addResourceToFolder)
-  const [deleteObject] = useMutation(deleteResource)
-  const [renameObject] = useMutation(renameResource)
+
+  const [activeContent, setActiveContent] = useState({
+    id: null,
+    name: '',
+    content: '',
+    isFolder: false,
+    isImage: false,
+  })
+
   const [updateObject] = useMutation(updateResource)
-
-  const [updateFlaxFolder] = useMutation(updateFlaxRootFolder)
-
-  const { loadingFolders, data: dataFolders } = useQuery(getFoldersList)
 
   const [getFileData] = useLazyQuery(getCmsFileContent, {
     onCompleted: ({ getCmsFileContent: Content }) => {
-      setActiveContent({ id: Content.id, content: Content.content })
+      const extension = Content.name.split('.').pop().toLowerCase()
+      const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg']
+
+      if (imageExtensions.includes(extension)) {
+        setImageSrc(Content.url)
+      }
+
+      setActiveContent({
+        id: Content.id,
+        content: Content.content,
+        name: Content.name,
+        isImage: imageExtensions.includes(extension),
+        isFolder: false,
+      })
     },
   })
 
@@ -149,65 +152,35 @@ const CMSFileBrowserPage = () => {
       await updateObject({
         variables: updatedContent,
       })
-      setActiveContent(updatedContent)
+      setActiveContent({
+        ...updatedContent,
+        name: activeContent.name,
+        isFolder: activeContent.isFolder,
+      })
     }, '2000'),
     [activeContent.id],
   )
 
-  const onTreeStateChange = async (state, event) => {
-    if (
-      event.type === 'toggleOpen' &&
-      event.params &&
-      event.params[0] === true
-    ) {
-      const item = findClickedFolder(treeData, event.path)
+  const uploadAssetsFn = async acceptedFiles => {
+    const body = new FormData()
 
-      if (item && item.children.length === 0) {
-        getTreeData({
-          variables: {
-            folderId: item.id,
-          },
-        })
-      }
-    } else if (event.type === 'addNode') {
-      const item = findClickedFolder(treeData, event.path)
+    acceptedFiles.forEach(f => body.append('files', f))
 
-      await addObject({
-        variables: {
-          id: item.id,
-          type: event.params[0],
-        },
-      })
+    body.append('id', activeContent.id)
 
-      getTreeData({
-        variables: {
-          folderId: item.id,
-        },
-      })
-    } else if (event.type === 'deleteNode') {
-      const item = findClickedFolder(treeData, event.path)
+    await fetch('/api/cmsUploadFiles', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body,
+    })
 
-      const deletedObj = await deleteObject({
-        variables: {
-          id: item.id,
-        },
-      })
-
-      getTreeData({
-        variables: {
-          folderId: deletedObj.data.deleteResource.parentId,
-        },
-      })
-    } else if (event.type === 'renameNode') {
-      const item = findClickedFolder(treeData, event.path)
-
-      await renameObject({
-        variables: {
-          id: item.id,
-          name: event.params[0],
-        },
-      })
-    }
+    getTreeData({
+      variables: {
+        folderId: activeContent.id,
+      },
+    })
   }
 
   const onNameClick = ({ defaultOnClick, nodeData }) => {
@@ -219,50 +192,49 @@ const CMSFileBrowserPage = () => {
           id: nodeData.fileId,
         },
       })
+    } else {
+      setActiveContent({
+        id: nodeData.id,
+        name: nodeData.name,
+        content: null,
+        isImage: false,
+        isFolder: true,
+      })
     }
   }
 
-  if (loading || loadingFolders) return <Spinner />
   if (error) return <CommsErrorBanner error={error} />
-
-  const selectOptions = ((dataFolders || {}).getFoldersList || []).map(fld => ({
-    value: fld.id,
-    label: fld.name,
-    rootFolder: fld.rootFolder,
-  }))
-
-  const selectedOption = selectOptions.find(fld => fld.rootFolder === true)
 
   return (
     <EditPageContainer>
       <EditPageLeftStyled>
-        <FolderTree
-          data={treeData}
-          initOpenStatus="custom"
-          onChange={onTreeStateChange}
+        <Browser
+          getTreeData={getTreeData}
+          loading={loading}
           onNameClick={onNameClick}
-          showCheckbox={false}
-        />
-        <hr />
-        <SpanActive>Root Flax Folder:</SpanActive>
-        <Select
-          aria-label="Select Folder"
-          isClearable={false}
-          label="Select Folder"
-          onChange={selected => {
-            updateFlaxFolder({ variables: { id: selected.value } })
-          }}
-          options={selectOptions}
-          value={selectedOption?.value}
-          width="100%"
+          treeData={treeData}
         />
       </EditPageLeftStyled>
       <EditPageRight>
-        <CodeMirror
-          extensions={[css(), html()]}
-          onChange={onChangeContent}
-          value={activeContent.content}
-        />
+        {!activeContent.isFolder &&
+          activeContent.id &&
+          !activeContent.isImage && (
+            <CodeMirror
+              extensions={[css(), html()]}
+              onChange={onChangeContent}
+              value={activeContent.content}
+            />
+          )}
+        {activeContent.isFolder && activeContent.id && (
+          <>
+            Upload To Folder <SpanActive>{activeContent.name}</SpanActive>:
+            <UploadComponent
+              label={t('dragndrop.Drag and drop other files here')}
+              uploadAssetsFn={uploadAssetsFn}
+            />
+          </>
+        )}
+        {activeContent.isImage && <img alt="Preview" src={imageSrc} />}
       </EditPageRight>
     </EditPageContainer>
   )

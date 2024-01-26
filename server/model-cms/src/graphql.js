@@ -147,6 +147,8 @@ const resolvers = {
       return {
         id,
         content: fileContent.data,
+        name: file.name,
+        url: fileUrl.url,
       }
     },
     async getFoldersList(_, vars, ctx) {
@@ -577,6 +579,8 @@ const typeDefs = `
   type FileContent {
     id: ID!
     content: String!
+    name: String!
+    url: String!
   }
 
   type FlaxPageHeaderConfig {

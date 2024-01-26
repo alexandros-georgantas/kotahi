@@ -163,6 +163,8 @@ export const getCmsFileContent = gql`
     getCmsFileContent(id: $id) {
       id
       content
+      name
+      url
     }
   }
 `
