@@ -1,8 +1,8 @@
 ---
-title: "Welcome"
+title: 'Welcome'
 layout: pages/homepage.njk
-permalink: "/flax/"
-classes: "flax-home"
+permalink: '/flax/'
+classes: 'flax-home'
 menufooter: What is Flax
 order: 1
 ---
