@@ -1,0 +1,69 @@
+{% extends "crossref/crossref-base.njk" %}
+{% from "../common/macros/doi.njk" import doi %}
+{% block bodyclass %}
+    article-single
+    crossref
+{% endblock bodyclass %}
+{% block content %}
+    <main>
+        <header>
+            <p>
+                Volume {{ article.volume }} / issue {{ article.issue }}
+                {# {% if article.page %}/ pages {{ article.page }}{% endif %} #}
+            </p>
+            <h1>
+                {% for title in article.title %}<span>{{ title  | safe }}</span>{% endfor %}
+            </h1>
+            <ul class="authors-list inline">
+                {% for author in article.author %}
+                    <li>
+                        {{ author.given -}}&nbsp;{{ author.family -}}
+                        {% if not loop.last %}{{-", " }}{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            {# all affiliation #}
+            <ul class="affiliations-list">
+                {% for author in article.author %}
+                    {% for affiliation in author.affiliation %}
+                        <li>
+                            {{ affiliation.name }}
+                            {% if not loop.last %}{{-", " }}{% endif %}
+                        </li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </header>
+        <article>
+            <section class="abstract">
+                <h2>Abstract</h2>
+                {% if article.abstract %}
+                    {{ article.abstract | dejats | safe  }}
+                {% else %}
+                    <p>
+                        <em>This article has no abstract linked</em>
+                    </p>
+                {% endif %}
+            </section>
+            <section>
+                <h2>Downloads</h2>
+                <ul class="article-links">
+                    {% for link in article.link  %}
+                        {% if link["content-type"] == "application/pdf" %}
+                            <li>
+                                <a href="{{ link.URL }}" class="link-pdf">Download PDF</a>
+                            </li>
+                        {% elif link["content-type"] == "application/xml" %}
+                            <li>
+                                <a href="{{ link.URL }}" class="link-xml">Download XML</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="link-doi">{{ doi(article.DOI) }}</li>
+                </ul>
+            </section>
+        </article>
+    </main>
+    {# next <prev>  #}
+    {% include "../common/next-prev.njk" %}
+{% endblock content %}

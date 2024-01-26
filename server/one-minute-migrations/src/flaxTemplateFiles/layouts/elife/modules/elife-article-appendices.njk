@@ -1,0 +1,9 @@
+{% from "../macros/article-looper.njk" import articleLoop %}
+<section id="article-appendices" class="appendix">
+    <h2>Appendices</h2>
+    {% for appendice in article.appendices %}
+        <h3>Appendix {{ loop.index }}</h3>
+        {# {% for append in  appendice.content %}{{ append.content[0].text | safe }}{% endfor %} #}
+        {{ articleLoop(appendice.content, level=2) }}
+    {% endfor %}
+</section>

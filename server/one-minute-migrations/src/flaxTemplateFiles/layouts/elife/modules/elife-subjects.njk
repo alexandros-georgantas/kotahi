@@ -1,0 +1,4 @@
+{# subjects are array #}
+<ul class="subjects">
+    {% for subject in article.subjects %}<li class="{{ subject.id }}">{{ subject.name }}</li>{% endfor %}
+</ul>

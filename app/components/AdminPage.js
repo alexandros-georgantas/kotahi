@@ -34,6 +34,7 @@ import TasksTemplatePage from './component-task-manager/src/TasksTemplatePage'
 import UsersPage from './component-users-manager/src/UsersPage'
 import ConfigManagerPage from './component-config-manager/src/ConfigManagerPage'
 import EmailTemplatesPage from './component-email-templates/src/EmailTemplatesPage'
+import OneMinuteMigrationPage from './component-one-minute-migration/OneMinuteMigrationPage'
 
 import CMSPagesPage from './component-cms-manager/src/CMSPagesPage'
 import CMSLayoutPage from './component-cms-manager/src/CMSLayoutPage'
@@ -183,6 +184,7 @@ const AdminPage = () => {
   const path = `${urlFrag}/versions/:version`
   const redirectLink = `${urlFrag}/login?next=${homeLink}`
   const emailTemplatesLink = `${urlFrag}/admin/email-templates`
+  const migrationLink = `${urlFrag}/admin/migration`
 
   if (showLinks) {
     const params = getParams(pathname, path)
@@ -276,6 +278,11 @@ const AdminPage = () => {
           link: emailTemplatesLink,
           name: i18next.t('leftMenu.Emails'),
           icon: 'mail',
+        },
+        {
+          link: migrationLink,
+          name: i18next.t('leftMenu.OneMinuteMigration'),
+          icon: 'log-in',
         },
         {
           menu: 'CMS',
@@ -543,6 +550,12 @@ const AdminPage = () => {
             component={EmailTemplatesPage}
             key="email-templates"
             path={`${emailTemplatesLink}/:pageId?`}
+            redirectLink={redirectLink}
+          />,
+          <PrivateRoute
+            component={OneMinuteMigrationPage}
+            key="one-minute-migration"
+            path={`${migrationLink}`}
             redirectLink={redirectLink}
           />,
         ]}

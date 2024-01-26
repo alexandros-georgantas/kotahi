@@ -1,0 +1,95 @@
+{% extends "crossref/crossref-base.njk" %}
+{% from "../common/macros/doi.njk" import doi %}
+{# get issn for the meta, check if there is a logo. otherwise put the journal name #}
+{% set journalid = issn + "meta" %}
+{% set journalmeta = journals[journalid] %}
+{% set journalscrap = issn + "scrap" %}
+{% set scrapmeta = journals[journalscrap] %}
+{% set volumedataname = issn + "volumes" %}
+{% set volumes = journals[volumedataname]   %}
+{% block bodyclass %}
+    homepage
+    crossref
+{% endblock bodyclass %}
+{% block content %}
+    <main>
+        <header>
+            {# {% if scrapmeta.logourl %}<img src="{{ scrapmeta.logourl }}" alt="Logo for {{ journal.title }}">{% endif %} #}
+            <h1>{{ journalmeta.title | safe }}</h1>
+            {% if journalmeta.subtitle %}<p class="subtitle">{{ journalmeta.subtitle | safe }}</p>{% endif %}
+            {% if journalmeta.publisher %}<p class="publisher">{{ journalmeta.publisher | safe }}</p>{% endif %}
+        </header>
+        <article>
+            {#  get the latest issue / volume #}
+            {% set volumenumber = volumes[volumes.length - 1].volume  %}
+            {% set issuenumber = volumes[volumes.length - 1].issues[volumes[volumes.length - 1].issues.length - 1].number  %}
+            <h2>
+                <span class="title">Latest articles</span>
+                <span class="volume-number">volume {{ volumenumber }} / issue {{ issuenumber }}</span>
+            </h2>
+            <ul class="article-list">
+                {% set latestIssue = volumes[volumes.length - 1].issues[volumes[volumes.length - 1].issues.length - 1]  %}
+                {% for article in latestIssue.articles  %}
+                    <li>
+                        <h3 class="article-title">
+                            <a href="/articles/{{ issn }}/{{ article.DOI }}/">
+                                {% for title in article.title   %}<span>{{ title  | safe }}</span>{% endfor %}
+                            </a>
+                        </h3>
+                        <ul class="authors-list inline">
+                            {% for author in article.author %}
+                                <li>
+                                    {{ author.given -}}&nbsp;{{ author.family -}}
+                                    {% if not loop.last %}{{-", " }}{% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <p class="links">
+                            <a href="/articles/{{ issn }}/{{ article.DOI }}">
+                                {% for title in article.title   %}<span>Go the article page</span>{% endfor %}
+                            </a>
+                            {{ doi(article.DOI) }}
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </article>
+        <article>
+            <h2>
+                <span class="title">Some older articles</span>
+            </h2>
+            <ul class="article-list">
+                {% set randomItems = [] %}
+                {% for i in range(6) %}
+                    {% set randomItem = journals[issn] | random %}
+                    {% set randomItems = randomItems.concat([randomItem]) %}
+                {% endfor %}
+                {% for article in randomItems  %}
+                    <li>
+                        <p>vol {{ article.volume }} / issue {{ article.issue }}</p>
+                        <h3 class="article-title">
+                            <a href="/articles/{{ issn }}/{{ article.DOI }}/">
+                                {% for title in article.title   %}<span>{{ title  | safe }}</span>{% endfor %}
+                            </a>
+                        </h3>
+                        <ul class="authors-list inline">
+                            {% for author in article.author %}
+                                <li>
+                                    {{ author.given -}}&nbsp;{{ author.family -}}
+                                    {% if not loop.last %}{{-", " }}{% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <p class="links">
+                            <a href="/articles/{{ issn }}/{{ article.DOI }}">
+                                {% for title in article.title   %}<span>Go the article page</span>{% endfor %}
+                            </a>
+                            {{ doi(article.DOI) }}
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </article>
+    </main>
+    {# {% include "./modules/crossref-menu.njk" %} #}
+{% endblock content %}

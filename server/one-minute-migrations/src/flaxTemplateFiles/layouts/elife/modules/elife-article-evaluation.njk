@@ -1,0 +1,13 @@
+{% from "../macros/article-looper.njk" import articleLoop %}
+<section class="editors-evaluation" id="article-editors-evaluation">
+    <h2>Editor’s Evaluation</h2>
+    {# article evaluation #}
+    {{ articleLoop(article.editorEvaluation.content) }}
+    <p class="eval-doi">
+        <a class="doi"
+           href="https://doi.org/{{- article.editorEvaluation.doi -}}">https://doi.org/{{-  article.editorEvaluation.doi -}}</a>
+    </p>
+    <ul class="links">
+        <a href="#decision-letter">Decision letter</a>
+    </ul>
+</section>

@@ -1,0 +1,25 @@
+{% extends "../base.njk" %}
+{% block content %}
+    <main>
+        <header>
+            <h1>{{ title }}</h1>
+            <p class="subtitle">{{ subtitle }}</p>
+            {# authors #}
+            <ul class="authors">
+                {% for author in authors %}
+                    <li>
+                      <span class="name">{{author.name}}</span>{%- if not loop.last  %},{%else%}.{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            <ul class="affiliations">
+                {% for author in authors %}
+                    <li>
+                      <span class="affiliations">{{author.affiliation}}</span>{%- if not loop.last  %},{%else%}.{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </header>
+        <article>{{ content | safe }}</article>
+    </main>
+{% endblock content %}
