@@ -1,0 +1,186 @@
+{
+  "management": {
+    "title": "Editor in chief",
+    "folks": [
+      {
+        "portrait": "Adam.jpg",
+        "name": "Adam Hyde",
+        "fonction": "Founder & Principal Architect",
+        "description": "Adam brings publishing and technical leadership as well as pioneering insights into publishing workflows and technologies. Adam is also technical advisor for the OA Switchboard project, holds a seat on the Electronic Information for Libraries (EIFL) Management Board, and co-founder of the Coalition for Open Access Publishing Infrastructure in Africa project.  Drop Adam a note at [adam@coko.foundation](mailto:adam@coko.foundation)"
+      }
+    ]
+  },
+  "editors": {
+    "title": "Senior Editors",
+    "folks": [
+      {
+        "portrait": "Dione.jpg",
+        "name": "Dione Mentis",
+        "fonction": "COO and Senior Architect",
+        "description": "Until Joining Coko Dione was an independent publishing consultant with over 10 years experience in the industry. Her expertise lies in educational content production, particularly digital-first, multi-format books, with a keen interest in optimising open-access production workflows and content development. Initally Dione joined Coko as our Technical Manager and is now our Chief Operating Officer. Drop Dione a note at [dione@coko.foundation](mailto:dione@coko.foundation)"
+      },
+      {
+        "portrait": "Yannis.jpg",
+        "name": "Yannis Barlas",
+        "fonction": "Lead Developer and Senior Architect",
+        "description": "Yannis has many years experience developing full stack applications and has been part of building almost every platform to come out of Coko. Yannis was one of the first developers to join Coko and has increasingly expanded his role to his current position as our Lead Developer (effectively our CTO)."
+      }
+    ]
+  },
+  "specialists": {
+    "cardWidth": "full",
+    "title": "Editors",
+    "folks": [
+      {
+        "portrait": "Bethany.png",
+        "name": "Bethany Lyons",
+        "fonction": "Financial Administrator",
+        "description": "Bethany comes from the US but lives in Raglan, New Zealand. Bethany is part-owner and operator of the beautiful Koru Lodge and also teaches yoga."
+      },
+      {
+        "portrait": "Sidorela.jpg",
+        "name": "Sidorela Uku",
+        "fonction": "QA Engineer",
+        "description": "Sidorela is our talented QA engineer and really passionate about open source projects and open knowledge."
+      },
+      {
+        "portrait": "vukile.jpg",
+        "name": "Vukile Langa",
+        "fonction": "Developer",
+        "description": "Vukile is a web developer keen to learn more about new developments in the tech field, and to apply this knowledge to solve problems in the real world."
+      },
+      {
+        "portrait": "Alexis.png",
+        "name": "Alexis Georgantas",
+        "fonction": "Lead Ketida Developer",
+        "description": "Alexis is a full stack engineer. Alexis is the lead developer on Ketida and leads the development on the community Feature Proposal process."
+      },
+      {
+        "portrait": "Anne.jpg",
+        "name": "Anne Erika Schmidt",
+        "fonction": "Exec Assistant and Logistics",
+        "description": "Anne has been the executive assistant of Coko founder Adam Hyde since 2018. Before she joined the team she was a research associate in the field of art history at Humboldt University Berlin."
+      },
+      {
+        "portrait": "Raewyn.jpg",
+        "name": "Raewyn Whyte",
+        "fonction": "Copy Editing",
+        "description": "Raewyn is our copy editor. Raewyn Whyte is an editor, indexer, and dance critic who writes for web and print."
+      },
+      {
+        "portrait": "Giannis.jpg",
+        "name": "Giannis Kopanas",
+        "fonction": "Developer",
+        "description": "Giannis is a full stack engineer with more than ten years of experience in Web Applications. Giannis has been involved with building several of the platforms to come out of Coko."
+      },
+      {
+        "portrait": "Ryan.png",
+        "name": "Ryan Dix-Peek",
+        "fonction": "Kotahi Project Manager and Architect",
+        "description": "Ryan joined Coko with 10 years experience in edtech, creating content and working with leaner management systems. Ryan leads the project management of Kotahi."
+      },
+      {
+        "portrait": "Julie.jpg",
+        "name": "Julie Blanc",
+        "fonction": "Pagedjs CSS Developer/Designer",
+        "description": "Julie is a CSS guru and plays a vital role in interpretation of the PagedMedia CSS specs and testing if paged.js is compliant. Julie also does quite a bit of presenting about PagedMedia and how it works. Julie lives in Paris and is undergoing her PHD there at the University of Paris 8 (Paragraphe lab) and at EnsadLab-Paris. Julies work and research focuses on the implications of automated typesetting in design practices."
+      },
+      {
+        "portrait": "Henrik.jpg",
+        "name": "Henrik van Leeuwen",
+        "fonction": "Branding and UX",
+        "description": "Henrik is our UX expert. He is also something of a design guru from the Netherlands. Henrik is interested in hardware development and has extensive expertise in interaction and graphic design."
+      },
+      {
+        "portrait": "Fred.jpg",
+        "name": "Fred Chasen",
+        "fonction": "Pagedjs Developer",
+        "description": "Fred is well known in this domain, having worked on publishing platforms and pagination for OReilly and Readium. Fred is also the founder of the popular epub.js. Fred is the main JavaScript developer for paged.js and lives in L.A."
+      },
+      {
+        "portrait": "Harshna.jpg",
+        "name": "Harshna Haswani",
+        "fonction": "Pagedjs CSS Developer/Designer in association with WITc, India",
+        "description": "Harshna hails from the culturally diverse country, India. She aspires to develop profitable, scalable, and user-friendly web applications. She also strives to make them aesthetically pleasing and secure. She believes that perseverance, curiosity, and ingenuity are paramount in realizing her dreams."
+      },
+      {
+        "portrait": "Julien.jpg",
+        "name": "Julien Taquet",
+        "fonction": "Pagedjs CSS Developer/Designer",
+        "description": "Julien is a book production expert having honed his skills with CSS book production in rapid production environments like Book Sprints. Julien now is focused on building community around Paged.js and bringing his skills to educate the growing community fo designers wanting to migrate to CSS book design."
+      },
+      {
+        "portrait": "Christos.jpg",
+        "name": "Christos Kokosias",
+        "fonction": "Lead Wax Developer",
+        "description": "Christos has been building web based word processors using a number of different open source frameworks, for the last 3 years. He is currently rebuilding Wax 'the right way' making it infinitely more extensible and customisable. Christos lives in Athens, Greece."
+      },
+      {
+        "portrait": "BelaToci.jpg",
+        "name": "Bela Toci",
+        "fonction": "QA Engineer",
+        "description": "Bela is a Mechatronics Engineer graduate, from Albania. She is an open-source enthusiast, environmentalist, an avid reader, and very passionate about open knowledge."
+      },
+      {
+        "portrait": "VigneshS.jpeg",
+        "name": "Vignesh S",
+        "fonction": "QA Engineer in association with WITc, India ",
+        "description": "Deeply Passionate software developer from Tamil Nadu, India with sharp rational and logical thinking skills . He is super enthusiastic about learning and working with web/cross-platform technologies . A keen player with a sustainability notion ."
+      },
+      {
+        "portrait": "Ben.jpg",
+        "name": "Ben Whitmore",
+        "fonction": "Lead Kotahi Developer",
+        "description": "Ben joins us from the lovely town of Raglan, New Zealand. Ben is the lead dev for Kotahi and works closely with all collaborating organizations wanting to use and extend Kotahi."
+      },
+      {
+        "portrait": "vigneshdevendran.jpg",
+        "name": "Vignesh Devendran",
+        "fonction": "Developer",
+        "description": "Developer with many years of experience in developing enterprise web applications. Vignesh currently work towards improving and extending features in Kotahi platform. He is a creative logical thinker with a great passion for technology and innovation. He is from Tamil Nadu, India."
+      },
+      {
+        "portrait": "DanVisel.jpg",
+        "name": "Dan Visel",
+        "fonction": "Developer",
+        "description": "Dan Visel is a creative technologist. As part of the Institute for the Future of the Book, he wrote and spoke extensively about the changing nature of reading and writing. Besides working with Coko, he's currently busy building digital projects for the National University of Singapore Press and is half of Circumference Books, a press for poetry in translation."
+      },
+      {
+        "portrait": "Wendell.jpg",
+        "name": "Wendell Piez",
+        "fonction": "Lead XSweet Developer",
+        "description": "Wendell is a stone cold guru in the XML and XSLT worlds. Now working with National Institute of Standards and Technologies (NIST), Information Technology Laboratory (ITL), Wendell is also a long term friend of the XML Guild and has been deeply involved in Balisage for many years. Wendell lives in Maryland, USA."
+      },
+      {
+        "portrait": "agathe.jpg",
+        "name": "Agathe Baëz",
+        "fonction": "Designer",
+        "description": "Agathe is a graphic designer passionate about books, paper and printing. She also likes to play with web languages to design digital and printed publications."
+      },
+      {
+        "portrait": "Grigor.jpg",
+        "name": "Grigor Malo",
+        "fonction": "Developer",
+        "description": "Grigor is a javascript developer with several years of experience. His work is mainly around frontend technologies. He has a keen interest in web accessibility. In his free time, Grigor likes to study mathematics and indulge in the wonders of philosophy."
+      },
+      {
+        "portrait": "Abhishek.jpg",
+        "name": "Abhishek Pokhriyal",
+        "fonction": "Developer",
+        "description": "Abhishek Pokhriyal is a Computer Science Engineer with 5+ years of experience in building and maintaining web and mobile applications. He has worked in various domains like eCommerce, health & fitness, food tech, and social sector/NGOs. He is a fan of Javascript and React and loves to build challenging UI with them."
+      },
+      {
+        "portrait": "Christina.jpg",
+        "name": "Christina Tromp",
+        "fonction": "Project Manager",
+        "description": "Christina is based in Cape Town, South Africa. She has a passion for using open-source publishing and educational technologies to develop and deliver accessible content to people all around the world. She has five years of experience managing complex, multi-format publishing projects and ecosystems."
+      },
+      {
+        "portrait": "Pankaj.jpg",
+        "name": "Pankaj Kandpal",
+        "fonction": "Developer",
+        "description": "Pankaj Kandpal is a Software Development Engineer at ColoredCow having experience in building scalable web and mobile applications. Pankaj has worked in MarTech, EduTech, and Social Sector domains. Being a believer in making things happen, has helped him collaborate in a team, be upfront, and take responsibility. He finds solving abstractions interesting. He also enjoys cooking and playing LAN games."
+      }
+    ]
+  }
+}

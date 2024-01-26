@@ -1,0 +1,23 @@
+{% extends "base.njk" %}
+{% block content %}
+    <main>
+        <header>
+        <div class="breadcrumb">
+            <p>
+                <a href="/about/">about</a> / {{ title }}
+            </p>
+            <h1>{{ title }}</h1>
+            {% if baseline %}<p class="intro">{{ baseline }}</p>{% endif %}
+        </header>
+        </div>
+        <article>
+            {{ content | safe }}
+            {% if relatedLinks %}
+                <h2>Related links</h2>
+                <ul class="relatedLinks">
+                    {% for link in relatedLinks %}<li>{{ link | markdownify | safe  }}</li>{% endfor %}
+                </ul>
+            {% endif %}
+        </article>
+    </main>
+{% endblock content %}

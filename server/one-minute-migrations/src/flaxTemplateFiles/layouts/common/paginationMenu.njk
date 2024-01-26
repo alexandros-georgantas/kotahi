@@ -1,0 +1,10 @@
+{# //next pagination // prev pagination #}
+<ul class="pagination-system">
+  
+    {%- for pageEntry in pagination.pages %}
+        <li>
+            <a href="{{ pagination.hrefs[ loop.index0 ] }}"
+               {% if page.url == pagination.hrefs[ loop.index0 ] %}aria-current="page"{% endif %}>{{ loop.index }}</a>
+        </li>
+    {%- endfor %}
+</ul>

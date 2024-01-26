@@ -1,0 +1,39 @@
+{% from "../macros/article-looper.njk" import articleLoop %}
+{# the reviewers #}
+<section id="article-decision-letter" class="decision-letter">
+    <h2>Decision letter</h2>
+    <ul class="decision-reviewers">
+        {% for reviewer in article.reviewers %}
+            <li data-orcid="{{ reviewer.orcid }}">
+                <span class="decision-role">{{ reviewer.role }};</span>
+                <h3 class="decision-name">{{ reviewer.name.preferred }}</h3>
+                <p class="decision-title">
+                    {% for affiliation in reviewer.affiliations %}
+                        <span class="decision-affiliation-name">{{ affiliation.name }}</span> <span class="address">{{- "(" -}}
+                            {% for block in affiliation.address.formatted %}
+                                {{- block -}}
+                                {% if not loop.last %},{% endif %}{% endfor %}{{- ")" -}}</span>
+                    {% endfor %}
+                    {% if reviewer.contribution  %}<p class="decision-contribution">{{ reviewer.contribution }}</p>{% endif %}
+                    {% if reviewer.competingInterests %}
+                        <p class="decision-competingInterests">{{ reviewer.competingInterests }}</p>
+                    {% endif %}
+                </p>
+            </li>
+        {% endfor %}
+    </ul>
+
+    {# <section class="decision-letter-intro"> #}
+    {#  elife editorial process comes here #}
+    {# </section> #}
+
+    <section class="decision-letter-content">
+        {# the content of the decision letter #}
+        {{ articleLoop(article.decisionLetter.content, level=2) }}
+    </section>
+    {# the author response #}
+    <section class="author-response">
+        <h2>Author response</h2>
+        {{ articleLoop(article.authorResponse.content, level=2) }}
+    </section>
+</section>

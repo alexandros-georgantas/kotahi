@@ -1,0 +1,20 @@
+{# the loop: recursive top builder #}
+{# the macro is a recursive loop that will generate a new section and fill it with the content of the loopable object, that may contain another section #}
+{# if there is a section, run the article loop, again and again and again. #}
+{# Each sub section will get a header based on the nesting titles #}
+{% macro articleLoopToc(loopable, levelmax=1) %}
+    {% set headingLevel = 0 %}
+    {% for block in loopable %}
+        {% if block.type == "section" %}
+            {% set headingLevel = headingLevel + 1 %}
+            <li>
+                <a href="#{{ block.id }}">{{ block.title }}</a>
+            </li>
+            {% if headingLevel <= levelmax %}
+                <ul>
+                    {{ articleLoopToc(block.content, headingLevel, levelmax) }}
+                </ul>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}

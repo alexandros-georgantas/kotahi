@@ -1,0 +1,15 @@
+
+<footer>
+    <section id="footer-partners">
+        <ul>
+            {% for partner in elifepartners  %}
+                <li>
+                    <img src="{{ partner.logourl }}" alt="{{ partner.name }}">
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+    <section class="footer-text">
+        <p>{{ elife.footerText | safe }}</p>
+    </section>
+</footer>

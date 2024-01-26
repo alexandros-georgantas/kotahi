@@ -1,0 +1,43 @@
+<ul id="article-author-details" class="authors-details">
+    {% for author in  article.authors %}
+        <li {% if author.orcid %}data-orcid="{{ author.orcid }}"{% endif %}>
+            <span class="author-name">{{- author.name.preferred -}}
+                {% if not loop.last %}{{- '<span class="separator">,</span>' | safe -}}{% endif %}
+            </span>
+            <section class="author-meta">
+                <ul class="author-affilitation">
+                    {% for affiliation in author.affiliations %}
+                        <li data-aff-id="{{ affiliation.name | slug }}">
+                            <span class="name">{{ affiliation.name }}</span> <span class="address">
+                                {{- "(" -}}
+                                {% for block in affiliation.address.formatted %}
+                                    {{- block -}}
+                                    {% if not loop.last %}{{- ", " -}}{% endif %}
+                                {% endfor %}
+                            {{- ")" -}}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <p class="author-contribution">
+                    <strong class="meta">Contribution:</strong> {{ author.contribution }}
+                </p>
+                <p class="author-competingInterests">
+                    <strong class="meta">Competing interests:</strong> {{ author.competingInterests }}
+                </p>
+                {% if author.emailAddresses %}
+                    <p class="author-email">
+                        <strong class="meta">For correspondence:</strong>
+                        <a href="mailto:{{ author.emailAddresses[O] }}">{{ author.emailAddresses[0] }}</a>
+                    </p>
+                {% endif %}
+                {% if author.orcid %}
+                    <p class="author-orcid-link">
+                        <a class="orcid-link" href="https://orcid.org/{{- author.orcid -}}">
+                            {% include "../svg/orcid.svg" %}
+                        {{ author.orcid }}</a>
+                    </p>
+                {% endif %}
+            </section>
+        </li>
+    {% endfor %}
+</ul>

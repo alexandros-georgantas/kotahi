@@ -1,0 +1,10 @@
+{% extends "base.njk" %}
+{% block content %}
+    <main>
+        <header>
+            <h1>{{ title }}</h1>
+            {% if baseline %}<p class="intro">{{ baseline }}</p>{% endif %}
+        </header>
+        <article>{{ content | safe }}</article>
+    </main>
+{% endblock content %}

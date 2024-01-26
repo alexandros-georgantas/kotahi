@@ -1,0 +1,60 @@
+{% extends "base.njk" %}
+{% block content %}
+    <main>
+        {{ content | safe }}
+        <section class="leadershipteam">
+            <header class="{{ team.management.cardWidth }}">
+                <h2>{{ team.management.title }}</h2>
+                <!-- <h2>{{team.management.presentation}}</h2> -->
+            </header>
+            {% for item in team.management.folks %}
+                <div class="grid-item {{ item.cardWidth }}">
+                    <figure>
+                        <img src="/assets/images/portraits/{{ item.portrait }}" alt="">
+                    </figure>
+                    <div>
+                        <h3>{{ item.name }}</h3>
+                        {# <h4>{{ item.fonction }}</h4> #}
+                        <p>{{ item.description | markdownify | safe }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </section>
+        <section class="seniors">
+            <header class="{{ team.management.cardWidth }}">
+                <h2>{{ team.editors.title }}</h2>
+                <!-- <h2>{{team.management.presentation}}</h2> -->
+            </header>
+            {% for item in team.editors.folks %}
+                <div class="grid-item {{ item.cardWidth }}">
+                    <figure>
+                        <img src="/assets/images/portraits/{{ item.portrait }}" alt="">
+                    </figure>
+                    <div>
+                        <h3>{{ item.name }}</h3>
+                        {# <h4>{{ item.fonction }}</h4> #}
+                        <p>{{ item.description | markdownify | safe }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </section>
+        <section class="specialists">
+            <header>
+                <h2>{{ team.specialists.title }}</h2>
+                {# <h3>{{ team.specialists.presentation }}</h3> #}
+            </header>
+            {% for item in team.specialists.folks %}
+                <div class="grid-item {{ item.cardWidth }}">
+                    <figure>
+                        <img src="/assets/images/portraits/{{ item.portrait }}" alt="">
+                    </figure>
+                    <div>
+                        <h3>{{ item.name }}</h3>
+                        {# <h4>{{ item.fonction }}</h4> #}
+                        <p>{{ item.description | markdownify | safe }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </section>
+    </main>
+{% endblock %}

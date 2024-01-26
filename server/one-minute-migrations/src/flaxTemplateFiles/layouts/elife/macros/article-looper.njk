@@ -1,0 +1,58 @@
+    {# the loop: recursvie article builder #}
+{# the macro is a recursive loop that will generate a new section and fill it with the content of the loopable object, that may contain another section #}
+{# if there is a section, run the article loop, again and again and again. #}
+{# Each sub section will get a header based on the nesting titles #}
+{% macro articleLoop(loopable, level=1) %}
+    {% for block in loopable %}
+        {% if block.type == "section" %}
+            {% set headingLevel = level + 1 %}
+            <section id="{{ block.id }}">
+                <h{{ headingLevel }} id="{{ block.id }}">{{ block.title }}</h{{- headingLevel -}}>
+                {{ articleLoop(block.content, headingLevel) }}
+            </section>
+        {% endif %}
+        {% if block.type == "paragraph" %}<p>{{ block.text | safe }}</p>{% endif %}
+        {% if block.type == "excerpt" %}
+            <blockquote>
+                {{ articleLoop(block.content, level=2) }}
+            </blockquote>
+        {% endif %}
+        {% if block.type == "figure" %}
+            <figure>
+                {% for asset in block.assets  %}
+                    <p class="label">
+                        {{ asset.label }}
+                        {% if loop.length > 1 and loop.index == 1 %}
+                            <span class="suppNum">with {{ loop.length - 1 }} supplements</span>
+                        {% endif %}
+                    </p>
+                    <figure {%if asset.type == "table"%}class="tableblock"{%endif%} id="{{ asset.id }}">
+                        {% if asset.type == "image" %}
+                            <img width="{{ asset.image.size.width }}"
+                                 height="{{ asset.image.size.height }}"
+                                 src="{{ asset.image.source.uri }}"
+                                 alt="{{ asset.image.alt }}">
+                            <figcaption>
+                                {# <p class="label">{{ asset.label }} {% if loop.length > 1 and loop.index == 1%} <span class="suppNum">with {{loop.length - 1}} supplements</span> {% endif %}</p> #}
+                                <h3>{{ asset.title | safe }}</h3>
+                                {{ articleLoop(asset.caption, level=1) }}
+                                <ul class="source-data">
+                                    {% for source in asset.sourceData  %}
+                                        <li>
+                                            <p class="source-label">{{ source.label }}</p>
+                                            <p class="source-title">{{ source.title }}</p>
+                                            <a href="{{ source.uri }}" download>Download {{ source.filename }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </figcaption>
+                        {% elif asset.type == "table" %}
+                            {% for table in asset.tables %}{{ table | safe }}{% endfor %}
+                        {% endif %}
+                    </figure>
+                {% endfor %}
+            </figure>
+            <p>{{ block.text | safe }}</p>
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
