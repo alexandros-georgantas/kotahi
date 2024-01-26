@@ -1,0 +1,24 @@
+{# affiliations #}
+{# make the list of affiliation #}
+{% set affiliationList = [] %}
+{% for author in article.authors %}
+    {% for affiliation in author.affiliations %}
+        {% set addAffiliation = true %}
+        {% for existingAffiliation in affiliationList  %}
+            {% if affiliation.name == existingAffiliation %}
+                {% set addAffiliation = false %}
+            {% endif %}
+        {% endfor %}
+        {% if addAffiliation %}
+            {% set affiliationList = affiliationList.concat(affiliation.name) %}
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+{# render the affiliation #}
+<ul class="affiliations">
+    {% for affiliation in affiliationList %}
+        <li>
+            <span data-aff-id="{{affiliation | slug }}" class="name">{{ affiliation }};</span>
+        </li>
+    {% endfor %}
+</ul>

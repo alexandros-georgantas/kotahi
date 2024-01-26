@@ -1,0 +1,30 @@
+<aside>
+    <div class="topbar">
+        <a href="/">{% include "./logo.njk" %}</a>
+        <button class="menu-call">MENU</button>
+        <nav class="hide">
+            <ul>
+                {% for item in collections.menu %}
+                    {% if item.data.menu %}
+                        <li>
+                            <a data-instant
+                               class="{% if item.url == page.url %}active{% endif %}"
+                               href="{{ item.url }}"
+                               title="{{ item.data.issn }}: {{ item.data.title }}">{%- if item.data.menu -%}{{ item.data.menu }}
+                            {% else %}
+                                {{- item.data.title }}
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+</div>
+</aside>
+<script>
+    document.querySelector(".menu-call").addEventListener("click", function() {
+        document.querySelector('.topbar nav').classList.toggle('hide');
+    })
+    
+</script>

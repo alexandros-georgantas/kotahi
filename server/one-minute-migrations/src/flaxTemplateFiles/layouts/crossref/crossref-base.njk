@@ -1,0 +1,34 @@
+{% extends "base.njk" %}
+{% block topbar %}
+    {% include "./modules/crossref-menu.njk" %}
+{% endblock topbar %}
+{% block supContent %}
+    <div class="themechanger">
+        <button type="" data-theme="blue">blue</button>
+        <button type="" data-theme="orange">orange</button>
+        <button type="" data-theme="green">green</button>
+    </div>
+{% endblock supContent  %}
+{% block scripts %}
+    <script>
+document.querySelectorAll(".themechanger button").forEach(button => {
+  button.addEventListener("click", function(event) {
+          document.querySelector(".active")?.classList.remove("active")
+    const el = event.target;
+    document.body.classList.remove("orange", "blue", "green");
+          el.classList.add("active")
+    document.body.classList.add(el.dataset.theme);
+
+
+    // Save the selected theme in localStorage
+    localStorage.setItem("flaxselectedTheme", el.dataset.theme);
+  });
+});
+
+// Check if a theme is stored in localStorage and apply it
+const storedTheme = localStorage.getItem("flaxselectedTheme");
+if (storedTheme) {
+  document.body.classList.add(storedTheme);
+}
+    </script>
+{% endblock scripts %}

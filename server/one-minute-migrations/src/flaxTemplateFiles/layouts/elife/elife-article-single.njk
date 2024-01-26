@@ -1,0 +1,42 @@
+{% extends "base.njk" %}
+{% from "../common/macros/doi.njk" import doi %}
+{% block bodyclass %}
+    article-single
+{% endblock bodyclass %}
+{% block content %}
+    <main>
+        <header>
+            {% include "./modules/elife-article-header.njk" %}
+        </header>
+        {% include "./modules/elife-article-meta.njk" %}
+        {% include "./modules/elife-article-topbar.njk" %}
+        {% include "./modules/elife-article-toc.njk" %}
+        <article id="article-content">
+            {% include "./modules/elife-article-abstract.njk" %}
+            {% if article.editorEvaluation.content %}
+                {% include "./modules/elife-article-evaluation.njk" %}
+            {% endif %}
+            {% include "./modules/elife-article-content.njk" %}
+            {% if article.appendices  %}
+                {% include "./modules/elife-article-appendices.njk" %}
+            {% endif %}
+            {% include "./modules/elife-article-data-availability.njk" %}
+            {% include "./modules/elife-article-references.njk" %}
+            {% include "./modules/elife-article-decisionLetter.njk" %}
+            <section id="article-infos">
+                <h2>Article and authors information</h2>
+                {% include "./modules/elife-article-authors-section.njk" %}
+                {% include "./modules/elife-article-funding.njk" %}
+                {% include "./modules/elife-article-aknowledgment.njk" %}
+                {% include "./modules/elife-article-ethics.njk" %}
+                {% include "./modules/elife-article-reviewers.njk" %}
+                {% include "./modules/elife-article-copyrights.njk" %}
+            </section>
+            {% include "./modules/elife-article-outro.njk" %}
+            {% include "./modules/elife-article-data-and-figs.njk" %}
+        </article>
+    </main>
+{% endblock content %}
+{% block scripts %}
+    <script src="/assets/js/article-read.js"></script>
+{% endblock scripts %}

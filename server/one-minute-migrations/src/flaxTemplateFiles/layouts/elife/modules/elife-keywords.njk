@@ -1,0 +1,7 @@
+{# keyword #}
+<section>
+    {# <h2>keywords</h2> #}
+    <ul class="keywords">
+        {% for keyword in article.keywords %}<li>{{ keyword | safe }}</li>{% endfor %}
+    </ul>
+</section>

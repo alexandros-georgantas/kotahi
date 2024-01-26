@@ -1,0 +1,7 @@
+{% from "../macros/article-looper.njk" import articleLoop %}
+{% if article.ethics %}
+    <section id="article-ethics">
+        <h3 id="ethics">Ethics</h3>
+        {{ articleLoop(article.ethics, level=2) }}
+    </section>
+{% endif %}

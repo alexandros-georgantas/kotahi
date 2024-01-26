@@ -673,6 +673,7 @@ const permissions = {
     manuscriptsImportStatus: isAuthenticated,
     messageCreated: userIsAllowedToChat,
     uploadProgress: isAuthenticated,
+    migrationStatusUpdate: isAuthenticated,
   },
   CurrentRole: isAuthenticated,
   Team: isAuthenticated,

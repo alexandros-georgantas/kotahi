@@ -1,0 +1,26 @@
+{% extends "crossref/crossref-base.njk" %}
+{% block bodyclass %}
+    team
+    crossref
+{% endblock bodyclass %}
+{% block content %}
+    <main>
+        {% set journalid = issn + "meta" %}
+        {% set journalmeta = journals[journalid] %}
+        {% set journalscrap = issn + "scrap" %}
+        {% set scrapmeta = journals[journalscrap] %}
+        <header>
+            <div class="sticky">
+                <h1>{{ title | safe }}</h1>
+            </div>
+        </header>
+        {% if scrapmeta.teamContent != "placeholder" %}
+        <article>{{ scrapmeta.teamContent | safe }}</article>
+        {%else%}
+        <article>
+            {% include "./modules/crossref-placeholder-team.njk" %}
+        </article>
+        {% endif %}
+
+    </main>
+{% endblock content %}
