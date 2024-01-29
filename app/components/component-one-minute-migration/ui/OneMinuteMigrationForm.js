@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import propTypes from 'prop-types'
 import Form from '@rjsf/core'
 import { useTranslation } from 'react-i18next'
+import styled from 'styled-components'
+import { grid } from '@pubsweet/ui-toolkit'
 
 import {
   ActionButton,
@@ -11,7 +13,23 @@ import {
   PaddedContent,
   SectionContent,
   WidthLimiter,
+  Icon,
+  Title,
+  Content,
 } from '../../shared'
+import { color } from '../../../theme'
+
+const StyledBetaWrapper = styled(SectionContent)`
+  display: flex;
+  flex-direction: column;
+  gap: ${grid(2)};
+  padding: ${grid(2)} ${grid(3)};
+`
+
+const StyledBetaContent = styled(Content)`
+  display: flex;
+  justify-content: center;
+`
 
 const FieldTemplate = props => {
   const { classNames, description, children } = props
@@ -63,7 +81,22 @@ const OneMinuteMigrationForm = ({
           <Heading>{t('oneMinuteMigrationPage.pageTitle')}</Heading>
         </HeadingWithAction>
         <WidthLimiter>
+          <StyledBetaWrapper>
+            <StyledBetaContent>
+              <Icon color={color.warning.base} size={4}>
+                alertTriangle
+              </Icon>
+              <Title>{t('betaFunctionality.title')}</Title>
+            </StyledBetaContent>
+            <StyledBetaContent>
+              {t('betaFunctionality.label')}
+            </StyledBetaContent>
+          </StyledBetaWrapper>
           <SectionContent>
+            <PaddedContent>
+              <p>{t('oneMinuteMigrationPage.info')}</p>
+              <p>{t('oneMinuteMigrationPage.notice')}</p>
+            </PaddedContent>
             <PaddedContent>
               <Form
                 // disabled={disabled}
