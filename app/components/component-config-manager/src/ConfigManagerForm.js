@@ -4,7 +4,7 @@ import React, { useMemo, useRef, useState } from 'react'
 import Form from '@rjsf/core'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { generateSchema, tabLabels } from './ui/schema' // Import the function that generates the schema and uiSchema
+import { generateSchemas, tabLabels } from './ui/schema' // Import the function that generates the schema and uiSchema
 
 import {
   ActionButton,
@@ -259,7 +259,7 @@ const ConfigManagerForm = ({
       title: defaultAuthorProofingSubmittedEmail.emailContent.description,
     }
 
-    return generateSchema(
+    return generateSchemas(
       emailNotificationOptions,
       deleteFile,
       createFile,
@@ -328,8 +328,8 @@ const ConfigManagerForm = ({
             noHtml5Validate
             omitExtraData={omitExtraData}
             onChange={handlers.form.onChange}
-            schema={schemas[key]}
-            uiSchema={schemas[key].uiSchema}
+            schema={schemas.data[key]}
+            uiSchema={schemas.ui[key]}
           >
             {/* to avoid default submit button display inside the form */}
             <hr />
