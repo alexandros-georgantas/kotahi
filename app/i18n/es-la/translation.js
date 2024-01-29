@@ -552,6 +552,10 @@ const esLa = {
       getLogo: 'Buscando el logo...',
       getTeam: 'Buscando la página del equipo...',
       getAbout: 'Buscando la página acerca de...',
+      info:
+        'Importe revistas electrónicas existentes de proveedores externos (como OJS) utilizando la API Crossref. Este es un servicio de mejor esfuerzo.',
+      notice:
+        'Nota: cualquier dato de migración anterior se borrará si se envía un nuevo ISSN.',
     },
     reportsPage: {
       Reports: 'Reportes',
@@ -1115,6 +1119,11 @@ const esLa = {
         true: 'Sí',
         false: 'No',
       },
+    },
+    betaFunctionality: {
+      title: 'Funcionalidad Beta',
+      label:
+        'Tenga en cuenta que esta funcionalidad aún está en desarrollo. Úselo a su propia discreción.',
     },
   },
 }

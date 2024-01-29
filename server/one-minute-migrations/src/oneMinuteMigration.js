@@ -233,7 +233,7 @@ const reorderPerIssue = data => {
 
     return typeof b.issue === 'number'
       ? b.issue - a.issue
-      : b.issue.localeCompare(a.issue)
+      : b.issue?.localeCompare(a.issue) || 0
   })
 
   return reorderedData
@@ -609,6 +609,7 @@ menu: "Team"
     })
     .catch(err => {
       logger.error(err)
+      throw new Error(err)
     })
 
   return processedItems

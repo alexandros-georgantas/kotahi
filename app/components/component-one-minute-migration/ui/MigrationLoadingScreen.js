@@ -2,6 +2,7 @@ import React from 'react'
 import propTypes from 'prop-types'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { grid } from '@pubsweet/ui-toolkit'
 import { ActionButton, Heading, Icon, Spinner, Title } from '../../shared'
 import { color } from '../../../theme'
 
@@ -18,6 +19,17 @@ const TopContentWrapper = styled.div`
   align-items: center;
   display: flex;
   flex-direction: column;
+  gap: ${grid(2)};
+`
+
+const StyledTitle = styled(Heading)`
+  padding: 0 ${grid(4)};
+  text-align: center;
+`
+
+const StyledPublisher = styled(Title)`
+  padding: 0 ${grid(8)};
+  text-align: center;
 `
 
 const MigrationLoadingScreen = ({
@@ -39,11 +51,13 @@ const MigrationLoadingScreen = ({
   return (
     <Wrapper>
       <TopContentWrapper>
-        <Heading>
+        <StyledTitle>
           {title ||
             `${t('oneMinuteMigrationPage.migratingJournal')} ${issn}...`}
-        </Heading>
-        {publisher && !hasError && <Title>{publisher}</Title>}
+        </StyledTitle>
+        {publisher && !hasError && (
+          <StyledPublisher>{publisher}</StyledPublisher>
+        )}
       </TopContentWrapper>
 
       {hasError || migrationComplete ? (
