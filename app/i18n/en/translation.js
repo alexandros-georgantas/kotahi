@@ -558,6 +558,10 @@ const en = {
       getLogo: 'Looking for the logo...',
       getTeam: 'Looking for the team page...',
       getAbout: 'Looking for the about page...',
+      info:
+        'Import existing electronic journals from third party providers (such as OJS) using the Crossref API. This is a best-effort service.',
+      notice:
+        'Note: any previous migration data will be cleared if a new ISSN is submitted.',
     },
     reportsPage: {
       Reports: 'Reports',
