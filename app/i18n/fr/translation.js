@@ -534,6 +534,10 @@ const fr = {
       getLogo: 'Je cherche le logo...',
       getTeam: "Je recherche la page de l'équipe...",
       getAbout: 'Je recherche la page à propos...',
+      info:
+        "Importez des revues électroniques existantes provenant de fournisseurs tiers (tels que OJS) à l'aide de l'API Crossref. Il s'agit d'un service faisant de son mieux.",
+      notice:
+        'Remarque : toutes les données de migration précédentes seront effacées si un nouvel ISSN est soumis.',
     },
     reportsPage: {
       Reports: 'Rapports',
@@ -1099,6 +1103,11 @@ const fr = {
         true: 'Oui',
         false: 'Non',
       },
+    },
+    betaFunctionality: {
+      title: 'Fonctionnalité Bêta',
+      label:
+        'Veuillez noter que cette fonctionnalité est encore en développement. Utilisez à votre propre discrétion.',
     },
   },
 }
