@@ -279,11 +279,15 @@ const AdminPage = () => {
           name: i18next.t('leftMenu.Emails'),
           icon: 'mail',
         },
-        {
-          link: migrationLink,
-          name: i18next.t('leftMenu.OneMinuteMigration'),
-          icon: 'log-in',
-        },
+        ...(config?.betaFunctionality?.isBetaEnabled
+          ? [
+              {
+                link: migrationLink,
+                name: i18next.t('leftMenu.OneMinuteMigration'),
+                icon: 'log-in',
+              },
+            ]
+          : []),
         {
           menu: 'CMS',
           name: i18next.t('leftMenu.CMS'),
@@ -304,11 +308,15 @@ const AdminPage = () => {
               name: i18next.t('leftMenu.Article'),
               icon: '',
             },
-            {
-              link: CMSFileBrowserLink,
-              name: i18next.t('leftMenu.FileBrowser'),
-              icon: '',
-            },
+            ...(config?.betaFunctionality?.isBetaEnabled
+              ? [
+                  {
+                    link: CMSFileBrowserLink,
+                    name: i18next.t('leftMenu.FileBrowser'),
+                    icon: '',
+                  },
+                ]
+              : []),
           ],
         },
       ],
@@ -532,13 +540,17 @@ const AdminPage = () => {
             redirectLink={redirectLink}
           />,
 
-          <PrivateRoute
-            component={CMSFileBrowserPage}
-            currentUser={currentUser}
-            key="CMSPagesPage"
-            path={`${CMSFileBrowserLink}`}
-            redirectLink={redirectLink}
-          />,
+          ...(config?.betaFunctionality?.isBetaEnabled
+            ? [
+                <PrivateRoute
+                  component={CMSFileBrowserPage}
+                  currentUser={currentUser}
+                  key="CMSPagesPage"
+                  path={`${CMSFileBrowserLink}`}
+                  redirectLink={redirectLink}
+                />,
+              ]
+            : []),
 
           <PrivateRoute
             component={ConfigManagerPage}
@@ -552,12 +564,16 @@ const AdminPage = () => {
             path={`${emailTemplatesLink}/:pageId?`}
             redirectLink={redirectLink}
           />,
-          <PrivateRoute
-            component={OneMinuteMigrationPage}
-            key="one-minute-migration"
-            path={`${migrationLink}`}
-            redirectLink={redirectLink}
-          />,
+          ...(config?.betaFunctionality?.isBetaEnabled
+            ? [
+                <PrivateRoute
+                  component={OneMinuteMigrationPage}
+                  key="one-minute-migration"
+                  path={`${migrationLink}`}
+                  redirectLink={redirectLink}
+                />,
+              ]
+            : []),
         ]}
         {isGroupManager && [
           <PrivateRoute
