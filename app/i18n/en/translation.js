@@ -520,30 +520,6 @@ const en = {
       notice:
         'Note: any previous migration data will be cleared if a new ISSN is submitted.',
     },
-    oneMinuteMigrationPage: {
-      pageTitle: 'One Minute Migration',
-      issnDescription: 'Journal ISSN to import',
-      startMigration: 'Start Migration',
-      goToJournal: 'Go to journal',
-      migratingJournal: 'Migrating journal',
-      fetchingMetadata: 'Fetching metadata',
-      error: 'Error',
-      notFound: 'Journal not found',
-      checkIssn: 'Please verify the ISSN',
-      tryAgain: 'Try again',
-      savingMetadata: 'Saving journal metadata...',
-      sortingJournal: 'Sorting journal per volumes and issues...',
-      metadataSaved: 'Metadata saved',
-      removingPreviousMigration:
-        'Removing previously downloaded data and generated pages...',
-      getLogo: 'Looking for the logo...',
-      getTeam: 'Looking for the team page...',
-      getAbout: 'Looking for the about page...',
-      info:
-        'Import existing electronic journals from third party providers, such as OJS. This is a best-effort service.',
-      notice:
-        'Note: any previous migration data will be cleared if a new ISSN is submitted.',
-    },
     reportsPage: {
       Reports: 'Reports',
       Show: 'Show',
