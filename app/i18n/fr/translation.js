@@ -535,6 +535,9 @@ const fr = {
       },
       allowedIPs: 'Liste des adresses IP du référentiel autorisées à accéder',
       api: 'API Kotahi',
+      betaFunctionality: 'Fonctionnalité bêta',
+      enableBetaFunctionality:
+        'Activer la fonctionnalité bêta pour les fonctionnalités encore en cours de développement',
     },
     oneMinuteMigrationPage: {
       pageTitle: 'Migration en Une Minute',

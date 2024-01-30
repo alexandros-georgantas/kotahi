@@ -532,6 +532,9 @@ const esLa = {
       },
       allowedIPs: 'Lista de IP del repositorio a las que se permite el acceso',
       api: 'API de Kotahi',
+      betaFunctionality: 'Funcionalidad Beta',
+      enableBetaFunctionality:
+        'Habilite la funcionalidad beta para funciones aún en desarrollo',
     },
     oneMinuteMigrationPage: {
       pageTitle: 'Migración en Un Minuto',

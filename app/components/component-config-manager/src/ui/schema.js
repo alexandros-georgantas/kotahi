@@ -986,6 +986,17 @@ const generateSchema = (
                   },
                 },
               },
+              betaFunctionality: {
+                type: 'object',
+                title: t('configPage.betaFunctionality'),
+                properties: {
+                  betaFunctionality: {
+                    type: 'boolean',
+                    title: t('configPage.enableBetaFunctionality'),
+                    default: false,
+                  },
+                },
+              },
             },
           },
           {
@@ -1524,6 +1535,17 @@ const generateSchema = (
                   },
                 },
               },
+              betaFunctionality: {
+                type: 'object',
+                title: t('configPage.betaFunctionality'),
+                properties: {
+                  betaFunctionality: {
+                    type: 'boolean',
+                    title: t('configPage.enableBetaFunctionality'),
+                    default: false,
+                  },
+                },
+              },
             },
           },
           {
@@ -2055,6 +2077,17 @@ const generateSchema = (
                   repoIpAddress: {
                     type: ['string', 'null'],
                     description: t('configPage.allowedIPs'),
+                  },
+                },
+              },
+              betaFunctionality: {
+                type: 'object',
+                title: t('configPage.betaFunctionality'),
+                properties: {
+                  betaFunctionality: {
+                    type: 'boolean',
+                    title: t('configPage.enableBetaFunctionality'),
+                    default: false,
                   },
                 },
               },
@@ -2612,6 +2645,17 @@ const generateSchema = (
                   repoIpAddress: {
                     type: ['string', 'null'],
                     description: t('configPage.allowedIPs'),
+                  },
+                },
+              },
+              betaFunctionality: {
+                type: 'object',
+                title: t('configPage.betaFunctionality'),
+                properties: {
+                  isBetaEnabled: {
+                    type: 'boolean',
+                    title: t('configPage.enableBetaFunctionality'),
+                    default: false,
                   },
                 },
               },
