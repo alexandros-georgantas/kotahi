@@ -533,7 +533,7 @@ const esLa = {
       getTeam: 'Buscando la página del equipo...',
       getAbout: 'Buscando la página acerca de...',
       info:
-        'Importe revistas electrónicas existentes de proveedores externos (como OJS) utilizando la API Crossref. Este es un servicio de mejor esfuerzo.',
+        'Importe revistas electrónicas existentes de proveedores externos, como OJS. Este es un servicio de mejor esfuerzo.',
       notice:
         'Nota: cualquier dato de migración anterior se borrará si se envía un nuevo ISSN.',
     },
