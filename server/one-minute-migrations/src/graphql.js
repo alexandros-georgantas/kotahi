@@ -1,4 +1,5 @@
 const { pubsubManager } = require('@coko/server')
+// const {fil} = require()
 const { startMigration } = require('./oneMinuteMigration')
 
 const { getPubsub } = pubsubManager
@@ -14,13 +15,13 @@ const resolvers = {
     migrationStatusUpdate: {
       subscribe: async (_, { groupId }, ctx) => {
         const pubsub = await getPubsub()
-        return pubsub.asyncIterator([`MIGRATION_STATUS_UPDATE`])
+        return pubsub.asyncIterator([`MIGRATION_STAT_${groupId}`])
       },
     },
     migrationTitleAndPublisher: {
       subscribe: async (_, { groupId }, ctx) => {
         const pubsub = await getPubsub()
-        return pubsub.asyncIterator([`MIGRATION_TITLE_AND_PUBLISHER`])
+        return pubsub.asyncIterator([`MIGRATION_META_${groupId}`])
       },
     },
   },
@@ -41,8 +42,8 @@ const typeDefs = `
   }
 
   extend type Subscription {
-	migrationStatusUpdate: String!
-	migrationTitleAndPublisher: MigrationTitleAndPublisher!
+	migrationStatusUpdate(groupId: ID!): String!
+	migrationTitleAndPublisher(groupId: ID!): MigrationTitleAndPublisher!
   }
 `
 
