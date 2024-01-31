@@ -36,6 +36,7 @@ const seed = async group => {
           name: path.basename(name),
           parentId,
           groupId: group.id,
+          rootFolder: !parentId, // set default true for the root of the group folder
         })
         .returning('id')
 

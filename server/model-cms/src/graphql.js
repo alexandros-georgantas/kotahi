@@ -70,6 +70,52 @@ const cleanCMSPageInput = inputData => {
   return inputData
 }
 
+const fileTreeView = async (groupId, folderId) => {
+  const AllFiles = await models.CMSFileTemplate.query().where(
+    'groupId',
+    groupId,
+  )
+
+  const fileIds = AllFiles.filter(file => file.fileId !== null).map(
+    f => f.fileId,
+  )
+
+  const files = await models.File.query().whereIn('id', fileIds)
+  const filesWithUrl = await getFilesWithUrl(files)
+
+  const getChildren = children =>
+    children.map(child => {
+      const nestedChildren = AllFiles.filter(f => f.parentId === child.id)
+      const file = filesWithUrl.find(fu => fu.id === child.fileId)
+
+      const fileUrl = file
+        ? file.storedObjects.find(f => f.type === 'original')
+        : { url: null }
+
+      return {
+        id: child.id,
+        name: child.name,
+        children: getChildren(nestedChildren),
+        fileId: child.fileId,
+        url: fileUrl.url,
+      }
+    })
+
+  const rootNode = folderId
+    ? AllFiles.find(f => f.id === folderId)
+    : AllFiles.find(f => f.parentId === null)
+
+  const children = AllFiles.filter(f => f.parentId === rootNode.id)
+
+  return {
+    id: rootNode.id,
+    name: rootNode.name,
+    children: getChildren(children),
+    fileId: null,
+    url: null,
+  }
+}
+
 const resolvers = {
   Query: {
     async cmsPages(_, vars, ctx) {
@@ -103,34 +149,18 @@ const resolvers = {
     async getCmsFilesTreeView(_, { folderId }, ctx) {
       const groupId = ctx.req.headers['group-id']
 
-      const AllFiles = await models.CMSFileTemplate.query().where(
-        'groupId',
+      return fileTreeView(groupId, folderId)
+    },
+
+    async getActiveCmsFilesTree(_, _vars, ctx) {
+      const groupId = ctx.req.headers['group-id']
+
+      const cmsFileTemplate = await models.CMSFileTemplate.query().findOne({
         groupId,
-      )
+        rootFolder: true,
+      })
 
-      const getChildren = children =>
-        children.map(child => {
-          const nestedChildren = AllFiles.filter(f => f.parentId === child.id)
-          return {
-            id: child.id,
-            name: child.name,
-            children: getChildren(nestedChildren),
-            fileId: child.fileId,
-          }
-        })
-
-      const rootNode = folderId
-        ? AllFiles.find(f => f.id === folderId)
-        : AllFiles.find(f => f.parentId === null)
-
-      const children = AllFiles.filter(f => f.parentId === rootNode.id)
-
-      return {
-        id: rootNode.id,
-        name: rootNode.name,
-        children: getChildren(children),
-        fileId: null,
-      }
+      return JSON.stringify(await fileTreeView(groupId, cmsFileTemplate.id))
     },
     async getCmsFileContent(_, { id }, ctx) {
       const file = await models.File.query().findById(id)
@@ -139,14 +169,17 @@ const resolvers = {
 
       const fileUrl = storedObjects.find(f => f.type === 'original')
 
-      const fileContent = await axios({
+      const response = await axios({
         method: 'get',
         url: fileUrl.url,
       })
 
       return {
         id,
-        content: fileContent.data,
+        content:
+          typeof response.data === 'object'
+            ? JSON.stringify(response.data)
+            : response.data.toString(),
         name: file.name,
         url: fileUrl.url,
       }
@@ -451,15 +484,6 @@ const resolvers = {
       })
     },
 
-    async article(parent) {
-      const { article } = await models.ArticleTemplate.query().findOne({
-        groupId: parent.groupId,
-        isCms: true,
-      })
-
-      return article
-    },
-
     async css(parent) {
       const { css } = await models.ArticleTemplate.query().findOne({
         groupId: parent.groupId,
@@ -492,6 +516,7 @@ const typeDefs = `
     getCmsFilesTreeView(folderId: ID): FileTreeView!
     getCmsFileContent(id: ID!): FileContent!
     getFoldersList: [FolderView!]
+    getActiveCmsFilesTree: String!
   }
 
   extend type Mutation {
@@ -568,6 +593,7 @@ const typeDefs = `
     children: [FileTreeView!]
     fileId: ID
     parentId: ID
+    url: String
   }
 
   type FolderView {
