@@ -26,10 +26,11 @@ const searchArticleTemplate = async groupId => {
 
 const resolvers = {
   Query: {
-    articleTemplate: async (_, { groupId, isCms = false }) =>
-      models.ArticleTemplate.query()
+    articleTemplate: async (_, { groupId, isCms = false }) => {
+      return models.ArticleTemplate.query()
         .findOne({ groupId, isCms })
-        .throwIfNotFound(),
+        .throwIfNotFound()
+    },
   },
   Mutation: {
     async updateTemplate(_, { id, input }) {
