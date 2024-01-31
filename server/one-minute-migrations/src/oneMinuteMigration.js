@@ -90,7 +90,7 @@ const insertResource = async (
   isDirectory,
   groupId,
   trx,
-  filePath = null,
+  fileContent = null,
   isRoot = false,
 ) => {
   try {
@@ -105,7 +105,7 @@ const insertResource = async (
 
     if (!isDirectory) {
       const insertedFile = await createFile(
-        fs.createReadStream(filePath || name),
+        fileContent || fs.createReadStream(name),
         path.basename(name),
         null,
         null,
@@ -390,6 +390,7 @@ menu: "Team"
       const { message } = res.data
 
       pubsub.publish(`MIGRATION_STATUS_UPDATE`, {
+        //
         migrationStatusUpdate: 'savingMetadata',
       })
 
@@ -402,23 +403,13 @@ menu: "Team"
 
       const stringifiedMetadata = `${JSON.stringify(message, null, 2)}`
 
-      const folderPath = path.join(__dirname, 'tmp', formattedIssn)
-
-      if (!fs.existsSync(folderPath)) {
-        fs.mkdirSync(folderPath, { recursive: true })
-      }
-
-      const metadataFilePath = `${folderPath}/metadata.json`
-
-      fs.writeFileSync(metadataFilePath, stringifiedMetadata, 'utf8')
-
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/data/journals/${formattedIssn}meta.json`,
         dataJournalsFolderId,
         false,
         groupId,
         trx,
-        metadataFilePath,
+        stringifiedMetadata,
       )
 
       return message
@@ -454,17 +445,13 @@ menu: "Team"
 
       const volumes = JSON.stringify(reconstructVolumes(message.items), null, 2)
 
-      const folderPath = path.join(__dirname, 'tmp', formattedIssn)
-      const volumesFilePath = `${folderPath}/volumes.json`
-      fs.writeFileSync(volumesFilePath, volumes, 'utf8')
-
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/data/journals/${formattedIssn}volumes.json`,
         dataJournalsFolderId,
         false,
         groupId,
         trx,
-        volumesFilePath,
+        volumes,
       )
 
       const scrapedMetadata = await scrapeMetaPage(
@@ -472,20 +459,14 @@ menu: "Team"
         groupId,
       )
 
-      const scrpaedMetadataFilePath = `${folderPath}/scrapedMetadata.json`
-      fs.writeFileSync(scrpaedMetadataFilePath, scrapedMetadata, 'utf8')
-
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/data/journals/${formattedIssn}scrap.json`,
         dataJournalsFolderId,
         false,
         groupId,
         trx,
-        scrpaedMetadataFilePath,
+        scrapedMetadata,
       )
-
-      const articleFilePath = `${folderPath}/article.json`
-      fs.writeFileSync(articleFilePath, stringifiedItems, 'utf8')
 
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/data/journals/${formattedIssn}.json`,
@@ -493,7 +474,7 @@ menu: "Team"
         false,
         groupId,
         trx,
-        articleFilePath,
+        stringifiedItems,
       )
 
       pubsub.publish(`MIGRATION_STATUS_UPDATE`, {
@@ -502,22 +483,16 @@ menu: "Team"
 
       // create the current articles page
 
-      const currentContentFilePath = `${folderPath}/current.md`
-      fs.writeFileSync(currentContentFilePath, currentContent, 'utf8')
-
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}current.md`,
         contentJournalsFolderId,
         false,
         groupId,
         trx,
-        currentContentFilePath,
+        currentContent,
       )
 
       // create the current home page
-
-      const homepageFilePath = `${folderPath}/home.md`
-      fs.writeFileSync(homepageFilePath, homePage, 'utf8')
 
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}home.md`,
@@ -525,13 +500,10 @@ menu: "Team"
         false,
         groupId,
         trx,
-        homepageFilePath,
+        homePage,
       )
 
       // create the archives article page
-
-      const archivesFilePath = `${folderPath}/archives.md`
-      fs.writeFileSync(archivesFilePath, archiveContent, 'utf8')
 
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}archives.md`,
@@ -539,10 +511,8 @@ menu: "Team"
         false,
         groupId,
         trx,
-        archivesFilePath,
+        archiveContent,
       )
-
-      fs.writeFileSync(articleFilePath, articleContent, 'utf8')
 
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}articles.md`,
@@ -550,11 +520,8 @@ menu: "Team"
         false,
         groupId,
         trx,
-        articleFilePath,
+        articleContent,
       )
-
-      const healthFilePath = `${folderPath}/health.md`
-      fs.writeFileSync(healthFilePath, indexHealth, 'utf8')
 
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}health.md`,
@@ -562,11 +529,8 @@ menu: "Team"
         false,
         groupId,
         trx,
-        healthFilePath,
+        indexHealth,
       )
-
-      const aboutFilePath = `${folderPath}/about.md`
-      fs.writeFileSync(aboutFilePath, aboutPage, 'utf8')
 
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}about.md`,
@@ -574,13 +538,10 @@ menu: "Team"
         false,
         groupId,
         trx,
-        aboutFilePath,
+        aboutPage,
       )
 
       // create the archives per volume page
-
-      const backissuesFilePath = `${folderPath}/backissues.md`
-      fs.writeFileSync(backissuesFilePath, volumeIndex, 'utf8')
 
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}backissues.md`,
@@ -588,13 +549,10 @@ menu: "Team"
         false,
         groupId,
         trx,
-        backissuesFilePath,
+        volumeIndex,
       )
 
       // create the team page
-
-      const teamFilePath = `${folderPath}/team.md`
-      fs.writeFileSync(teamFilePath, teamPage, 'utf8')
 
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}team.md`,
@@ -602,7 +560,7 @@ menu: "Team"
         false,
         groupId,
         trx,
-        teamFilePath,
+        teamPage,
       )
 
       return stringifiedItems
