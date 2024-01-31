@@ -49,7 +49,7 @@ async function pullHTML(document, element) {
 
 const getLogo = async (content, imageClosest, groupId) => {
   const pubsub = await getPubsub()
-  pubsub.publish(`MIGRATION_STATUS_UPDATE`, {
+  pubsub.publish(`MIGRATION_STAT_${groupId}`, {
     migrationStatusUpdate: 'getLogo',
   })
 
@@ -71,7 +71,7 @@ const getLogo = async (content, imageClosest, groupId) => {
 //                      '#navigationPrimary', '.page'
 const getTeam = async (content, closestElement, groupId) => {
   const pubsub = await getPubsub()
-  pubsub.publish(`MIGRATION_STATUS_UPDATE`, {
+  pubsub.publish(`MIGRATION_STAT_${groupId}`, {
     migrationStatusUpdate: 'getTeam',
   })
 
@@ -111,7 +111,7 @@ const getTeam = async (content, closestElement, groupId) => {
 //                      '#navigationPrimary', '.page'
 const getAbout = async (content, closestElement, groupId) => {
   const pubsub = await getPubsub()
-  pubsub.publish(`MIGRATION_STATUS_UPDATE`, {
+  pubsub.publish(`MIGRATION_STAT_${groupId}`, {
     migrationStatusUpdate: 'getAbout',
   })
 

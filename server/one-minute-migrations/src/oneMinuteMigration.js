@@ -389,12 +389,11 @@ menu: "Team"
     .then(async res => {
       const { message } = res.data
 
-      pubsub.publish(`MIGRATION_STATUS_UPDATE`, {
-        //
+      pubsub.publish(`MIGRATION_STAT_${groupId}`, {
         migrationStatusUpdate: 'savingMetadata',
       })
 
-      pubsub.publish(`MIGRATION_TITLE_AND_PUBLISHER`, {
+      pubsub.publish(`MIGRATION_META_${groupId}`, {
         migrationTitleAndPublisher: {
           title: message.title,
           publisher: message.publisher,
@@ -436,7 +435,7 @@ menu: "Team"
     .then(async res => {
       const { message } = res.data
 
-      pubsub.publish(`MIGRATION_STATUS_UPDATE`, {
+      pubsub.publish(`MIGRATION_STAT_${groupId}`, {
         migrationStatusUpdate: 'sortingJournal',
       })
 
@@ -477,7 +476,7 @@ menu: "Team"
         stringifiedItems,
       )
 
-      pubsub.publish(`MIGRATION_STATUS_UPDATE`, {
+      pubsub.publish(`MIGRATION_STAT_${groupId}`, {
         migrationStatusUpdate: 'metadataSaved',
       })
 
@@ -580,7 +579,7 @@ const startMigration = async (issn, groupId) => {
     // remove previous data
     const pubsub = await getPubsub()
 
-    pubsub.publish(`MIGRATION_STATUS_UPDATE`, {
+    pubsub.publish(`MIGRATION_STAT_${groupId}`, {
       migrationStatusUpdate: 'removingPreviousMigration',
     })
 

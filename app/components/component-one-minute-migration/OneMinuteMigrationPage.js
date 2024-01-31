@@ -11,14 +11,14 @@ const START_MIGRATION = gql`
 `
 
 const MIGRATION_STATUS_UPDATE = gql`
-  subscription MigrationStatusUpdate {
-    migrationStatusUpdate
+  subscription MigrationStatusUpdate($groupId: ID!) {
+    migrationStatusUpdate(groupId: $groupId)
   }
 `
 
 const MIGRATION_TITLE_AND_PUBLISHER = gql`
-  subscription MigrationTitleAndPublisher {
-    migrationTitleAndPublisher {
+  subscription MigrationTitleAndPublisher($groupId: ID!) {
+    migrationTitleAndPublisher(groupId: $groupId) {
       title
       publisher
     }
