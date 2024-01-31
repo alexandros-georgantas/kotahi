@@ -12,7 +12,7 @@ import { css } from '@codemirror/lang-css'
 import 'react-folder-tree/dist/style.css'
 
 import Browser from './browser/browser'
-import { Spinner, CommsErrorBanner } from '../../shared'
+import { CommsErrorBanner } from '../../shared'
 
 import UploadComponent from '../../component-production/src/components/uploadManager/UploadComponent'
 

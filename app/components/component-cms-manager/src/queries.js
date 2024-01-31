@@ -64,7 +64,6 @@ const cmsLayoutFields = `
     logo {
       ${fileFields}
     }
-    article
     css
 `
 
