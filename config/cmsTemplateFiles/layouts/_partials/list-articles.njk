@@ -9,7 +9,7 @@
                 {{ article.headerInfo.topics }}
             </span>
             <h2 class="article-title">
-                <a href="{{config.defaultArticleDirectory}}{{article.shortId}}/index.html">{{ article.headerInfo.title | safe }}</a>
+                <a href="{{cmsConfig.defaultArticleDirectory}}{{article.shortId}}/index.html">{{ article.headerInfo.title | safe }}</a>
             </h2>
             <span class="author-name">{{ article.headerInfo.authorNames | arrayToString('lastName') }}</span>
             <p class="published-date">
