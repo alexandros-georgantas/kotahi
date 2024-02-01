@@ -14,10 +14,6 @@ const {
 
 const { CMSFileTemplate } = require('@pubsweet/models')
 
-const {
-  connectToFileStorage,
-} = require('@coko/server/src/services/fileStorage')
-
 const Config = require('../../config/src/config')
 const { crossrefScrape } = require('./scraper')
 
@@ -91,7 +87,6 @@ const insertResource = async (
   groupId,
   trx,
   fileContent = null,
-  isRoot = false,
 ) => {
   try {
     const insertedResource = await CMSFileTemplate.query(trx)
@@ -99,7 +94,6 @@ const insertResource = async (
         name: path.basename(name),
         parentId,
         groupId,
-        ...(isDirectory && isRoot ? { rootFolder: true } : {}),
       })
       .returning('id')
 
@@ -172,10 +166,7 @@ const createRootFolder = async (groupId, trx) => {
     groupId,
     trx,
     null,
-    true,
   )
-
-  //   console.log('trx.isCompleted', trx.isCompleted())
 
   await readDirectoryRecursively(
     `${__dirname}/flaxTemplateFiles/`,
@@ -573,8 +564,6 @@ menu: "Team"
 }
 
 const startMigration = async (issn, groupId) => {
-  await connectToFileStorage()
-
   return useTransaction(async trx => {
     // remove previous data
     const pubsub = await getPubsub()
