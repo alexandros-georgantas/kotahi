@@ -16,12 +16,18 @@ const readDirectoryRecursively = async (directoryPath, parentId, callBack) => {
     const stats = fs.statSync(filePath)
 
     if (stats.isDirectory()) {
-      const insertedDirectoryId = await callBack(filePath, parentId, true)
+      const insertedDirectoryId = await callBack(
+        filePath,
+        parentId,
+        false,
+        true,
+      )
+
       // It's a directory, so recursively read its contents
       await readDirectoryRecursively(filePath, insertedDirectoryId, callBack)
     } else {
       // It's a file, you can perform operations on the file here
-      await callBack(filePath, parentId, false)
+      await callBack(filePath, parentId, false, false)
     }
   })
 }
@@ -29,14 +35,14 @@ const readDirectoryRecursively = async (directoryPath, parentId, callBack) => {
 const seed = async group => {
   await connectToFileStorage()
 
-  const insertResource = async (name, parentId, isDirectory) =>
+  const insertResource = async (name, parentId, rootFolder, isDirectory) =>
     useTransaction(async trx => {
       const insertedResource = await CMSFileTemplate.query(trx)
         .insertGraph({
           name: path.basename(name),
           parentId,
           groupId: group.id,
-          rootFolder: !parentId, // set default true for the root of the group folder
+          rootFolder, // set default true for the root of the group folder
         })
         .returning('id')
 
@@ -65,7 +71,19 @@ const seed = async group => {
   })
 
   if (!existFolder) {
-    const insertedFolderId = await insertResource(group.name, null, true)
+    const insertedRootFolderId = await insertResource(
+      'Cms Files',
+      null,
+      false,
+      true,
+    )
+
+    const insertedFolderId = await insertResource(
+      group.name,
+      insertedRootFolderId,
+      true,
+      true,
+    )
 
     await readDirectoryRecursively(
       `${__dirname}/../config/cmsTemplateFiles`,
