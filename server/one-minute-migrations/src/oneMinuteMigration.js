@@ -59,6 +59,7 @@ const readDirectoryRecursively = async (
         const insertedDirectoryId = await callBack(
           filePath,
           parentId,
+          false,
           true,
           groupId,
           trx,
@@ -74,7 +75,7 @@ const readDirectoryRecursively = async (
         )
       } else {
         // It's a file, you can perform operations on the file here
-        await callBack(filePath, parentId, false, groupId, trx)
+        await callBack(filePath, parentId, false, false, groupId, trx)
       }
     }),
   )
@@ -83,6 +84,7 @@ const readDirectoryRecursively = async (
 const insertResource = async (
   name,
   parentId,
+  rootFolder,
   isDirectory,
   groupId,
   trx,
@@ -94,6 +96,7 @@ const insertResource = async (
         name: path.basename(name),
         parentId,
         groupId,
+        rootFolder,
       })
       .returning('id')
 
@@ -121,6 +124,11 @@ const insertResource = async (
 }
 
 const createRootFolder = async (groupId, trx) => {
+  const cmsFolder = await CMSFileTemplate.query(trx).findOne({
+    groupId,
+    parentId: null,
+  })
+
   const existingFolder = await CMSFileTemplate.query(trx).findOne({
     name: MIGRATION_FOLDER_NAME,
     groupId,
@@ -161,7 +169,8 @@ const createRootFolder = async (groupId, trx) => {
 
   const rootFolderId = await insertResource(
     MIGRATION_FOLDER_NAME,
-    null,
+    cmsFolder.id,
+    true,
     true,
     groupId,
     trx,
@@ -200,6 +209,7 @@ const createRootFolder = async (groupId, trx) => {
   const dataJournalsFolderId = await insertResource(
     `${MIGRATION_FOLDER_NAME}/data/${JOURNALS_FOLDER_NAME}/`,
     dataFolderId,
+    false,
     true,
     groupId,
     trx,
@@ -208,6 +218,7 @@ const createRootFolder = async (groupId, trx) => {
   const contentJournalsFolderId = await insertResource(
     `${MIGRATION_FOLDER_NAME}/data/${JOURNALS_FOLDER_NAME}/`,
     contentFolderId,
+    false,
     true,
     groupId,
     trx,
@@ -397,6 +408,7 @@ menu: "Team"
         `${MIGRATION_FOLDER_NAME}/data/journals/${formattedIssn}meta.json`,
         dataJournalsFolderId,
         false,
+        false,
         groupId,
         trx,
         stringifiedMetadata,
@@ -439,6 +451,7 @@ menu: "Team"
         `${MIGRATION_FOLDER_NAME}/data/journals/${formattedIssn}volumes.json`,
         dataJournalsFolderId,
         false,
+        false,
         groupId,
         trx,
         volumes,
@@ -453,6 +466,7 @@ menu: "Team"
         `${MIGRATION_FOLDER_NAME}/data/journals/${formattedIssn}scrap.json`,
         dataJournalsFolderId,
         false,
+        false,
         groupId,
         trx,
         scrapedMetadata,
@@ -461,6 +475,7 @@ menu: "Team"
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/data/journals/${formattedIssn}.json`,
         dataJournalsFolderId,
+        false,
         false,
         groupId,
         trx,
@@ -477,6 +492,7 @@ menu: "Team"
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}current.md`,
         contentJournalsFolderId,
         false,
+        false,
         groupId,
         trx,
         currentContent,
@@ -487,6 +503,7 @@ menu: "Team"
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}home.md`,
         contentJournalsFolderId,
+        false,
         false,
         groupId,
         trx,
@@ -499,6 +516,7 @@ menu: "Team"
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}archives.md`,
         contentJournalsFolderId,
         false,
+        false,
         groupId,
         trx,
         archiveContent,
@@ -507,6 +525,7 @@ menu: "Team"
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}articles.md`,
         contentJournalsFolderId,
+        false,
         false,
         groupId,
         trx,
@@ -517,6 +536,7 @@ menu: "Team"
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}health.md`,
         contentJournalsFolderId,
         false,
+        false,
         groupId,
         trx,
         indexHealth,
@@ -525,6 +545,7 @@ menu: "Team"
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}about.md`,
         contentJournalsFolderId,
+        false,
         false,
         groupId,
         trx,
@@ -537,6 +558,7 @@ menu: "Team"
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}backissues.md`,
         contentJournalsFolderId,
         false,
+        false,
         groupId,
         trx,
         volumeIndex,
@@ -547,6 +569,7 @@ menu: "Team"
       await insertResource(
         `${MIGRATION_FOLDER_NAME}/content/journals/${formattedIssn}team.md`,
         contentJournalsFolderId,
+        false,
         false,
         groupId,
         trx,
