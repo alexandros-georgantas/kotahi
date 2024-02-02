@@ -562,6 +562,8 @@ const fr = {
         "Importez des revues électroniques existantes provenant de fournisseurs tiers, tels que OJS. Il s'agit d'un service faisant de son mieux.",
       notice:
         'Remarque : toutes les données de migration précédentes seront effacées si un nouvel ISSN est soumis.',
+      updatingRootFolder: 'Mise à jour du dossier racine du CMS...',
+      rebuildingFlax: 'Reconstruction du site du Flax...',
     },
     reportsPage: {
       Reports: 'Rapports',

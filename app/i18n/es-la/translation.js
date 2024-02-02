@@ -559,6 +559,8 @@ const esLa = {
         'Importe revistas electrónicas existentes de proveedores externos, como OJS. Este es un servicio de mejor esfuerzo.',
       notice:
         'Nota: cualquier dato de migración anterior se borrará si se envía un nuevo ISSN.',
+      updatingRootFolder: 'Actualizando la carpeta raíz del CMS...',
+      rebuildingFlax: 'Reconstruyendo el sitio de Flax...',
     },
     reportsPage: {
       Reports: 'Reportes',
