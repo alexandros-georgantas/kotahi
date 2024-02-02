@@ -61,6 +61,53 @@ describe('Email Notification Tests', () => {
         'contain',
         'Author Invitation sent by Elaine Barnes to Jon',
       )
+
+      cy.reload()
+      cy.contains('Tasks & Notifications').click()
+      cy.getByDataTestId('choose-receiver').click()
+      cy.get('input[aria-label="Choose receiver"]').type('Joane{enter}', {
+        force: true,
+      })
+
+      // Choose Invitation Template Dropdown
+      ControlPage.getEmailNotificationDropdowns()
+        .eq(1)
+        .type('Reviewer Invitation{enter}')
+
+      cy.contains('Notify').click()
+
+      ControlPage.clickExpandChatButton()
+
+      /* Verify Notification in Editorial Discussion Panel */
+      ControlPage.clickNthChatTab(1)
+
+      ControlPage.getMessageContainer().should(
+        'contain',
+        'Reviewer Invitation sent by Elaine Barnes to Joane Pilger',
+      )
+
+      cy.reload()
+      cy.contains('Tasks & Notifications').click()
+      cy.getByDataTestId('choose-receiver').click()
+      cy.get('input[aria-label="Choose receiver"]').type('Gale{enter}', {
+        force: true,
+      })
+      // Choose Invitation Template Dropdown
+      ControlPage.getEmailNotificationDropdowns()
+        .eq(1)
+        .type('Task notification {enter}')
+
+      cy.contains('Notify').click()
+
+      ControlPage.clickExpandChatButton()
+
+      /* Verify Notification in Editorial Discussion Panel */
+      ControlPage.clickNthChatTab(1)
+
+      ControlPage.getMessageContainer().should(
+        'contain',
+        'Task notification sent by Elaine Barnes to Gale Davis',
+      )
     })
   })
 })
