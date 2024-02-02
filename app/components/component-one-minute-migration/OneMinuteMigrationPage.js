@@ -25,7 +25,7 @@ const MIGRATION_TITLE_AND_PUBLISHER = gql`
   }
 `
 
-const link = `${process.env.FLAX_SITE_URL}/migrations/`
+const link = `${process.env.FLAX_SITE_URL}/journal/`
 
 const OneMinuteMigrationPage = props => {
   const [issn, setIssn] = useState(null)

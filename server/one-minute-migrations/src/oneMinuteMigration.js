@@ -16,6 +16,7 @@ const { CMSFileTemplate } = require('@pubsweet/models')
 
 const Config = require('../../config/src/config')
 const { crossrefScrape } = require('./scraper')
+const { rebuildCMSSite } = require('../../flax-site/flax-api')
 
 const { getPubsub } = pubsubManager
 
@@ -587,9 +588,10 @@ menu: "Team"
 }
 
 const startMigration = async (issn, groupId) => {
-  return useTransaction(async trx => {
+  const pubsub = await getPubsub()
+
+  const result = await useTransaction(async trx => {
     // remove previous data
-    const pubsub = await getPubsub()
 
     pubsub.publish(`MIGRATION_STAT_${groupId}`, {
       migrationStatusUpdate: 'removingPreviousMigration',
@@ -598,6 +600,7 @@ const startMigration = async (issn, groupId) => {
     const {
       dataJournalsFolderId,
       contentJournalsFolderId,
+      rootFolderId,
     } = await createRootFolder(groupId, trx)
 
     const link = await crossrefApiCall(
@@ -608,11 +611,32 @@ const startMigration = async (issn, groupId) => {
       trx,
     )
 
+    pubsub.publish(`MIGRATION_STAT_${groupId}`, {
+      migrationStatusUpdate: 'updatingRootFolder',
+    })
+
+    await CMSFileTemplate.query(trx)
+      .patch({ rootFolder: false })
+      .where({ groupId })
+
+    await CMSFileTemplate.query(trx)
+      .patch({ rootFolder: true })
+      .findOne({ id: rootFolderId, groupId })
+      .returning('*')
+
+    pubsub.publish(`MIGRATION_STAT_${groupId}`, {
+      migrationStatusUpdate: 'rebuildingFlax',
+    })
+
     return link
   }).catch(e => {
     logger.error('one minute migration failed', e)
     throw new Error(e)
   })
+
+  await rebuildCMSSite(groupId, { path: 'pages' })
+
+  return result
 }
 
 module.exports = { startMigration }
