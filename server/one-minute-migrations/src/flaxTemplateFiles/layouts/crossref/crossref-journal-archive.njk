@@ -40,9 +40,10 @@
                                 {% endfor %}
                             </ul>
                             <p class="links">
-                                <a href="/articles/{{ issn }}/{{ article.DOI }}">
+                                <a href="/articles/{{ issn }}/{{ article.DOI }}/">
                                     {% for title in article.title   %}<span>Go the article page</span>{% endfor %}
                                 </a>
+                                <span class="separator">|</span>
                                 {{ doi(article.DOI) }}
                             </p>
                         </li>
