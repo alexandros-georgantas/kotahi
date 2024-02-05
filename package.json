@@ -28,7 +28,7 @@
     "test:server-and-client": "start-test server:test 'http://localhost:3000/healthcheck' client",
     "test:all:chrome": "start-test test:server-and-client 4000 test:chrome",
     "test:all:firefox": "start-test test:server-and-client 4000 test:firefox",
-    "test:chrome": "cypress run --record --browser chrome --spec 'cypress/e2e/**/**.js'",
+    "test:chrome": "cypress run --browser chrome --spec 'cypress/e2e/**/**.js'",
     "test:firefox": "cypress run --browser firefox --headless --spec 'cypress/e2e/**/**.js'",
     "test": "dotenv cypress open"
   },
