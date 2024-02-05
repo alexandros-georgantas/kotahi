@@ -1,4 +1,3 @@
-/* eslint-disable jest/no-commented-out-tests */
 /* eslint-disable prettier/prettier,jest/valid-expect-in-promise */
 /* eslint-disable jest/expect-expect */
 
@@ -21,46 +20,11 @@ describe('notifications tests', () => {
     DashboardPage.getHeader().should('be.visible')
   })
 
-  context.skip('sent notification via control panel', () => {
+  context('sent notification via control panel', () => {
     beforeEach(() => {
       Menu.clickManuscriptsAndAssertPageLoad()
       ManuscriptsPage.selectOptionWithText('Control')
       cy.awaitDisappearSpinner()
-    })
-    it('sent notification to user from notification tab', () => {
-      ControlPage.clickDecisionTab(4)
-      cy.get('[data-testid="choose-receiver"]').click()
-      cy.get(
-        '[data-testid="choose-receiver"] > div > div > input',
-      ).focus().type('Elaine{enter}', { delay: 200, force: true })
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(300)
-      cy.get('[data-testid="Notification_email_select"]').click()
-      cy.get(
-        '[data-testid="Notification_email_select"] > div > div > input',
-      ).focus().type('Invitation{enter}', { delay: 200, force: true })
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(300)
-      cy.contains('Notify').click()
-      cy.get('[class*=LabelOnlySpan]:last').click()
-      cy.contains('Invitation sent by Sinead Sullivan to Elaine Barnes')
-    })
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip('sent notification to unregistered user', () => {
-      ControlPage.clickDecisionTab(4)
-      cy.get('[title="Add a new task"]').click()
-      cy.get('[class*="TextInput__StyledInput"]:last').type(
-        'First task for unregistered user',
-      )
-      cy.get('[data-testid="Assignee_select"]').type('Unregistered User{enter}')
-      cy.get('[data-cy="new-user-email"]')
-        .focus()
-        .type('uku.sidorela@gmail.com')
-      cy.get('[data-cy="new-user-name"]').type('QA tester')
-      // cy.contains('Unregistered User').click({ force: true})
-      // cy.get('#react-select-12-option-0-0').click({ force: true })
-      cy.get('[class*=MinimalButton]').click()
-      cy.get('[class*=Task__EditLabel]').click()
     })
     it('sent notification 3 notifications via task details modal', () => {
       ControlPage.clickDecisionTab(4)
