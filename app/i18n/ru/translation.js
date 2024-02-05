@@ -10,6 +10,9 @@ const ru = {
       revising: 'На исправлении',
       published: 'Опубликовано',
       unknown: 'Неизвестный статус',
+      assigned: 'Доказательство автора присвоено',
+      inProgress: 'Авторская проверка в процессе',
+      completed: 'Доказательство автора завершено',
     },
     reviewerStatus: {
       invited: 'Приглашен',
@@ -68,10 +71,10 @@ const ru = {
         Reject: 'Отклонить',
       },
       teams: {
-        assign: '{{teamLabel}}',
-        'Senior Editor': 'Консультативный куратор',
-        'Handling Editor': 'Выпускающий редактор',
-        Editor: 'Обращение с куратором',
+        assign: 'Назначить {{teamLabel}}...',
+        'Senior Editor': 'главный редактор',
+        'Handling Editor': 'выпускающий редактор',
+        Editor: 'литературный редактор',
       },
       kanban: {
         'Last updated': 'Последнее обновление',
@@ -172,15 +175,12 @@ const ru = {
       'New Alerts': 'Новые оповещения',
       'My Submissions': 'Мои статьи',
       'To Review': 'Статьи для рецензирования',
-      "Manuscripts I'm Curator of": 'Рукописи, куратором которых я являюсь',
+      "Manuscripts I'm editor of": 'Статьи для редактирования',
       mySubmissions: {
         'My Submissions': 'Мои статьи',
       },
       toReview: {
         'To Review': 'Статьи для рецензирования',
-      },
-      edit: {
-        "Manuscripts I'm curator of": 'Рукописи, куратором которых я являюсь',
       },
     },
     reviewPage: {
@@ -234,6 +234,12 @@ const ru = {
       declinedInvitation: 'Отклонено {{dateString}}',
       'Invited via email': 'Приглашен по email',
       'View Details': 'Просмотр',
+      'Assign Author for Proofing': 'Назначить автора для проверки',
+      'Submit for author proofing': 'Отправить на авторскую проверку',
+      authorRequired: 'Требуется приглашение автора!',
+      hideAssignedAuthors: 'Скрыть всех назначенных авторов',
+      showAssignedAuthors: 'Показать всех назначенных авторов',
+      assignedOn: '{{assigneeName}} назначен на {{date}}',
       decisionTab: {
         'Archived version': 'Версия в архиве',
         notCurrentVersion:
@@ -363,6 +369,14 @@ const ru = {
     },
     productionPage: {
       Production: 'Редактирование',
+      AuthorProofing: 'Авторская проверка',
+      Feedback: 'Обратная связь',
+      Attachments: 'Вложения',
+      Submitted: 'Поданный',
+      Submit: 'Представлять на рассмотрение',
+      'Edited on': 'Отредактировано {{date}}',
+      submittedOn: '{{submitterName}} представлены на {{date}}',
+      'read-only': ' (только для чтения)',
       'No supported view of the file':
         'Нет поддерживаемого представления файла',
       Download: 'Загрузить',
@@ -469,6 +483,10 @@ const ru = {
       evaluationCompleteEmailTemplate: 'Рецензия отправлена',
       submissionConfirmationEmailTemplate: 'Рукопись подана',
       alertUnreadMessageDigestTemplate: 'Непрочитанные сообщения в обсуждении',
+      authorProofingInvitationEmailTemplate:
+        'Приглашение, подтвержденное автором',
+      authorProofingSubmittedEmailTemplate:
+        'Автор завершил проверку и отправил отзыв',
       Reports: 'Аналитика',
       reportShowInMenu:
         'Администратору и редактору доступен раздел “Аналитика”',
@@ -731,9 +749,8 @@ const ru = {
       'Show group manager discussion': 'Показать обсуждение',
       'Hide Chat': 'Скрыть чат',
       'Discussion with author': 'Чат с Автором',
-      'Curatorial discussion': 'Кураторская дискуссия',
-      'Discussion with curatorial team': 'Обсуждение с кураторской командой',
-      'Discussion with curator': 'Обсуждение с куратором',
+      'Discussion with editorial team': 'Обсуждение с редакцией',
+      'Editorial discussion': 'Чат редакции',
       'Show Chat': 'Показать чат',
       edit: 'Редактировать',
       delete: 'Удалить',
@@ -806,7 +823,8 @@ const ru = {
         'No reason provided': 'Причина не указана.',
       },
       reviewReport: {
-        'Review Report': `Отчет о рецензировании от {{name}}`,
+        reviewReport: 'Отчет о рецензировании от {{name}}',
+        anonymousReviewReport: 'Отчет о рецензировании',
         'Last Updated': 'Последнее обновление: {{dateString}}',
         Reviewer: 'Рецензент:',
         Status: 'Статус',

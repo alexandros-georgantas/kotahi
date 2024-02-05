@@ -10,6 +10,9 @@ const esLa = {
       revise: 'Revisar',
       revising: 'Revisando',
       published: 'Publicado',
+      assigned: 'Prueba de autor asignada',
+      inProgress: 'Revisión del autor en curso',
+      completed: 'Prueba de autor completada',
       unknown: 'Desconocido',
     },
     reviewerStatus: {
@@ -69,9 +72,9 @@ const esLa = {
       },
       teams: {
         assign: 'Asignar {{teamLabel}}...',
-        'Senior Editor': 'Curador Asesor',
-        'Handling Editor': 'Editor de Tratamiento',
-        Editor: 'Curador de manejo',
+        'Senior Editor': 'editor senior',
+        'Handling Editor': 'editor de tratamiento',
+        Editor: 'editor',
       },
       kanban: {
         'Last updated': 'Última actualización',
@@ -171,15 +174,12 @@ const esLa = {
       'New Alerts': 'Nuevas Alertas',
       'My Submissions': 'Mis Presentaciones',
       'To Review': 'Para Revisión',
-      "Manuscripts I'm Curator of": 'Manuscritos soy curador de',
+      "Manuscripts I'm editor of": 'Manuscritos en los que soy editor',
       mySubmissions: {
         'My Submissions': 'Mis Presentaciones',
       },
       toReview: {
         'To Review': 'Para Revisión',
-      },
-      edit: {
-        "Manuscripts I'm curator of": 'Manuscritos soy curador de',
       },
     },
     reviewPage: {
@@ -231,6 +231,12 @@ const esLa = {
       declinedInvitation: 'Rechazado el {{dateString}}',
       'Invited via email': 'Invitado vía correo electrónico',
       'View Details': 'Ver Detalles',
+      'Assign Author for Proofing': 'Asignar autor para revisión',
+      'Submit for author proofing': 'Enviar para revisión del autor',
+      authorRequired: '¡Requiere que se invite a un autor!',
+      hideAssignedAuthors: 'Ocultar todos los autores asignados',
+      showAssignedAuthors: 'Mostrar todos los autores asignados',
+      assignedOn: '{{assigneeName}} asignado el {{date}}',
       decisionTab: {
         'Archived version': 'Versión Archivada',
         notCurrentVersion:
@@ -362,6 +368,14 @@ const esLa = {
     },
     productionPage: {
       Production: 'Producción',
+      AuthorProofing: 'Revisión del autor',
+      Feedback: 'Comentario',
+      Attachments: 'Archivos adjuntos',
+      Submitted: 'Enviada',
+      Submit: 'Entregar',
+      'Edited on': 'Editado el {{date}}',
+      submittedOn: '{{submitterName}} presentado el {{date}}',
+      'read-only': ' (solo lectura)',
       'No supported view of the file': 'No hay una vista admitida del archivo',
       Download: 'Descargar',
       Editor: 'Editor',
@@ -471,6 +485,10 @@ const esLa = {
       evaluationCompleteEmailTemplate: 'Revisión enviada',
       submissionConfirmationEmailTemplate: 'Manuscrito enviado',
       alertUnreadMessageDigestTemplate: 'Mensaje de discusión no leído',
+      authorProofingInvitationEmailTemplate:
+        'Prueba de autor invitación asignada',
+      authorProofingSubmittedEmailTemplate:
+        'Prueba del autor completada y comentarios enviados.',
       Reports: 'Reportes',
       reportShowInMenu:
         'El Gerente de Grupo y el administrador pueden acceder a los Reportes',
@@ -731,12 +749,11 @@ const esLa = {
       'Group Manager discussion': 'Discusión de Gerente de Grupo',
       'Show admin discussion': 'Mostrar discusión de Administrador',
       'Show group manager discussion': 'Mostrar discusión de Gerente de Grupo',
-      'Discussion with curatorial team': 'Discusión con el equipo curatorial',
-      'Discussion with editor': 'Discusión con el editor',
+      'Discussion with editorial team': 'Discusión con el equipo editorial',
       'Show Chat': 'Mostrar Chat',
       'Hide Chat': 'Ocultar Chat',
       'Discussion with author': 'Discusión con el autor',
-      'Curatorial discussion': 'Discusión curatorial',
+      'Editorial discussion': 'Discusión editorial',
       edit: 'Editar',
       delete: 'Eliminar',
       Edited: 'Editado',
@@ -757,7 +774,7 @@ const esLa = {
         'Registered Users': 'Usuarios Registrados',
         userRoles: {
           Reviewer: 'Revisor',
-          Editor: 'Curador',
+          Editor: 'Editor',
           Author: 'Autor',
         },
       },
@@ -808,7 +825,8 @@ const esLa = {
         'No reason provided': 'No se proporcionó motivo.',
       },
       reviewReport: {
-        'Review Report': 'Informe de Revisión de {{name}}',
+        reviewReport: 'Informe de revisión de {{name}}',
+        anonymousReviewReport: 'Informe de revisión',
         'Last Updated': 'Última Actualización: {{dateString}}',
         Reviewer: 'Revisor:',
         Status: 'Estado',

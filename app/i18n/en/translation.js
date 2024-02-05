@@ -9,6 +9,9 @@ const en = {
       revise: 'Revise',
       revising: 'Revising',
       published: 'Published',
+      assigned: 'Author proof assigned',
+      inProgress: 'Author proofing in progress',
+      completed: 'Author proof completed',
       unknown: 'Unknown',
     },
     reviewerStatus: {
@@ -68,9 +71,9 @@ const en = {
       },
       teams: {
         assign: 'Assign {{teamLabel}}...',
-        'Senior Editor': 'Advisory Curator',
-        'Handling Editor': 'Handling Editor',
-        Editor: 'Handling Curator',
+        'Senior Editor': 'senior editor',
+        'Handling Editor': 'handling editor',
+        Editor: 'editor',
       },
       kanban: {
         'Last updated': 'Last updated',
@@ -169,15 +172,12 @@ const en = {
       'New Alerts': 'New Alerts',
       'My Submissions': 'My Submissions',
       'To Review': 'To Review',
-      "Manuscripts I'm Curator of": 'Manuscripts I’m Curator of',
+      "Manuscripts I'm editor of": 'Manuscripts I’m editor of',
       mySubmissions: {
         'My Submissions': 'My Submissions',
       },
       toReview: {
         'To Review': 'To Review',
-      },
-      edit: {
-        "Manuscripts I'm curator of": 'Manuscripts I’m curator of',
       },
     },
     reviewPage: {
@@ -228,6 +228,12 @@ const en = {
       declinedInvitation: 'Declined {{dateString}}',
       'Invited via email': 'Invited via email',
       'View Details': 'View Details',
+      'Assign Author for Proofing': 'Assign Author for Proofing',
+      'Submit for author proofing': 'Submit for author proofing',
+      authorRequired: 'Requires an author to be invited!',
+      hideAssignedAuthors: 'Hide all authors assigned',
+      showAssignedAuthors: 'Show all authors assigned',
+      assignedOn: '{{assigneeName}} assigned on {{date}}',
       decisionTab: {
         'Archived version': 'Archived version',
         notCurrentVersion:
@@ -356,6 +362,14 @@ const en = {
     },
     productionPage: {
       Production: 'Production',
+      AuthorProofing: 'Author Proofing',
+      Feedback: 'Feedback',
+      Attachments: 'Attachments',
+      Submitted: 'Submitted',
+      Submit: 'Submit',
+      'Edited on': 'Edited on {{date}}',
+      submittedOn: '{{submitterName}} submitted on {{date}}',
+      'read-only': ' (read-only)',
       'No supported view of the file': 'No supported view of the file',
       Download: 'Download',
       Editor: 'Editor',
@@ -455,6 +469,9 @@ const en = {
       evaluationCompleteEmailTemplate: 'Submitted review',
       submissionConfirmationEmailTemplate: 'Submitted manuscript',
       alertUnreadMessageDigestTemplate: 'Unread discussion message',
+      authorProofingInvitationEmailTemplate: 'Author proof assigned invitation',
+      authorProofingSubmittedEmailTemplate:
+        'Author proof completed and submitted feedback',
       Reports: 'Reports',
       reportShowInMenu: 'Group Manager and admin can access Reports',
       'User Management': 'User Management',
@@ -709,12 +726,11 @@ const en = {
       'Group Manager discussion': 'Group Manager discussion',
       'Show admin discussion': 'Show admin discussion',
       'Show group manager discussion': 'Show group manager discussion',
-      'Discussion with curatorial team': 'Discussion with curatorial team',
-      'Discussion with curator': 'Discussion with curator',
+      'Discussion with editorial team': 'Discussion with editorial team',
       'Show Chat': 'Show Chat',
       'Hide Chat': 'Hide Chat',
       'Discussion with author': 'Discussion with author',
-      'Curatorial discussion': 'Curatorial discussion',
+      'Editorial discussion': 'Editorial discussion',
       edit: 'Edit',
       delete: 'Delete',
       Edited: 'Edited',
@@ -735,7 +751,7 @@ const en = {
         'Registered Users': 'Registered Users',
         userRoles: {
           Reviewer: 'Reviewer',
-          Editor: 'Curator',
+          Editor: 'Editor',
           Author: 'Author',
         },
       },
@@ -786,7 +802,8 @@ const en = {
         'No reason provided': 'No reason provided.',
       },
       reviewReport: {
-        'Review Report': '{{name}}’s Review Report',
+        reviewReport: '{{name}}’s review report',
+        anonymousReviewReport: 'Review report',
         'Last Updated': 'Last Updated: {{dateString}}',
         Reviewer: 'Reviewer:',
         Status: 'Status',

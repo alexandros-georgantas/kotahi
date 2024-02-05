@@ -9,6 +9,9 @@ const fr = {
       revise: 'Réviser',
       revising: 'En révision',
       published: 'Publié',
+      assigned: "Epreuve d'auteur attribuée",
+      inProgress: "Révision de l'auteur en cours",
+      completed: "Epreuve d'auteur complétée",
       unknown: 'Inconnu',
     },
     reviewerStatus: {
@@ -68,9 +71,9 @@ const fr = {
       },
       teams: {
         assign: 'Attribuer à {{teamLabel}}...',
-        'Senior Editor': 'Conservateur-conseil',
+        'Senior Editor': 'Éditeur en chef',
         'Handling Editor': 'Éditeur responsable',
-        Editor: 'Conservateur de manutention',
+        Editor: 'Éditeur',
       },
       kanban: {
         'Last updated': 'Dernière mise à jour',
@@ -170,15 +173,12 @@ const fr = {
       'New Alerts': 'Nouvelles alertes',
       'My Submissions': 'Mes soumissions',
       'To Review': 'À réviser',
-      "Manuscripts I'm Curator of": 'Manuscrits dont je suis conservateur',
+      "Manuscripts I'm editor of": 'Manuscrits dont je suis éditeur',
       mySubmissions: {
         'My Submissions': 'Mes soumissions',
       },
       toReview: {
         'To Review': 'À réviser',
-      },
-      edit: {
-        "Manuscripts I'm curator of": '',
       },
     },
     reviewPage: {
@@ -230,6 +230,13 @@ const fr = {
       declinedInvitation: 'Refusé {{dateString}}',
       'Invited via email': 'Invité par email',
       'View Details': 'Voir les détails',
+      'Assign Author for Proofing': 'Attribuer un auteur pour la vérification',
+      'Submit for author proofing':
+        "Soumettre pour la vérification de l'auteur",
+      authorRequired: "Nécessite qu'un auteur soit invité !",
+      hideAssignedAuthors: 'Masquer tous les auteurs attribués',
+      showAssignedAuthors: 'Afficher tous les auteurs attribués',
+      assignedOn: '{{assigneeName}} attribué le {{date}}',
       decisionTab: {
         'Archived version': 'Version archivée',
         notCurrentVersion:
@@ -361,6 +368,14 @@ const fr = {
     },
     productionPage: {
       Production: 'Production',
+      AuthorProofing: "Vérification de l'auteur",
+      Feedback: 'Retour',
+      Attachments: 'Pièces jointes',
+      Submitted: 'Soumis',
+      Submit: 'Soumettre',
+      'Edited on': 'Edité le {{date}}',
+      submittedOn: '{{submitterName}} soumis le {{date}}',
+      'read-only': ' (lecture seulement)',
       'No supported view of the file': 'Aucune vue supportée du fichier',
       Download: 'Télécharger',
       Editor: 'Éditeur',
@@ -472,6 +487,10 @@ const fr = {
       evaluationCompleteEmailTemplate: 'Évaluation soumise',
       submissionConfirmationEmailTemplate: 'Manuscrit soumis',
       alertUnreadMessageDigestTemplate: 'Message de discussion non lu',
+      authorProofingInvitationEmailTemplate:
+        "Invitation attribuée à l'épreuve d'auteur",
+      authorProofingSubmittedEmailTemplate:
+        "Preuve d'auteur complétée et commentaires soumis",
       Reports: 'Rapports',
       reportShowInMenu:
         "Le gestionnaire de groupe et l'administrateur peuvent accéder aux rapports",
@@ -735,10 +754,8 @@ const fr = {
         'Afficher la discussion du gestionnaire de groupe',
       'Hide Chat': 'Masquer le chat',
       'Discussion with author': "Discussion avec l'auteur",
-      'Curatorial discussion': 'Discussion curatoriale',
-      'Discussion with curatorial team':
-        "Discussion avec l'équipe de conservation",
-      'Discussion with curator': 'Discussion avec le conservateur',
+      'Discussion with editorial team': "Discussion avec l'équipe éditoriale",
+      'Editorial discussion': 'Discussion éditoriale',
       'Show Chat': 'Afficher le chat',
       edit: 'Modifier',
       delete: 'Supprimer',
@@ -760,7 +777,7 @@ const fr = {
         'Registered Users': 'Utilisateurs enregistrés',
         userRoles: {
           Reviewer: 'Évaluateur',
-          Editor: 'Conservateur',
+          Editor: 'Éditeur',
           Author: 'Auteur',
         },
       },
@@ -811,7 +828,8 @@ const fr = {
         'No reason provided': 'Aucune raison fournie.',
       },
       reviewReport: {
-        'Review Report': "Rapport d'évaluation de {{name}}",
+        reviewReport: "Rapport d'évaluation de {{name}}",
+        anonymousReviewReport: "Rapport d'évaluation",
         'Last Updated': 'Dernière mise à jour : {{dateString}}',
         Reviewer: 'Évaluateur :',
         Status: 'Statut',
