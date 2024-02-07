@@ -2,50 +2,68 @@
 import React, { useState, useEffect, useRef } from 'react'
 import './CssAssistantWC'
 import styled from 'styled-components'
-
-const UserPromptInput = styled.textarea`
-  background: none;
-  border: none;
-  caret-color: #056b05;
-  font-size: inherit;
-  height: 18px;
-  outline: none;
-  resize: none;
-`
+import { color } from '../../theme'
 
 const StyledContainer = styled.div`
-  background: #fff;
-  border-radius: 20px;
-  padding: 1rem 0.5rem;
+  --color: #2fac66;
+  --font-size: 16px;
+  align-items: center;
+  background-color: #fffe;
+  border: 4px solid var(--color);
+  border-radius: 30px;
+  box-shadow: 0 0 5px #0004, inset 0 0 5px #0004;
+  display: flex;
+  font-size: var(--font-size);
+  height: fit-content;
+  justify-content: center;
+  overflow: visible;
+  padding: 0.4rem 0.8rem;
+  position: relative;
+  scroll-behavior: smooth;
+  transition: all 0.5s;
+  width: fit-content;
+
+  textarea {
+    --height: ${p =>
+      p.height || `calc(var(--font-size) + (var(--font-size) / 2));`};
+    background: none;
+    border: none;
+    caret-color: var(--color);
+    font-size: inherit;
+    height: var(--height);
+    max-height: 100px;
+    outline: none;
+    overflow: auto;
+    resize: none;
+    width: 70%;
+  }
 `
 
 const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
   const context = useRef([])
 
-  const [selectedNode, setSelectedNode] = useState([])
+  const [selectedCtx, setSelectedCtx] = useState([])
   const promptRef = useRef(null)
   const [userPrompt, setUserPrompt] = useState('')
 
-  const findCtxByNode = (node, ctx) => {
-    return ctx.find(c => c.node === node)
+  const getCtxByNode = node => {
+    return context.current.find(c => c.node === node)
   }
 
   const createCtx = (node, index, parentSelector) => {
+    const tagName = node.tagName.toLowerCase()
+
     const selector = `${
-      parentSelector
-        ? `${parentSelector} > ${node.tagName.toLowerCase()}`
-        : baseId
-    }`
+      parentSelector ? `${parentSelector} > ${tagName}` : node.id || baseId
+    }`.trim()
 
     const childs = createChildsCtx(node, selector)
     return {
+      selector,
       index,
       node,
-      tagname: node.tagName.toLowerCase(),
+      tagName,
       childs,
-      rules: {},
-      history: [],
-      selector,
     }
   }
 
@@ -64,26 +82,26 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
 
     if (parentCtx) {
       addToCtx(createCtx(parentCtx, 0, ''))
-
-      const addListeners = ctx => {
-        ctx.node.addEventListener('click', selectNode)
-        ctx?.childs &&
-          ctx?.childs?.length > 0 &&
-          ctx.childs.forEach(child => addListeners(child))
-      }
-
-      addListeners(context.current[0])
-
+      context.current = context.current.map((ctx, i) => ({
+        ...ctx,
+        index: i + 1,
+        history: [],
+        rules: {},
+      }))
       // console.log(context.current)
+
+      context.current.forEach(
+        ctx => ctx.node && ctx.node.addEventListener('click', selectNode),
+      )
     }
   }, [parentCtx])
+
   useEffect(() => {
     return () => {
       if (parentCtx) {
-        ;[...parentCtx.querySelectorAll('*')].forEach(node =>
-          node.removeEventListener('click', selectNode),
+        context.current.forEach(
+          ctx => ctx.node && ctx.node.removeEventListener('click', selectNode),
         )
-        parentCtx.removeEventListener('click', selectNode)
       }
     }
   }, [])
@@ -91,29 +109,34 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
 
   const selectNode = e => {
     e.stopPropagation()
-    // setSelectedNode(findCtxByNode(e.target))
-    // console.log(context.current)
+    setSelectedCtx(prev => {
+      const temp = prev
+      prev.node && (temp.node.style.outline = 'none')
+      return getCtxByNode(e.target)
+    })
   }
 
   useEffect(() => {
-    // console.log(selectedNode)
-  }, [selectedNode])
+    selectedCtx.node && (selectedCtx.node.style.outline = '1px dashed #5d5')
+  }, [selectedCtx])
 
   const autoResize = () => {
     if (promptRef.current) {
+      const lines = promptRef.current.value.split('\n').length
       promptRef.current.style.height = 'auto'
-      promptRef.current.style.height = `${promptRef.current.scrollHeight}px`
+      lines === 1
+        ? (promptRef.current.style.height = '24px')
+        : (promptRef.current.style.height = `${promptRef.current.scrollHeight}px`)
     }
   }
 
   return (
     <StyledContainer>
-      <UserPromptInput
+      <textarea
         disabled={!enabled}
         onChange={handleChange}
         onInput={autoResize}
         ref={promptRef}
-        resize="none"
         value={userPrompt}
         {...rest}
       />

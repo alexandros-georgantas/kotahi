@@ -11,7 +11,7 @@ export const Base = () => {
 
   return (
     <div>
-      <article ref={mainRef}>
+      <article id="#css-assistant-scoped" ref={mainRef}>
         <header>
           <h1>Chapter 1</h1>
         </header>
@@ -37,7 +37,11 @@ export const Base = () => {
           </p>
         </section>
       </article>
-      <CssAssistant baseId="css-assistant-scoped" enabled parentCtx={context} />
+      <CssAssistant
+        baseId="#css-assistant-scoped"
+        enabled
+        parentCtx={context}
+      />
     </div>
   )
 }
