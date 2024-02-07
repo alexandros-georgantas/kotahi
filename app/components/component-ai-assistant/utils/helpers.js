@@ -1,3 +1,5 @@
+import { ALLOWED_PROPS } from './constants'
+
 export const safeKey = (name, object) => {
   let finalName = name
 
@@ -15,8 +17,17 @@ export const safeKey = (name, object) => {
   return finalName
 }
 
-export const getComputed = (el, prop) =>
-  window.getComputedStyle(el).getPropertyValue(prop)
+export const getComputed = el =>
+  values(window.getComputedStyle(el))
+    .map(
+      val =>
+        getComputedStyle(el).getPropertyValue(val) &&
+        ALLOWED_PROPS.includes(val) && {
+          rule: val,
+          value: getComputedStyle(el).getPropertyValue(val),
+        },
+    )
+    .filter(Boolean)
 
 export const toSnake = key =>
   key

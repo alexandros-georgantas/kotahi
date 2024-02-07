@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import './CssAssistantWC'
 import styled from 'styled-components'
 import useStylesheets from './hooks/useStyleSheet'
+import { getComputed } from './utils/helpers'
 
 const StyledContainer = styled.div`
   --color: #2fac66;
@@ -19,7 +20,6 @@ const StyledContainer = styled.div`
   overflow: visible;
   padding: 0.4rem 0.8rem;
   position: relative;
-  scroll-behavior: smooth;
   transition: all 0.5s;
   width: fit-content;
 
@@ -35,7 +35,7 @@ const StyledContainer = styled.div`
     outline: none;
     overflow: auto;
     resize: none;
-    width: 70%;
+    width: 100%;
   }
 `
 
@@ -47,9 +47,7 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
   const promptRef = useRef(null)
   const [userPrompt, setUserPrompt] = useState('')
 
-  const { insertRule, deleteRule, updateRule } = useStylesheets(
-    styleSheetRef?.current?.sheet,
-  )
+  const { insertRule, deleteRule, updateRule } = useStylesheets()
 
   useEffect(() => {
     // console.log(parentCtx)
@@ -58,13 +56,12 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
       addToCtx(createCtx(parentCtx, 0, '')) // creates the whole context tarting from the parentCtx
       context.current = context.current.map((ctx, i) => ({
         ...ctx,
-        index: i + 1,
         history: [],
-        rules: {}, // this shoudl be the actual computedStyles from ctx.node
+        rules: [{ rule: 'color', value: 'green' }], // this should be the actual computedStyles from ctx.node
       }))
-
       // console.log(context.current)
-      if (!document.getElementById('dynamicStyles')) {
+
+      if (!document.getElementById('css-assistant-scoped-styles')) {
         const styleTag = document.createElement('style')
         styleTag.id = 'css-assistant-scoped-styles'
         parentCtx.parentNode.insertBefore(styleTag, parentCtx)
@@ -74,12 +71,29 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
         styleSheetRef.current = document.getElementById(
           'css-assistant-scoped-styles',
         )
-        // console.log(styleSheetRef.current)
       }
 
-      context.current.forEach(
-        ctx => ctx.node && ctx.node.addEventListener('click', selectNode),
-      )
+      context.current.forEach(ctx => insertRule(styleSheetRef.current, ctx))
+      //       const recursiveInsert = cntxt =>
+      //   cntxt.forEach(ctx => {
+      //     insertRule(styleSheetRef.current, ctx)
+      //     ctx.childs.length > 0 && recursiveInsert(ctx.childs)
+      //   })
+
+      // recursiveInsert(context.current)
+      // updateRule(styleSheetRef.current, {
+      //   ...getCtxBy('node', parentCtx),
+      //   rules: [
+      //     ...getCtxBy('node', parentCtx).rules,
+      //     { rule: 'color', value: 'blue' },
+      //   ],
+      // })
+      // console.log(styleSheetRef.current)
+
+      context.current.forEach(ctx => {
+        ctx.node && ctx.node.classList.add(ctx.className)
+        ctx.node && ctx.node.addEventListener('click', selectNode)
+      })
     }
   }, [parentCtx])
 
@@ -96,18 +110,21 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
 
   // #region CONTEXT
   // -- create --
-  const createCtx = (node, index, parentSelector) => {
+  const createCtx = (node, parentSelector) => {
+    const index = [...node.parentNode.children].indexOf(node)
     const tagName = node.tagName.toLowerCase()
+    const className = `index_${index}`
 
     const selector = `${
       parentSelector
-        ? `${parentSelector} > ${tagName}`
-        : `#${node.id || baseId || 'css-assistant-scope'}`
+        ? `${parentSelector} > ${tagName}.${className}`
+        : `#${node.id || baseId}`
     }`.trim()
 
     const childs = createChildsCtx(node, selector)
     return {
       selector,
+      className,
       index,
       node,
       tagName,
@@ -117,15 +134,17 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
 
   const createChildsCtx = (ctxNode, parentSelector) =>
     [...ctxNode.children].map((node, index) =>
-      addToCtx(createCtx(node, index, parentSelector)),
+      addToCtx(createCtx(node, parentSelector)),
     )
 
   // -- handle
-  const getCtxBy = {
-    node: node => {
-      context.current.find(c => c.node === node)
-    },
-    selector: selector => context.current.find(c => c.selector === selector),
+  const getCtxBy = (by, prop) => {
+    const ctxProps = {
+      node: node => context.current.find(c => c.node === node),
+      selector: selector => context.current.find(c => c.selector === selector),
+    }
+
+    return ctxProps[by](prop)
   }
 
   const addToCtx = ctx => {
@@ -134,7 +153,7 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
   }
 
   const updateCtx = (ctx, newRules) => {
-    const scopedCtx = getCtxBy.node(ctx.node)
+    const scopedCtx = getCtxBy('node', ctx.node)
     if (!scopedCtx) return
     scopedCtx.rules = { ...scopedCtx.rules, newRules }
   }
@@ -147,7 +166,7 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
     setSelectedCtx(prev => {
       const temp = prev
       prev.node && (temp.node.style.outline = 'none')
-      return getCtxBy.node(e.target)
+      return getCtxBy('node', e.target)
     })
   }
 
@@ -159,8 +178,8 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
     if (promptRef.current) {
       const lines = promptRef.current.value.split('\n').length
       promptRef.current.style.height = 'auto'
-      lines === 1
-        ? (promptRef.current.style.height = '24px')
+      promptRef.current.scrollHeight === 42
+        ? (promptRef.current.style.height = `${24 * lines}px`)
         : (promptRef.current.style.height = `${promptRef.current.scrollHeight}px`)
     }
   }
