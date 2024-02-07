@@ -19,10 +19,10 @@ const StyledContainer = styled.div`
   padding: 1rem 0.5rem;
 `
 
-const CssAssistant = ({ apiKey, enabled, parentCtx, ...rest }) => {
+const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
   const context = useRef([])
 
-  const [selectedContexts, setSetselectedContexts] = useState([])
+  const [selectedNode, setSelectedNode] = useState([])
   const promptRef = useRef(null)
   const [userPrompt, setUserPrompt] = useState('')
 
@@ -32,32 +32,38 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, ...rest }) => {
 
   const createCtx = (node, index, parentSelector) => {
     const selector = `${
-      parentSelector ? `${parentSelector} > ${node.tagName}` : '#mainCtx'
+      parentSelector
+        ? `${parentSelector} > ${node.tagName.toLowerCase()}`
+        : baseId
     }`
 
     const childs = createChildsCtx(node, selector)
     return {
       index,
       node,
-      tagname: node.tagName,
-      childs: childs.map(ch => ch.node),
+      tagname: node.tagName.toLowerCase(),
+      childs,
       rules: {},
       history: [],
       selector,
     }
   }
 
+  const addToCtx = ctx => {
+    context.current = [...context.current, ctx]
+    return ctx
+  }
+
   const createChildsCtx = (ctxNode, parentSelector) =>
     [...ctxNode.children].map((node, index) =>
-      createCtx(node, index, parentSelector),
+      addToCtx(createCtx(node, index, parentSelector)),
     )
 
   useEffect(() => {
-    // console.log(parentCtx())
+    // console.log(parentCtx)
 
-    if (parentCtx()) {
-      const mainCtx = createCtx(parentCtx(), 0, '')
-      context.current = [mainCtx]
+    if (parentCtx) {
+      addToCtx(createCtx(parentCtx, 0, ''))
 
       const addListeners = ctx => {
         ctx.node.addEventListener('click', selectNode)
@@ -70,21 +76,28 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, ...rest }) => {
 
       // console.log(context.current)
     }
-
-    return () => {
-      ;[...parentCtx().querySelectorAll('*')].forEach(node =>
-        node.removeEventListener('click', selectNode),
-      )
-      parentCtx().removeEventListener('click', selectNode)
-    }
   }, [parentCtx])
-
+  useEffect(() => {
+    return () => {
+      if (parentCtx) {
+        ;[...parentCtx.querySelectorAll('*')].forEach(node =>
+          node.removeEventListener('click', selectNode),
+        )
+        parentCtx.removeEventListener('click', selectNode)
+      }
+    }
+  }, [])
   const handleChange = ({ target }) => setUserPrompt(target.value)
 
   const selectNode = e => {
     e.stopPropagation()
-    setSetselectedContexts(findCtxByNode(e.target))
+    // setSelectedNode(findCtxByNode(e.target))
+    // console.log(context.current)
   }
+
+  useEffect(() => {
+    // console.log(selectedNode)
+  }, [selectedNode])
 
   const autoResize = () => {
     if (promptRef.current) {
