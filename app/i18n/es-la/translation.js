@@ -105,6 +105,8 @@ const esLa = {
       Layout: 'Diseño',
       'Go to your profile': 'Ir a tu perfil',
       Article: 'Plantilla de Artículo',
+      FileBrowser: 'Explorador de archivos',
+      OneMinuteMigration: 'Migración',
     },
 
     profilePage: {
@@ -532,6 +534,35 @@ const esLa = {
       },
       allowedIPs: 'Lista de IP del repositorio a las que se permite el acceso',
       api: 'API de Kotahi',
+      betaFunctionality: 'Funcionalidad Beta',
+      enableBetaFunctionality:
+        'Habilite la funcionalidad beta para funciones aún en desarrollo',
+    },
+    oneMinuteMigrationPage: {
+      pageTitle: 'Migración en Un Minuto',
+      issnDescription: 'ISSN de revista para importar',
+      startMigration: 'Iniciar la Migración',
+      goToJournal: 'Ir al revista',
+      migratingJournal: 'Revista migratoria',
+      fetchingMetadata: 'Obteniendo metadatos',
+      error: 'Error',
+      notFound: 'Revista no encontrado',
+      checkIssn: 'Por favor verifique el ISSN',
+      tryAgain: 'Intentar otra vez',
+      savingMetadata: 'Guardando metadatos del revista...',
+      sortingJournal: 'Ordenando revista por volúmenes y números...',
+      metadataSaved: 'Metadatos guardados',
+      removingPreviousMigration:
+        'Eliminando datos descargados previamente y páginas generadas...',
+      getLogo: 'Buscando el logo...',
+      getTeam: 'Buscando la página del equipo...',
+      getAbout: 'Buscando la página acerca de...',
+      info:
+        'Importe revistas electrónicas existentes de proveedores externos, como OJS. Este es un servicio de mejor esfuerzo.',
+      notice:
+        'Nota: cualquier dato de migración anterior se borrará si se envía un nuevo ISSN.',
+      updatingRootFolder: 'Actualizando la carpeta raíz del CMS...',
+      rebuildingFlax: 'Reconstruyendo el sitio de Flax...',
     },
     reportsPage: {
       Reports: 'Reportes',
@@ -1095,6 +1126,11 @@ const esLa = {
         true: 'Sí',
         false: 'No',
       },
+    },
+    betaFunctionality: {
+      title: 'Funcionalidad Beta',
+      label:
+        'Tenga en cuenta que esta funcionalidad aún está en desarrollo. Úselo a su propia discreción.',
     },
   },
 }

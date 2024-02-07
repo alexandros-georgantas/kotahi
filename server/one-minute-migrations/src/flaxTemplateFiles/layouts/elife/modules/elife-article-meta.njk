@@ -1,0 +1,61 @@
+<section id="article-metadata">
+    {# <h2>Metadatada</h2> #}
+    <div class="article-meta-type">
+    {% if article.status == "poa" %}
+        <h3>Author Accepted Manuscript</h3>
+        <p>PDF only version. The full online version will follow soon.</p>
+    {% elif article.status == "vor" %}
+        <h3>Version of Record</h3>
+        <p>Accepted for publication after peer review and revision.</p>
+    {% else %}
+        <h3>{{ article.status }}</h3>
+        <p>this article status is not yet managed in flax</p>
+    {% endif %}
+    </div>
+    <details class="article-links-and-downloads">
+        <summary>Downloads</summary>
+        {# <h4>The content</h4> #}
+        <ul>
+            <li>
+                <a href="{{ article.pdf }}" class="pdf-article">Article PDF</a>
+            </li>
+            <li>
+                <a href="{{ article.figuresPdf }}" class="pdf-figures">Figures PDF</a>
+            </li>
+            {# </ul> #}
+            {# <h4>Open citations</h4> #}
+            {# <ul> #}
+            <li>
+                <a href="https://www.mendeley.com/import?doi={{ article.doi }}"
+                   class="mendeley">Mendeley open citation</a>
+            </li>
+            <li>
+                <a href="https://www.readcube.com/articles/{{ article.doi }}"
+                   class="readcube">ReadCube open citation</a>
+            </li>
+        </ul>
+    </details>
+    <details class="article-cite-this-article">
+        <summary>Cite this article</summary>
+        {% include "./elife-cite-this-article.njk" %}
+    </details>
+    <details class="article-share-this-article">
+        <summary>Share this article</summary>
+        <p id="share-this-article">
+            https://doi.org/{{ article.doi }}
+            <button class="clipboard-cp"
+                    onclick="copyToClipboard(document.querySelector('#share-this-article'))">Copy to clipboard</button>
+        </p>
+    </details>
+    <details>
+        <summary>History</summary>
+    missing in the meta
+    </details>
+    <details class="article-metadata-metrics">
+        <summary>Metrics</summary>
+        <ul>
+            <li>200 views</li>
+            <li>186 downloads</li>
+        </ul>
+    </details>
+</section>

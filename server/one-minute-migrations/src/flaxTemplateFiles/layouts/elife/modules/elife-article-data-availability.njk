@@ -1,0 +1,26 @@
+{% from "../macros/article-looper.njk" import articleLoop %}
+<section id="article-data-availability" class="data-availability">
+    <h2>Data availability</h2>
+    {{ articleLoop(article.dataSets.availability, level=2) }}
+    {% if article.dataSets.generated %}
+        <p class="message">The following datasets were generated.</p>
+        <ul class="references">
+            {% for dataset in article.dataSets.generated  %}
+                <li>
+                    <span class="reference-name">
+                        {% for author in dataset.authors %}
+                            {{ author.name.preferred -}}
+                            {% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </span>
+                    <span class="reference-year">({{ dataset.date }})</span>
+                    <strong class="reference-title">{{ dataset.title }}</strong>
+                    <span class="reference-details">{{ dataset.details }}</span>
+                    <span class="reference-links">
+                    <a class="reference-link doi" href="https://doi.org/{{- dataset.doi -}}">https://doi.org/{{- dataset.doi -}}</a>
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</section>

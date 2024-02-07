@@ -1,0 +1,30 @@
+<footer>
+    <section id="footer-partners">
+        <ul>
+            {% for partner in partners  %}
+                <li>
+                    <img src="{{ partner.logourl }}" alt="{{ partner.name }}">
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+    <section class="footer-text">
+        <p>{{ site.footer.journalname | safe }} {{ site.footer.publisher | safe }}</p>
+        <nav class="submenu">
+            <ul>
+                {% for item in collections.menufooter %}
+                    <li>
+                        <a data-instant
+                           class="{% if item.url == page.url %}active{% endif %}"
+                           href="{{ item.url }}"
+                           title="{{ item.data.issn }}: {{ item.data.title }}">{%- if item.data.menufooter -%}{{- item.data.menufooter }}
+                        {% else %}
+                            {{- item.data.title }}
+                        {% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+</section>
+</footer>

@@ -30,5 +30,7 @@ config/journal/docmaps_scheme.json
 cypress/videos
 cypress/screenshots
 
+server/one-minute-migrations/src/tmp/
+
 # macOS
 .dccache

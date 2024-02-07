@@ -1,0 +1,46 @@
+{% from "../macros/article-looper-toc.njk" import articleLoopToc %}
+{% from "../macros/article-looper-figures.njk" import tocFigureTitle %}
+<aside id="toc-article" class="toc">
+    <p class="meta">Table of contents</p>
+    <ul class="nav">
+        <li>
+            <a href="#article-abstract">Abstract</a>
+        </li>
+        {% if article.editorEvaluation %}
+            <li>
+                <a href="#article-editors-evaluation">Editor’s evaluation</a>
+            </li>
+        {% endif %}
+        {{ articleLoopToc(article.body) }}
+        {% if article.appendices  %}
+            <li>
+                <a href="#article-appendices">Appendices</a>
+            </li>
+        {% endif %}
+        {# article.dataSets.availability #}
+        {% if article.dataSets.availability  %}
+            <li>
+                <a href="#article-data-availability">Data availability</a>
+            </li>
+        {% endif %}
+        {% if article.references %}
+            <li>
+                <a href="#article-references">References</a>
+            </li>
+        {% endif %}
+        {% if article.decisionLetter %}
+            <li>
+                <a href="#article-decision-letter">Decision letter</a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="#article-infos">Article and authors informations</a>
+        </li>
+    </ul>
+</aside>
+<aside id="toc-figures" class="toc">
+    <p class="meta">Table of figures</p>
+    <ul class="nav">
+        {{ tocFigureTitle(article.body) }}
+    </ul>
+</aside>

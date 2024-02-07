@@ -1,0 +1,14 @@
+<nav class="nextPrevEnd">
+    {% set previousPost = pagination.href.previous %}
+    {% set nextPost = pagination.href.next %}
+    {% if previousPost %}
+        <p class="previous">
+            <a title="previous article" href="{{ previousPost }}"><span class="meta">previous article</span><span class="name">{{ pagination.page.previous.title | safe }}</span></a>
+        </p>
+    {% endif %}
+    {% if nextPost %}
+        <p class="next">
+            <a title="next article" href="{{ nextPost }}"><span class="meta">next article</span> <span class="name">{{ pagination.page.next.title | safe }}</span></a>
+        </p>
+    {% endif %}
+</nav>

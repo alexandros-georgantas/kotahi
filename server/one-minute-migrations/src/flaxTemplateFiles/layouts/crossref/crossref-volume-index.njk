@@ -1,0 +1,73 @@
+{% extends "crossref/crossref-base.njk" %}
+{% from "../common/macros/doi.njk" import doi %}
+{% block bodyclass %}
+    article-single
+    crossref
+{% endblock bodyclass %}
+{% set volumedataname = issn + "volumes" %}
+{% set volumes = journals[volumedataname] %}
+{% block content %}
+    <main>
+        <header>
+            <h1>{{ Title }}</h1>
+        </header>
+        <aside>
+            <div class="toc">
+                <h4>volumes</h4>
+                <ul>
+                    {% for volume in volumes  | reverse %}
+                        <li>
+                            <a href="#vol{{ volume.volume }}">volume {{ volume.volume }}</a>
+                            <ul class="toc-issues">
+                                {% for issue in volume.issues  %}
+                                    <li>
+                                        <a href="#vol{{ volume.volume }}-iss{{- issue.number }}">issue {{ issue.number }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </aside>
+        <article>
+            {% for volume in volumes  | reverse %}
+                <section id="vol{{ volume.volume }}">
+                    <h2>Volume {{ volume.volume }}</h2>
+                    {% for issue in volume.issues  %}
+                        <section class="issue" id="vol{{ volume.volume }}-iss{{- issue.number }}">
+                            <h3>Issue {{ issue.number  }}</h3>
+                            {% for article in issue.articles | reorderJournal %}
+                                <section class="article-item">
+                                    <h4 class="article-title">
+                                        <a href="/articles/{{ issn }}/{{ article.DOI }}/">
+                                            {% for title in article.title   %}
+                                                <span>{{ title  | safe }}</span>
+                                                {% if article.page and article.page != "0-0" %}<span class="page-number">[p. {{ article.page }}]</span>{% endif %}
+                                            {% endfor %}
+                                        </a>
+                                    </h4>
+                                    <ul class="authors-list inline">
+                                        {% for author in article.author %}
+                                            <li>
+                                                {{ author.given -}}&nbsp;{{ author.family -}}
+                                                {% if not loop.last %}{{-", " }}{% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                    <p class="links">
+                                        <a href="/articles/{{ issn }}/{{ article.DOI }}/">
+                                            {% for title in article.title   %}<span>Go the article page</span>{% endfor %}
+                                        </a>
+                                        <span class="separator">|</span>
+                                        {{ doi(article.DOI) }}
+                                    </p>
+                                </section>
+                            {% endfor %}
+                        </section>
+                    {% endfor %}
+                </section>
+            {% endfor %}
+        </article>
+    </main>
+{% endblock content %}

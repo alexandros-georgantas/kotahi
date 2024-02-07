@@ -1,0 +1,70 @@
+{# references #}
+{# references will be the following styles: #}
+{#
+names (date) <b>title</b> <em>journal name</em> 
+doi | linkPubMed | googlescholar 
+#}
+<section id="article-references" class="reference">
+    <h2>References</h2>
+    <ol class="references">
+        {% for reference in article.references %}
+        <li class="reference-item" id="{{reference.id}}">
+                {% if reference.type == "software" %}
+                    <p class="reference-type">Software</p>
+                {% elif reference.type == "conference-proceeding" %}
+                    <p class="reference-type">Conference</p>
+                {% elif reference.type == "preprint" %}
+                    <p class="reference-type">Preprint</p>
+                {% elif reference.type == "book-chapter" %}
+                    <p class="reference-type">Book</p>
+                {% endif %}
+                <span class="reference-authors">
+                    {% for author in reference.authors %}
+                        <span class="reference-author">{{- author.name.preferred -}}
+                            {% if not loop.last %},{% endif %}
+                        </span>
+                    {% endfor %}
+                </span>
+                {% if reference.type == "journal" %}
+                    <span class="reference-date">({{ reference.date | safe }})</span>
+                    <span class="reference-title">{{ reference.articleTitle | safe }},</span>
+                    <span class="reference-journal">{{ reference.journal | safe }}</span>
+                    <span class="reference-links"><a class="reference-link doi"
+   href="https://doi.org/{{- reference.doi -}}">https://doi.org/{{- reference.doi -}}</a> </span>
+                {% elif reference.type == "conference-proceeding" %}
+                    <span class="reference-date">({{ reference.date | safe }})</span>
+                    <span class="reference-title">{{ reference.articleTitle | safe }},</span>
+                    <span class="reference-journal">{{ reference.journal | safe }}</span>
+                    <span class="reference-links"><a class="reference-link" href="{{ reference.uri }}">{{ reference.uri }}</a></span>
+                {% elif reference.type == "book-chapter" %}
+                    <span class="reference-date">({{ reference.date | safe }})</span>
+                    <span class="reference-title">{{ reference.chapterTitle | safe }},</span>
+                    in
+                    <em class="reference-book-title">{{ reference.bookTitle | safe }}.</em>
+                    {% for publisher in reference.publisher.name %}<span class="reference-publisher">{{ publisher }}.</span>{% endfor %}
+                    {% if reference.pages %}
+                        <span class="reference-book-pages">
+                            {% if reference.pages.range %}
+                                pp. {{ reference.pages.range }}
+                            {% elif reference.pages.first %}
+                                p. {{ reference.pages.first }}
+                            {% endif %}
+                        </span>
+                    {% endif %}
+                    <span class="reference-links"><a class="reference-link" href="{{ reference.uri }}">{{ reference.uri }}</a></span>
+                {% elif reference.type == "preprint" %}
+                    <span class="reference-date">({{ reference.date | safe }})</span>
+                    <span class="reference-title">{{ reference.articleTitle | safe }},</span>
+                    <span class="reference-journal">{{ reference.journal | safe }}</span>
+                    <span class="reference-links"><a class="reference-link doi"
+   href="https://doi.org/{{- reference.doi -}}">https://doi.org/{{- reference.doi -}}</a> </span>
+                {% elif reference.type == "software" %}
+                    <span class="reference-date">({{ reference.date | safe }})</span>
+                    <span class="reference-title">{{ reference.title | safe }}, version {{ reference.version }}</span>
+                    <span class="reference-journal">{{ reference.journal | safe }}</span>
+                    <span class="reference-links"><a class="reference-link" href="{{ reference.uri }}">{{ reference.uri }}</a></span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+</section>

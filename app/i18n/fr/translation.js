@@ -104,6 +104,8 @@ const fr = {
       Layout: 'Mise en page',
       Article: "Modèle d' Article",
       'Go to your profile': 'Accéder à votre profil',
+      FileBrowser: 'Explorateur de fichiers',
+      OneMinuteMigration: 'Migration',
     },
 
     profilePage: {
@@ -535,6 +537,35 @@ const fr = {
       },
       allowedIPs: 'Liste des adresses IP du référentiel autorisées à accéder',
       api: 'API Kotahi',
+      betaFunctionality: 'Fonctionnalité bêta',
+      enableBetaFunctionality:
+        'Activer la fonctionnalité bêta pour les fonctionnalités encore en cours de développement',
+    },
+    oneMinuteMigrationPage: {
+      pageTitle: 'Migration en Une Minute',
+      issnDescription: 'Revue ISSN à importer',
+      startMigration: 'Démarrer la Migration',
+      goToJournal: 'Aller au journal',
+      migratingJournal: 'Migration du journal',
+      fetchingMetadata: 'Récupérer des métadonnées',
+      error: 'Erreur',
+      notFound: 'Journal introuvable',
+      checkIssn: "Veuillez vérifier l'ISSN",
+      tryAgain: 'Essayer à nouveau',
+      savingMetadata: 'Enregistrement des métadonnées du journal...',
+      sortingJournal: 'Tri du journal par volumes et numéros...',
+      metadataSaved: 'Métadonnées enregistrées',
+      removingPreviousMigration:
+        'Suppression des données précédemment téléchargées et des pages générées...',
+      getLogo: 'Je cherche le logo...',
+      getTeam: "Je recherche la page de l'équipe...",
+      getAbout: 'Je recherche la page à propos...',
+      info:
+        "Importez des revues électroniques existantes provenant de fournisseurs tiers, tels que OJS. Il s'agit d'un service faisant de son mieux.",
+      notice:
+        'Remarque : toutes les données de migration précédentes seront effacées si un nouvel ISSN est soumis.',
+      updatingRootFolder: 'Mise à jour du dossier racine du CMS...',
+      rebuildingFlax: 'Reconstruction du site du Flax...',
     },
     reportsPage: {
       Reports: 'Rapports',
@@ -1099,6 +1130,11 @@ const fr = {
         true: 'Oui',
         false: 'Non',
       },
+    },
+    betaFunctionality: {
+      title: 'Fonctionnalité Bêta',
+      label:
+        'Veuillez noter que cette fonctionnalité est encore en développement. Utilisez à votre propre discrétion.',
     },
   },
 }

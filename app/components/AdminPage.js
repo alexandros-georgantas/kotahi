@@ -34,10 +34,12 @@ import TasksTemplatePage from './component-task-manager/src/TasksTemplatePage'
 import UsersPage from './component-users-manager/src/UsersPage'
 import ConfigManagerPage from './component-config-manager/src/ConfigManagerPage'
 import EmailTemplatesPage from './component-email-templates/src/EmailTemplatesPage'
+import OneMinuteMigrationPage from './component-one-minute-migration/OneMinuteMigrationPage'
 
 import CMSPagesPage from './component-cms-manager/src/CMSPagesPage'
 import CMSLayoutPage from './component-cms-manager/src/CMSLayoutPage'
 import CMSArticlePage from './component-cms-manager/src/CMSArticlePage'
+import CMSFileBrowserPage from './component-cms-manager/src/CMSFileBrowserPage'
 
 import QUERY from './adminPageQueries'
 
@@ -177,10 +179,12 @@ const AdminPage = () => {
   const CMSPagesPageLink = `${urlFrag}/admin/cms/pages`
   const CMSLayoutPageLink = `${urlFrag}/admin/cms/layout`
   const CMSArticlePageLink = `${urlFrag}/admin/cms/article`
+  const CMSFileBrowserLink = `${urlFrag}/admin/cms/filebrowser`
   const loginLink = `${urlFrag}/login?next=${homeLink}`
   const path = `${urlFrag}/versions/:version`
   const redirectLink = `${urlFrag}/login?next=${homeLink}`
   const emailTemplatesLink = `${urlFrag}/admin/email-templates`
+  const migrationLink = `${urlFrag}/admin/migration`
 
   if (showLinks) {
     const params = getParams(pathname, path)
@@ -275,6 +279,15 @@ const AdminPage = () => {
           name: i18next.t('leftMenu.Emails'),
           icon: 'mail',
         },
+        ...(config?.betaFunctionality?.isBetaEnabled
+          ? [
+              {
+                link: migrationLink,
+                name: i18next.t('leftMenu.OneMinuteMigration'),
+                icon: 'log-in',
+              },
+            ]
+          : []),
         {
           menu: 'CMS',
           name: i18next.t('leftMenu.CMS'),
@@ -295,6 +308,15 @@ const AdminPage = () => {
               name: i18next.t('leftMenu.Article'),
               icon: '',
             },
+            ...(config?.betaFunctionality?.isBetaEnabled
+              ? [
+                  {
+                    link: CMSFileBrowserLink,
+                    name: i18next.t('leftMenu.FileBrowser'),
+                    icon: '',
+                  },
+                ]
+              : []),
           ],
         },
       ],
@@ -525,6 +547,18 @@ const AdminPage = () => {
             redirectLink={redirectLink}
           />,
 
+          ...(config?.betaFunctionality?.isBetaEnabled
+            ? [
+                <PrivateRoute
+                  component={CMSFileBrowserPage}
+                  currentUser={currentUser}
+                  key="CMSPagesPage"
+                  path={`${CMSFileBrowserLink}`}
+                  redirectLink={redirectLink}
+                />,
+              ]
+            : []),
+
           <PrivateRoute
             component={ConfigManagerPage}
             key="configuration"
@@ -537,6 +571,16 @@ const AdminPage = () => {
             path={`${emailTemplatesLink}/:pageId?`}
             redirectLink={redirectLink}
           />,
+          ...(config?.betaFunctionality?.isBetaEnabled
+            ? [
+                <PrivateRoute
+                  component={OneMinuteMigrationPage}
+                  key="one-minute-migration"
+                  path={`${migrationLink}`}
+                  redirectLink={redirectLink}
+                />,
+              ]
+            : []),
         ]}
         {isGroupManager && [
           <PrivateRoute

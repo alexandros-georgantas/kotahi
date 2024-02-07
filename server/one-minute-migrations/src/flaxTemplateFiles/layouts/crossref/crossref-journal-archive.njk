@@ -1,0 +1,55 @@
+{% extends "crossref/crossref-base.njk" %}
+{% from "../common/macros/doi.njk" import doi %}
+{% block bodyclass %}
+    articles-list
+    crossref
+    archives
+{% endblock bodyclass %}
+{% block content %}
+    <main>
+        {% set journalid = issn + "meta" %}
+        {% set journalmeta = journals[journalid] %}
+        <header>
+            <div class="sticky">
+                <h1>{{ journalmeta.title | safe }}</h1>
+                <p class="publisher">{{ journalmeta.publisher }}</p>
+                {% include "../common/paginationMenu.njk" %}
+            </div>
+        </header>
+        <article>
+            <ul class="article-list">
+                {% for article in pagination.items %}
+                    {% if article.type == "journal-issue" %}
+                        <li class="issue-title">
+                            Volume {{ article.volume }} / issue {{ article.issue }}
+                            {# {% if article.page %}/ pages {{ article.page }}{% endif %} #}
+                        </li>
+                    {% else %}
+                        <li>
+                            <h2 class="article-title">
+                                <a href="/articles/{{ issn }}/{{ article.DOI }}/">
+                                    {% for title in article.title   %}<span>{{ title  | safe }}</span>{% endfor %}
+                                </a>
+                            </h2>
+                            <ul class="authors-list inline">
+                                {% for author in article.author %}
+                                    <li>
+                                        {{ author.given -}}&nbsp;{{ author.family -}}
+                                        {% if not loop.last %}{{-", " }}{% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <p class="links">
+                                <a href="/articles/{{ issn }}/{{ article.DOI }}/">
+                                    {% for title in article.title   %}<span>Go the article page</span>{% endfor %}
+                                </a>
+                                <span class="separator">|</span>
+                                {{ doi(article.DOI) }}
+                            </p>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </article>
+    </main>
+{% endblock content %}

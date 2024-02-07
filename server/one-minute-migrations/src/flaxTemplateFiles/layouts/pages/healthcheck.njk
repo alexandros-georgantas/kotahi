@@ -1,0 +1,24 @@
+{% extends "base.njk" %}
+{% block headscripts %}
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+        import { fetchJournalDetails } from '/assets/js/healthchecker.js';
+        window.fetchJournalDetails = fetchJournalDetails;   
+    </script>
+{% endblock headscripts %}
+{% block content %}
+    <main>
+        <header>
+            <h1>{{ title }}</h1>
+        </header>
+        <article>
+            <form onsubmit="event.preventDefault(); fetchJournalDetails();">
+                <label for="issn">Enter ISSN:</label>
+                <input type="text" id="issn" required>
+                <button type="submit">Search</button>
+            </form>
+            <div id="results"></div>
+        </article>
+    </main>
+{% endblock  %}

@@ -1,0 +1,48 @@
+{% extends "crossref/crossref-base.njk" %}
+{% from "../common/macros/doi.njk" import doi %}
+{% block bodyclass %}
+    article-single
+    crossref
+{% endblock bodyclass %}
+{% block content %}
+    <main>
+        <header>
+            <h1>{{ volume.volume }}</h1>
+        </header>
+        <main>
+                <h2>{{ volume.volume }}</h2>
+            {% for issue in volume.issues  %}
+            
+                <h2>Issue {{ issue.number }}</h2>
+                {% for article in issues[issue].articles  %}
+                    {% if article.type == "journal-issue" %}
+                    {% else %}
+                        {% for article in issue.article  %}
+                            <li>
+                                <h2 class="article-title">
+                                    <a href="/articles/{{ issn }}/{{ article.DOI }}/">
+                                        {% for title in article.title   %}<span>{{ title  | safe }}</span>{% endfor %}
+                                    </a>
+                                </h2>
+                                <ul class="authors-list inline">
+                                    {% for author in article.author %}
+                                        <li>
+                                            {{ author.given -}}&nbsp;{{ author.family -}}
+                                            {% if not loop.last %}{{-", " }}{% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                <p class="links">
+                                    <a href="/articles/{{ issn }}/{{ article.DOI }}/">
+                                        {% for title in article.title   %}<span>Go the article page</span>{% endfor %}
+                                    </a>
+                                	<span class="separator">|</span>
+                                    {{ doi(article.DOI) }}
+                                </p>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </main>
+    {% endblock content %}

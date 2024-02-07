@@ -1,0 +1,19 @@
+{# funding #}
+<section id="article-fundings" class="funding">
+    <h3>Funding</h3>
+    <ul class="funding-list">
+        {% for award in article.funding.awards %}
+            <li id="{{ award.id }}">
+                <span class="funding-founder-name">
+                    {{  award.source.name  }}
+                    {% if award.awardId %}({{ award.awardId }}){% endif %}
+                </span>
+                {% if  award.recipients %}
+                    <ul class="funding-recipients">
+                        {% for recipient in award.recipients %}<li class="sourcename">{{ recipient.name.preferred }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</section>

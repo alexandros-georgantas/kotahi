@@ -104,6 +104,8 @@ const en = {
       Layout: 'Layout',
       Article: 'Article Template',
       'Go to your profile': 'Go to your profile',
+      FileBrowser: 'File Browser',
+      OneMinuteMigration: 'Migration',
     },
 
     profilePage: {
@@ -511,6 +513,35 @@ const en = {
       },
       allowedIPs: 'List of repository IPs allowed access',
       api: 'COAR Notify',
+      betaFunctionality: 'Beta Functionality',
+      enableBetaFunctionality:
+        'Enable beta functionality for features still under development',
+    },
+    oneMinuteMigrationPage: {
+      pageTitle: 'One Minute Migration',
+      issnDescription: 'Journal ISSN to import',
+      startMigration: 'Start Migration',
+      goToJournal: 'Go to journal',
+      migratingJournal: 'Migrating journal',
+      fetchingMetadata: 'Fetching metadata',
+      error: 'Error',
+      notFound: 'Journal not found',
+      checkIssn: 'Please verify the ISSN',
+      tryAgain: 'Try again',
+      savingMetadata: 'Saving journal metadata...',
+      sortingJournal: 'Sorting journal per volumes and issues...',
+      metadataSaved: 'Metadata saved',
+      removingPreviousMigration:
+        'Removing previously downloaded data and generated pages...',
+      getLogo: 'Looking for the logo...',
+      getTeam: 'Looking for the team page...',
+      getAbout: 'Looking for the about page...',
+      info:
+        'Import existing electronic journals from third party providers, such as OJS. This is a best-effort service.',
+      notice:
+        'Note: any previous migration data will be cleared if a new ISSN is submitted.',
+      updatingRootFolder: 'Updating the CMS root folder...',
+      rebuildingFlax: 'Rebuilding Flax site...',
     },
     reportsPage: {
       Reports: 'Reports',
@@ -1066,6 +1097,11 @@ const en = {
         true: 'Yes',
         false: 'No',
       },
+    },
+    betaFunctionality: {
+      title: 'Beta Functionality',
+      label:
+        'Please note that this functionality is still under development. Use at your own discretion.',
     },
   },
 }

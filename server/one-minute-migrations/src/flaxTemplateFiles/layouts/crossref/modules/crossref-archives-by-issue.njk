@@ -1,0 +1,31 @@
+
+
+<h1>Volume {{ volume.key }}</h1>
+{% set issuesByVolume = volume.items | groupBy(["issue", "volume"]) %}
+
+{% for issue, volumeItems in issuesByVolume %}
+  <h2>Issue {{ issue }}</h2>
+  <ul>
+    {% for volume, items in volumeItems %}
+      <h3>Volume {{ volume }}</h3>
+      {% for item in items %}
+        <li>{{ item.title }}</li>
+      {% endfor %}
+    {% endfor %}
+  </ul>
+{% endfor %}
+
+{% if pagination.pages.length > 1 %}
+  <div class="pagination">
+    {% if pagination.previous %}
+      <a href="{{ pagination.previous.href }}">Previous</a>
+    {% endif %}
+    {% for page in pagination.pages %}
+      <a href="{{ page.href }}">{{ page.pageNumber }}</a>
+    {% endfor %}
+    {% if pagination.next %}
+      <a href="{{ pagination.next.href }}">Next</a>
+    {% endif %}
+  </div>
+{% endif %}
+
