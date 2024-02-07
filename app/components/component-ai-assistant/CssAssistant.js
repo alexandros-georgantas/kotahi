@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import './CssAssistantWC'
 import styled from 'styled-components'
-import { color } from '../../theme'
+import useStylesheets from './hooks/useStyleSheet'
 
 const StyledContainer = styled.div`
   --color: #2fac66;
@@ -40,55 +40,42 @@ const StyledContainer = styled.div`
 `
 
 const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
+  // #region HOOKS
   const context = useRef([])
-
+  const styleSheetRef = useRef(null)
   const [selectedCtx, setSelectedCtx] = useState([])
   const promptRef = useRef(null)
   const [userPrompt, setUserPrompt] = useState('')
 
-  const getCtxByNode = node => {
-    return context.current.find(c => c.node === node)
-  }
-
-  const createCtx = (node, index, parentSelector) => {
-    const tagName = node.tagName.toLowerCase()
-
-    const selector = `${
-      parentSelector ? `${parentSelector} > ${tagName}` : node.id || baseId
-    }`.trim()
-
-    const childs = createChildsCtx(node, selector)
-    return {
-      selector,
-      index,
-      node,
-      tagName,
-      childs,
-    }
-  }
-
-  const addToCtx = ctx => {
-    context.current = [...context.current, ctx]
-    return ctx
-  }
-
-  const createChildsCtx = (ctxNode, parentSelector) =>
-    [...ctxNode.children].map((node, index) =>
-      addToCtx(createCtx(node, index, parentSelector)),
-    )
+  const { insertRule, deleteRule, updateRule } = useStylesheets(
+    styleSheetRef?.current?.sheet,
+  )
 
   useEffect(() => {
     // console.log(parentCtx)
 
     if (parentCtx) {
-      addToCtx(createCtx(parentCtx, 0, ''))
+      addToCtx(createCtx(parentCtx, 0, '')) // creates the whole context tarting from the parentCtx
       context.current = context.current.map((ctx, i) => ({
         ...ctx,
         index: i + 1,
         history: [],
-        rules: {},
+        rules: {}, // this shoudl be the actual computedStyles from ctx.node
       }))
+
       // console.log(context.current)
+      if (!document.getElementById('dynamicStyles')) {
+        const styleTag = document.createElement('style')
+        styleTag.id = 'css-assistant-scoped-styles'
+        parentCtx.parentNode.insertBefore(styleTag, parentCtx)
+        styleSheetRef.current = styleTag
+        // console.log(styleSheetRef.current)
+      } else {
+        styleSheetRef.current = document.getElementById(
+          'css-assistant-scoped-styles',
+        )
+        // console.log(styleSheetRef.current)
+      }
 
       context.current.forEach(
         ctx => ctx.node && ctx.node.addEventListener('click', selectNode),
@@ -105,6 +92,54 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
       }
     }
   }, [])
+  // #endregion HOOKS
+
+  // #region CONTEXT
+  // -- create --
+  const createCtx = (node, index, parentSelector) => {
+    const tagName = node.tagName.toLowerCase()
+
+    const selector = `${
+      parentSelector
+        ? `${parentSelector} > ${tagName}`
+        : `#${node.id || baseId || 'css-assistant-scope'}`
+    }`.trim()
+
+    const childs = createChildsCtx(node, selector)
+    return {
+      selector,
+      index,
+      node,
+      tagName,
+      childs,
+    }
+  }
+
+  const createChildsCtx = (ctxNode, parentSelector) =>
+    [...ctxNode.children].map((node, index) =>
+      addToCtx(createCtx(node, index, parentSelector)),
+    )
+
+  // -- handle
+  const getCtxBy = {
+    node: node => {
+      context.current.find(c => c.node === node)
+    },
+    selector: selector => context.current.find(c => c.selector === selector),
+  }
+
+  const addToCtx = ctx => {
+    context.current = [...context.current, ctx]
+    return ctx
+  }
+
+  const updateCtx = (ctx, newRules) => {
+    const scopedCtx = getCtxBy.node(ctx.node)
+    if (!scopedCtx) return
+    scopedCtx.rules = { ...scopedCtx.rules, newRules }
+  }
+  // #endregion CONTEXT
+
   const handleChange = ({ target }) => setUserPrompt(target.value)
 
   const selectNode = e => {
@@ -112,7 +147,7 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
     setSelectedCtx(prev => {
       const temp = prev
       prev.node && (temp.node.style.outline = 'none')
-      return getCtxByNode(e.target)
+      return getCtxBy.node(e.target)
     })
   }
 

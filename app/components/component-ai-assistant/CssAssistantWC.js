@@ -1,7 +1,5 @@
 /* eslint-disable no-underscore-dangle */
 const { API_KEY } = process.env
-export const getComputed = (el, prop) =>
-  window.getComputedStyle(el).getPropertyValue(prop)
 
 export const onEntries = (obj, cb) => {
   Object.entries(obj).forEach(([k, v]) => cb(k, v))
@@ -270,10 +268,10 @@ export class CssAssistant extends HTMLElement {
     return this._promptsCtx.find(elm => elm.element === node)
   }
 
-  autoResize() {
-    this.style.height = getComputed(this, 'font-size')
-    this.style.height = `${this.scrollHeight}px`
-  }
+  // autoResize() {
+  //   this.style.height = getComputed(this, 'font-size')
+  //   this.style.height = `${this.scrollHeight}px`
+  // }
   // #endregion helpers
 }
 
