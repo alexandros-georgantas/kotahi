@@ -17,7 +17,7 @@ export const safeKey = (name, object) => {
   return finalName
 }
 
-export const getComputed = el =>
+export const getComputedRule = el =>
   values(window.getComputedStyle(el))
     .map(
       val =>
@@ -28,6 +28,8 @@ export const getComputed = el =>
         },
     )
     .filter(Boolean)
+
+export const hasChilds = node => [...(node.children.length > 0)]
 
 export const toSnake = key =>
   key
@@ -98,13 +100,15 @@ export const keys = obj => Object.keys(obj)
 export const values = obj => Object.values(obj)
 export const entries = obj => Object.entries(obj)
 
-export const onEntries = (obj, cb) =>
-  Object.entries(obj).forEach((k, v) => cb(k, v))
-export const mapEntries = (obj, cb) =>
-  Object.entries(obj).map((k, v) => cb(k, v))
+export const onEntries = (obj, cb) => entries(obj).forEach((k, v) => cb(k, v))
+export const mapEntries = (obj, cb) => entries(obj).map((k, v) => cb(k, v))
 export const filterEntries = (obj, cb) =>
-  Object.entries(obj).filter((k, v) => cb(k, v))
+  entries(obj).filter((k, v) => cb(k, v))
 
-export const onKeys = (obj, cb) => Object.keys(obj).map(cb)
-export const mapKeys = (obj, cb) => Object.keys(obj).map(cb)
-export const filterKeys = (obj, cb) => Object.keys(obj).map(cb)
+export const onKeys = (obj, cb) => keys(obj).forEach(cb)
+export const mapKeys = (obj, cb) => keys(obj).map(cb)
+export const filterKeys = (obj, cb) => keys(obj).filter(cb)
+
+export const onValues = (obj, cb) => values(obj).forEach(cb)
+export const mapValues = (obj, cb) => values(obj).map(cb)
+export const filterValues = (obj, cb) => values(obj).filter(cb)

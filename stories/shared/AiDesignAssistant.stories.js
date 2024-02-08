@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
+import styled from 'styled-components'
 import CssAssistant from '../../app/components/component-ai-assistant/CssAssistant'
+
+const Container = styled.div``
 
 export const Base = () => {
   const mainRef = useRef(null)
@@ -10,7 +13,7 @@ export const Base = () => {
   }, [mainRef])
 
   return (
-    <div>
+    <Container>
       <article id="css-assistant-scoped" ref={mainRef}>
         <header>
           <h1>Chapter 1</h1>
@@ -38,7 +41,7 @@ export const Base = () => {
         </section>
       </article>
       <CssAssistant enabled parentCtx={context} />
-    </div>
+    </Container>
   )
 }
 

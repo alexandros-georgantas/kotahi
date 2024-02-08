@@ -1,5 +1,5 @@
 const useStylesheets = () => {
-  const insertRule = (sheet, ctx) => {
+  const insertRule = (styleNode, ctx) => {
     const { selector, rules } = ctx
 
     const ruleString = `${selector} {\n${rules
@@ -9,18 +9,23 @@ const useStylesheets = () => {
       .join(';\n')}\n}`
 
     try {
-      sheet.sheet.insertRule(ruleString, sheet.sheet.cssRules.length)
+      styleNode.sheet.insertRule(ruleString, styleNode.sheet.cssRules.length)
     } catch (error) {
       console.error('Error inserting rule: ', error)
     }
   }
 
-  const updateRule = (sheet, { selector, rules: { rule, value } }) => {
+  const updateRule = (sheet, { selector, rules }) => {
     ;[...sheet.sheet.cssRules].forEach(cssRule => {
-      if (cssRule.selectorText === selector && cssRule.style[rule]) {
-        // eslint-disable-next-line no-param-reassign
-        cssRule.style[rule] = value
-      }
+      rules.forEach(({ rule, value }) => {
+        if (
+          cssRule.selectorText === selector &&
+          cssRule.style[rule] !== value
+        ) {
+          // eslint-disable-next-line no-param-reassign
+          cssRule.style[rule] = value
+        }
+      })
     })
   }
 
