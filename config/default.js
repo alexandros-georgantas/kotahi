@@ -213,4 +213,7 @@ module.exports = {
   'import-for-prc': {
     default_import: 'false',
   },
+  chatGPT: {
+    key: 'CHAT_GPT_KEY',
+  },
 }
