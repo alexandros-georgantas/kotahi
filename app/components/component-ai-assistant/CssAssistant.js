@@ -4,9 +4,10 @@ import React, { useState, useEffect, useRef } from 'react'
 import './CssAssistantWC'
 import styled from 'styled-components'
 import gql from 'graphql-tag'
-import { useApolloClient, useLazyQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import useStylesheet from './hooks/useStyleSheet'
 import { onEntries, safeCall } from './utils/helpers'
+import SendButton from './SendButton'
 
 const CHAT_GPT_QUERY = gql`
   query ChatGpt($input: String!, $history: [ChatGptMessage!]) {
@@ -34,13 +35,14 @@ Keep in mind that 'user' might not know css, so the prompt must be analysed care
 )}], If the prompt refers to an HTML element and it's tagname matches one of these valid selectors use it, otherwise use "${
   ctx.selector
 }" as default value. This variable represents the HTML element whose CSS properties need to be changed.
+
 ["validSelector"] also can be followed by ::nth-of-type(n) or nth-child(n) pseudoselectors, but ONLY if user specifies a number for the element,
 
-Provide a CSS rule and its value in the following JSON format: {"validSelector": {"cssRuleInCamelCase": "validCSSValue"}, ...moreRulesIfMoreHtmlElementsAreInvolved}.
+Provide a CSS rule and its value in the following JSON format: {"[validSelector]": {"cssRule": "validCSSValue"}, ...moreRulesIfMoreHtmlElementsAreInvolved}.
 
 Use hex for colors and px units for sizes.
 
-You cannot use individual properties, like ('backgroundImage', 'backgroundColor', 'borderColor', ...etc); use shorthand properties instead.
+You cannot use individual properties, like ('background-image', 'background-color', 'border-color', ...etc); use shorthand properties instead.
 
 You can refer to this rules as context for user's request if needed: ${String(
   ctx.rules,
@@ -62,6 +64,7 @@ const StyledForm = styled.form`
   box-shadow: 0 0 5px #0004, inset 0 0 5px #0004;
   display: flex;
   font-size: var(--font-size);
+  gap: 8px;
   height: fit-content;
   justify-content: center;
   overflow: auto;
@@ -299,8 +302,14 @@ const CssAssistant = ({
     selectedCtx &&
       getChatGpt({
         variables: {
-          input: String(userPrompt),
-          history: selectedCtx.history,
+          input: userPrompt,
+          history: [
+            {
+              role: 'system',
+              content: systemGuidelines(selectedCtx),
+            },
+            ...selectedCtx.history,
+          ],
         },
       })
   }
@@ -343,6 +352,11 @@ const CssAssistant = ({
         ref={promptRef}
         value={userPrompt}
         {...rest}
+      />
+      <SendButton
+        onClick={handleSubmit}
+        size="24"
+        style={{ transform: 'scale(1.3)', cursor: 'pointer' }}
       />
     </StyledForm>
   )

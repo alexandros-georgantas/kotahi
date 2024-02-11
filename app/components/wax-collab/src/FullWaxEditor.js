@@ -35,6 +35,7 @@ const FullWaxEditor = ({
   fileUpload,
   user,
   manuscriptId,
+  aiAssistant,
   ...rest
 }) => {
   const handleAssetManager = () => onAssetManager(manuscriptId)
@@ -72,7 +73,7 @@ const FullWaxEditor = ({
           layout={
             useComments
               ? FullWaxEditorCommentsLayout(readonly, authorComments)
-              : FullWaxEditorLayout(readonly)
+              : FullWaxEditorLayout(readonly, aiAssistant)
           }
           onChange={source => debouncedSave(source)}
           placeholder={placeholder}

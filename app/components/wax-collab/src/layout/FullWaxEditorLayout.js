@@ -4,6 +4,7 @@ import {
   ComponentPlugin,
   DocumentHelpers,
 } from 'wax-prosemirror-core'
+import styled from 'styled-components'
 import {
   Grid,
   EditorDiv,
@@ -20,6 +21,15 @@ import {
 } from './NotesStyles'
 import 'wax-prosemirror-core/dist/index.css'
 import 'wax-prosemirror-services/dist/index.css'
+import CssAssistant from '../../../component-ai-assistant/CssAssistant'
+
+const StyledCssAssistant = styled(CssAssistant)``
+
+const StyledHeading = styled.div`
+  background-color: #fff;
+  padding: 10px;
+  width: 100%;
+`
 
 const getNotes = main => {
   const notes = DocumentHelpers.findChildrenByType(
@@ -35,14 +45,14 @@ const TopBar = ComponentPlugin('topBar')
 const NotesArea = ComponentPlugin('notesArea')
 const CounterInfo = ComponentPlugin('bottomRightInfo')
 
-const FullWaxEditorLayout = readOnly => ({ editor }) => {
+const FullWaxEditorLayout = (readOnly, aiAssistant) => ({ editor }) => {
   const {
     pmViews: { main },
     options,
+    activeView,
   } = useContext(WaxContext)
 
   const notes = (main && getNotes(main)) ?? []
-
   // added to bring in full screen
 
   let fullScreenStyles = {}
@@ -63,6 +73,11 @@ const FullWaxEditorLayout = readOnly => ({ editor }) => {
 
   return (
     <div id="wax-container" style={fullScreenStyles}>
+      {aiAssistant && (
+        <StyledHeading>
+          <StyledCssAssistant enabled scope={activeView.dom} />
+        </StyledHeading>
+      )}
       <Grid readonly={readOnly} readOnlyComments>
         {readOnly ? (
           <FullWaxEditorGrid useComments={false}>

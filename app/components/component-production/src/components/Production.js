@@ -24,6 +24,7 @@ import AuthorFeedbackForm from '../../../component-author-feedback/src/component
 import UploadAsset from './uploadManager/UploadAsset'
 import ReadonlyFormTemplate from '../../../component-review/src/components/metadata/ReadonlyFormTemplate'
 import { color } from '../../../../theme'
+import FullWaxEditor from '../../../wax-collab/src/FullWaxEditor'
 
 const FlexRow = styled.div`
   display: flex;
@@ -40,6 +41,7 @@ const StyledManuscript = styled(Manuscript)`
   flex-direction: column;
   height: 100vh;
   overflow-y: auto;
+  position: relative;
   width: 100%;
 `
 
@@ -51,6 +53,24 @@ const ScrollableTabContent = styled.section`
   height: calc(100vh - 108px);
   overflow: auto;
   width: calc(100vw - 232px);
+`
+
+const LabeledTab = styled.div`
+  position: relative;
+
+  &::before {
+    background: ${color.brand1.base};
+    border-radius: 5px;
+    color: white;
+    content: 'Beta';
+    display: flex;
+    font-size: 11px;
+    line-height: 1;
+    padding: 3px 5px;
+    position: absolute;
+    right: -42%;
+    top: -15px;
+  }
 `
 
 const Production = ({
@@ -131,6 +151,10 @@ const Production = ({
                 saveSource={debouncedSave}
                 user={currentUser}
                 value={manuscript.meta.source}
+                // value={styleHtmlString(
+                //   manuscript.meta.source,
+                //   'p {color: blue;}',
+                // )}
               />
             ) : (
               <Spinner />
@@ -186,6 +210,7 @@ const Production = ({
           extensions={[html()]}
           onChange={onChangeHtml}
           value={htmlValue}
+          // value={styleHtmlString(htmlValue, 'p {color: blue !important;}')}
         />
       </ScrollableTabContent>
     ),
@@ -227,6 +252,30 @@ const Production = ({
     label: t('productionPage.PDF metadata'),
   }
 
+  const cssAiAssistant = {
+    content: (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'auto',
+          height: '100%',
+        }}
+      >
+        <FullWaxEditor
+          aiAssistant
+          readonly
+          saveSource={debouncedSave}
+          user={currentUser}
+          value={manuscript.meta.source}
+        />
+      </div>
+    ),
+
+    key: 'css-ai-assistant',
+    label: <LabeledTab>AiAssistant</LabeledTab>,
+  }
+
   const tabSections = []
 
   if (isAuthorProofingVersion) {
@@ -243,6 +292,7 @@ const Production = ({
       cssPagedJS,
       uploadAssets,
       manuscriptMetadata,
+      cssAiAssistant,
     )
 
     if (authorFeedback.submitted) tabSections.push(feedbackSection)
@@ -264,6 +314,10 @@ const Production = ({
               makePdf={makePdf}
               manuscriptId={manuscript.id}
               manuscriptSource={manuscript.meta.source}
+              // manuscriptSource={styleHtmlString(
+              //   manuscript.meta.source,
+              //   'p {color: blue;}',
+              // )}
             />
           </ControlsContainer>
         </FlexRow>
