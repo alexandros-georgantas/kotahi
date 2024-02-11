@@ -31,6 +31,19 @@ export const getComputedRule = el =>
 
 export const hasChilds = node => [...(node.children.length > 0)]
 
+export const styleHtmlString = (source, style) => {
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(source, 'text/html')
+
+  const headElement = doc.querySelector('head')
+  const styleElement = document.createElement('style')
+  styleElement.innerHTML = style
+
+  headElement.appendChild(styleElement)
+
+  return doc.documentElement.outerHTML
+}
+
 export const toSnake = key =>
   key
     .split(/(?=[A-Z])/)
@@ -100,10 +113,10 @@ export const keys = obj => Object.keys(obj)
 export const values = obj => Object.values(obj)
 export const entries = obj => Object.entries(obj)
 
-export const onEntries = (obj, cb) => entries(obj).forEach((k, v) => cb(k, v))
-export const mapEntries = (obj, cb) => entries(obj).map((k, v) => cb(k, v))
+export const onEntries = (obj, cb) => entries(obj).forEach(([k, v]) => cb(k, v))
+export const mapEntries = (obj, cb) => entries(obj).map(([k, v]) => cb(k, v))
 export const filterEntries = (obj, cb) =>
-  entries(obj).filter((k, v) => cb(k, v))
+  entries(obj).filter(([k, v]) => cb(k, v))
 
 export const onKeys = (obj, cb) => keys(obj).forEach(cb)
 export const mapKeys = (obj, cb) => keys(obj).map(cb)

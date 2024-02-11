@@ -40,7 +40,7 @@ export const Base = () => {
           </p>
         </section>
       </article>
-      <CssAssistant enabled parentCtx={context} />
+      <CssAssistant enabled scope={context} />
     </Container>
   )
 }

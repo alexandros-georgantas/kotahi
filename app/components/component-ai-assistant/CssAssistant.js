@@ -1,9 +1,56 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from 'react'
 import './CssAssistantWC'
 import styled from 'styled-components'
-import useStylesheets from './hooks/useStyleSheet'
-import { safeCall } from './utils/helpers'
+import gql from 'graphql-tag'
+import { useApolloClient, useLazyQuery } from '@apollo/client'
+import useStylesheet from './hooks/useStyleSheet'
+import { onEntries, safeCall } from './utils/helpers'
+
+const CHAT_GPT_QUERY = gql`
+  query ChatGpt($input: String!, $history: [ChatGptMessage!]) {
+    chatGPT(input: $input, history: $history)
+  }
+`
+
+const getSelectorsRecursively = ctx => [
+  ctx.selector,
+  ...ctx.childs.map(child => child.selector),
+]
+
+const systemGuidelines = ctx => `
+
+You are a CSS, JS and HTML expert, your task is to interpret which changes the 'user' wants to do on a css property from an html tag.
+
+You must retain the contex of the properties 'user' pointed on previous prompts, to add, remove, or modify it/them accordingly.
+
+Keep in mind that 'user' might not know css, so the prompt must be analysed carefully in order to complete the task.
+
+[validSelector] is a placeholder variable (see below), and its value can only be one of the following valid selectors: [${getSelectorsRecursively(
+  ctx,
+).join(
+  ', ',
+)}], If the prompt refers to an HTML element and it's tagname matches one of these valid selectors use it, otherwise use "${
+  ctx.selector
+}" as default value. This variable represents the HTML element whose CSS properties need to be changed.
+["validSelector"] also can be followed by ::nth-of-type(n) or nth-child(n) pseudoselectors, but ONLY if user specifies a number for the element,
+
+Provide a CSS rule and its value in the following JSON format: {"validSelector": {"cssRuleInCamelCase": "validCSSValue"}, ...moreRulesIfMoreHtmlElementsAreInvolved}.
+
+Use hex for colors and px units for sizes.
+
+You cannot use individual properties, like ('backgroundImage', 'backgroundColor', 'borderColor', ...etc); use shorthand properties instead.
+
+You can refer to this rules as context for user's request if needed: ${String(
+  ctx.rules,
+)}
+
+The output must always be a valid JSON. Ensure that each key is a string enclosed in double quotes and that each value is a valid CSS value, also enclosed in double quotes.
+
+If the prompt can't be resolved through CSS or doesn't involve CSS, respond: 'My purpose is to assist you with your book's design. Please, tell me how can i help you to improve your designs'.
+
+`
 
 const StyledForm = styled.form`
   --color: #2fac66;
@@ -17,15 +64,15 @@ const StyledForm = styled.form`
   font-size: var(--font-size);
   height: fit-content;
   justify-content: center;
-  overflow: visible;
+  overflow: auto;
   padding: 0.4rem 0.8rem;
   position: relative;
   transition: all 0.5s;
-  width: fit-content;
+  width: 500px;
 
   textarea {
     --height: ${p =>
-      p.height || `calc(var(--font-size) + (var(--font-size) / 2));`};
+      p.height || `calc(var(--font-size) + (var(--font-size) / 4));`};
     background: none;
     border: none;
     caret-color: var(--color);
@@ -33,74 +80,115 @@ const StyledForm = styled.form`
     height: var(--height);
     max-height: 100px;
     outline: none;
-    overflow: auto;
+    overflow-y: auto;
     resize: none;
     width: 100%;
   }
 `
 
-const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
+const CssAssistant = ({
+  enabled,
+  scope,
+  baseId,
+  className,
+  setCss = () => null,
+  appendStyleTag = true,
+  ...rest
+}) => {
   // #region HOOKS
   const context = useRef([])
   const styleSheetRef = useRef(null)
   const [selectedCtx, setSelectedCtx] = useState([])
   const promptRef = useRef(null)
   const [userPrompt, setUserPrompt] = useState('')
+  const [responseWithDetails, setResponseWithDetails] = useState('')
 
-  const { insertRule, deleteRule, updateRule } = useStylesheets()
+  const [getChatGpt, { loading, error, data }] = useLazyQuery(CHAT_GPT_QUERY, {
+    onCompleted: ({ chatGPT }) => {
+      if (chatGPT.startsWith('{')) {
+        const response = JSON.parse(chatGPT)
+        response &&
+          onEntries(response, (selector, rules) => {
+            addRules(getCtxBy('selector', selector), rules)
+          })
+      } else setResponseWithDetails(chatGPT)
 
-  useEffect(() => {
-    if (parentCtx) {
-      addToCtx(createCtx(parentCtx, 0, '')) // creates the whole context starting from the parentCtx
-      context.current = context.current.map((ctx, i) => ({
-        ...ctx,
-        history: [],
-        rules:
-          ctx.node === parentCtx
-            ? [
-                { rule: 'background', value: '#5a8' },
-                { rule: 'color', value: '#eee' },
-              ]
-            : [{}], // this should be the actual computedStyles from ctx.node
-      }))
+      selectedCtx.history.push(
+        { role: 'user', content: userPrompt },
+        { role: 'assistant', content: chatGPT },
+      )
+      setUserPrompt('')
+      autoResize()
+    },
+  })
 
-      createStyleSheet()
-
-      context.current.forEach(ctx => insertRule(styleSheetRef.current, ctx))
-
-      const randomCtx = context.current[3]
-
-      const randomRules = [
-        { rule: 'border-radius', value: '5px' },
-        { rule: 'color', value: '#1f1f1f' },
-        { rule: 'padding', value: '8px 15px' },
-        { rule: 'background', value: '#eef6ff' },
-      ]
-
-      // -- addRules() usage --
-      addRules(randomCtx, randomRules)
-
-      context.current.forEach(ctx => {
-        ctx.node && ctx.node.classList.add(ctx.className)
-        ctx.node && ctx.node.addEventListener('click', selectCtx)
-      })
-    }
-  }, [parentCtx])
-
+  const { insertRule, getCss } = useStylesheet(styleSheetRef)
+  // cleanUp
   useEffect(() => {
     return () => {
-      if (parentCtx) {
+      if (scope) {
         context.current.forEach(
-          ctx => ctx.node && ctx.node.removeEventListener('click', selectCtx),
+          ctx =>
+            ctx.node &&
+            ctx.node.removeEventListener('click', handleCtxSelectOnClick),
+        )
+
+        scope.parentNode.parentNode.removeEventListener(
+          'click',
+          handleCtxSelectOnClick,
         )
       }
     }
   }, [])
+  // createCtx from scope node
+  useEffect(() => {
+    if (scope) {
+      const tempScope = scope
+      !tempScope.id && (tempScope.id = 'css-ai-assistant-scope')
+      addToCtx(createCtx(scope, 0, '')) // creates the whole context starting from the scope
+      context.current = context.current.map((ctx, i) => ({
+        ...ctx,
+        history: [],
+        rules: ctx.node === scope ? { background: '#5a8', color: '#eee' } : {}, // this should be the actual computedStyles from ctx.node
+      }))
+
+      styleSheetRef.current = createStyleSheet()
+      context.current.forEach(ctx => insertRule(ctx))
+
+      const randomRules = {
+        'border-radius': '5px',
+        color: '#1f1f1f',
+        padding: '8px 15px',
+        background: '#eef6ff',
+      }
+
+      // -- addRules() usage --
+      context.current
+        .filter(c => c.tagName === 'p')
+        .forEach(ctx => ctx.rules && addRules(ctx, randomRules))
+      selectCtx(scope)
+
+      setCss(getCss(styleSheetRef.current))
+      context.current.forEach(ctx => {
+        // ctx.node && ctx.node.classList.add(ctx.className)
+        ctx.node && ctx.node.addEventListener('click', handleCtxSelectOnClick)
+      })
+      scope.parentNode.parentNode.addEventListener(
+        'click',
+        handleCtxSelectOnClick,
+      )
+    }
+
+    // console.log(context.current)
+  }, [scope])
 
   useEffect(() => {
-    selectedCtx.node && (selectedCtx.node.style.outline = '1px dashed #5d5')
+    selectedCtx?.node && (selectedCtx.node.style.outline = '1px dashed #5d5')
   }, [selectedCtx])
 
+  useEffect(() => {
+    // console.log(responseWithDetails)
+  }, [responseWithDetails])
   // #endregion HOOKS
 
   // #region CONTEXT
@@ -108,20 +196,21 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
   const createCtx = (node, parentSelector) => {
     const index = [...node.parentNode.children].indexOf(node)
     const tagName = node.tagName.toLowerCase()
-    const className = `index_${index}`
+
+    const classNames =
+      [...node.classList].length > 0 ? `.${[...node.classList].join('.')}` : ''
 
     const selector = `${
       parentSelector
-        ? `${parentSelector} > ${tagName}.${
-            className || '' /* this will be used when element is selected */
-          }`
-        : `#${node.id || baseId}`
+        ? `${parentSelector} > ${tagName}${classNames}`
+        : `${tagName}${
+            node.id || baseId ? `#${node.id || baseId}` : ''
+          }${classNames}`
     }`.trim()
 
     const childs = createChildsCtx(node, selector)
     return {
       selector,
-      className,
       index,
       node,
       tagName,
@@ -132,11 +221,13 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
   const createChildsCtx = (ctxNode, parentSelector) =>
     [...ctxNode.children].map(node => addToCtx(createCtx(node, parentSelector)))
 
-  const getCtxBy = (by, prop) => {
+  const getCtxBy = (by, prop, all) => {
+    const method = all ? 'filter' : 'find'
+
     const ctxProps = {
-      node: node => context.current.find(ctx => ctx.node === node),
+      node: node => context.current[method](ctx => ctx.node === node),
       selector: selector =>
-        context.current.find(ctx => ctx.selector === selector),
+        context.current[method](ctx => ctx.selector === selector),
     }
 
     return ctxProps[by](prop)
@@ -148,23 +239,16 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
   }
 
   const updateCtx = ({ ctx, prop, propValue, onUpdate }) => {
-    const scopedCtx = getCtxBy('node', ctx.node)
+    const scopedCtx = getCtxBy('node', ctx?.node || scope)
     if (!scopedCtx) return
     scopedCtx[prop] = propValue
     safeCall(onUpdate)()
   }
 
-  const createRules = (ctx, inputRules = []) => {
+  const createRules = (ctx, inputRules = {}) => {
     if (!ctx) return null
-    const prev = ctx.rules
-
-    const existingRule = rule => prev.find(rules => rules.rule === rule)
-
-    inputRules.forEach(({ rule, value }, i) =>
-      existingRule(rule)
-        ? (prev[i] = { rule, value })
-        : prev.push({ rule, value }),
-    )
+    const prev = { ...ctx.rules }
+    onEntries(inputRules, (rule, value) => (prev[rule] = value))
     ctx.rules = prev
     return prev
   }
@@ -174,8 +258,17 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
       ctx,
       prop: 'rules',
       propValue: createRules(ctx, inputRules),
-      onUpdate: () => updateRule(styleSheetRef.current, ctx),
+      onUpdate: () => insertRule(ctx),
     })
+  }
+
+  const selectCtx = node => {
+    setSelectedCtx(prev => {
+      const temp = prev
+      prev?.node && prev.node !== node && (temp.node.style.outline = 'none')
+      return getCtxBy('node', node)
+    })
+    promptRef.current.focus()
   }
 
   // #endregion CONTEXT
@@ -183,42 +276,70 @@ const CssAssistant = ({ apiKey, enabled, parentCtx, baseId, ...rest }) => {
     if (!document.getElementById('css-assistant-scoped-styles')) {
       const styleTag = document.createElement('style')
       styleTag.id = 'css-assistant-scoped-styles'
-      parentCtx.parentNode.insertBefore(styleTag, parentCtx)
-      styleSheetRef.current = styleTag
-    } else {
-      styleSheetRef.current = document.getElementById(
-        'css-assistant-scoped-styles',
-      )
+      appendStyleTag && scope.parentNode.insertBefore(styleTag, scope)
+      return styleTag
     }
+
+    return document.getElementById('css-assistant-scoped-styles')
   }
 
-  const handleChange = ({ target }) => setUserPrompt(target.value)
+  const handleChange = ({ target }) => {
+    autoResize()
+    setUserPrompt(target.value)
+  }
 
-  const selectCtx = e => {
+  const handleCtxSelectOnClick = e => {
+    e.preventDefault()
     e.stopPropagation()
-    setSelectedCtx(prev => {
-      const temp = prev
-      prev.node && (temp.node.style.outline = 'none')
-      return getCtxBy('node', e.target)
-    })
+    getCtxBy('node', e.target) ? selectCtx(e.target) : selectCtx(scope)
+  }
+
+  const handleSubmit = async e => {
+    e.preventDefault()
+    selectedCtx &&
+      getChatGpt({
+        variables: {
+          input: String(userPrompt),
+          history: selectedCtx.history,
+        },
+      })
+  }
+
+  const handleKeydown = async e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      selectedCtx &&
+        getChatGpt({
+          variables: {
+            input: userPrompt,
+            history: [
+              {
+                role: 'system',
+                content: systemGuidelines(selectedCtx),
+              },
+              ...selectedCtx.history,
+            ],
+          },
+        })
+    }
   }
 
   const autoResize = () => {
     if (promptRef.current) {
       const lines = promptRef.current.value.split('\n').length
       promptRef.current.style.height = 'auto'
-      promptRef.current.scrollHeight === 42
-        ? (promptRef.current.style.height = `${24 * lines}px`)
+      promptRef.current.value.length < 39
+        ? (promptRef.current.style.height = `${20 * lines}px`)
         : (promptRef.current.style.height = `${promptRef.current.scrollHeight}px`)
     }
   }
 
   return (
-    <StyledForm $enabled={enabled}>
+    <StyledForm $enabled={enabled} className={className}>
       <textarea
         disabled={!enabled}
         onChange={handleChange}
-        onInput={autoResize}
+        onKeyDown={handleKeydown}
         ref={promptRef}
         value={userPrompt}
         {...rest}

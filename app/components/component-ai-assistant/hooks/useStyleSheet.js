@@ -1,23 +1,38 @@
-const useStylesheets = () => {
-  const insertRule = (styleNode, ctx) => {
+import { mapEntries, onEntries } from '../utils/helpers'
+
+const useStylesheet = styleNode => {
+  const insertRule = ctx => {
     const { selector, rules } = ctx
 
-    const ruleString = `${selector} {\n${rules
-      .map(({ rule, value }) => {
-        return `\t${rule}: ${value}`
-      })
-      .join(';\n')}\n}`
+    const selectorsInRules = [...styleNode.current.sheet.cssRules].map(
+      cssRule => cssRule.selectorText,
+    )
+
+    const ruleString = `${selector} {\n${mapEntries(rules, (rule, value) => {
+      return `\t${rule}: ${value}`
+    }).join(';\n')}}`
 
     try {
-      styleNode.sheet.insertRule(ruleString, styleNode.sheet.cssRules.length)
+      !selectorsInRules.includes(selector)
+        ? styleNode.current.sheet.insertRule(
+            ruleString,
+            styleNode.current.sheet.cssRules.length,
+          )
+        : updateRule(ctx)
     } catch (error) {
       console.error('Error inserting rule: ', error)
     }
   }
 
-  const updateRule = (sheet, { selector, rules }) => {
-    ;[...sheet.sheet.cssRules].forEach(cssRule => {
-      rules.forEach(({ rule, value }) => {
+  const updateRule = ctx => {
+    const { selector, rules } = ctx
+    const cssRules = [...styleNode.current.sheet.cssRules]
+
+    cssRules.forEach(cssRule => {
+      // console.log(rules)
+      onEntries(rules, (rule, value) => {
+        // console.log(`${rule}:${value}`)
+
         if (
           cssRule.selectorText === selector &&
           cssRule.style[rule] !== value
@@ -29,15 +44,18 @@ const useStylesheets = () => {
     })
   }
 
-  const deleteRule = (sheet, selector, rule) => {
-    ;[...sheet.sheet.cssRules].forEach((cssRule, index) => {
+  const deleteRule = (selector, rule) => {
+    ;[...styleNode.current.sheet.cssRules].forEach((cssRule, index) => {
       if (cssRule.selectorText === selector && cssRule.style[rule]) {
-        sheet.sheet.deleteRule(index)
+        styleNode.current.sheet.deleteRule(index)
       }
     })
   }
 
-  return { insertRule, updateRule, deleteRule }
+  const getCss = () =>
+    mapEntries(styleNode.current.sheet.rules, (k, v) => v.cssText).join('')
+
+  return { insertRule, updateRule, deleteRule, getCss }
 }
 
-export default useStylesheets
+export default useStylesheet
