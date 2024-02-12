@@ -584,6 +584,9 @@ const ru = {
         Wiley: 'Wiley',
         'Wolters Kluwer': 'Wolters Kluwer',
       },
+      betaFunctionality: 'Бета-функциональность',
+      enableBetaFunctionality:
+        'Включить бета-версию функций, которые все еще находятся в разработке.',
     },
     reportsPage: {
       Reports: 'Аналитика',

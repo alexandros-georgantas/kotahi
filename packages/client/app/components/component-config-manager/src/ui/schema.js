@@ -23,6 +23,7 @@ export const tabKeyBasedSchema = {
     'taskManager',
     'report',
     'user',
+    'betaFunctionality',
   ],
   production: ['production'],
   integrations: ['kotahiApis', 'coarNotify', 'aiDesignStudio', 'publishing'],
@@ -576,6 +577,17 @@ export const generateSchemas = (
             },
           },
         },
+        betaFunctionality: {
+          type: 'object',
+          title: t('configPage.betaFunctionality'),
+          properties: {
+            betaFunctionality: {
+              type: 'boolean',
+              title: t('configPage.enableBetaFunctionality'),
+              default: false,
+            },
+          },
+        },
         aiDesignStudio: {
           type: 'object',
           title: t('configPage.aiDesignStudio'),
@@ -1117,6 +1129,17 @@ export const generateSchemas = (
             },
           },
         },
+        betaFunctionality: {
+          type: 'object',
+          title: t('configPage.betaFunctionality'),
+          properties: {
+            betaFunctionality: {
+              type: 'boolean',
+              title: t('configPage.enableBetaFunctionality'),
+              default: false,
+            },
+          },
+        },
         aiDesignStudio: {
           type: 'object',
           title: t('configPage.aiDesignStudio'),
@@ -1651,6 +1674,17 @@ export const generateSchemas = (
             repoIpAddress: {
               type: ['string', 'null'],
               description: t('configPage.allowedIPs'),
+            },
+          },
+        },
+        betaFunctionality: {
+          type: 'object',
+          title: t('configPage.betaFunctionality'),
+          properties: {
+            betaFunctionality: {
+              type: 'boolean',
+              title: t('configPage.enableBetaFunctionality'),
+              default: false,
             },
           },
         },
@@ -2207,6 +2241,17 @@ export const generateSchemas = (
             repoIpAddress: {
               type: ['string', 'null'],
               description: t('configPage.allowedIPs'),
+            },
+          },
+        },
+        betaFunctionality: {
+          type: 'object',
+          title: t('configPage.betaFunctionality'),
+          properties: {
+            betaFunctionality: {
+              type: 'boolean',
+              title: t('configPage.enableBetaFunctionality'),
+              default: false,
             },
           },
         },
