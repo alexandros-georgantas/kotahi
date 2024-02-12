@@ -512,6 +512,9 @@ const en = {
       },
       allowedIPs: 'List of repository IPs allowed access',
       api: 'COAR Notify',
+      betaFunctionality: 'Beta Functionality',
+      enableBetaFunctionality:
+        'Enable beta functionality for features still under development',
     },
     reportsPage: {
       Reports: 'Reports',

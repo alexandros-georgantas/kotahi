@@ -531,6 +531,9 @@ const ru = {
       },
       allowedIPs: 'Список IP-адресов репозитория, которым разрешен доступ',
       api: 'Один API',
+      betaFunctionality: 'Бета-функциональность',
+      enableBetaFunctionality:
+        'Включить бета-версию функций, которые все еще находятся в разработке.',
     },
     reportsPage: {
       Reports: 'Аналитика',
