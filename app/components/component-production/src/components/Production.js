@@ -24,7 +24,7 @@ import AuthorFeedbackForm from '../../../component-author-feedback/src/component
 import UploadAsset from './uploadManager/UploadAsset'
 import ReadonlyFormTemplate from '../../../component-review/src/components/metadata/ReadonlyFormTemplate'
 import { color } from '../../../../theme'
-import FullWaxEditor from '../../../wax-collab/src/FullWaxEditor'
+import AiDesignDemo from '../../../component-ai-assistant/AiDesignDemo'
 
 const FlexRow = styled.div`
   display: flex;
@@ -151,10 +151,6 @@ const Production = ({
                 saveSource={debouncedSave}
                 user={currentUser}
                 value={manuscript.meta.source}
-                // value={styleHtmlString(
-                //   manuscript.meta.source,
-                //   'p {color: blue;}',
-                // )}
               />
             ) : (
               <Spinner />
@@ -210,7 +206,6 @@ const Production = ({
           extensions={[html()]}
           onChange={onChangeHtml}
           value={htmlValue}
-          // value={styleHtmlString(htmlValue, 'p {color: blue !important;}')}
         />
       </ScrollableTabContent>
     ),
@@ -254,22 +249,11 @@ const Production = ({
 
   const cssAiAssistant = {
     content: (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'auto',
-          height: '100%',
-        }}
-      >
-        <FullWaxEditor
-          aiAssistant
-          readonly
-          saveSource={debouncedSave}
-          user={currentUser}
-          value={manuscript.meta.source}
-        />
-      </div>
+      <AiDesignDemo
+        currentUser={currentUser}
+        manuscript={manuscript}
+        saveSource={debouncedSave}
+      />
     ),
 
     key: 'css-ai-assistant',

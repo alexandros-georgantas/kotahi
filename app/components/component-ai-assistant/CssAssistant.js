@@ -5,9 +5,11 @@ import './CssAssistantWC'
 import styled from 'styled-components'
 import gql from 'graphql-tag'
 import { useLazyQuery } from '@apollo/client'
+import { rotate360 } from '@pubsweet/ui-toolkit'
 import useStylesheet from './hooks/useStyleSheet'
 import { onEntries, safeCall } from './utils/helpers'
 import SendButton from './SendButton'
+import { color } from '../../theme'
 
 const CHAT_GPT_QUERY = gql`
   query ChatGpt($input: String!, $history: [ChatGptMessage!]) {
@@ -59,9 +61,9 @@ const StyledForm = styled.form`
   --font-size: 16px;
   align-items: center;
   background-color: #fffe;
-  border: 4px solid var(--color);
-  border-radius: 30px;
-  box-shadow: 0 0 5px #0004, inset 0 0 5px #0004;
+  /* border: 4px solid var(--color); */
+  /* border-radius: 30px; */
+  /* box-shadow: 0 0 5px #0004, inset 0 0 5px #0004; */
   display: flex;
   font-size: var(--font-size);
   gap: 8px;
@@ -78,6 +80,7 @@ const StyledForm = styled.form`
       p.height || `calc(var(--font-size) + (var(--font-size) / 4));`};
     background: none;
     border: none;
+    border-bottom: 1px solid #0004;
     caret-color: var(--color);
     font-size: inherit;
     height: var(--height);
@@ -86,6 +89,25 @@ const StyledForm = styled.form`
     overflow-y: auto;
     resize: none;
     width: 100%;
+  }
+`
+
+const StyledSpinner = styled.div`
+  display: flex;
+  height: fit-content;
+  width: 24px;
+
+  &:after {
+    animation: ${rotate360} 1s linear infinite;
+    border: 2px solid ${color.brand1.base};
+    border-color: ${color.brand1.base} transparent ${color.brand1.base}
+      transparent;
+    border-radius: 50%;
+    content: ' ';
+    display: block;
+    height: 18px;
+    margin: 1px;
+    width: 18px;
   }
 `
 
@@ -121,7 +143,6 @@ const CssAssistant = ({
         { role: 'assistant', content: chatGPT },
       )
       setUserPrompt('')
-      autoResize()
     },
   })
 
@@ -152,28 +173,16 @@ const CssAssistant = ({
       context.current = context.current.map((ctx, i) => ({
         ...ctx,
         history: [],
-        rules: ctx.node === scope ? { background: '#5a8', color: '#eee' } : {}, // this should be the actual computedStyles from ctx.node
+        rules: {},
       }))
 
       styleSheetRef.current = createStyleSheet()
       context.current.forEach(ctx => insertRule(ctx))
 
-      const randomRules = {
-        'border-radius': '5px',
-        color: '#1f1f1f',
-        padding: '8px 15px',
-        background: '#eef6ff',
-      }
-
-      // -- addRules() usage --
-      context.current
-        .filter(c => c.tagName === 'p')
-        .forEach(ctx => ctx.rules && addRules(ctx, randomRules))
       selectCtx(scope)
 
       setCss(getCss(styleSheetRef.current))
       context.current.forEach(ctx => {
-        // ctx.node && ctx.node.classList.add(ctx.className)
         ctx.node && ctx.node.addEventListener('click', handleCtxSelectOnClick)
       })
       scope.parentNode.parentNode.addEventListener(
@@ -181,8 +190,6 @@ const CssAssistant = ({
         handleCtxSelectOnClick,
       )
     }
-
-    // console.log(context.current)
   }, [scope])
 
   useEffect(() => {
@@ -192,6 +199,10 @@ const CssAssistant = ({
   useEffect(() => {
     // console.log(responseWithDetails)
   }, [responseWithDetails])
+
+  useEffect(() => {
+    autoResize()
+  }, [userPrompt])
   // #endregion HOOKS
 
   // #region CONTEXT
@@ -248,7 +259,7 @@ const CssAssistant = ({
     safeCall(onUpdate)()
   }
 
-  const createRules = (ctx, inputRules = {}) => {
+  const addRulesToCtx = (ctx, inputRules = {}) => {
     if (!ctx) return null
     const prev = { ...ctx.rules }
     onEntries(inputRules, (rule, value) => (prev[rule] = value))
@@ -260,7 +271,7 @@ const CssAssistant = ({
     updateCtx({
       ctx,
       prop: 'rules',
-      propValue: createRules(ctx, inputRules),
+      propValue: addRulesToCtx(ctx, inputRules),
       onUpdate: () => insertRule(ctx),
     })
   }
@@ -287,7 +298,6 @@ const CssAssistant = ({
   }
 
   const handleChange = ({ target }) => {
-    autoResize()
     setUserPrompt(target.value)
   }
 
@@ -353,11 +363,15 @@ const CssAssistant = ({
         value={userPrompt}
         {...rest}
       />
-      <SendButton
-        onClick={handleSubmit}
-        size="24"
-        style={{ transform: 'scale(1.3)', cursor: 'pointer' }}
-      />
+      {loading ? (
+        <StyledSpinner />
+      ) : (
+        <SendButton
+          onClick={handleSubmit}
+          size="24"
+          style={{ transform: 'scale(1.3)', cursor: 'pointer' }}
+        />
+      )}
     </StyledForm>
   )
 }
