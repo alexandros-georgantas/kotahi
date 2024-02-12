@@ -4,7 +4,7 @@ import React, { useMemo, useRef, useState } from 'react'
 import Form from '@rjsf/core'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { generateSchemas, tabLabels } from './ui/schema' // Import the function that generates the schema and uiSchema
+import { generateSchemas, tabKeyBasedSchema, tabLabels } from './ui/schema' // Import the function that generates the schema and uiSchema
 
 import {
   ActionButton,
@@ -108,6 +108,7 @@ const StyledHeading = styled(Heading)`
 `
 
 const StyledTabsContainer = styled(TabsContainer)`
+  position: relative;
   z-index: 4;
 `
 
@@ -149,6 +150,7 @@ const InstanceTypeLegend = styled.legend`
 
 const StyledActionButton = styled(ActionButton)`
   margin-right: 20px;
+  transition: all 0.2s;
   width: 10%;
 `
 
@@ -164,9 +166,18 @@ const StyledForm = styled(Form)`
 `
 
 const Footer = styled.div`
+  align-items: center;
   display: flex;
+  gap: 1.5rem;
   justify-content: flex-end;
   padding-top: 0.6rem;
+
+  > div {
+    color: ${color.brand1.tint10};
+    opacity: ${p => (p.$pending ? 1 : 0)};
+    padding: 0 0.6rem;
+    transition: opacity 0.2s;
+  }
 `
 // #endregion Styleds
 
@@ -213,6 +224,7 @@ const ConfigManagerForm = ({
   const [tabKey, setTabKey] = useState('general')
   const logoAndFavicon = useRef({})
   const storedFormData = useRef(passedFormData)
+  const [pendingChanges, setPendingChanges] = useState({})
 
   const schemas = useMemo(() => {
     const emailNotificationOptions = emailTemplates.map(template => {
@@ -274,11 +286,33 @@ const ConfigManagerForm = ({
 
   const handlers = {
     form: {
-      onChange: ({ formData }) => {
+      onChange: ({ formData }, properties, key) => {
         const updatedData = {
           ...storedFormData.current,
           ...formData,
         }
+
+        setPendingChanges(prev => {
+          const temp = { ...prev }
+
+          try {
+            temp[key] =
+              properties
+                .flat()
+                .flatMap(property =>
+                  Object.entries(formData[property]).map(([k, v]) =>
+                    v
+                      ? String(v) !== String(passedFormData[property][k])
+                      : !v && passedFormData[property][k],
+                  ),
+                )
+                .filter(Boolean).length > 0
+          } catch (e) {
+            return temp
+          }
+
+          return temp
+        })
 
         storedFormData.current = updatedData
       },
@@ -308,7 +342,7 @@ const ConfigManagerForm = ({
 
   const forms = useMemo(
     () =>
-      Object.keys(tabLabels).map(key => (
+      Object.entries(tabKeyBasedSchema).map(([key, values]) => (
         <StyledPaddedContent
           $active={tabKey === key}
           $visible={contentVisible}
@@ -327,7 +361,7 @@ const ConfigManagerForm = ({
             liveValidate={liveValidate}
             noHtml5Validate
             omitExtraData={omitExtraData}
-            onChange={handlers.form.onChange}
+            onChange={data => handlers.form.onChange(data, values, key)}
             schema={schemas.data[key]}
             uiSchema={schemas.ui[key]}
           >
@@ -338,6 +372,9 @@ const ConfigManagerForm = ({
       )),
     [tabKey, contentVisible],
   )
+
+  const submitButtonDisabled =
+    disabled || Object.values(pendingChanges).every(change => !change)
 
   return (
     <>
@@ -361,15 +398,16 @@ const ConfigManagerForm = ({
           ))}
         </StyledFlexRow>
         <StyledSectionContent>{forms}</StyledSectionContent>
-        <Footer>
+        <Footer $pending={Object.values(pendingChanges).some(v => v === true)}>
+          <div>You have unsaved changes, remember to update!</div>
           <StyledActionButton
-            disabled={disabled}
+            disabled={submitButtonDisabled}
             onClick={handlers.form.onSubmit}
             primary
             status={updateConfigStatus}
             type="submit"
           >
-            {t('configPage.Submit')}
+            {t('configPage.Update')}
           </StyledActionButton>
         </Footer>
       </StyledContainer>

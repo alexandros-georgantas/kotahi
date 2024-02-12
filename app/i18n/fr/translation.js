@@ -504,7 +504,7 @@ const fr = {
         "Tous les utilisateurs sont assignés les rôles de gestionnaire de groupe et d'administrateur",
       kotahiApis: 'API Kotahi',
       tokens: 'Jetons',
-      Submit: 'Soumettre',
+      Update: 'Mise à jour',
       article: 'article',
       'peer review': 'évaluation par les pairs',
       showTabs: {

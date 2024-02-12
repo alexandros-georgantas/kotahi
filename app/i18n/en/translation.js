@@ -483,7 +483,7 @@ const en = {
       userIsAdmin: 'All users are assigned Group Manager and Admin roles',
       kotahiApis: 'Kotahi APIs',
       tokens: 'Tokens',
-      Submit: 'Submit',
+      Update: 'Update',
       article: 'article',
       'peer review': 'peer review',
       showTabs: {
