@@ -178,6 +178,7 @@ const ru = {
       "Manuscripts I'm editor of": 'Статьи для редактирования',
       mySubmissions: {
         'My Submissions': 'Мои статьи',
+        'Author proofing editor': 'Редактор авторских корректур',
       },
       toReview: {
         'To Review': 'Статьи для рецензирования',
@@ -206,6 +207,8 @@ const ru = {
       selectedArticles_few: '{{count}} статьи выбрано',
       selectedArticles_many: '{{count}} статей выбрано',
       Archive: 'Архивировать',
+      takeAction: 'действие',
+      exportAsJson: 'Скачать JSON',
     },
     decisionPage: {
       'Current version': 'Текущая версия',
@@ -430,6 +433,8 @@ const ru = {
         'Импортировать рукописи вручную с помощью функции "Обновить"',
       'Control panel': 'Панель управления',
       'Display manuscript short id': 'Показывать краткий ID статей',
+      'Author proofing enabled':
+        'Разрешить авторам участвовать в раундах корректуры',
       'Reviewers can see submitted reviews':
         'Рецензентам доступен просмотр отправленных рецензий',
       'Authors can see individual peer reviews':

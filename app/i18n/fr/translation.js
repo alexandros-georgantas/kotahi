@@ -176,6 +176,7 @@ const fr = {
       "Manuscripts I'm editor of": 'Manuscrits dont je suis éditeur',
       mySubmissions: {
         'My Submissions': 'Mes soumissions',
+        'Author proofing editor': "Éditeur de correction d'auteur",
       },
       toReview: {
         'To Review': 'À réviser',
@@ -202,6 +203,8 @@ const fr = {
       'Select All': 'Sélectionner tout',
       selectedArticles: '{{count}} articles sélectionnés',
       Archive: 'Archiver',
+      takeAction: 'Action',
+      exportAsJson: 'Télécharger JSON',
     },
     decisionPage: {
       'Current version': 'Version actuelle',
@@ -431,6 +434,8 @@ const fr = {
       'Control panel': 'Panneau de contrôle',
       'Display manuscript short id':
         "Afficher l'identifiant court du manuscrit",
+      'Author proofing enabled':
+        'Autoriser les auteurs à participer aux cycles de relecture',
       'Reviewers can see submitted reviews':
         'Les évaluateurs peuvent voir les évaluations soumises',
       'Authors can see individual peer reviews':

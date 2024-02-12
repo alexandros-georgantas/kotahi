@@ -89,16 +89,41 @@ const {
   removeUserFromManuscriptChatChannel,
 } = require('../../model-channel/src/channelCommsUtils')
 
-const { getPubsub } = pubsubManager
+const { cachedGet } = require('../../querycache')
 
-const updateAndRepackageForGraphql = async ms => {
-  return models.Manuscript.query().updateAndFetchById(ms.id, ms)
-}
+const { getPubsub } = pubsubManager
 
 const getCss = async () => {
   const css = await generateCss()
   return css
 }
+
+// Helper function to extract review and decision data
+const extractReviewData = (reviews, isDecision) =>
+  reviews
+    .filter(review => review.isDecision === isDecision)
+    .map(review => ({
+      created: review.created,
+      updated: review.updated,
+      isDecision: review.isDecision,
+      isHiddenReviewerName: review.isHiddenReviewerName,
+      isHiddenFromAuthor: review.isHiddenFromAuthor,
+      canBePublishedPublicly: review.canBePublishedPublicly,
+      username: review.user ? review.user.username : null,
+      jsonData: JSON.stringify(review.jsonData),
+    }))
+
+// Helper function to extract common manuscript or version data
+const extractCommonData = item => ({
+  created: item.created,
+  updated: item.updated,
+  status: item.status,
+  decision: item.decision,
+  submission: JSON.stringify(item.submission),
+  importSourceServer: item.importSourceServer,
+  shortId: item.shortId,
+  teams: item.teams.map(team => ({ ...team })),
+})
 
 /** Get reviews from the manuscript if present, or from DB. Generate full file info for
  * all files attached to reviews, and stringify JSON data in preparation for serving to client.
@@ -320,7 +345,7 @@ const commonUpdateManuscript = async (id, input, ctx) => {
     await populateTemplatedTasksForManuscript(id)
 
   await uploadAndConvertBase64ImagesInManuscript(updatedMs)
-  return updateAndRepackageForGraphql(updatedMs)
+  return models.Manuscript.query().updateAndFetchById(id, updatedMs)
 }
 
 /** Send the manuscriptId OR a configured ref; and send token if one is configured */
@@ -759,7 +784,7 @@ const resolvers = {
         // Automated email reviewReject on rejection
         const reviewer = await models.User.query()
           .findById(context.user)
-          .withGraphFetched('[defaultIdentity]')
+          .withGraphJoined('[defaultIdentity]')
 
         const reviewerName =
           reviewer.username || reviewer.defaultIdentity.name || ''
@@ -875,9 +900,7 @@ const resolvers = {
       if (updated.status === 'completed') {
         const manuscript = await models.Manuscript.query()
           .findById(id)
-          .withGraphFetched(
-            '[teams.[members.[user.[defaultIdentity]]], channels]',
-          )
+          .withGraphJoined('[teams.members.user.defaultIdentity, channels]')
 
         const author = await models.User.query().findById(ctx.user)
 
@@ -977,7 +1000,7 @@ const resolvers = {
       // Automated email submissionConfirmation on submission
       const manuscript = await models.Manuscript.query()
         .findById(id)
-        .withGraphFetched('[submitter.[defaultIdentity], channels]')
+        .withGraphFetched('[submitter.defaultIdentity, channels]')
 
       const activeConfig = await models.Config.getCached(manuscript.groupId)
 
@@ -1168,7 +1191,7 @@ const resolvers = {
         }
       }
 
-      return updateAndRepackageForGraphql(manuscript)
+      return models.Manuscript.query().updateAndFetchById(id, manuscript)
     },
     async addReviewer(_, { manuscriptId, userId, invitationId }, ctx) {
       const manuscript = await models.Manuscript.query().findById(manuscriptId)
@@ -1202,7 +1225,7 @@ const resolvers = {
           }).save()
         }
 
-        return existingTeam.$query().withGraphFetched('members.[user]')
+        return existingTeam.$query()
       }
 
       // Create a new team of reviewers if it doesn't exist
@@ -1238,7 +1261,7 @@ const resolvers = {
         type: 'editorial',
       })
 
-      return reviewerTeam.$query().withGraphFetched('members.[user]')
+      return reviewerTeam.$query().withGraphFetched('members.user')
     },
     /** To identify which data we're making publishable/unpublishable, we need:
      * manuscriptId; the ID of the owning review/decision or manuscript object; and the fieldName.
@@ -1471,7 +1494,7 @@ const resolvers = {
       return models.Manuscript.query().findById(id)
     },
     // TODO This is overcomplicated, trying to do three things at once (find manuscripts
-    // where author is author, reviewer or editor).
+    // where user is author, reviewer or editor).
     async manuscriptsUserHasCurrentRoleIn(
       _,
       {
@@ -1488,27 +1511,16 @@ const resolvers = {
     ) {
       const submissionForm = await getSubmissionForm(groupId)
 
-      // Get IDs of the top-level manuscripts
-      // TODO move this query to the model
-      const topLevelManuscripts = await models.Manuscript.query()
-        .select(
-          raw(
-            'coalesce(manuscripts.parent_id, manuscripts.id) AS top_level_id',
-          ),
-        )
-        .join('teams', 'manuscripts.id', '=', 'teams.object_id')
-        .join('team_members', 'teams.id', '=', 'team_members.team_id')
-        .where('team_members.user_id', ctx.user)
-        .where('is_hidden', false)
-        .where('group_id', groupId)
-        .distinct()
+      const firstVersionIds = await models.Manuscript.getFirstVersionIdsOfManuscriptsUserHasARoleIn(
+        ctx.user,
+        groupId,
+      )
 
       // Get those top-level manuscripts with all versions, all with teams and members
       const allManuscriptsWithInfo = []
-      const topLevelIds = topLevelManuscripts.map(m => m.topLevelId)
 
       // eslint-disable-next-line no-restricted-syntax
-      for (const someIds of chunk(topLevelIds, 20)) {
+      for (const someIds of chunk(firstVersionIds, 20)) {
         // eslint-disable-next-line no-await-in-loop
         const someManuscriptsWithInfo = await models.Manuscript.query()
           .withGraphFetched(
@@ -1720,7 +1732,7 @@ const resolvers = {
     async doisToRegister(_, { id }, ctx) {
       const manuscript = await models.Manuscript.query()
         .findById(id)
-        .withGraphFetched('reviews')
+        .withGraphJoined('reviews')
 
       const activeConfig = await models.Config.getCached(manuscript.groupId)
 
@@ -1816,6 +1828,44 @@ const resolvers = {
       const doi = getDoi(suffix, activeConfig)
       return { isDOIValid: await doiIsAvailable(doi) }
     },
+
+    async getManuscriptsData(_, { selectedManuscripts }, ctx) {
+      const manuscripts = await models.Manuscript.query()
+        .findByIds(selectedManuscripts)
+        .withGraphFetched('[reviews.[user], teams.[members]]')
+
+      const exportData = []
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const manuscript of manuscripts) {
+        // eslint-disable-next-line no-await-in-loop
+        const manuscriptVersions = await manuscript.getManuscriptVersions()
+
+        const manuscriptData = {
+          versionIdentifier: manuscriptVersions.length + 1,
+          ...extractCommonData(manuscript),
+          reviews: extractReviewData(manuscript.reviews, false),
+          decisions: extractReviewData(manuscript.reviews, true),
+          manuscriptVersions: manuscriptVersions.map((version, index) => ({
+            versionIdentifier: manuscriptVersions.length - index,
+            ...extractCommonData(version),
+            reviews: extractReviewData(version.reviews, false),
+            decisions: extractReviewData(version.reviews, true),
+          })),
+        }
+
+        exportData.push(manuscriptData)
+      }
+
+      return exportData
+    },
+    async currentUserIsReviewerOfManuscript(_, { manuscriptId }, ctx) {
+      const team = await models.User.relatedQuery('teams')
+        .for(ctx.user)
+        .findOne({ role: 'reviewer', objectId: manuscriptId })
+
+      return !!team
+    },
   },
   Manuscript: {
     ...manuscriptAndPublishedManuscriptSharedResolvers,
@@ -1831,9 +1881,7 @@ const resolvers = {
       return getRelatedReviews(parent, ctx)
     },
     async teams(parent, _, ctx) {
-      return (
-        parent.teams || models.Manuscript.relatedQuery('teams').for(parent.id)
-      )
+      return parent.teams || cachedGet(`teamsForObject:${parent.id}`)
     },
     async invitations(parent) {
       return (
@@ -1850,23 +1898,25 @@ const resolvers = {
       )
     },
     async manuscriptVersions(parent) {
-      const manuscript = await models.Manuscript.query().findById(parent.id)
-      return manuscript.getManuscriptVersions()
+      return cachedGet(`subVersionsOfMs:${parent.id}`)
     },
     async submitter(parent) {
+      return parent.submitter ?? cachedGet(`submitterOfMs:${parent.id}`)
+    },
+    async files(parent) {
       return (
-        parent.submitter ||
-        models.Manuscript.relatedQuery('submitter').for(parent.id).first()
+        parent.files ?? models.Manuscript.relatedQuery('files').for(parent.id)
       )
     },
     async firstVersionCreated(parent) {
+      if (parent.created && !parent.parentId) return parent.created
       const id = parent.parentId || parent.id
 
-      const createdDate = await models.Manuscript.query()
+      const record = await models.Manuscript.query()
         .findById(id)
         .select('created')
 
-      return createdDate.created
+      return record.created
     },
     async authorFeedback(parent) {
       if (parent.authorFeedback && parent.authorFeedback.submitterId) {
@@ -2068,6 +2118,8 @@ const typeDefs = `
     publishedManuscript(id: ID!): PublishedManuscript
     unreviewedPreprints(token: String!, groupName: String): [Preprint!]!
     doisToRegister(id: ID!): [String]
+    getManuscriptsData(selectedManuscripts: [ID!]!): [ManuscriptExport!]!
+    currentUserIsReviewerOfManuscript(manuscriptId: ID!): Boolean!
   }
 
   input ManuscriptsFilter {
@@ -2143,6 +2195,32 @@ const typeDefs = `
     hasOverdueTasksForUser: Boolean
     invitations: [Invitation]
     authorFeedback: ManuscriptAuthorFeeback
+  }
+
+  type ReviewExport {
+    created: DateTime!
+    updated: DateTime
+    username: String
+    isDecision: Boolean
+    isHiddenReviewerName: Boolean
+    isHiddenFromAuthor: Boolean
+    jsonData: String
+  }
+
+  type ManuscriptExport {
+    versionIdentifier: Int!
+    created: DateTime!
+    updated: DateTime
+    manuscriptVersions: [ManuscriptExport]
+    shortId: Int!
+    teams: [Team]
+    reviews: [ReviewExport]
+    decisions: [ReviewExport]
+    status: String
+    decision: String
+    authors: [Author]
+    submission: String
+    importSourceServer: String
   }
 
   input ManuscriptInput {

@@ -175,6 +175,7 @@ const en = {
       "Manuscripts I'm editor of": 'Manuscripts I’m editor of',
       mySubmissions: {
         'My Submissions': 'My Submissions',
+        'Author proofing editor': 'Author proofing editor',
       },
       toReview: {
         'To Review': 'To Review',
@@ -201,6 +202,8 @@ const en = {
       'Select All': 'Select All',
       selectedArticles: '{{count}} articles selected',
       Archive: 'Archive',
+      takeAction: 'Action',
+      exportAsJson: 'Download JSON',
     },
     decisionPage: {
       'Current version': 'Current version',
@@ -421,6 +424,8 @@ const en = {
         'Import manuscripts manually using the ‘Refresh’ action',
       'Control panel': 'Control panel',
       'Display manuscript short id': 'Display manuscript short id',
+      'Author proofing enabled':
+        'Allow authors to particpate in proofreading rounds',
       'Reviewers can see submitted reviews':
         'Reviewers can see submitted reviews',
       'Authors can see individual peer reviews':

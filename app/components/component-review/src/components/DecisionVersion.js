@@ -103,6 +103,8 @@ const DecisionVersion = ({
     selectedManuscriptVersionId: version.id,
   }
 
+  const authorProofingEnabled = config.controlPanel?.authorProofingEnabled // let's set this based on the config
+
   const debouncedSave = useCallback(
     debounce(source => {
       updateManuscript(version.id, { meta: { source } })
@@ -351,10 +353,11 @@ const DecisionVersion = ({
               />
             </AdminSection>
           )}
-          {isCurrentVersion && (
+          {authorProofingEnabled && (
             <AdminSection>
               <AssignAuthorForProofing
                 assignAuthorForProofing={assignAuthorForProofing}
+                isCurrentVersion={isCurrentVersion}
                 manuscript={version}
               />
             </AdminSection>

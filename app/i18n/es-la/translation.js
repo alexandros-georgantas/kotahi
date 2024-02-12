@@ -177,6 +177,7 @@ const esLa = {
       "Manuscripts I'm editor of": 'Manuscritos en los que soy editor',
       mySubmissions: {
         'My Submissions': 'Mis Presentaciones',
+        'Author proofing editor': 'Editor de pruebas de autor',
       },
       toReview: {
         'To Review': 'Para Revisión',
@@ -203,6 +204,8 @@ const esLa = {
       'Select All': 'Seleccionar Todo',
       selectedArticles: '{{count}} artículos seleccionados',
       Archive: 'Archivo',
+      takeAction: 'Acción',
+      exportAsJson: 'Descargar JSON',
     },
     decisionPage: {
       'Current version': 'Versión Actual',
@@ -430,6 +433,8 @@ const esLa = {
         'Importar manuscritos manualmente usando la acción "Actualizar"',
       'Control panel': 'Panel de Control',
       'Display manuscript short id': 'Mostrar ID corto del manuscrito',
+      'Author proofing enabled':
+        'Permitir a las autoras participar en rondas de corrección de pruebas',
       'Reviewers can see submitted reviews':
         'Los revisores pueden ver revisiones enviadas',
       'Authors can see individual peer reviews':
