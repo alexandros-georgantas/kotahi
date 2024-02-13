@@ -1906,11 +1906,6 @@ const resolvers = {
     async submitter(parent) {
       return parent.submitter ?? cachedGet(`submitterOfMs:${parent.id}`)
     },
-    async files(parent) {
-      return (
-        parent.files ?? models.Manuscript.relatedQuery('files').for(parent.id)
-      )
-    },
     async firstVersionCreated(parent) {
       if (parent.created && !parent.parentId) return parent.created
       const id = parent.parentId || parent.id
