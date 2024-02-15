@@ -10,6 +10,7 @@ import useStylesheet from './hooks/useStyleSheet'
 import { onEntries, safeCall } from './utils/helpers'
 import SendButton from './SendButton'
 import { color } from '../../theme'
+import ResponsesUi from './ResponsesUi'
 
 const CHAT_GPT_QUERY = gql`
   query ChatGpt($input: String!, $history: [ChatGptMessage!]) {
@@ -17,10 +18,18 @@ const CHAT_GPT_QUERY = gql`
   }
 `
 
-const getSelectorsRecursively = ctx => [
-  ctx.selector,
-  ...ctx.childs.map(child => child.selector),
-]
+const getSelectorsRecursively = ctx => {
+  const finalOutput = [ctx.selector]
+
+  ctx.childs.forEach(
+    child =>
+      child?.selector &&
+      !finalOutput.includes(child.selector) &&
+      finalOutput.push(child.selector),
+  )
+
+  return finalOutput
+}
 
 const systemGuidelines = ctx => `
 
@@ -52,18 +61,20 @@ You can refer to this rules as context for user's request if needed: ${String(
 
 The output must always be a valid JSON. Ensure that each key is a string enclosed in double quotes and that each value is a valid CSS value, also enclosed in double quotes.
 
-If the prompt can't be resolved through CSS or doesn't involve CSS, respond: 'My purpose is to assist you with your book's design. Please, tell me how can i help you to improve your designs'.
+You must never say to user what to code, you must return the valid JSOn or in other case ask user again to improve his promt in order to help you to style his article. but always as a result must be the json output, not a suggestion
+
+If the prompt can't be resolved through CSS or doesn't involve CSS, respond: 'My purpose is to assist you with your article's design. Please, tell me how can i help you to improve your designs'.
 
 `
 
 const StyledForm = styled.form`
   --color: #2fac66;
-  --font-size: 16px;
+  --color-border: #0004;
+  --font-size: 14px;
   align-items: center;
   background-color: #fffe;
-  /* border: 4px solid var(--color); */
-  /* border-radius: 30px; */
-  /* box-shadow: 0 0 5px #0004, inset 0 0 5px #0004; */
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
   display: flex;
   font-size: var(--font-size);
   gap: 8px;
@@ -80,7 +91,7 @@ const StyledForm = styled.form`
       p.height || `calc(var(--font-size) + (var(--font-size) / 4));`};
     background: none;
     border: none;
-    border-bottom: 1px solid #0004;
+    /* border-bottom: 1px solid #0002; */
     caret-color: var(--color);
     font-size: inherit;
     height: var(--height);
@@ -134,8 +145,11 @@ const CssAssistant = ({
         const response = JSON.parse(chatGPT)
         response &&
           onEntries(response, (selector, rules) => {
-            addRules(getCtxBy('selector', selector), rules)
+            getCtxBy('selector', selector)
+              ? addRules(getCtxBy('selector', selector), rules)
+              : insertRule({ selector, rules })
           })
+        setResponseWithDetails('Here you go!')
       } else setResponseWithDetails(chatGPT)
 
       selectedCtx.history.push(
@@ -151,12 +165,7 @@ const CssAssistant = ({
   useEffect(() => {
     return () => {
       if (scope) {
-        context.current.forEach(
-          ctx =>
-            ctx.node &&
-            ctx.node.removeEventListener('click', handleCtxSelectOnClick),
-        )
-
+        scope.removeEventListener('click', handleCtxSelectOnClick)
         scope.parentNode.parentNode.removeEventListener(
           'click',
           handleCtxSelectOnClick,
@@ -169,7 +178,8 @@ const CssAssistant = ({
     if (scope) {
       const tempScope = scope
       !tempScope.id && (tempScope.id = 'css-ai-assistant-scope')
-      addToCtx(createCtx(scope, 0, '')) // creates the whole context starting from the scope
+      // TODO: dont't create the whole context, await until user clicks on the element to scope
+      addToCtx(createCtx(scope, 0)) // creates the whole context starting from the scope
       context.current = context.current.map((ctx, i) => ({
         ...ctx,
         history: [],
@@ -177,18 +187,22 @@ const CssAssistant = ({
       }))
 
       styleSheetRef.current = createStyleSheet()
-      context.current.forEach(ctx => insertRule(ctx))
+      // TODO: dont' create rules until they exists, same for selectors
+      context.current.forEach(
+        ctx =>
+          Object.values(ctx.rules).map(rule => rule).length > 0 &&
+          insertRule(ctx),
+      )
 
       selectCtx(scope)
 
-      setCss(getCss(styleSheetRef.current))
-      context.current.forEach(ctx => {
-        ctx.node && ctx.node.addEventListener('click', handleCtxSelectOnClick)
-      })
+      setCss(getCss())
+      scope.addEventListener('click', handleCtxSelectOnClick)
       scope.parentNode.parentNode.addEventListener(
         'click',
         handleCtxSelectOnClick,
       )
+      // console.log(context.current)
     }
   }, [scope])
 
@@ -197,19 +211,19 @@ const CssAssistant = ({
   }, [selectedCtx])
 
   useEffect(() => {
-    // console.log(responseWithDetails)
-  }, [responseWithDetails])
-
-  useEffect(() => {
     autoResize()
   }, [userPrompt])
   // #endregion HOOKS
 
   // #region CONTEXT
 
-  const createCtx = (node, parentSelector) => {
+  const createCtx = (node, parent) => {
     const index = [...node.parentNode.children].indexOf(node)
     const tagName = node.tagName.toLowerCase()
+
+    const parentSelector = !parent
+      ? getCtxBy('node', node.parentNode)?.selector || ''
+      : parent
 
     const classNames =
       [...node.classList].length > 0 ? `.${[...node.classList].join('.')}` : ''
@@ -229,11 +243,14 @@ const CssAssistant = ({
       node,
       tagName,
       childs,
+      history: [],
     }
   }
 
   const createChildsCtx = (ctxNode, parentSelector) =>
-    [...ctxNode.children].map(node => addToCtx(createCtx(node, parentSelector)))
+    [...ctxNode.children]
+      .map(node => addToCtx(createCtx(node, parentSelector)))
+      .filter(Boolean)
 
   const getCtxBy = (by, prop, all) => {
     const method = all ? 'filter' : 'find'
@@ -242,12 +259,15 @@ const CssAssistant = ({
       node: node => context.current[method](ctx => ctx.node === node),
       selector: selector =>
         context.current[method](ctx => ctx.selector === selector),
+      tagName: tag => context.current[method](ctx => ctx.tagName === tag),
     }
 
     return ctxProps[by](prop)
   }
 
-  const addToCtx = ctx => {
+  const addToCtx = (ctx, isChild) => {
+    if (isChild) return ctx
+    if (getCtxBy('selector', ctx.selector)) return false
     context.current = [...context.current, ctx]
     return ctx
   }
@@ -274,6 +294,9 @@ const CssAssistant = ({
       propValue: addRulesToCtx(ctx, inputRules),
       onUpdate: () => insertRule(ctx),
     })
+    selectedCtx?.node && (selectedCtx.node.style.outline = 'none')
+    setCss(getCss())
+    selectedCtx?.node && (selectedCtx.node.style.outline = '1px dashed #5d5')
   }
 
   const selectCtx = node => {
@@ -304,42 +327,42 @@ const CssAssistant = ({
   const handleCtxSelectOnClick = e => {
     e.preventDefault()
     e.stopPropagation()
-    getCtxBy('node', e.target) ? selectCtx(e.target) : selectCtx(scope)
+    !getCtxBy('node', e.target) && addToCtx(createCtx(e.target))
+    selectCtx(e.target)
+    // console.log(context.current)
   }
 
   const handleSubmit = async e => {
     e.preventDefault()
-    selectedCtx &&
-      getChatGpt({
-        variables: {
-          input: userPrompt,
-          history: [
-            {
-              role: 'system',
-              content: systemGuidelines(selectedCtx),
-            },
-            ...selectedCtx.history,
-          ],
-        },
-      })
-  }
-
-  const handleKeydown = async e => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      selectedCtx &&
-        getChatGpt({
+    userPrompt && setResponseWithDetails('Just give me a few seconds')
+    userPrompt
+      ? getChatGpt({
           variables: {
             input: userPrompt,
             history: [
               {
                 role: 'system',
-                content: systemGuidelines(selectedCtx),
+                content: systemGuidelines(
+                  selectedCtx || getCtxBy('node', scope),
+                ),
               },
               ...selectedCtx.history,
             ],
           },
         })
+      : setResponseWithDetails('Please, tell me what you want to do')
+  }
+
+  const handleKeydown = async e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      handleSubmit(e)
+    }
+
+    if (e.key === 'ArrowDown') {
+      const userHistory = selectedCtx.history.filter(v => v.role === 'user')
+      userHistory.length > 0 &&
+        !userPrompt &&
+        setUserPrompt(userHistory[userHistory.length - 1].content)
     }
   }
 
@@ -348,31 +371,49 @@ const CssAssistant = ({
       const lines = promptRef.current.value.split('\n').length
       promptRef.current.style.height = 'auto'
       promptRef.current.value.length < 39
-        ? (promptRef.current.style.height = `${20 * lines}px`)
+        ? (promptRef.current.style.height = `${16 * lines}px`)
         : (promptRef.current.style.height = `${promptRef.current.scrollHeight}px`)
     }
   }
 
   return (
-    <StyledForm $enabled={enabled} className={className}>
-      <textarea
-        disabled={!enabled}
-        onChange={handleChange}
-        onKeyDown={handleKeydown}
-        ref={promptRef}
-        value={userPrompt}
-        {...rest}
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        padding: '0 5px',
+        alignItems: 'center',
+        gap: '1rem',
+      }}
+    >
+      <span style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+        <StyledForm $enabled={enabled} className={className}>
+          <textarea
+            disabled={!enabled}
+            onChange={handleChange}
+            onKeyDown={handleKeydown}
+            ref={promptRef}
+            value={userPrompt}
+            {...rest}
+          />
+          {loading ? (
+            <StyledSpinner />
+          ) : (
+            <SendButton
+              fill={color.brand1.base()}
+              onClick={handleSubmit}
+              size="24"
+              style={{ transform: 'scale(1.3)', cursor: 'pointer' }}
+            />
+          )}
+        </StyledForm>
+      </span>
+      <ResponsesUi
+        promptRef={promptRef}
+        responseWithDetails={responseWithDetails}
+        setUserPrompt={setUserPrompt}
       />
-      {loading ? (
-        <StyledSpinner />
-      ) : (
-        <SendButton
-          onClick={handleSubmit}
-          size="24"
-          style={{ transform: 'scale(1.3)', cursor: 'pointer' }}
-        />
-      )}
-    </StyledForm>
+    </div>
   )
 }
 

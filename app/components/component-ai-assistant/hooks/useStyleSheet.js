@@ -3,6 +3,7 @@ import { mapEntries, onEntries } from '../utils/helpers'
 const useStylesheet = styleNode => {
   const insertRule = ctx => {
     const { selector, rules } = ctx
+    if (!rules) return
 
     const selectorsInRules = [...styleNode.current.sheet.cssRules].map(
       cssRule => cssRule.selectorText,
