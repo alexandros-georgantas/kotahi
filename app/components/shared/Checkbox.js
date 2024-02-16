@@ -5,6 +5,7 @@ import { color, space } from '../../theme'
 const CheckboxContainer = styled.div`
   align-content: center;
   display: flex;
+  gap: ${space.e};
   margin-bottom: 4px;
 
   input[type='checkbox'] {
@@ -26,18 +27,23 @@ const CheckboxContainer = styled.div`
       border: none;
     }
   }
-
-  label {
-    margin-left: ${space.e};
-  }
 `
 
 // eslint-disable-next-line import/prefer-default-export
 export const Checkbox = props => {
-  const { checked, id, label, value, style = {}, handleChange } = props
+  const {
+    checked,
+    id,
+    label,
+    value,
+    style = {},
+    handleChange,
+    labelBefore,
+  } = props
 
   return (
     <CheckboxContainer style={style}>
+      {labelBefore && <label htmlFor={id}>{label}</label>}
       <input
         checked={checked}
         id={id}
@@ -45,7 +51,7 @@ export const Checkbox = props => {
         onChange={handleChange}
         type="checkbox"
       />
-      <label htmlFor={id}>{label}</label>
+      {!labelBefore && <label htmlFor={id}>{label}</label>}
     </CheckboxContainer>
   )
 }

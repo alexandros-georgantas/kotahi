@@ -25,19 +25,19 @@ const MessageContent = styled.span`
 `
 
 const MessageWrapper = styled.span`
-  align-items: flex-end;
+  align-items: flex-start;
   display: flex;
   filter: drop-shadow(0 0 2px #0005);
   flex-direction: column;
   font-size: 14px;
+  left: -10px;
   line-height: 1.1;
   max-width: 400px;
   min-width: 300px;
   position: absolute;
-  right: -10px;
   top: 40px;
   transform: scale(${p => (p.$hide ? 0 : 1)});
-  transform-origin: top right 30px;
+  transform-origin: 30px 0;
   transition: transform 0.3s;
   width: fit-content;
   z-index: 99999;
@@ -54,8 +54,8 @@ const Triangle = styled.span`
   border-right: 10px solid transparent;
   height: 0;
   margin-bottom: -1px;
-  margin-right: 20px;
-  transform: skew(-20deg);
+  margin-left: 20px;
+  transform: skew(20deg);
   width: 0;
   z-index: 5;
 `

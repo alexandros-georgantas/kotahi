@@ -4,21 +4,40 @@ import FullWaxEditor from '../wax-collab/src/FullWaxEditor'
 import CssAssistant from './CssAssistant'
 import { color } from '../../theme'
 import { Checkbox } from '../shared'
+import { cssStringToObject } from './utils/helpers'
 
-const previewSrc = (scope, css) => /* html */ `
-<!DOCTYPE html>
-<html>
-<head>
-  <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
-  <style>
-    @page {
+const previewOnlyCSS = /* css */ `  
+  ::-webkit-scrollbar {
+    height: 5px;
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: ${color.brand1.base}88;
+    border-radius: 5px;
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #fff0;
+    padding: 5px;
+  }
+`
+
+const initialPagedJSCSS = /* css */ ` 
+  :root {
+  --page-counter-color: #777
+  }
+  @page {
       size: A4;
       margin:  20mm;
       border:  1pt solid #0004;
+      padding: 20mm;
 
       @bottom-center {
         content: "Page " counter(page) " of " counter(pages);
         vertical-align: middle;
+        color: var(--page-counter-color);
         text-align: center;
         border-top:  1pt solid #0004; 
         padding-top:  5mm;
@@ -35,120 +54,38 @@ const previewSrc = (scope, css) => /* html */ `
     }
 
     @page :right {
-      margin-left:  2cm;
+      margin-left:  3cm;
       margin-right:  3cm;
     }
 
-    body {
+    #body {
       column-count:  1;
       column-gap:  20px;
-
-      column-width:  500px;
-
+      column-width:  100%;
       column-rule-style: solid;
       column-rule-width:  1px;
       column-rule-color: #ccc;
+      font-size: 14px;
+      line-height: 1.5;
+      hyphenate-limit-chars: 8;
     }
     body,
     html {
       margin: 0;
     }
-      ::-webkit-scrollbar {
-    height: 5px;
-    width: 5px;
-  }
+`
 
-  ::-webkit-scrollbar-thumb {
-    background: #07c15799;
-    border-radius: 5px;
-    width: 5px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #fff0;
-    padding: 5px;
-  }
-
-    body {
-      font-size: 14px;
-      line-height: 1.5;
-      hyphenate-limit-chars: 8;
-    }
-
-    .topbar {
-      text-align: right;
-      letter-spacing: 0.05ch;
-      justify-content: space-between;
-      align-items: center;
-      margin: 0;
-      padding: 0 0 8px;
-      font-size: 0.8em;
-      font-weight: 500;
-      display: flex;
-    }
-
-    .topbar .journal-name {
-      color: var(--color-main);
-      margin: 0;
-      font-size: 1.2em;
-      font-weight: 800;
-    }
-
-    .topbar img {
-      fill: var(--color-main);
-      width: auto;
-      max-width: 45mm;
-      height: 3em;
-      margin-left: 0;
-      padding-bottom: 0.3em;
-      display: block;
-    }
-
-    .topbar svg {
-      fill: var(--color-main);
-      width: auto;
-      max-width: 45mm;
-      height: 3em;
-      margin-left: 0;
-      padding-bottom: 0.3em;
-      display: block;
-    }
-
-    .topbar .topics {
-      text-transform: uppercase;
-      text-align: right;
-      color: var(--color-main);
-      letter-spacing: 0.04ch;
-      flex-wrap: wrap;
-      justify-content: end;
-      gap: 3ch;
-      margin: 0;
-      padding: 0;
-      font-size: 0.8em;
-      list-style-type: none;
-      display: flex;
-    }
-
-    .svg-icon.email {
-      color: var(--color-main);
-      max-height: 20px;
-    }
-
-    .chapter {
-      break-before: always;
-      page: blank;
-    }
-
-    .pagedjs_left_page .pagedjs_margin-top-left .pagedjs_margin-content {
-      width: auto;
-      background-color: #ffd2b5;
-      color: #fe4017;
-      padding:  2mm  5mm;
-    }
+const generateSrcDoc = (scope, css) => /* html */ `
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
+  <style>
+    ${previewOnlyCSS}
     ${css || ''}
   </style>
 </head>
-<body>
+<body id="body">
   ${scope.outerHTML}
   <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -165,10 +102,11 @@ const StyledCssAssistant = styled(CssAssistant)`
 `
 
 const StyledHeading = styled.div`
+  align-items: center;
   background-color: #fff;
   border-bottom: 1px solid #0004;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   padding: 0 10px;
   scrollbar-color: #07c15799;
@@ -181,7 +119,7 @@ const Wrapper = styled.div`
   border-radius: 0 8px 8px 8px;
   display: flex;
   flex-direction: column;
-  height: 90%;
+  height: 100%;
   margin-top: -1px;
   overflow: hidden;
   width: 100%;
@@ -192,9 +130,9 @@ const EditorContainer = styled.div`
   display: flex;
   height: 100%;
   overflow: auto;
-  padding: ${p => (p.$show ? '20px' : '0')};
+  padding: 40px;
   transition: width 0.5s;
-  width: ${p => (p.$show ? '100%' : '0')};
+  width: 100%;
 
   ::-webkit-scrollbar {
     height: 5px;
@@ -202,7 +140,7 @@ const EditorContainer = styled.div`
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #07c15799;
+    background: ${color.brand1.base}88;
     border-radius: 5px;
     width: 5px;
   }
@@ -215,9 +153,53 @@ const EditorContainer = styled.div`
 
 const PreviewIframe = styled.iframe`
   display: flex;
-  transform-origin: right;
-  transition: width 0.5s;
+  height: 100%;
+  width: 100%;
+`
+
+const CheckBoxes = styled.div`
+  border-left: 1px solid #0002;
+  color: ${props => props.color};
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  line-height: 1.3;
+  padding: 5px 10px;
+`
+
+const WindowsContainer = styled.div`
+  display: flex;
+  height: 100%;
+  width: 100%;
+`
+
+const StyledWindow = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  transition: width 0.5s ease;
   width: ${p => (p.$show ? '100%' : '0')};
+`
+
+const WindowLabel = styled.div`
+  background-color: ${color.brand1.base}88;
+  box-shadow: 0 0 2px #0009;
+  color: white;
+  display: flex;
+  font-size: 12px;
+  font-weight: bold;
+  justify-content: space-between;
+  padding: 2px 10px;
+  text-shadow: 0 0 2px #0009;
+  z-index: 99;
+`
+
+const WindowDivision = styled.div`
+  background-color: #0004;
+  height: 100%;
+  width: 3px;
+  z-index: 999;
 `
 
 const StyledCheckbox = styled(Checkbox)``
@@ -225,17 +207,22 @@ const StyledCheckbox = styled(Checkbox)``
 function AiDesignDemo({ saveSource, currentUser, manuscript }) {
   const [scope, setScope] = useState(null)
   const [css, setCss] = useState(null)
-  const [preview, setPreview] = useState(null)
-  const [previewOnChange, setPreviewOnChange] = useState(false)
+  const [previewSource, setPreviewSource] = useState(null)
+  const [livePreview, setLivePreview] = useState(false)
   const [showEditor, setShowEditor] = useState(true)
   const [showPreview, setShowPreview] = useState(false)
 
   useEffect(() => {
-    previewOnChange && scope?.outerHTML && setPreview(previewSrc(scope, css))
+    livePreview &&
+      scope?.outerHTML &&
+      setPreviewSource(generateSrcDoc(scope, css))
   }, [scope, css])
 
   useEffect(() => {
-    showPreview && scope?.outerHTML && setPreview(previewSrc(scope, css))
+    showPreview &&
+      scope?.outerHTML &&
+      setPreviewSource(generateSrcDoc(scope, css))
+    !showPreview && setShowEditor(true)
   }, [showPreview])
 
   return (
@@ -246,28 +233,12 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
           placeholder="Type here how your article should look..."
           scope={scope}
           setCss={setCss}
+          stylesFromSource={cssStringToObject(initialPagedJSCSS)}
         />
-        <span
-          style={{
-            color: color.brand1.base(),
-            fontSize: '14px',
-            lineHeight: '1.3',
-            display: 'flex',
-            gap: '1rem',
-            justifyContent: 'flex-end',
-            padding: '5px 10px',
-            borderTop: '1px solid #0002',
-          }}
-        >
+        <CheckBoxes>
           <StyledCheckbox
-            checked={previewOnChange}
-            handleChange={e => setPreviewOnChange(!previewOnChange)}
-            label="Live preview"
-            style={{ margin: 0 }}
-          />
-          <StyledCheckbox
-            checked={showEditor}
-            handleChange={e => setShowEditor(!showEditor)}
+            checked={showEditor || (!showPreview && !showEditor)}
+            handleChange={e => setShowEditor(showPreview ? !showEditor : true)}
             label="Show Editor"
             style={{ margin: 0 }}
           />
@@ -277,30 +248,36 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
             label="Show Preview"
             style={{ margin: 0 }}
           />
-        </span>
+        </CheckBoxes>
       </StyledHeading>
-      <div
-        style={{
-          display: 'flex',
-          width: '100%',
-          height: '100%',
-        }}
-      >
-        <EditorContainer $show={showEditor}>
-          <FullWaxEditor
-            getActiveViewDom={setScope}
-            readonly
-            saveSource={saveSource}
-            user={currentUser}
-            value={manuscript.meta.source}
-          />
-        </EditorContainer>
-        <PreviewIframe
-          $show={showPreview}
-          srcDoc={preview}
-          title="pdf-preview"
-        />
-      </div>
+      <WindowsContainer>
+        <StyledWindow $show={showEditor}>
+          <WindowLabel>EDITOR</WindowLabel>
+          <EditorContainer>
+            <FullWaxEditor
+              getActiveViewDom={setScope}
+              readonly
+              saveSource={saveSource}
+              user={currentUser}
+              value={manuscript.meta.source}
+            />
+          </EditorContainer>
+        </StyledWindow>
+        {showEditor && showPreview && <WindowDivision />}
+        <StyledWindow $show={showPreview}>
+          <WindowLabel>
+            <span>PDF PREVIEW:</span>
+            <StyledCheckbox
+              checked={livePreview}
+              handleChange={e => setLivePreview(!livePreview)}
+              label="Live preview"
+              labelBefore
+              style={{ margin: 0 }}
+            />
+          </WindowLabel>
+          <PreviewIframe srcDoc={previewSource} title="pdf-preview" />
+        </StyledWindow>
+      </WindowsContainer>
     </Wrapper>
   )
 }

@@ -1,13 +1,11 @@
 /* eslint-disable no-nested-ternary */
-/* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useRef } from 'react'
-import './CssAssistantWC'
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import styled from 'styled-components'
 import gql from 'graphql-tag'
 import { useLazyQuery } from '@apollo/client'
 import { rotate360 } from '@pubsweet/ui-toolkit'
 import useStylesheet from './hooks/useStyleSheet'
-import { onEntries, safeCall } from './utils/helpers'
+import { callOn, onEntries, safeCall } from './utils/helpers'
 import SendButton from './SendButton'
 import { color } from '../../theme'
 import ResponsesUi from './ResponsesUi'
@@ -31,7 +29,7 @@ const getSelectorsRecursively = ctx => {
   return finalOutput
 }
 
-const systemGuidelines = ctx => `
+const systemGuidelines = (ctx, sheet) => `
 
 You are a CSS, JS and HTML expert, your task is to interpret which changes the 'user' wants to do on a css property from an html tag.
 
@@ -41,17 +39,20 @@ Keep in mind that 'user' might not know css, so the prompt must be analysed care
 
 [validSelector] is a placeholder variable (see below), and its value can only be one of the following valid selectors: [${getSelectorsRecursively(
   ctx,
-).join(
-  ', ',
-)}], If the prompt refers to an HTML element and it's tagname matches one of these valid selectors use it, otherwise use "${
-  ctx.selector
-}" as default value. This variable represents the HTML element whose CSS properties need to be changed.
+  sheet,
+).join(', ')}].${sheet ? ` This style sheet is the context:${sheet}` : ''}
+
+Sometimes you will need to aplly pagedjs css, here is the documentation url: 'https://pagedjs.org'.
+
+ If the prompt refers to an HTML element and it's tagname matches one of these valid selectors use it, otherwise use "${
+   ctx.selector
+ }" as default value. This variable represents the HTML element whose CSS properties need to be changed.
 
 ["validSelector"] also can be followed by ::nth-of-type(n) or nth-child(n) pseudoselectors, but ONLY if user specifies a number for the element,
 
 Provide a CSS rule and its value in the following JSON format: {"[validSelector]": {"cssRule": "validCSSValue"}, ...moreRulesIfMoreHtmlElementsAreInvolved}.
 
-Use hex for colors and px units for sizes.
+Use hex for colors and px units for sizes. 'user' can request to mix colors: for example if the color is #000000 and 'user' asks for a litle more of blue you have to do: '#000055'
 
 You cannot use individual properties, like ('background-image', 'background-color', 'border-color', ...etc); use shorthand properties instead.
 
@@ -61,7 +62,11 @@ You can refer to this rules as context for user's request if needed: ${String(
 
 The output must always be a valid JSON. Ensure that each key is a string enclosed in double quotes and that each value is a valid CSS value, also enclosed in double quotes.
 
-You must never say to user what to code, you must return the valid JSOn or in other case ask user again to improve his promt in order to help you to style his article. but always as a result must be the json output, not a suggestion
+If 'user' request to know for the value of a property on the css sheet context, respond in natural language: The value of a [property] is [value]
+
+You must never say to user what to code, you must return the valid JSON or, in other case, ask user again to improve his prompt in order to help you to style his article.
+
+IMPORTANT: If you have the css solution for 'user' request return the JSON output only, not a suggestion
 
 If the prompt can't be resolved through CSS or doesn't involve CSS, respond: 'My purpose is to assist you with your article's design. Please, tell me how can i help you to improve your designs'.
 
@@ -91,7 +96,6 @@ const StyledForm = styled.form`
       p.height || `calc(var(--font-size) + (var(--font-size) / 4));`};
     background: none;
     border: none;
-    /* border-bottom: 1px solid #0002; */
     caret-color: var(--color);
     font-size: inherit;
     height: var(--height);
@@ -127,6 +131,7 @@ const CssAssistant = ({
   scope,
   baseId,
   className,
+  stylesFromSource,
   setCss = () => null,
   appendStyleTag = true,
   ...rest
@@ -137,9 +142,9 @@ const CssAssistant = ({
   const [selectedCtx, setSelectedCtx] = useState([])
   const promptRef = useRef(null)
   const [userPrompt, setUserPrompt] = useState('')
-  const [responseWithDetails, setResponseWithDetails] = useState('')
+  const [feedback, setFeedback] = useState('')
 
-  const [getChatGpt, { loading, error, data }] = useLazyQuery(CHAT_GPT_QUERY, {
+  const [getChatGpt, { loading, error }] = useLazyQuery(CHAT_GPT_QUERY, {
     onCompleted: ({ chatGPT }) => {
       if (chatGPT.startsWith('{')) {
         const response = JSON.parse(chatGPT)
@@ -149,8 +154,13 @@ const CssAssistant = ({
               ? addRules(getCtxBy('selector', selector), rules)
               : insertRule({ selector, rules })
           })
-        setResponseWithDetails('Here you go!')
-      } else setResponseWithDetails(chatGPT)
+        setFeedback('Here you go!')
+      } else
+        setFeedback(
+          chatGPT.includes('{')
+            ? `I can't interpret your request, can you provide more precise instructions`
+            : chatGPT,
+        )
 
       selectedCtx.history.push(
         { role: 'user', content: userPrompt },
@@ -161,18 +171,6 @@ const CssAssistant = ({
   })
 
   const { insertRule, getCss } = useStylesheet(styleSheetRef)
-  // cleanUp
-  useEffect(() => {
-    return () => {
-      if (scope) {
-        scope.removeEventListener('click', handleCtxSelectOnClick)
-        scope.parentNode.parentNode.removeEventListener(
-          'click',
-          handleCtxSelectOnClick,
-        )
-      }
-    }
-  }, [])
   // createCtx from scope node
   useEffect(() => {
     if (scope) {
@@ -205,12 +203,36 @@ const CssAssistant = ({
       // console.log(context.current)
     }
   }, [scope])
+  // cleanUp
+  useEffect(() => {
+    return () => {
+      if (scope) {
+        scope.removeEventListener('click', handleCtxSelectOnClick)
+        scope.parentNode.parentNode.removeEventListener(
+          'click',
+          handleCtxSelectOnClick,
+        )
+      }
+    }
+  }, [])
+  useEffect(() => {
+    styleSheetRef?.current &&
+      stylesFromSource &&
+      onEntries(stylesFromSource, (selector, rules) => {
+        getCtxBy('selector', selector)
+          ? addRules(getCtxBy('selector', selector), rules)
+          : insertRule({ selector, rules })
+      })
+  }, [stylesFromSource])
+  useEffect(() => {
+    error && setFeedback(error)
+  }, [error])
 
   useEffect(() => {
     selectedCtx?.node && (selectedCtx.node.style.outline = '1px dashed #5d5')
   }, [selectedCtx])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     autoResize()
   }, [userPrompt])
   // #endregion HOOKS
@@ -294,9 +316,7 @@ const CssAssistant = ({
       propValue: addRulesToCtx(ctx, inputRules),
       onUpdate: () => insertRule(ctx),
     })
-    selectedCtx?.node && (selectedCtx.node.style.outline = 'none')
     setCss(getCss())
-    selectedCtx?.node && (selectedCtx.node.style.outline = '1px dashed #5d5')
   }
 
   const selectCtx = node => {
@@ -334,7 +354,7 @@ const CssAssistant = ({
 
   const handleSubmit = async e => {
     e.preventDefault()
-    userPrompt && setResponseWithDetails('Just give me a few seconds')
+    userPrompt && setFeedback('Just give me a few seconds')
     userPrompt
       ? getChatGpt({
           variables: {
@@ -344,26 +364,26 @@ const CssAssistant = ({
                 role: 'system',
                 content: systemGuidelines(
                   selectedCtx || getCtxBy('node', scope),
+                  getCss(),
                 ),
               },
               ...selectedCtx.history,
             ],
           },
         })
-      : setResponseWithDetails('Please, tell me what you want to do')
+      : setFeedback('Please, tell me what you want to do')
   }
 
   const handleKeydown = async e => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      handleSubmit(e)
-    }
-
-    if (e.key === 'ArrowDown') {
-      const userHistory = selectedCtx.history.filter(v => v.role === 'user')
-      userHistory.length > 0 &&
-        !userPrompt &&
-        setUserPrompt(userHistory[userHistory.length - 1].content)
-    }
+    callOn(e.key, {
+      Enter: () => !e.shiftKey && handleSubmit(e),
+      ArrowDown: () => {
+        const userHistory = selectedCtx.history.filter(v => v.role === 'user')
+        userHistory.length > 0 &&
+          !userPrompt &&
+          setUserPrompt(userHistory[userHistory.length - 1].content)
+      },
+    })
   }
 
   const autoResize = () => {
@@ -386,6 +406,11 @@ const CssAssistant = ({
         gap: '1rem',
       }}
     >
+      <ResponsesUi
+        promptRef={promptRef}
+        responseWithDetails={feedback}
+        setUserPrompt={setUserPrompt}
+      />
       <span style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
         <StyledForm $enabled={enabled} className={className}>
           <textarea
@@ -408,11 +433,6 @@ const CssAssistant = ({
           )}
         </StyledForm>
       </span>
-      <ResponsesUi
-        promptRef={promptRef}
-        responseWithDetails={responseWithDetails}
-        setUserPrompt={setUserPrompt}
-      />
     </div>
   )
 }

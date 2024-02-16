@@ -29,7 +29,32 @@ export const getComputedRule = el =>
     )
     .filter(Boolean)
 
-export const hasChilds = node => [...(node.children.length > 0)]
+export const cssStringToObject = cssString => {
+  const cssObject = {}
+  const ruleSets = cssString.split('}')
+
+  ruleSets.forEach(ruleSet => {
+    if (!ruleSet) return
+    const [selector = '', rules = ''] = ruleSet.split('{')
+
+    const trimmedSelector = selector.trim()
+    const trimmedRules = rules.trim().slice(0, -1)
+
+    const declarations = trimmedRules.split(';')
+
+    cssObject[trimmedSelector] = {}
+
+    declarations.forEach(declaration => {
+      const [property = '', value = ''] = declaration.split(':')
+
+      if (property && value) {
+        cssObject[trimmedSelector][property.trim()] = value.trim()
+      }
+    })
+  })
+
+  return cssObject
+}
 
 export const styleHtmlString = (source, style) => {
   const parser = new DOMParser()
