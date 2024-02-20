@@ -25,6 +25,7 @@ import UploadAsset from './uploadManager/UploadAsset'
 import ReadonlyFormTemplate from '../../../component-review/src/components/metadata/ReadonlyFormTemplate'
 import { color } from '../../../../theme'
 import AiDesignDemo from '../../../component-ai-assistant/AiDesignDemo'
+import { CssAssistantProvider } from '../../../component-ai-assistant/hooks/CssAssistantContext'
 
 const FlexRow = styled.div`
   display: flex;
@@ -249,11 +250,13 @@ const Production = ({
 
   const cssAiAssistant = {
     content: (
-      <AiDesignDemo
-        currentUser={currentUser}
-        manuscript={manuscript}
-        saveSource={debouncedSave}
-      />
+      <CssAssistantProvider>
+        <AiDesignDemo
+          currentUser={currentUser}
+          manuscript={manuscript}
+          saveSource={debouncedSave}
+        />
+      </CssAssistantProvider>
     ),
 
     key: 'css-ai-assistant',

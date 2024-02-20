@@ -1,4 +1,4 @@
-import { mapEntries, onEntries } from '../utils/helpers'
+import { mapEntries, onEntries } from '../utils'
 
 const useStylesheet = styleNode => {
   const insertRule = ctx => {
@@ -30,10 +30,7 @@ const useStylesheet = styleNode => {
     const cssRules = [...styleNode.current.sheet.cssRules]
 
     cssRules.forEach(cssRule => {
-      // console.log(rules)
       onEntries(rules, (rule, value) => {
-        // console.log(`${rule}:${value}`)
-
         if (
           cssRule.selectorText === selector &&
           cssRule.style[rule] !== value

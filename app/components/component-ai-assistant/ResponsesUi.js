@@ -1,10 +1,11 @@
+/* eslint-disable react/no-array-index-key */
 /* stylelint-disable selector-type-no-unknown */
 /* eslint-disable react/no-unescaped-entities */
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { color } from '../../theme'
-// import RobotIcon from './RobotIcon'
 import { CloseButtonIcon } from '../wax-collab/src/CustomWaxToolGroups/CitationService/components/styles'
+import { CssAssistantContext } from './hooks/CssAssistantContext'
 
 const Wrapper = styled.span`
   display: flex;
@@ -19,7 +20,7 @@ const MessageContent = styled.span`
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 10px;
+  padding: 18px;
   position: relative;
   width: 100%;
 `
@@ -32,14 +33,13 @@ const MessageWrapper = styled.span`
   font-size: 14px;
   left: -10px;
   line-height: 1.1;
-  max-width: 400px;
   min-width: 300px;
   position: absolute;
   top: 40px;
   transform: scale(${p => (p.$hide ? 0 : 1)});
   transform-origin: 30px 0;
   transition: transform 0.3s;
-  width: fit-content;
+  white-space: nowrap;
   z-index: 99999;
 
   > ${MessageContent} > * {
@@ -87,11 +87,13 @@ const UnStyledButton = styled.button`
   }
 `
 
-const ResponsesUi = ({ responseWithDetails, setUserPrompt, promptRef }) => {
+const ResponsesUi = () => {
+  const { feedback, setUserPrompt, promptRef } = useContext(CssAssistantContext)
   const [hideMessage, setHideMessage] = useState(false)
+
   useEffect(() => {
     setHideMessage(false)
-  }, [responseWithDetails])
+  }, [feedback])
 
   const OptionsTemplate = ({ content }) => {
     return (
@@ -102,7 +104,7 @@ const ResponsesUi = ({ responseWithDetails, setUserPrompt, promptRef }) => {
             promptRef.current.focus()
           }}
         >
-          {content}
+          {String(content)}
         </UnStyledButton>
       </li>
     )
@@ -145,15 +147,30 @@ const ResponsesUi = ({ responseWithDetails, setUserPrompt, promptRef }) => {
             </UnStyledButton>
           </span>
           <PaddedContent>
-            {responseWithDetails || (
+            {feedback ? (
+              String(feedback)
+                .split('\n')
+                .map((line, i) =>
+                  /^[0-9.]|-/.test(line) ? (
+                    <OptionsTemplate content={line} key={line + i} />
+                  ) : (
+                    <span key={line + i}>{line}</span>
+                  ),
+                )
+            ) : (
               <>
                 <span>Hello there!</span>
-                <span>I'm here to help with your article design</span>
+                <span>I'm here to help with your pdf design</span>
+                <span>
+                  Also, you can ask for the current values, for example: what is
+                  the margin ammount for the title?, colors?, sizes?, ...etc
+                </span>
                 <span style={{ marginBottom: '8px' }}>
                   Here you have some suggestions to get started:
                 </span>
                 <ul>
                   <OptionsTemplate content="Make the Title blue, and add a underline" />
+                  <OptionsTemplate content="Wich is the size of the page?" />
                   <OptionsTemplate content="The back should be Black and text white" />
                   <OptionsTemplate content="Make the text sans serif" />
                   <OptionsTemplate content="Paragraphs should be dark grey" />

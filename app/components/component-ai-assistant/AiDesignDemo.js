@@ -1,104 +1,25 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import FullWaxEditor from '../wax-collab/src/FullWaxEditor'
 import CssAssistant from './CssAssistant'
 import { color } from '../../theme'
 import { Checkbox } from '../shared'
-import { cssStringToObject } from './utils/helpers'
+import { cssStringToObject, generateSrcDoc, initialPagedJSCSS } from './utils'
+import SelectionBox from './SelectionBox'
+import RefreshIcon from './RefreshIcon'
+import { CssAssistantContext } from './hooks/CssAssistantContext'
+import ResponsesUi from './ResponsesUi'
 
-const previewOnlyCSS = /* css */ `  
-  ::-webkit-scrollbar {
-    height: 5px;
-    width: 5px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: ${color.brand1.base}88;
-    border-radius: 5px;
-    width: 5px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #fff0;
-    padding: 5px;
-  }
-`
-
-const initialPagedJSCSS = /* css */ ` 
-  :root {
-  --page-counter-color: #777
-  }
-  @page {
-      size: A4;
-      margin:  20mm;
-      border:  1pt solid #0004;
-      padding: 20mm;
-
-      @bottom-center {
-        content: "Page " counter(page) " of " counter(pages);
-        vertical-align: middle;
-        color: var(--page-counter-color);
-        text-align: center;
-        border-top:  1pt solid #0004; 
-        padding-top:  5mm;
-      }
-    }
-
-    @page :first {
-      margin:  3cm;
-    }
-
-    @page :left {
-      margin-left:  3cm;
-      margin-right:  2cm;
-    }
-
-    @page :right {
-      margin-left:  3cm;
-      margin-right:  3cm;
-    }
-
-    #body {
-      column-count:  1;
-      column-gap:  20px;
-      column-width:  100%;
-      column-rule-style: solid;
-      column-rule-width:  1px;
-      column-rule-color: #ccc;
-      font-size: 14px;
-      line-height: 1.5;
-      hyphenate-limit-chars: 8;
-    }
-    body,
-    html {
-      margin: 0;
-    }
-`
-
-const generateSrcDoc = (scope, css) => /* html */ `
-<!DOCTYPE html>
-<html>
-<head>
-  <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
-  <style>
-    ${previewOnlyCSS}
-    ${css || ''}
-  </style>
-</head>
-<body id="body">
-  ${scope.outerHTML}
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const scopeIsReady = document.getElementById("css-assistant-scope")
-      scopeIsReady && PagedPolyfill.preview(scopeIsReady);
-    });
-  </script>
-</body>
-</html>
-  `
-
-const StyledCssAssistant = styled(CssAssistant)`
+const Assistant = styled(CssAssistant)`
   margin: 10px 0;
+`
+
+const CssAssistantUI = styled.div`
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 0 5px;
 `
 
 const StyledHeading = styled.div`
@@ -108,17 +29,15 @@ const StyledHeading = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding: 0 10px;
+  padding: 0 0px 0 10px;
   scrollbar-color: #07c15799;
   scrollbar-width: thin;
   width: 100%;
 `
 
-const Wrapper = styled.div`
+const Root = styled.div`
   border: 1px solid #0002;
   border-radius: 0 8px 8px 8px;
-  display: flex;
-  flex-direction: column;
   height: 100%;
   margin-top: -1px;
   overflow: hidden;
@@ -128,10 +47,12 @@ const Wrapper = styled.div`
 const EditorContainer = styled.div`
   background: #eee;
   display: flex;
-  height: 100%;
+  height: 89%;
   overflow: auto;
   padding: 40px;
+  position: relative;
   transition: width 0.5s;
+  user-select: none;
   width: 100%;
 
   ::-webkit-scrollbar {
@@ -153,7 +74,7 @@ const EditorContainer = styled.div`
 
 const PreviewIframe = styled.iframe`
   display: flex;
-  height: 100%;
+  height: 89%;
   width: 100%;
 `
 
@@ -164,7 +85,19 @@ const CheckBoxes = styled.div`
   flex-direction: column;
   font-size: 14px;
   line-height: 1.3;
-  padding: 5px 10px;
+  padding: 0;
+
+  > :first-child {
+    border-bottom: 1px solid #0002;
+    color: ${color.brand1.base};
+    font-size: 11px;
+    padding: 2px 5px 0;
+    width: 100%;
+  }
+
+  > :nth-child(2) {
+    padding: 5px 10px;
+  }
 `
 
 const WindowsContainer = styled.div`
@@ -183,15 +116,16 @@ const StyledWindow = styled.div`
 `
 
 const WindowLabel = styled.div`
-  background-color: ${color.brand1.base}88;
+  background-color: #f6f6f6;
   box-shadow: 0 0 2px #0009;
-  color: white;
+  color: #777;
   display: flex;
   font-size: 12px;
   font-weight: bold;
   justify-content: space-between;
   padding: 2px 10px;
-  text-shadow: 0 0 2px #0009;
+  white-space: nowrap;
+  /* text-shadow: 0 0 2px #0004; */
   z-index: 99;
 `
 
@@ -202,52 +136,89 @@ const WindowDivision = styled.div`
   z-index: 999;
 `
 
+const StyledRefreshButton = styled.span`
+  align-items: center;
+  display: flex;
+  gap: 8px;
+
+  button {
+    background: #fff0;
+    border-radius: 5px;
+    cursor: pointer;
+    height: 20px;
+    outline: 1px solid #777;
+    padding: 1px 1px 0;
+    width: 21px;
+
+    &:hover {
+      background: ${color.brand1.base}55;
+    }
+  }
+
+  svg {
+    fill: #777;
+    height: 11px;
+    width: 11px;
+  }
+`
+
 const StyledCheckbox = styled(Checkbox)``
 
 function AiDesignDemo({ saveSource, currentUser, manuscript }) {
-  const [scope, setScope] = useState(null)
-  const [css, setCss] = useState(null)
+  const { css, html, setHtml } = useContext(CssAssistantContext)
+
   const [previewSource, setPreviewSource] = useState(null)
   const [livePreview, setLivePreview] = useState(false)
   const [showEditor, setShowEditor] = useState(true)
   const [showPreview, setShowPreview] = useState(false)
 
   useEffect(() => {
-    livePreview &&
-      scope?.outerHTML &&
-      setPreviewSource(generateSrcDoc(scope, css))
-  }, [scope, css])
+    showPreview &&
+      livePreview &&
+      html?.outerHTML &&
+      setPreviewSource(generateSrcDoc(html, css))
+  }, [html, css])
 
   useEffect(() => {
     showPreview &&
-      scope?.outerHTML &&
-      setPreviewSource(generateSrcDoc(scope, css))
+      html?.outerHTML &&
+      setPreviewSource(generateSrcDoc(html, css))
     !showPreview && setShowEditor(true)
   }, [showPreview])
 
+  const updatePreview = () => {
+    setPreviewSource(generateSrcDoc(html, css))
+  }
+
   return (
-    <Wrapper>
+    <Root>
       <StyledHeading>
-        <StyledCssAssistant
-          enabled
-          placeholder="Type here how your article should look..."
-          scope={scope}
-          setCss={setCss}
-          stylesFromSource={cssStringToObject(initialPagedJSCSS)}
-        />
+        <CssAssistantUI>
+          <ResponsesUi />
+          <Assistant
+            enabled
+            placeholder="Type here how your article should look..."
+            stylesFromSource={cssStringToObject(initialPagedJSCSS)}
+          />
+        </CssAssistantUI>
         <CheckBoxes>
-          <StyledCheckbox
-            checked={showEditor || (!showPreview && !showEditor)}
-            handleChange={e => setShowEditor(showPreview ? !showEditor : true)}
-            label="Show Editor"
-            style={{ margin: 0 }}
-          />
-          <StyledCheckbox
-            checked={showPreview}
-            handleChange={e => setShowPreview(!showPreview)}
-            label="Show Preview"
-            style={{ margin: 0 }}
-          />
+          <strong>VIEW:</strong>
+          <span>
+            <StyledCheckbox
+              checked={showEditor || (!showPreview && !showEditor)}
+              handleChange={e =>
+                setShowEditor(showPreview ? !showEditor : true)
+              }
+              label="Editor"
+              style={{ margin: 0 }}
+            />
+            <StyledCheckbox
+              checked={showPreview}
+              handleChange={e => setShowPreview(!showPreview)}
+              label="PDF Preview"
+              style={{ margin: 0 }}
+            />
+          </span>
         </CheckBoxes>
       </StyledHeading>
       <WindowsContainer>
@@ -255,18 +226,24 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
           <WindowLabel>EDITOR</WindowLabel>
           <EditorContainer>
             <FullWaxEditor
-              getActiveViewDom={setScope}
+              getActiveViewDom={setHtml}
               readonly
               saveSource={saveSource}
               user={currentUser}
               value={manuscript.meta.source}
             />
+            <SelectionBox />
           </EditorContainer>
         </StyledWindow>
         {showEditor && showPreview && <WindowDivision />}
         <StyledWindow $show={showPreview}>
           <WindowLabel>
-            <span>PDF PREVIEW:</span>
+            <StyledRefreshButton>
+              <button onClick={updatePreview} type="submit">
+                <RefreshIcon />
+              </button>
+              <span>PDF PREVIEW:</span>
+            </StyledRefreshButton>
             <StyledCheckbox
               checked={livePreview}
               handleChange={e => setLivePreview(!livePreview)}
@@ -278,7 +255,7 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
           <PreviewIframe srcDoc={previewSource} title="pdf-preview" />
         </StyledWindow>
       </WindowsContainer>
-    </Wrapper>
+    </Root>
   )
 }
 
