@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
-import React, { createContext, useRef, useState } from 'react'
+import React, { createContext, useMemo, useRef, useState } from 'react'
 import { safeCall } from '../utils'
+import useStylesheet from './useStyleSheet'
 
 export const CssAssistantContext = createContext()
 
@@ -8,11 +9,12 @@ export const CssAssistantProvider = ({ children }) => {
   const context = useRef([])
   const styleSheetRef = useRef(null)
   const history = useRef({ active: true, index: 0 })
+  const { insertRule, makeCss } = useStylesheet(styleSheetRef)
 
   const [selectedCtx, setSelectedCtx] = useState([])
   const [selectedNode, setSelectedNode] = useState(null)
 
-  const [html, setHtml] = useState(null)
+  const [htmlSrc, setHtmlSrc] = useState(null)
   const [css, setCss] = useState(null)
 
   const [feedback, setFeedback] = useState('')
@@ -21,7 +23,7 @@ export const CssAssistantProvider = ({ children }) => {
   const [userPrompt, setUserPrompt] = useState('')
 
   const createStyleSheet = (
-    onCreate = styleTag => html.parentNode.insertBefore(styleTag, html), // we can optionally change this cb for more customization
+    onCreate, // we can optionally change this cb for more customization
   ) => {
     if (!document.getElementById('css-assistant-scoped-styles')) {
       const styleTag = document.createElement('style')
@@ -33,34 +35,44 @@ export const CssAssistantProvider = ({ children }) => {
     return document.getElementById('css-assistant-scoped-styles')
   }
 
-  const dom = {
-    promptRef,
-    styleSheetRef,
-    selectedNode,
-    createStyleSheet,
-  }
+  const dom = useMemo(() => {
+    return {
+      promptRef,
+      styleSheetRef,
+      createStyleSheet,
+      insertRule,
+      makeCss,
+    }
+  }, [styleSheetRef, promptRef])
 
-  const ctx = {
-    context,
-    history,
-    selectedCtx,
-    setSelectedCtx,
-    setSelectedNode,
-  }
+  const ctx = useMemo(() => {
+    return {
+      context,
+      history,
+      selectedNode,
+      selectedCtx,
+      setSelectedCtx,
+      setSelectedNode,
+    }
+  }, [context, history, selectedCtx, selectedNode])
 
-  const chatGpt = {
-    feedback,
-    userPrompt,
-    setFeedback,
-    setUserPrompt,
-  }
+  const chatGpt = useMemo(() => {
+    return {
+      feedback,
+      userPrompt,
+      setFeedback,
+      setUserPrompt,
+    }
+  }, [feedback, userPrompt])
 
-  const htmlAndCss = {
-    css,
-    html,
-    setCss,
-    setHtml,
-  }
+  const htmlAndCss = useMemo(() => {
+    return {
+      css,
+      htmlSrc,
+      setCss,
+      setHtmlSrc,
+    }
+  }, [css, htmlSrc])
 
   return (
     <CssAssistantContext.Provider

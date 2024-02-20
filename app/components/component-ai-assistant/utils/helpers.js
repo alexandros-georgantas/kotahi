@@ -1,7 +1,7 @@
 import { ALLOWED_PROPS, previewOnlyCSS } from './constants'
 import { mapEntries, onEntries, values } from './utils'
 
-export const generateSrcDoc = (scope, css) => /* html */ `
+export const srcdoc = (scope, css) => /* html */ `
     <!DOCTYPE html>
     <html>
     <head>

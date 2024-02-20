@@ -1,13 +1,11 @@
 import React from 'react'
 
-const SendButton = ({ fill = '#2FAC66', size, ...rest }) => {
+const SendIcon = ({ size, ...rest }) => {
   return (
     <svg
-      height={size}
       preserveAspectRatio="none"
       version="1.1"
       viewBox="0 0 18 18"
-      width={size}
       x="0px"
       xmlns="http://www.w3.org/2000/svg"
       y="0px"
@@ -19,7 +17,6 @@ const SendButton = ({ fill = '#2FAC66', size, ...rest }) => {
             d="
 M 6.65 9.9
 L 5.65 14.6 15.4 9.4 5.65 4.2 6.65 8.9 9.25 9.4 6.65 9.9 Z"
-            fill={fill}
             stroke="none"
           />
         </g>
@@ -32,4 +29,4 @@ L 5.65 14.6 15.4 9.4 5.65 4.2 6.65 8.9 9.25 9.4 6.65 9.9 Z"
   )
 }
 
-export default SendButton
+export default SendIcon

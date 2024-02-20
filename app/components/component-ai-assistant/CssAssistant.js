@@ -1,20 +1,18 @@
 /* eslint-disable no-nested-ternary */
-import React, { useEffect, useLayoutEffect, useContext } from 'react'
+import React, { useEffect, useContext } from 'react'
 import styled from 'styled-components'
 import gql from 'graphql-tag'
 import { useLazyQuery } from '@apollo/client'
 import { rotate360 } from '@pubsweet/ui-toolkit'
-import { debounce } from 'lodash'
-import useStylesheet from './hooks/useStyleSheet'
+import { debounce, mapValues } from 'lodash'
 import {
   autoResize,
   callOn,
   onEntries,
-  safeCall,
   setInlineStyle,
   systemGuidelinesV2,
 } from './utils'
-import SendButton from './SendButton'
+import SendIcon from './SendButton'
 import { color } from '../../theme'
 import { CssAssistantContext } from './hooks/CssAssistantContext'
 
@@ -78,6 +76,21 @@ const StyledSpinner = styled.div`
   }
 `
 
+const SendButton = styled.button`
+  aspect-ratio: 1 /1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  width: 24px;
+
+  > svg {
+    fill: ${color.brand1.base};
+    transform: scale(1.35);
+  }
+`
+
 const CssAssistant = ({
   enabled,
   baseId,
@@ -86,12 +99,12 @@ const CssAssistant = ({
   appendStyleTag = true,
   ...rest
 }) => {
-  // #region HOOKS
+  // #region HOOKS ---------------------------------------------------------------------
   const {
     styleSheetRef,
     context,
     setCss,
-    html,
+    htmlSrc,
     selectedCtx,
     setSelectedCtx,
     setSelectedNode,
@@ -101,9 +114,9 @@ const CssAssistant = ({
     setUserPrompt,
     promptRef,
     createStyleSheet,
+    insertRule,
+    makeCss,
   } = useContext(CssAssistantContext)
-
-  const { insertRule, getCss } = useStylesheet(styleSheetRef)
 
   const [getChatGpt, { loading, error }] = useLazyQuery(CHAT_GPT_QUERY, {
     onCompleted: ({ chatGPT }) => {
@@ -111,16 +124,16 @@ const CssAssistant = ({
         const response = JSON.parse(chatGPT)
         response &&
           onEntries(response, (selector, rules) => {
-            if (selectedCtx.node === html) {
+            if (selectedCtx.node === htmlSrc) {
               getCtxBy('selector', selector)
-                ? addRules(getCtxBy('selector', selector), rules)
+                ? addRules(getCtxBy('selector', selector), rules, true)
                 : insertRule({ selector, rules })
             } else {
+              addRules(selectedCtx, rules)
               setInlineStyle(selectedCtx.node, rules)
-              addRulesToCtx(selectedCtx, rules)
             }
           })
-        setCss(getCss())
+        setCss(makeCss())
         setFeedback('Here you go!')
       } else
         setFeedback(
@@ -138,67 +151,59 @@ const CssAssistant = ({
   })
 
   useEffect(() => {
-    if (html) {
-      const tempScope = html
-      !tempScope.id && (tempScope.id = 'css-ai-assistant-scope')
-      addToCtx(createCtx(html, 0))
-      context.current = context.current.map(ctx => ({
-        ...ctx,
-        history: [],
-        rules: {},
-      }))
+    if (htmlSrc) {
+      const tempScope = htmlSrc
+      !tempScope.id && (tempScope.id = 'assistant-ctx')
+      const allChilds = [...htmlSrc.children]
 
-      styleSheetRef.current = createStyleSheet()
+      addToCtx(newCtx(htmlSrc, 0))
+      styleSheetRef.current = createStyleSheet(styleTag =>
+        htmlSrc.parentNode.insertBefore(styleTag, htmlSrc),
+      )
+      stylesFromSource &&
+        onEntries(stylesFromSource, (selector, rules) => {
+          getCtxBy('selector', selector)
+            ? addRules(getCtxBy('selector', selector), rules, true)
+            : insertRule({ selector, rules })
+        })
+
       context.current.forEach(
-        ctx =>
-          Object.values(ctx.rules).map(rule => rule).length > 0 &&
-          insertRule(ctx),
+        ctx => mapValues(ctx.rules, rule => rule).length > 0 && insertRule(ctx),
       )
 
-      setSelectedCtx(getCtxBy('node', html))
-
-      setCss(getCss())
-      ;[...html.children].forEach(child =>
+      setSelectedCtx(getCtxBy('node', htmlSrc))
+      setCss(makeCss())
+      allChilds.forEach(child =>
         child.addEventListener('click', handleSelection),
       )
-      html.parentNode.parentNode.addEventListener('click', handleSelection)
-      // console.log(context.current)
+      htmlSrc.parentNode.parentNode.addEventListener('click', handleSelection)
     }
-  }, [html])
-  // cleanUp
+  }, [htmlSrc])
+
   useEffect(() => {
     return () => {
-      if (html) {
-        ;[...html.children].forEach(child =>
+      if (htmlSrc) {
+        ;[...htmlSrc.children].forEach(child =>
           child.removeEventListener('click', handleSelection),
         )
-        html.parentNode.parentNode.removeEventListener('click', handleSelection)
+        htmlSrc.parentNode.parentNode.removeEventListener(
+          'click',
+          handleSelection,
+        )
       }
     }
   }, [])
-  useEffect(() => {
-    styleSheetRef?.current &&
-      stylesFromSource &&
-      onEntries(stylesFromSource, (selector, rules) => {
-        getCtxBy('selector', selector)
-          ? addRules(getCtxBy('selector', selector), rules)
-          : insertRule({ selector, rules })
-      })
-  }, [stylesFromSource])
 
   useEffect(() => {
     error &&
       setFeedback('Something went wrong, please check your internet connection')
   }, [error])
 
-  useLayoutEffect(() => {
-    debouncedResize()
-  }, [userPrompt])
   // #endregion HOOKS
 
-  // #region CONTEXT
+  // #region CONTEXT -------------------------------------------------------------------
 
-  const createCtx = (node, parent) => {
+  const newCtx = (node, parent, rules = {}, addSelector = true) => {
     const index = [...node.parentNode.children].indexOf(node)
     const tagName = node.tagName.toLowerCase()
 
@@ -217,21 +222,29 @@ const CssAssistant = ({
           }${classNames}`
     }`.trim()
 
-    const childs = createChildsCtx(node, selector)
+    const childs = newChildsCtx(node, selector)
     return {
-      selector,
+      selector: addSelector ? selector : '',
       index,
       node,
       tagName,
       childs,
+      rules,
       history: [],
     }
   }
 
-  const createChildsCtx = (ctxNode, parentSelector) =>
+  const newChildsCtx = (ctxNode, parentSelector) =>
     [...ctxNode.children]
-      .map(node => addToCtx(createCtx(node, parentSelector)))
+      .map(node => addToCtx(newCtx(node, parentSelector)))
       .filter(Boolean)
+
+  const addToCtx = (ctx, isChild) => {
+    if (isChild) return ctx
+    if (ctx.selector && getCtxBy('selector', ctx.selector)) return false
+    context.current = [...context.current, ctx]
+    return ctx
+  }
 
   const getCtxBy = (by, prop, all) => {
     const method = all ? 'filter' : 'find'
@@ -247,58 +260,50 @@ const CssAssistant = ({
     return callOn(by, ctxProps, [prop])
   }
 
-  const addToCtx = (ctx, isChild) => {
-    if (isChild) return ctx
-    if (getCtxBy('selector', ctx.selector)) return false
-    context.current = [...context.current, ctx]
-    return ctx
-  }
-
-  const updateCtx = ({ prop, propValue, onUpdate }) => {
-    if (!selectedCtx) return
-    selectedCtx[prop] = propValue
-    safeCall(onUpdate)()
-  }
-
-  const addRulesToCtx = (ctx, inputRules = {}) => {
+  const addRules = (ctx, inputRules = {}, updateCss = false) => {
     if (!ctx) return null
     const rules = { ...ctx.rules }
     onEntries(inputRules, (rule, value) => (rules[rule] = value))
     ctx.rules = rules
+
+    if (updateCss) {
+      insertRule(ctx)
+      setCss(makeCss())
+    }
+
     return rules
   }
 
-  const addRules = (ctx, inputRules) => {
-    updateCtx({
-      prop: 'rules',
-      propValue: addRulesToCtx(ctx, inputRules),
-      onUpdate: () => insertRule(ctx),
-    })
-    setCss(getCss())
-  }
   // #endregion CONTEXT
 
-  // #region HANDLERS
+  // #region HANDLERS ------------------------------------------------------------------
+
   const handleChange = ({ target }) => {
     setUserPrompt(target.value)
+    debouncedResize()
   }
 
   const handleSelection = e => {
     e.preventDefault()
     e.stopPropagation()
 
-    if (html.contains(e.target)) {
-      setSelectedCtx(getCtxBy('node', e.target))
+    if (htmlSrc.contains(e.target)) {
+      const ctx =
+        getCtxBy('node', e.target) ||
+        addToCtx(newCtx(e.target, null, {}, false))
+
+      setSelectedCtx(ctx)
       setSelectedNode(e.target)
     } else {
-      setSelectedCtx(getCtxBy('node', html))
-      setSelectedNode(html)
+      setSelectedCtx(getCtxBy('node', htmlSrc))
+      setSelectedNode(htmlSrc)
     }
 
+    // console.log(context.current)
     promptRef.current.focus()
   }
 
-  const handleSubmit = async e => {
+  const handleSend = async e => {
     e.preventDefault()
     userPrompt && setFeedback('Just give me a few seconds')
     userPrompt
@@ -309,8 +314,12 @@ const CssAssistant = ({
               {
                 role: 'system',
                 content: systemGuidelinesV2(
-                  selectedCtx || getCtxBy('node', html),
-                  getCss(),
+                  selectedCtx || getCtxBy('node', htmlSrc),
+                  makeCss(),
+                  context.current
+                    .map(({ selector }) => selector)
+                    .filter(Boolean)
+                    .join(', '),
                 ),
               },
               ...selectedCtx.history,
@@ -322,7 +331,7 @@ const CssAssistant = ({
 
   const handleKeydown = async e => {
     callOn(e.key, {
-      Enter: () => !e.shiftKey && handleSubmit(e),
+      Enter: () => !e.shiftKey && handleSend(e),
       ArrowDown: () => {
         const userHistory = selectedCtx.history.filter(v => v.role === 'user')
         if (userHistory.length < 1) return
@@ -337,6 +346,7 @@ const CssAssistant = ({
       default: () => history.current.active && (history.current.active = false),
     })
   }
+
   // #endregion HANDLERS
 
   const debouncedResize = debounce(() => {
@@ -356,12 +366,9 @@ const CssAssistant = ({
       {loading ? (
         <StyledSpinner />
       ) : (
-        <SendButton
-          fill={color.brand1.base()}
-          onClick={handleSubmit}
-          size="24"
-          style={{ transform: 'scale(1.3)', cursor: 'pointer' }}
-        />
+        <SendButton onClick={handleSend}>
+          <SendIcon size="18" />
+        </SendButton>
       )}
     </StyledForm>
   )

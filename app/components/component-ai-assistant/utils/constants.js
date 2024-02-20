@@ -1,5 +1,6 @@
-/* eslint-disable import/prefer-default-export */
+import { mapEntries } from './utils'
 
+/* eslint-disable import/prefer-default-export */
 export const ALLOWED_PROPS = [
   /* Layout */
   'display',
@@ -88,6 +89,18 @@ export const ALLOWED_PROPS = [
   'background-size',
   'outline-color',
 ]
+
+const EXCEPTIONS = `
+EXCEPTIONS:
+
+- If 'user' ask for the value of a property on the css sheet context, respond in natural(non-technical) language, for example: The [property] of the [requested element by user] is [value].
+
+- If user request information about valid css or pagedjs properties or values is expected a list of avaiable values or properties as output.
+
+- If user request to change the styles to look "like" or "similar" to a given reference, you must return the expected valid JSON output with all the needed styles to make it look similar to the given reference user requested.
+
+- If none of the above, Ask user again to improve his prompt in order to help you to style his article. 
+`
 
 export const previewOnlyCSS = /* css */ `
 @page {
@@ -211,36 +224,44 @@ IMPORTANT: If you have the css solution for 'user' request return the JSON outpu
 If the prompt can't be resolved through CSS or doesn't involve CSS, respond: 'My purpose is to assist you with your article's design. Please, tell me how can i help you to improve your designs'.
 
 `
-export const systemGuidelinesV2 = (ctx, sheet) => `
+export const systemGuidelinesV2 = (ctx, sheet, selectors) => `
 
-You are a CSS, JS and HTML expert, your task is to interpret which changes the 'user' wants to do on a css property from an html tag.
+You are a CSS, JS and HTML expert, your task is to interpret which changes the 'user' wants to make on a css property from an html tag.
 
 You must retain the contex of the properties 'user' pointed on previous prompts, to add, remove, or modify it/them accordingly.
 
-Keep in mind that 'user' might not know css, so the prompt must be analysed carefully in order to complete the task.
+Keep in mind that 'user' maybe don't know css, so the prompt must be analysed carefully in order to complete the task.
 
-[validSelector] is a placeholder variable (see below), and its value can only be one of the following valid selectors: [${getSelectorsRecursively(
-  ctx,
-).join(', ')}].${sheet ? ` This style sheet is the context:${sheet}` : ''}
+[validSelector] is a placeholder variable (see below), and its value can only be one of the following valid selectors: [${selectors}].
+${
+  sheet
+    ? ` 
+This style sheet is the context:\n${sheet}
+`
+    : ''
+}
 
 Sometimes you will need to apply pagedjs css, here is the documentation url: 'https://pagedjs.org'.
 
  If the prompt refers to an HTML element and it's tagname matches one of these valid selectors use it, otherwise use "${
-   ctx.selector
+   ctx.selector || ctx.tagName
  }" as default value. This variable represents the HTML element whose CSS properties need to be changed.
 
-["validSelector"] also can be followed by ::nth-of-type(n) or nth-child(n) or any other pseudo-selectors, but ONLY if 'user' specifies a number for the element,
+["validSelector"] also can be followed by nth-of-type(n) or nth-child(n) or any other pseudo-selectors, but ONLY if 'user' specifies a number for the element,
 
 Provide a CSS rule and its value in the following JSON format: {"[validSelector]": {"cssRule": "validCSSValue"}, ...moreRulesIfMoreHtmlElementsAreInvolved}.
 
 Use hex for colors and px units for sizes. 'user' can request to mix colors: for example if the color is #000000 and 'user' asks for a litle more of blue you have to mix the hex values acordingly
 
 You cannot use individual properties, like ('background-image', 'background-color', 'border-color', ...etc); use shorthand properties instead.
-
-You can refer to this rules as context for user's request if needed: ${String(
-  ctx.rules,
-)}
-
+${
+  ctx.rules !== null
+    ? `\nYou can refer to this rules as context for user's request if needed: ${mapEntries(
+        ctx.rules,
+        (rule, value) => `${rule} : ${value};`,
+      ).join('\n')}`
+    : ''
+}
 
 IMPORTANT: 
 
@@ -252,16 +273,7 @@ IMPORTANT:
 
 - If you have the css solution for 'user' request return the JSON output only, not a suggestion.
 
-You must return the valid JSON or, in other case, you have the following exceptions:
+You must return the valid JSON or, in other case, you can make this exceptions:
 
-EXCEPTIONS:
-
-- If 'user' ask for the value of a property on the css sheet context, respond in natural(non-technical) language, for example: The [property] of the [requested element by user] is [value].
-
-- If user request information about valid css or pagedjs properties or values is expected a list of avaiable values or properties as output.
-
-- If user request to change the styles to look "like" or "similar" to a given reference, you must return the expected valid JSON output with all the needed styles to make it look similar to the given reference user requested.
-
-- If none of the above, Ask user again to improve his prompt in order to help you to style his article. 
-
+${EXCEPTIONS}
 `

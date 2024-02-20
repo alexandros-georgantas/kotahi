@@ -3,18 +3,26 @@ import { mapEntries, onEntries } from '../utils'
 const useStylesheet = styleNode => {
   const insertRule = ctx => {
     const { selector, rules } = ctx
-    if (!rules) return
+    if (!rules || !selector) return
 
-    const selectorsInRules = [...styleNode.current.sheet.cssRules].map(
-      cssRule => cssRule.selectorText,
+    const selectorOnRules = [...styleNode.current.sheet.cssRules].find(
+      cssRule => cssRule.selectorText === selector,
     )
 
-    const ruleString = `${selector} {\n${mapEntries(rules, (rule, value) => {
-      return `\t${rule}: ${value}`
-    }).join(';\n')}}`
+    const ruleString = `${selector} {
+${mapEntries(rules, (rule, value) =>
+  rule.length ? `\t${rule}: ${value};\n` : '',
+).join('')}}
+`
+
+    // console.log(
+    //   selectorOnRules
+    //     ? `rule updated:\n${ruleString}`
+    //     : `rule inserted:\n${ruleString}`,
+    // )
 
     try {
-      !selectorsInRules.includes(selector)
+      !selectorOnRules
         ? styleNode.current.sheet.insertRule(
             ruleString,
             styleNode.current.sheet.cssRules.length,
@@ -50,10 +58,10 @@ const useStylesheet = styleNode => {
     })
   }
 
-  const getCss = () =>
+  const makeCss = () =>
     mapEntries(styleNode.current.sheet.rules, (k, v) => v.cssText).join('')
 
-  return { insertRule, updateRule, deleteRule, getCss }
+  return { insertRule, updateRule, deleteRule, makeCss }
 }
 
 export default useStylesheet

@@ -4,7 +4,7 @@ import FullWaxEditor from '../wax-collab/src/FullWaxEditor'
 import CssAssistant from './CssAssistant'
 import { color } from '../../theme'
 import { Checkbox } from '../shared'
-import { cssStringToObject, generateSrcDoc, initialPagedJSCSS } from './utils'
+import { cssStringToObject, srcdoc, initialPagedJSCSS } from './utils'
 import SelectionBox from './SelectionBox'
 import RefreshIcon from './RefreshIcon'
 import { CssAssistantContext } from './hooks/CssAssistantContext'
@@ -165,7 +165,7 @@ const StyledRefreshButton = styled.span`
 const StyledCheckbox = styled(Checkbox)``
 
 function AiDesignDemo({ saveSource, currentUser, manuscript }) {
-  const { css, html, setHtml } = useContext(CssAssistantContext)
+  const { css, htmlSrc, setHtmlSrc } = useContext(CssAssistantContext)
 
   const [previewSource, setPreviewSource] = useState(null)
   const [livePreview, setLivePreview] = useState(false)
@@ -175,19 +175,17 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
   useEffect(() => {
     showPreview &&
       livePreview &&
-      html?.outerHTML &&
-      setPreviewSource(generateSrcDoc(html, css))
-  }, [html, css])
+      htmlSrc?.outerHTML &&
+      setPreviewSource(srcdoc(htmlSrc, css))
+  }, [htmlSrc, css])
 
   useEffect(() => {
-    showPreview &&
-      html?.outerHTML &&
-      setPreviewSource(generateSrcDoc(html, css))
+    showPreview && htmlSrc?.outerHTML && setPreviewSource(srcdoc(htmlSrc, css))
     !showPreview && setShowEditor(true)
   }, [showPreview])
 
   const updatePreview = () => {
-    setPreviewSource(generateSrcDoc(html, css))
+    setPreviewSource(srcdoc(htmlSrc, css))
   }
 
   return (
@@ -226,7 +224,7 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
           <WindowLabel>EDITOR</WindowLabel>
           <EditorContainer>
             <FullWaxEditor
-              getActiveViewDom={setHtml}
+              getActiveViewDom={setHtmlSrc}
               readonly
               saveSource={saveSource}
               user={currentUser}
