@@ -4,11 +4,11 @@ import FullWaxEditor from '../wax-collab/src/FullWaxEditor'
 import CssAssistant from './CssAssistant'
 import { color } from '../../theme'
 import { Checkbox } from '../shared'
-import { cssStringToObject, srcdoc, initialPagedJSCSS } from './utils'
+import { srcdoc, initialPagedJSCSS } from './utils'
 import SelectionBox from './SelectionBox'
 import RefreshIcon from './RefreshIcon'
 import { CssAssistantContext } from './hooks/CssAssistantContext'
-import ResponsesUi from './ResponsesUi'
+import ResponsesUi, { ChatBox } from './ResponsesUi'
 
 const Assistant = styled(CssAssistant)`
   margin: 10px 0;
@@ -78,6 +78,35 @@ const PreviewIframe = styled.iframe`
   width: 100%;
 `
 
+const ChatHistoryContainer = styled.div`
+  background: #ddd;
+  display: flex;
+  flex-direction: column;
+  height: 89%;
+  overflow: auto;
+  padding: 40px;
+  position: relative;
+  transition: width 0.5s;
+  user-select: none;
+  width: 100%;
+
+  ::-webkit-scrollbar {
+    height: 5px;
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #777;
+    border-radius: 5px;
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #fff0;
+    padding: 5px;
+  }
+`
+
 const CheckBoxes = styled.div`
   border-left: 1px solid #0002;
   color: ${props => props.color};
@@ -85,6 +114,7 @@ const CheckBoxes = styled.div`
   flex-direction: column;
   font-size: 14px;
   line-height: 1.3;
+  min-width: 150px;
   padding: 0;
 
   > :first-child {
@@ -115,7 +145,7 @@ const StyledWindow = styled.div`
   width: ${p => (p.$show ? '100%' : '0')};
 `
 
-const WindowLabel = styled.div`
+const WindowHeading = styled.div`
   background-color: #f6f6f6;
   box-shadow: 0 0 2px #0009;
   color: #777;
@@ -165,12 +195,21 @@ const StyledRefreshButton = styled.span`
 const StyledCheckbox = styled(Checkbox)``
 
 function AiDesignDemo({ saveSource, currentUser, manuscript }) {
-  const { css, htmlSrc, setHtmlSrc } = useContext(CssAssistantContext)
+  const {
+    css,
+    htmlSrc,
+    setHtmlSrc,
+    selectedCtx,
+    setSelectedCtx,
+    setSelectedNode,
+    context,
+  } = useContext(CssAssistantContext)
 
   const [previewSource, setPreviewSource] = useState(null)
   const [livePreview, setLivePreview] = useState(false)
   const [showEditor, setShowEditor] = useState(true)
   const [showPreview, setShowPreview] = useState(false)
+  const [showChat, setShowChat] = useState(false)
 
   useEffect(() => {
     showPreview &&
@@ -184,6 +223,13 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
     !showPreview && setShowEditor(true)
   }, [showPreview])
 
+  useEffect(() => {
+    if (!showEditor) {
+      setSelectedCtx(context.current.find(ctx => ctx.node === htmlSrc))
+      setSelectedNode(htmlSrc)
+    }
+  }, [showEditor])
+
   const updatePreview = () => {
     setPreviewSource(srcdoc(htmlSrc, css))
   }
@@ -192,11 +238,11 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
     <Root>
       <StyledHeading>
         <CssAssistantUI>
-          <ResponsesUi />
+          <ResponsesUi forceHide={showChat} />
           <Assistant
             enabled
             placeholder="Type here how your article should look..."
-            stylesFromSource={cssStringToObject(initialPagedJSCSS)}
+            stylesFromSource={initialPagedJSCSS}
           />
         </CssAssistantUI>
         <CheckBoxes>
@@ -216,12 +262,74 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
               label="PDF Preview"
               style={{ margin: 0 }}
             />
+            <StyledCheckbox
+              checked={showChat}
+              handleChange={e => setShowChat(!showChat)}
+              label="Chat History"
+              style={{ margin: 0 }}
+            />
           </span>
         </CheckBoxes>
       </StyledHeading>
       <WindowsContainer>
+        <StyledWindow $show={showChat} style={{ maxWidth: '30%' }}>
+          <WindowHeading>CHAT HISTORY</WindowHeading>
+          <ChatHistoryContainer>
+            {selectedCtx?.history?.length > 0 ? (
+              selectedCtx.history.map(({ role, content }) => (
+                <span
+                  key={content}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    marginBottom: '10px',
+                  }}
+                >
+                  {role === 'assistant' ? (
+                    <ChatBox
+                      $pointerOnBottom
+                      content={content}
+                      header={<strong>Kotahi AI PDF designer</strong>}
+                      position="inherit"
+                      skew="-20deg"
+                    />
+                  ) : (
+                    <ChatBox
+                      $pointerOnBottom
+                      $pointerOnRight
+                      content={content}
+                      header={
+                        <strong>{`${currentUser?.username || 'You'}:`}</strong>
+                      }
+                      position="inherit"
+                      skew="20deg"
+                    />
+                  )}
+                </span>
+              ))
+            ) : (
+              <span
+                style={{
+                  color: '#777',
+                  background: '#fff',
+                  padding: '10px',
+                  borderRadius: '5px',
+                  textAlign: 'center',
+                }}
+              >
+                {`Make your first prompt related to ${
+                  selectedCtx.node === htmlSrc
+                    ? 'the article'
+                    : `this <${selectedCtx.tagName || 'selected'}> element`
+                }`}
+              </span>
+            )}
+          </ChatHistoryContainer>
+        </StyledWindow>
+        {showChat && (showEditor || showPreview) && <WindowDivision />}
+
         <StyledWindow $show={showEditor}>
-          <WindowLabel>EDITOR</WindowLabel>
+          <WindowHeading>EDITOR</WindowHeading>
           <EditorContainer>
             <FullWaxEditor
               getActiveViewDom={setHtmlSrc}
@@ -235,7 +343,7 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
         </StyledWindow>
         {showEditor && showPreview && <WindowDivision />}
         <StyledWindow $show={showPreview}>
-          <WindowLabel>
+          <WindowHeading>
             <StyledRefreshButton>
               <button onClick={updatePreview} type="submit">
                 <RefreshIcon />
@@ -249,7 +357,7 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
               labelBefore
               style={{ margin: 0 }}
             />
-          </WindowLabel>
+          </WindowHeading>
           <PreviewIframe srcDoc={previewSource} title="pdf-preview" />
         </StyledWindow>
       </WindowsContainer>

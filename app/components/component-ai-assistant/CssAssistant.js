@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import gql from 'graphql-tag'
 import { useLazyQuery } from '@apollo/client'
 import { rotate360 } from '@pubsweet/ui-toolkit'
-import { debounce, mapValues } from 'lodash'
+import { debounce } from 'lodash'
 import {
   autoResize,
   callOn,
@@ -114,39 +114,30 @@ const CssAssistant = ({
     setUserPrompt,
     promptRef,
     createStyleSheet,
-    insertRule,
-    makeCss,
   } = useContext(CssAssistantContext)
 
   const [getChatGpt, { loading, error }] = useLazyQuery(CHAT_GPT_QUERY, {
     onCompleted: ({ chatGPT }) => {
       if (chatGPT.startsWith('{')) {
         const response = JSON.parse(chatGPT)
-        response &&
-          onEntries(response, (selector, rules) => {
-            if (selectedCtx.node === htmlSrc) {
-              getCtxBy('selector', selector)
-                ? addRules(getCtxBy('selector', selector), rules, true)
-                : insertRule({ selector, rules })
-            } else {
-              addRules(selectedCtx, rules)
-              setInlineStyle(selectedCtx.node, rules)
-            }
-          })
-        setCss(makeCss())
-        setFeedback('Here you go!')
-      } else
-        setFeedback(
-          chatGPT.includes('{')
-            ? `Please, can you provide more precise instructions?`
-            : chatGPT,
-        )
+        const { css, json, feedback } = response
+        const ctxIsHtmlSrc = selectedCtx.node === htmlSrc
 
-      selectedCtx.history.push(
-        { role: 'user', content: userPrompt },
-        { role: 'assistant', content: chatGPT },
-      )
-      setUserPrompt('')
+        if (json && !ctxIsHtmlSrc) {
+          addRules(selectedCtx, json)
+          setInlineStyle(selectedCtx.node, json)
+        } else if (css) {
+          styleSheetRef.current.textContent += css
+          setCss(styleSheetRef.current.textContent)
+        }
+
+        feedback && setFeedback(feedback)
+
+        selectedCtx.history.push({ role: 'assistant', content: feedback })
+        setUserPrompt('')
+      } else {
+        setFeedback(chatGPT)
+      }
     },
   })
 
@@ -156,23 +147,16 @@ const CssAssistant = ({
       !tempScope.id && (tempScope.id = 'assistant-ctx')
       const allChilds = [...htmlSrc.children]
 
-      addToCtx(newCtx(htmlSrc, 0))
+      addToCtx(newCtx(htmlSrc))
       styleSheetRef.current = createStyleSheet(styleTag =>
         htmlSrc.parentNode.insertBefore(styleTag, htmlSrc),
       )
       stylesFromSource &&
-        onEntries(stylesFromSource, (selector, rules) => {
-          getCtxBy('selector', selector)
-            ? addRules(getCtxBy('selector', selector), rules, true)
-            : insertRule({ selector, rules })
-        })
-
-      context.current.forEach(
-        ctx => mapValues(ctx.rules, rule => rule).length > 0 && insertRule(ctx),
-      )
+        (styleSheetRef.current.textContent += stylesFromSource)
 
       setSelectedCtx(getCtxBy('node', htmlSrc))
-      setCss(makeCss())
+      setSelectedNode(htmlSrc)
+      setCss(styleSheetRef.current.textContent)
       allChilds.forEach(child =>
         child.addEventListener('click', handleSelection),
       )
@@ -204,7 +188,6 @@ const CssAssistant = ({
   // #region CONTEXT -------------------------------------------------------------------
 
   const newCtx = (node, parent, rules = {}, addSelector = true) => {
-    const index = [...node.parentNode.children].indexOf(node)
     const tagName = node.tagName.toLowerCase()
 
     const parentSelector = !parent
@@ -222,13 +205,11 @@ const CssAssistant = ({
           }${classNames}`
     }`.trim()
 
-    const childs = newChildsCtx(node, selector)
+    newChildsCtx(node, selector)
     return {
       selector: addSelector ? selector : '',
-      index,
       node,
       tagName,
-      childs,
       rules,
       history: [],
     }
@@ -239,8 +220,7 @@ const CssAssistant = ({
       .map(node => addToCtx(newCtx(node, parentSelector)))
       .filter(Boolean)
 
-  const addToCtx = (ctx, isChild) => {
-    if (isChild) return ctx
+  const addToCtx = ctx => {
     if (ctx.selector && getCtxBy('selector', ctx.selector)) return false
     context.current = [...context.current, ctx]
     return ctx
@@ -260,16 +240,11 @@ const CssAssistant = ({
     return callOn(by, ctxProps, [prop])
   }
 
-  const addRules = (ctx, inputRules = {}, updateCss = false) => {
+  const addRules = (ctx, inputRules = {}) => {
     if (!ctx) return null
     const rules = { ...ctx.rules }
     onEntries(inputRules, (rule, value) => (rules[rule] = value))
     ctx.rules = rules
-
-    if (updateCss) {
-      insertRule(ctx)
-      setCss(makeCss())
-    }
 
     return rules
   }
@@ -305,6 +280,7 @@ const CssAssistant = ({
 
   const handleSend = async e => {
     e.preventDefault()
+    selectedCtx.history.push({ role: 'user', content: userPrompt })
     userPrompt && setFeedback('Just give me a few seconds')
     userPrompt
       ? getChatGpt({
@@ -315,11 +291,14 @@ const CssAssistant = ({
                 role: 'system',
                 content: systemGuidelinesV2(
                   selectedCtx || getCtxBy('node', htmlSrc),
-                  makeCss(),
-                  context.current
-                    .map(({ selector }) => selector)
-                    .filter(Boolean)
-                    .join(', '),
+                  styleSheetRef?.current?.textContent,
+                  [
+                    ...new Set(
+                      context.current
+                        .map(({ selector }) => selector)
+                        .filter(Boolean),
+                    ),
+                  ].join(', '),
                 ),
               },
               ...selectedCtx.history,

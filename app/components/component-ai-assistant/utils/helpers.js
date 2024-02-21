@@ -7,8 +7,8 @@ export const srcdoc = (scope, css) => /* html */ `
     <head>
       <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
       <style>
-        ${css.replace('#body', 'body') || ''}
         ${previewOnlyCSS}
+        ${css.replace('#body', 'body') || ''}
       </style>
     </head>
     <body id="body">
@@ -21,7 +21,7 @@ export const srcdoc = (scope, css) => /* html */ `
       </script>
     </body>
     </html>
-  `
+`
 
 export const safeKey = (name, object) => {
   let finalName = name

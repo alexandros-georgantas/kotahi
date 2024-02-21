@@ -2,7 +2,7 @@
 /* stylelint-disable selector-type-no-unknown */
 /* eslint-disable react/no-unescaped-entities */
 import React, { useContext, useEffect, useState } from 'react'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { color } from '../../theme'
 import { CloseButtonIcon } from '../wax-collab/src/CustomWaxToolGroups/CitationService/components/styles'
 import { CssAssistantContext } from './hooks/CssAssistantContext'
@@ -13,10 +13,23 @@ const Wrapper = styled.span`
   position: relative;
 `
 
+const chatFadeIn = keyframes`
+   0% {
+    opacity: 0;
+  }
+
+   100% {
+    opacity: 1;
+  }
+`
+
 const MessageContent = styled.span`
   background-color: white;
   border-radius: 15px;
-  box-shadow: inset 5px -8px 15px #0001;
+  box-shadow: ${p =>
+    p.$pointerOnBottom
+      ? 'inset -5px 8px 15px #0001'
+      : 'inset 5px -8px 15px #0001'};
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -26,7 +39,8 @@ const MessageContent = styled.span`
 `
 
 const MessageWrapper = styled.span`
-  align-items: flex-start;
+  align-items: ${p => (p.$pointerOnRight ? 'flex-end' : 'flex-start')};
+  animation: ${chatFadeIn} 0.3s ease;
   display: flex;
   filter: drop-shadow(0 0 2px #0005);
   flex-direction: column;
@@ -34,12 +48,12 @@ const MessageWrapper = styled.span`
   left: -10px;
   line-height: 1.1;
   min-width: 300px;
-  position: absolute;
+  position: ${p => p.position};
   top: 40px;
   transform: scale(${p => (p.$hide ? 0 : 1)});
-  transform-origin: 30px 0;
+  transform-origin: ${p => p.$transformOrigin};
   transition: transform 0.3s;
-  white-space: nowrap;
+  /* white-space: nowrap; */
   z-index: 99999;
 
   > ${MessageContent} > * {
@@ -49,13 +63,17 @@ const MessageWrapper = styled.span`
 `
 
 const Triangle = styled.span`
-  border-bottom: 16px solid #fff;
+  border-bottom: ${p => (!p.$pointerOnBottom ? '16px solid #fff' : '')};
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
+  border-top: ${p => (p.$pointerOnBottom ? '16px solid #fff' : '')};
   height: 0;
-  margin-bottom: -1px;
-  margin-left: 20px;
-  transform: skew(20deg);
+  margin-bottom: ${p => (p.$pointerOnBottom ? '-1px' : '')};
+
+  margin-left: ${p => (!p.$pointerOnRight ? '20px' : '')};
+  margin-right: ${p => (p.$pointerOnRight ? '20px' : '')};
+  margin-top: ${p => (!p.$pointerOnBottom ? '-1px' : '')};
+  transform: skew(${p => p.skew});
   width: 0;
   z-index: 5;
 `
@@ -87,7 +105,61 @@ const UnStyledButton = styled.button`
   }
 `
 
-const ResponsesUi = () => {
+export const ChatBox = ({
+  children,
+  content,
+  header,
+  hide,
+  $pointerOnBottom,
+  $pointerOnRight,
+  $transformOrigin = '30px 0',
+  position = 'absolute',
+  skew = '20deg',
+  ...rest
+}) => {
+  return (
+    <MessageWrapper
+      $hide={hide}
+      $pointerOnRight={$pointerOnRight}
+      $transformOrigin={$transformOrigin}
+      position={position}
+      {...rest}
+    >
+      {!$pointerOnBottom && (
+        <Triangle
+          $pointerOnBottom={$pointerOnBottom}
+          $pointerOnRight={$pointerOnRight}
+          skew={skew}
+        />
+      )}
+      <MessageContent $pointerOnBottom={$pointerOnBottom}>
+        {children || (
+          <>
+            <span
+              style={{
+                display: 'flex',
+                width: '100%',
+                justifyContent: 'space-between',
+              }}
+            >
+              {header}
+            </span>
+            <PaddedContent>{content}</PaddedContent>
+          </>
+        )}
+      </MessageContent>
+      {$pointerOnBottom && (
+        <Triangle
+          $pointerOnBottom={$pointerOnBottom}
+          $pointerOnRight={$pointerOnRight}
+          skew={skew}
+        />
+      )}
+    </MessageWrapper>
+  )
+}
+
+const ResponsesUi = ({ forceHide }) => {
   const { feedback, setUserPrompt, promptRef } = useContext(CssAssistantContext)
   const [hideMessage, setHideMessage] = useState(false)
 
@@ -128,58 +200,63 @@ const ResponsesUi = () => {
       >
         AI
       </UnStyledButton>
-      <MessageWrapper $hide={hideMessage}>
-        <Triangle />
-        <MessageContent>
-          <span
-            style={{
-              display: 'flex',
-              width: '100%',
-              justifyContent: 'space-between',
-            }}
+      <ChatBox
+        hide={forceHide || (!forceHide && hideMessage)}
+        style={{ whiteSpace: 'nowrap' }}
+      >
+        <span
+          style={{
+            display: 'flex',
+            width: '100%',
+            justifyContent: 'space-between',
+          }}
+        >
+          <SmallText>Kotahi AI PDF Designer:</SmallText>
+          <UnStyledButton
+            onClick={() => setHideMessage(!hideMessage)}
+            style={{ objectFit: 'contain', width: '18px', height: '18px' }}
           >
-            <SmallText>Kotahi AI PDF Designer:</SmallText>
-            <UnStyledButton
-              onClick={() => setHideMessage(!hideMessage)}
-              style={{ objectFit: 'contain', width: '18px', height: '18px' }}
-            >
-              <CloseButtonIcon fill={color.brand1.base()} size="18" />
-            </UnStyledButton>
-          </span>
-          <PaddedContent>
-            {feedback ? (
-              String(feedback)
-                .split('\n')
-                .map((line, i) =>
-                  /^[0-9.]|-/.test(line) ? (
-                    <OptionsTemplate content={line} key={line + i} />
-                  ) : (
-                    <span key={line + i}>{line}</span>
-                  ),
-                )
-            ) : (
-              <>
-                <span>Hello there!</span>
-                <span>I'm here to help with your pdf design</span>
-                <span>
-                  Also, you can ask for the current values, for example: what is
-                  the margin ammount for the title?, colors?, sizes?, ...etc
-                </span>
-                <span style={{ marginBottom: '8px' }}>
-                  Here you have some suggestions to get started:
-                </span>
-                <ul>
-                  <OptionsTemplate content="Make the Title blue, and add a underline" />
-                  <OptionsTemplate content="Wich is the size of the page?" />
-                  <OptionsTemplate content="The back should be Black and text white" />
-                  <OptionsTemplate content="Make the text sans serif" />
-                  <OptionsTemplate content="Paragraphs should be dark grey" />
-                </ul>
-              </>
-            )}
-          </PaddedContent>
-        </MessageContent>
-      </MessageWrapper>
+            <CloseButtonIcon fill={color.brand1.base()} size="18" />
+          </UnStyledButton>
+        </span>
+        <PaddedContent>
+          {feedback ? (
+            String(feedback)
+              .split('\n')
+              .map((line, i) =>
+                /^[0-9.]|-/.test(line) ? (
+                  <OptionsTemplate
+                    content={line}
+                    key={line + i}
+                    onClick={e => {
+                      setUserPrompt(e.target.textContent)
+                      promptRef.current.focus()
+                    }}
+                  />
+                ) : (
+                  <span key={line + i}>{line}</span>
+                ),
+              )
+          ) : (
+            <>
+              <span>Hello there!</span>
+              <span>I'm here to help with your pdf design</span>
+              <span>Also, you can ask for the current property values</span>
+              <span>for example: Which is the title margin/color/size?</span>
+              <span style={{ marginBottom: '8px' }}>
+                Here you have some suggestions to get started:
+              </span>
+              <ul>
+                <OptionsTemplate content="Make the Title blue, and add a underline" />
+                <OptionsTemplate content="Wich is the size of the page?" />
+                <OptionsTemplate content="The back should be Black and text white" />
+                <OptionsTemplate content="Make the text sans serif" />
+                <OptionsTemplate content="Paragraphs should be dark grey" />
+              </ul>
+            </>
+          )}
+        </PaddedContent>
+      </ChatBox>
     </Wrapper>
   )
 }
