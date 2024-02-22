@@ -1,14 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
+import { Printer, RefreshCw } from 'react-feather'
 import FullWaxEditor from '../wax-collab/src/FullWaxEditor'
 import CssAssistant from './CssAssistant'
 import { color } from '../../theme'
 import { Checkbox } from '../shared'
 import { srcdoc, initialPagedJSCSS } from './utils'
 import SelectionBox from './SelectionBox'
-import RefreshIcon from './RefreshIcon'
 import { CssAssistantContext } from './hooks/CssAssistantContext'
-import ResponsesUi, { ChatBox } from './ResponsesUi'
+import ResponsesUi from './ResponsesUi'
+import ChatHistory from './ChatHistory'
 
 const Assistant = styled(CssAssistant)`
   margin: 10px 0;
@@ -38,7 +39,7 @@ const StyledHeading = styled.div`
 const Root = styled.div`
   border: 1px solid #0002;
   border-radius: 0 8px 8px 8px;
-  height: 100%;
+  height: 91%;
   margin-top: -1px;
   overflow: hidden;
   width: 100%;
@@ -78,35 +79,6 @@ const PreviewIframe = styled.iframe`
   width: 100%;
 `
 
-const ChatHistoryContainer = styled.div`
-  background: #ddd;
-  display: flex;
-  flex-direction: column;
-  height: 89%;
-  overflow: auto;
-  padding: 40px;
-  position: relative;
-  transition: width 0.5s;
-  user-select: none;
-  width: 100%;
-
-  ::-webkit-scrollbar {
-    height: 5px;
-    width: 5px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #777;
-    border-radius: 5px;
-    width: 5px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #fff0;
-    padding: 5px;
-  }
-`
-
 const CheckBoxes = styled.div`
   border-left: 1px solid #0002;
   color: ${props => props.color};
@@ -117,15 +89,7 @@ const CheckBoxes = styled.div`
   min-width: 150px;
   padding: 0;
 
-  > :first-child {
-    border-bottom: 1px solid #0002;
-    color: ${color.brand1.base};
-    font-size: 11px;
-    padding: 2px 5px 0;
-    width: 100%;
-  }
-
-  > :nth-child(2) {
+  > span {
     padding: 5px 10px;
   }
 `
@@ -160,7 +124,7 @@ const WindowHeading = styled.div`
 `
 
 const WindowDivision = styled.div`
-  background-color: #0004;
+  background-color: #0002;
   height: 100%;
   width: 3px;
   z-index: 999;
@@ -169,26 +133,27 @@ const WindowDivision = styled.div`
 const StyledRefreshButton = styled.span`
   align-items: center;
   display: flex;
-  gap: 8px;
+  gap: 5px;
 
   button {
+    align-items: center;
     background: #fff0;
-    border-radius: 5px;
+    border-right: 1px solid #0002;
     cursor: pointer;
-    height: 20px;
-    outline: 1px solid #777;
-    padding: 1px 1px 0;
-    width: 21px;
-
-    &:hover {
-      background: ${color.brand1.base}55;
-    }
+    display: flex;
+    justify-content: center;
+    padding-right: 4px;
+    width: 20px;
   }
 
   svg {
-    fill: #777;
-    height: 11px;
-    width: 11px;
+    height: 15px;
+    stroke: #777;
+    width: 15px;
+
+    &:hover {
+      stroke: ${color.brand1.base}55;
+    }
   }
 `
 
@@ -199,39 +164,37 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
     css,
     htmlSrc,
     setHtmlSrc,
-    selectedCtx,
     setSelectedCtx,
     setSelectedNode,
     context,
   } = useContext(CssAssistantContext)
 
+  const previewRef = useRef(null)
   const [previewSource, setPreviewSource] = useState(null)
-  const [livePreview, setLivePreview] = useState(false)
+  const [livePreview, setLivePreview] = useState(true)
   const [showEditor, setShowEditor] = useState(true)
   const [showPreview, setShowPreview] = useState(false)
-  const [showChat, setShowChat] = useState(false)
+  const [showChat, setShowChat] = useState(true)
 
   useEffect(() => {
-    showPreview &&
-      livePreview &&
-      htmlSrc?.outerHTML &&
-      setPreviewSource(srcdoc(htmlSrc, css))
+    showPreview && livePreview && updatePreview()
   }, [htmlSrc, css])
 
   useEffect(() => {
-    showPreview && htmlSrc?.outerHTML && setPreviewSource(srcdoc(htmlSrc, css))
-    !showPreview && setShowEditor(true)
+    showPreview && updatePreview()
+    !showPreview && !showEditor && setShowEditor(true)
   }, [showPreview])
 
   useEffect(() => {
     if (!showEditor) {
       setSelectedCtx(context.current.find(ctx => ctx.node === htmlSrc))
       setSelectedNode(htmlSrc)
+      !showPreview && setShowPreview(true)
     }
   }, [showEditor])
 
   const updatePreview = () => {
-    setPreviewSource(srcdoc(htmlSrc, css))
+    css && htmlSrc?.outerHTML && setPreviewSource(srcdoc(htmlSrc, css))
   }
 
   return (
@@ -246,13 +209,10 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
           />
         </CssAssistantUI>
         <CheckBoxes>
-          <strong>VIEW:</strong>
           <span>
             <StyledCheckbox
               checked={showEditor || (!showPreview && !showEditor)}
-              handleChange={e =>
-                setShowEditor(showPreview ? !showEditor : true)
-              }
+              handleChange={e => setShowEditor(!showEditor)}
               label="Editor"
               style={{ margin: 0 }}
             />
@@ -274,57 +234,7 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
       <WindowsContainer>
         <StyledWindow $show={showChat} style={{ maxWidth: '30%' }}>
           <WindowHeading>CHAT HISTORY</WindowHeading>
-          <ChatHistoryContainer>
-            {selectedCtx?.history?.length > 0 ? (
-              selectedCtx.history.map(({ role, content }) => (
-                <span
-                  key={content}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    marginBottom: '10px',
-                  }}
-                >
-                  {role === 'assistant' ? (
-                    <ChatBox
-                      $pointerOnBottom
-                      content={content}
-                      header={<strong>Kotahi AI PDF designer</strong>}
-                      position="inherit"
-                      skew="-20deg"
-                    />
-                  ) : (
-                    <ChatBox
-                      $pointerOnBottom
-                      $pointerOnRight
-                      content={content}
-                      header={
-                        <strong>{`${currentUser?.username || 'You'}:`}</strong>
-                      }
-                      position="inherit"
-                      skew="20deg"
-                    />
-                  )}
-                </span>
-              ))
-            ) : (
-              <span
-                style={{
-                  color: '#777',
-                  background: '#fff',
-                  padding: '10px',
-                  borderRadius: '5px',
-                  textAlign: 'center',
-                }}
-              >
-                {`Make your first prompt related to ${
-                  selectedCtx.node === htmlSrc
-                    ? 'the article'
-                    : `this <${selectedCtx.tagName || 'selected'}> element`
-                }`}
-              </span>
-            )}
-          </ChatHistoryContainer>
+          <ChatHistory user={currentUser} />
         </StyledWindow>
         {showChat && (showEditor || showPreview) && <WindowDivision />}
 
@@ -344,21 +254,31 @@ function AiDesignDemo({ saveSource, currentUser, manuscript }) {
         {showEditor && showPreview && <WindowDivision />}
         <StyledWindow $show={showPreview}>
           <WindowHeading>
+            <span>PDF PREVIEW:</span>
             <StyledRefreshButton>
               <button onClick={updatePreview} type="submit">
-                <RefreshIcon />
+                <RefreshCw />
               </button>
-              <span>PDF PREVIEW:</span>
+              <button
+                onClick={() => previewRef?.current?.contentWindow?.print()}
+                type="submit"
+              >
+                <Printer />
+              </button>
+              <StyledCheckbox
+                checked={livePreview}
+                handleChange={e => setLivePreview(!livePreview)}
+                label="Live preview"
+                style={{ margin: 0 }}
+              />
             </StyledRefreshButton>
-            <StyledCheckbox
-              checked={livePreview}
-              handleChange={e => setLivePreview(!livePreview)}
-              label="Live preview"
-              labelBefore
-              style={{ margin: 0 }}
-            />
           </WindowHeading>
-          <PreviewIframe srcDoc={previewSource} title="pdf-preview" />
+          <PreviewIframe
+            onLoad={updatePreview}
+            ref={previewRef}
+            srcDoc={previewSource}
+            title="pdf-preview"
+          />
         </StyledWindow>
       </WindowsContainer>
     </Root>

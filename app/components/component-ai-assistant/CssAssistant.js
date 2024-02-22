@@ -134,9 +134,9 @@ const CssAssistant = ({
         feedback && setFeedback(feedback)
 
         selectedCtx.history.push({ role: 'assistant', content: feedback })
-        setUserPrompt('')
       } else {
         setFeedback(chatGPT)
+        selectedCtx.history.push({ role: 'assistant', content: chatGPT })
       }
     },
   })
@@ -280,7 +280,6 @@ const CssAssistant = ({
 
   const handleSend = async e => {
     e.preventDefault()
-    selectedCtx.history.push({ role: 'user', content: userPrompt })
     userPrompt && setFeedback('Just give me a few seconds')
     userPrompt
       ? getChatGpt({
@@ -302,10 +301,16 @@ const CssAssistant = ({
                 ),
               },
               ...selectedCtx.history,
+              {
+                role: 'user',
+                content: `${userPrompt} (always respond with the valid JSON, all strings must be enclosed in double quotes, and any double quotes within the string must be escaped with a backslash`,
+              },
             ],
           },
         })
       : setFeedback('Please, tell me what you want to do')
+    selectedCtx.history.push({ role: 'user', content: userPrompt })
+    setUserPrompt('')
   }
 
   const handleKeydown = async e => {

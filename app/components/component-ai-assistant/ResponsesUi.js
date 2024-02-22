@@ -13,13 +13,15 @@ const Wrapper = styled.span`
   position: relative;
 `
 
-const chatFadeIn = keyframes`
+export const chatFadeIn = keyframes`
    0% {
     opacity: 0;
+    transform: translateX(-100%);
   }
 
    100% {
     opacity: 1;
+    transform: translateX(0);
   }
 `
 
@@ -40,7 +42,6 @@ const MessageContent = styled.span`
 
 const MessageWrapper = styled.span`
   align-items: ${p => (p.$pointerOnRight ? 'flex-end' : 'flex-start')};
-  animation: ${chatFadeIn} 0.3s ease;
   display: flex;
   filter: drop-shadow(0 0 2px #0005);
   flex-direction: column;
