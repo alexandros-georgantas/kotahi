@@ -400,7 +400,7 @@ const CSS_LIMITS = `Use hex for colors. 'user' can request to mix colors: for ex
 You cannot use individual properties, like ('background-image', 'background-color', 'border-color', ...etc); use shorthand properties instead.`
 
 const JSON_FORMAT = `The output must be always in the following JSON format: {
-  "json": {"validCSSProperty": "validCSSValue", ...moreValidCssPropertiesAndValues},
+  "rules": {"validCSSProperty": "validCSSValue", ...moreValidCssPropertiesAndValues},
 },
 "css": "${CSS_FORMAT}",
 "feedback": you must provide here a string with the feedback: 
@@ -423,12 +423,15 @@ IMPORTANT:
 
 - Ensure that each key is a string enclosed in double quotes and that each value is a valid CSS value, also enclosed in double quotes.
 
-- If user request to change the styles to make the article look "like" or "similar" to a given reference, you must return the expected valid JSON output with all the needed styles to make it look similar to the given reference user requested.
+- If 'user' requests to change the styles to make the article look "like" or "similar" to a given reference:
+     - Your scope must be pagedjs, starting from the @page rule. 
+     - You must modify all necessary styles, including pagedjs rules.
+     - It needs to be as detailed as possible, change colors, fonts, margins, padding, footers and any other pagedjs and css styles to achieve the most similar appearence.
 
 - The Response must be ALWAYS the expected valid JSON, never text, if you have something to say it must be on the feedback from the JSON object.
 `
 
-export const systemGuidelinesV2 = (ctx, sheet, selectors, outputFormat) => `
+export const systemGuidelinesV2 = (ctx, sheet, selectors) => `
 
 ${TASK_AND_ROLE_DEFINITIONS}
 

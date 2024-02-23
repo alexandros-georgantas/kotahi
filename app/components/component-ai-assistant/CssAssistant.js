@@ -119,21 +119,27 @@ const CssAssistant = ({
   const [getChatGpt, { loading, error }] = useLazyQuery(CHAT_GPT_QUERY, {
     onCompleted: ({ chatGPT }) => {
       if (chatGPT.startsWith('{')) {
-        const response = JSON.parse(chatGPT)
-        const { css, json, feedback } = response
-        const ctxIsHtmlSrc = selectedCtx.node === htmlSrc
+        try {
+          const response = JSON.parse(chatGPT)
+          const { css, rules, feedback } = response
+          const ctxIsHtmlSrc = selectedCtx.node === htmlSrc
 
-        if (json && !ctxIsHtmlSrc) {
-          addRules(selectedCtx, json)
-          setInlineStyle(selectedCtx.node, json)
-        } else if (css) {
-          styleSheetRef.current.textContent += css
-          setCss(styleSheetRef.current.textContent)
+          if (rules && !ctxIsHtmlSrc) {
+            addRules(selectedCtx, rules)
+            setInlineStyle(selectedCtx.node, rules)
+          } else if (css) {
+            styleSheetRef.current.textContent += css
+            setCss(styleSheetRef.current.textContent)
+          }
+
+          feedback && setFeedback(feedback)
+
+          selectedCtx.history.push({ role: 'assistant', content: feedback })
+        } catch (err) {
+          setFeedback(
+            'There was an error generating the response\n Please, try again in a few seconds',
+          )
         }
-
-        feedback && setFeedback(feedback)
-
-        selectedCtx.history.push({ role: 'assistant', content: feedback })
       } else {
         setFeedback(chatGPT)
         selectedCtx.history.push({ role: 'assistant', content: chatGPT })
@@ -311,6 +317,7 @@ const CssAssistant = ({
       : setFeedback('Please, tell me what you want to do')
     selectedCtx.history.push({ role: 'user', content: userPrompt })
     setUserPrompt('')
+    autoResize()
   }
 
   const handleKeydown = async e => {

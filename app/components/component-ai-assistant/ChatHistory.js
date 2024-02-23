@@ -47,6 +47,7 @@ const ChatHistoryContainer = styled.div`
 
 const MessageContainer = styled.div`
   animation: ${chatFadeIn} 0.5s;
+  color: #555;
   display: flex;
   flex-direction: column;
   margin-bottom: 10px;
@@ -77,8 +78,8 @@ const MessageHeader = styled.div`
 
 const MessageContent = styled.div`
   border-left: 1px solid #0002;
-  margin: 4px calc(var(--message-header-gap) + var(--profile-picture-size));
-  padding: 0 8px;
+  margin: 0 calc(var(--message-header-gap) + var(--profile-picture-size) + 1px);
+  padding: 0 var(--message-header-gap);
 `
 
 const ChatHistory = ({ user }) => {
