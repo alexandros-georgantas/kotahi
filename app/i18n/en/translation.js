@@ -535,7 +535,7 @@ const en = {
       getTeam: 'Looking for the team page...',
       getAbout: 'Looking for the about page...',
       info:
-        'Import existing electronic journals from third party providers, such as OJS. This is a best-effort service.',
+        'Import existing electronic journals from third party providers. This is a best-effort service.',
       notice:
         'Note: any previous migration data will be cleared if a new ISSN is submitted.',
       updatingRootFolder: 'Updating the CMS root folder...',
