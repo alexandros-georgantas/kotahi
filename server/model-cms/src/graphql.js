@@ -4,10 +4,16 @@ const { fileStorage } = require('@coko/server')
 
 const File = require('@coko/server/src/models/file/file.model')
 
+const fs = require('fs')
+
 const {
   replaceImageSrc,
   getFilesWithUrl,
 } = require('../../utils/fileStorageUtils')
+
+const languages = JSON.parse(
+  fs.readFileSync(`${__dirname}/../../../app/i18n/languages.json`, 'utf8'),
+)
 
 const setInitialLayout = async groupId => {
   const { formData } = await models.Config.getCached(groupId)
@@ -29,20 +35,14 @@ const getFlaxPageConfig = async (configKey, groupId) => {
     .orderBy('title')
 
   if (!pages) return []
-
-  return pages
-    .map(page => ({
-      id: page.id,
-      title: page.title,
-      url: page.url,
-      shownInMenu: page[configKey].shownInMenu,
-      sequenceIndex: page[configKey].sequenceIndex,
-    }))
-    .sort((page1, page2) => {
-      if (page1.sequenceIndex < page2.sequenceIndex) return -1
-      if (page1.sequenceIndex > page2.sequenceIndex) return 1
-      return 0
-    })
+  return pages.map(page => ({
+    id: page.id,
+    title: page.title,
+    url: page.url,
+    // shownInMenu: page[configKey].shownInMenu,
+    // sequenceIndex: page[configKey].sequenceIndex,
+    config: page[configKey],
+  }))
 }
 
 const setFileUrls = storedObjects => {
@@ -215,24 +215,42 @@ const resolvers = {
       let files = await models.File.query().where('object_id', parent.id)
       files = await getFilesWithUrl(files)
 
-      return replaceImageSrc(parent.content, files, 'medium')
+      const replacedImagesLangObj = {}
+
+      Object.keys(parent.content).forEach(async key => {
+        const value = parent.content[key]
+
+        if (typeof value === 'string') {
+          replacedImagesLangObj[key] = await replaceImageSrc(
+            value,
+            files,
+            'medium',
+          )
+        }
+      })
+
+      return replacedImagesLangObj
     },
   },
 
   CMSLayout: {
     async logo(parent) {
-      if (!parent.logoId) {
+      if (Object.keys(parent.logoId).length === 0) {
         return null
       }
 
-      const logoFile = await models.CMSLayout.relatedQuery('logo')
-        .for(parent.id)
-        .first()
-
-      const updatedStoredObjects = setFileUrls(logoFile.storedObjects)
-
-      logoFile.storedObjects = updatedStoredObjects
-      return logoFile
+      const logos = {}
+      /* eslint-disable no-await-in-loop */
+      await Promise.all(
+        Object.keys(parent.logoId).map(async key => {
+          const fileId = parent.logoId[key]
+          const file = await models.File.query().where('id', fileId).first()
+          const updatedStoredObjects = setFileUrls(file.storedObjects)
+          file.storedObjects = updatedStoredObjects
+          logos[key] = file
+        }),
+      )
+      return logos
     },
 
     async flaxHeaderConfig(parent) {
@@ -240,7 +258,8 @@ const resolvers = {
     },
 
     async flaxFooterConfig(parent) {
-      return getFlaxPageConfig('flaxFooterConfig', parent.groupId)
+      const res = await getFlaxPageConfig('flaxFooterConfig', parent.groupId)
+      return res
     },
 
     async publishConfig(parent) {
@@ -249,6 +268,19 @@ const resolvers = {
       return JSON.stringify({
         licenseUrl: formData.publishing.crossref.licenseUrl,
       })
+    },
+
+    async languagesWithLabels(parent) {
+      let withLabels = []
+
+      if (parent.languages.length) {
+        withLabels = parent.languages.map(langKey => ({
+          value: langKey,
+          label: languages[langKey],
+        }))
+      }
+
+      return withLabels
     },
   },
 
@@ -266,6 +298,15 @@ const resolvers = {
   },
 }
 
+// input CMSPageInput {
+//     title: String
+//     url: String
+//     content: String
+//     published: DateTime
+//     edited: DateTime
+//     flaxHeaderConfig: FlaxConfigInput
+//     flaxFooterConfig: FlaxConfigInput
+//   }
 const typeDefs = `
   extend type Query {
     cmsPage(id: ID!): CMSPage!
@@ -283,15 +324,17 @@ const typeDefs = `
   type CMSPage {
     id: ID!
     url: String!
-    title: String!
+    title: JSON!
     status: String!
-    content: String
+    content: JSON
     meta: String
     creator: User
     published: DateTime
     edited: DateTime
     created: DateTime!
     updated: DateTime
+    flaxHeaderConfig: JSON!
+    flaxFooterConfig: JSON!
   }
 
   type CreatePageResponse {
@@ -314,15 +357,15 @@ const typeDefs = `
     sequenceIndex: Int
     file: File
   }
-
+  scalar JSON
   type CMSLayout {
     id: ID!
     active: Boolean!
-    primaryColor: String!
-    secondaryColor: String!
-    logo: File
+    primaryColor: JSON!
+    secondaryColor: JSON!
+    logo: JSON
     partners: [StoredPartner!]
-    footerText: String
+    footerText: JSON
     published: DateTime
     edited: DateTime!
     created: DateTime!
@@ -330,32 +373,40 @@ const typeDefs = `
     flaxHeaderConfig: [FlaxPageHeaderConfig!]
     flaxFooterConfig: [FlaxPageFooterConfig!]
     publishConfig: String!
+    languages: [String]
+    languagesWithLabels: [JSON]
   }
 
   type FlaxPageHeaderConfig {
     id: ID!
-    title: String!
+    title: JSON!
     url: String!
     sequenceIndex: Int
     shownInMenu: Boolean
+    config: JSON
+  }
+
+  type LanguageTexts {
+    en: String
   }
 
   type FlaxPageFooterConfig {
     id: ID!
-    title: String!
+    title: JSON!
     url: String!
     sequenceIndex: Int
     shownInMenu: Boolean
+    config: JSON
   }
 
   input CMSPageInput {
-    title: String
+    title: JSON
     url: String
-    content: String
+    content: JSON
     published: DateTime
     edited: DateTime
-    flaxHeaderConfig: FlaxConfigInput
-    flaxFooterConfig: FlaxConfigInput
+    flaxHeaderConfig: JSON
+    flaxFooterConfig: JSON
   }
 
   input StoredPartnerInput {
@@ -364,14 +415,16 @@ const typeDefs = `
     sequenceIndex: Int 
   }
 
+
   input CMSLayoutInput {
-    primaryColor: String
-    secondaryColor: String
-    logoId: String
+    primaryColor: JSON
+    secondaryColor: JSON
+    logoId: JSON
     partners: [StoredPartnerInput]
-    footerText: String
+    footerText: JSON
     published: DateTime
     edited: DateTime
+    languages: [String]
   }
 
   input FlaxConfigInput {

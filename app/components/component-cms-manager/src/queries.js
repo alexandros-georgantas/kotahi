@@ -18,6 +18,7 @@ const flaxPageConfigFields = `
     sequenceIndex
     shownInMenu
     url
+    config
 `
 
 const cmsPageFields = `
@@ -34,6 +35,8 @@ const cmsPageFields = `
       id
       username
     }
+    flaxHeaderConfig
+    flaxFooterConfig
 `
 
 const cmsLayoutFields = `
@@ -59,10 +62,8 @@ const cmsLayoutFields = `
        ${fileFields}
       }
     }
-    logo {
-      ${fileFields}
-    }
- 
+    logo
+    languages
 `
 
 const createCmsPageFields = `

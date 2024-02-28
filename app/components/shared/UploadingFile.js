@@ -85,7 +85,10 @@ const ErrorWrapper = styled.div`
   z-index: 4;
 `
 
-const getFileExtension = ({ name }) => name.replace(/^.+\./, '')
+// const getFileExtension = ({ name }) => name.replace(/^.+\./, '')
+const getFileExtension = ({ name }) => {
+  return name.replace(/^.+\./, '')
+}
 
 const UploadingFile = ({
   file,

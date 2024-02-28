@@ -13,10 +13,12 @@ import {
   rebuildFlaxSiteMutation,
   createFileMutation,
   deleteFileMutation,
+  getCMSPages,
 } from './queries'
 
 const CMSLayoutPage = ({ history }) => {
   const { loading, data, error } = useQuery(getCMSLayout)
+  const cmsPages = useQuery(getCMSPages)
   const [updateCMSLayout] = useMutation(updateCMSLayoutMutation)
   const [updateCMSPageInfo] = useMutation(updateCMSPageDataMutation)
   const [rebuildFlaxSite] = useMutation(rebuildFlaxSiteMutation)
@@ -55,17 +57,18 @@ const CMSLayoutPage = ({ history }) => {
     updatePageOrderInfo(updatedHeaderInfo, 'flaxFooterConfig')
   }
 
-  const updatePageOrderInfo = (pageOrderInfo, key) => {
+  const updatePageOrderInfo = async (pageOrderInfo, key) => {
     pageOrderInfo.forEach(cmsPage => {
-      const { id, sequenceIndex, shownInMenu } = cmsPage
+      const { id, sequenceIndex, shownInMenu, lang } = cmsPage
+      const curPageDB = cmsPages.data.cmsPages.filter(page => page.id === id)[0]
+      const val = { ...curPageDB[key] }
+      val[lang] = { sequenceIndex, shownInMenu }
+
       updateCMSPageInfo({
         variables: {
           id,
           input: {
-            [key]: {
-              sequenceIndex,
-              shownInMenu,
-            },
+            [key]: val,
           },
         },
       })

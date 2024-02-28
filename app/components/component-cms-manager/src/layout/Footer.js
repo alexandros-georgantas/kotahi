@@ -56,6 +56,7 @@ const Footer = ({
   deleteFile,
   triggerAutoSave,
   onPageOrderUpdated,
+  curLang,
 }) => {
   const [selectedFiles, setSelectedFiles] = useState(
     formikProps.values.partners,
@@ -67,6 +68,17 @@ const Footer = ({
   const onDataChanged = (name, value) => {
     formikProps.setFieldValue(name, value)
     triggerAutoSave({ [name]: value })
+  }
+
+  const onDataChangedLang = (name, value) => {
+    const prevData = { ...cmsLayout[name] }
+    prevData[curLang] = value
+
+    formikProps.setFieldValue(name, prevData[curLang])
+
+    const data = {}
+    data[name] = prevData === undefined ? null : prevData
+    triggerAutoSave(data)
   }
 
   const onFileAdded = file => {
@@ -87,8 +99,14 @@ const Footer = ({
     })
   }
 
+  const getInputValue = name => {
+    if (cmsLayout[name][curLang]) return cmsLayout[name][curLang]
+
+    return Object.values(cmsLayout[name])[0]
+  }
+
   return (
-    <FullWidthAndHeightContainer>
+    <FullWidthAndHeightContainer key={curLang}>
       <LayoutMainHeading>{t('cmsPage.layout.Footer')}</LayoutMainHeading>
       <CompactSectionWithFullWidth key={partnersInput.name}>
         <LayoutSecondaryHeading>
@@ -129,10 +147,11 @@ const Footer = ({
         <ValidatedFieldFormik
           component={footerTextInput.component}
           name={footerTextInput.name}
-          onChange={value => onDataChanged(footerTextInput.name, value)}
+          onChange={value => onDataChangedLang(footerTextInput.name, value)}
           setFieldValue={formikProps.setFieldValue}
           setTouched={formikProps.setTouched}
           type={footerTextInput.type}
+          value={getInputValue(footerTextInput.name)}
           {...footerTextInput.otherProps}
         />
       </CompactSectionWithFullWidth>
@@ -142,6 +161,7 @@ const Footer = ({
           {t('cmsPage.layout.Footer Page links')}
         </LayoutSecondaryHeading>
         <PageOrder
+          curLang={curLang}
           initialItems={cmsLayout.flaxFooterConfig}
           onPageOrderUpdated={onPageOrderUpdated}
         />

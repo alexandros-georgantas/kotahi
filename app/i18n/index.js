@@ -2,6 +2,7 @@ import en from './en/translation'
 import esLa from './es-la/translation'
 import fr from './fr/translation'
 import ru from './ru/translation'
+import languages from './languages.json'
 
 const resources = {
   en,
@@ -11,12 +12,12 @@ const resources = {
 }
 
 const languagesLabels = [
-  { value: 'en', label: 'English' },
-  { value: 'es-LA', label: 'Español Latinoamericano' },
-  { value: 'fr', label: 'Français' },
+  { value: 'en', label: languages.en },
+  { value: 'es-LA', label: languages['es-LA'] },
+  { value: 'fr', label: languages.fr },
   {
     value: 'ru-RU',
-    label: 'Русский',
+    label: languages['ru-RU'],
     monthAbbrevs: [
       'Янв',
       'Февр',

@@ -293,6 +293,11 @@ const en = {
         Published: 'Published',
         'Brand logo': 'Brand logo',
         'Brand Color': 'Brand Color',
+        'Choose languages': 'Choose languages',
+        LanguagesDesc:
+          'You can select the language(s) for your website and arrange them in the desired order<br/>If your website only for 1 language, you can leave this field blank',
+        'Add language': 'Add language',
+        'Remove language': 'Remove language',
         fields: {
           primaryColor: 'Primary color',
           secondaryColor: 'Secondary color',
@@ -813,6 +818,11 @@ const en = {
       },
       deleteField: {
         'Permanently delete this field': 'Permanently delete this field?',
+        Ok: 'Ok',
+        Cancel: 'Cancel',
+      },
+      deleteCMSLang: {
+        'Delete lang': 'Delete this language?',
         Ok: 'Ok',
         Cancel: 'Cancel',
       },

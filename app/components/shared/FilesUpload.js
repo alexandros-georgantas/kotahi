@@ -42,6 +42,7 @@ const DropzoneAndList = ({
   insert,
   remove,
   createFile,
+  curLang,
   deleteFile,
   fileType,
   fieldName,
@@ -53,8 +54,16 @@ const DropzoneAndList = ({
   // Disable the input in case we want a single file upload
   // and a file has already been uploaded
   const { t } = useTranslation()
+  let files = cloneDeep(get(values, fieldName) || []).map(file => {
+    if (file.id) return file
 
-  const files = cloneDeep(get(values, fieldName) || [])
+    if (!curLang) return { ...file, ...file[Object.keys(file)[0]] }
+    if (curLang && file[curLang]) return { ...file, ...file[curLang] }
+    if (curLang && !file[curLang]) return null
+    return file
+  })
+
+  files = files
     .filter(file => file != null)
     .map((file, index) => {
       // This is so that we preserve the location of the file in the top-level
@@ -69,7 +78,7 @@ const DropzoneAndList = ({
 
   const defaultFileListing = clonedFiles => {
     return (
-      <Files>
+      <Files key={curLang}>
         {clonedFiles.map(file => (
           <UploadingFile
             confirmBeforeDelete={confirmBeforeDelete}
@@ -116,7 +125,6 @@ const DropzoneAndList = ({
           </Root>
         )}
       </Dropzone>
-
       {renderFileList
         ? renderFileList(files, { remove, deleteFile })
         : defaultFileListing(files)}
@@ -164,6 +172,7 @@ const FilesUpload = ({
   onFileAdded,
   onFileRemoved,
   confirmBeforeDelete,
+  curLang = undefined,
 }) => {
   let existingFiles = []
 
@@ -214,12 +223,14 @@ const FilesUpload = ({
 
   return (
     <FieldArray
+      key={curLang}
       name={fieldName}
       render={formikProps => (
         <DropzoneAndList
           acceptMultiple={acceptMultiple}
           confirmBeforeDelete={confirmBeforeDelete}
           createFile={createFile}
+          curLang={curLang}
           deleteFile={deleteFile}
           fieldName={fieldName}
           fileType={fileType}

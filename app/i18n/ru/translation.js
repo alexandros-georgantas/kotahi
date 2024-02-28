@@ -300,6 +300,11 @@ const ru = {
         Published: 'Опубликовано',
         'Brand logo': 'Логотип',
         'Brand Color': 'Цвета',
+        'Choose languages': 'Выберите язык(и) сайта',
+        LanguagesDesc:
+          'Вы можете выбрать язык(и) для сайта вашего журнала и расположить их в необходимом порядке<br />Если сайт вашего журнала на 1 языке, вы можете оставить это поле пустым',
+        'Add language': 'Добавить язык',
+        'Remove language': 'Удалить язык',
         fields: {
           primaryColor: 'Основной цвет',
           secondaryColor: 'Дополнительный цвет',
@@ -833,6 +838,11 @@ const ru = {
       },
       deleteField: {
         'Permanently delete this field': 'Удалить навсегда это поле?',
+        Ok: 'Да',
+        Cancel: 'Отменить',
+      },
+      deleteCMSLang: {
+        'Delete lang': 'Удалить язык?',
         Ok: 'Да',
         Cancel: 'Отменить',
       },

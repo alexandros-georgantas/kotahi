@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import { DragVerticalIcon } from '../../../shared/Icons'
 import { LayoutHeaderListContainer, LayoutHeaderListItem } from '../style'
@@ -22,10 +22,12 @@ const reformObject = values => {
     title: item.title,
     sequenceIndex: item.sequenceIndex,
     shownInMenu: item.shownInMenu,
+    config: item.config,
+    url: item.url,
   }))
 }
 
-const PageOrder = ({ initialItems, onPageOrderUpdated }) => {
+const PageOrder = ({ initialItems, onPageOrderUpdated, curLang }) => {
   const [items, setItems] = React.useState(reformObject(initialItems))
 
   const updateItems = updatedItems => {
@@ -42,18 +44,23 @@ const PageOrder = ({ initialItems, onPageOrderUpdated }) => {
       items,
       result.source.index,
       result.destination.index,
-    )
+    ).map(item => {
+      return { ...item, lang: curLang || 'en' }
+    })
 
     updateItems(updatedItems)
   }
 
   const toggleChange = (item, index) => {
-    const updatedItems = Array.from(items)
+    const updatedItems = Array.from(items).map(changedItem => {
+      return { ...changedItem, lang: curLang || 'en' }
+    })
+
     updatedItems[index].shownInMenu = !item.shownInMenu
     updateItems(updatedItems)
   }
 
-  const renderItemList = (item, index) => {
+  const renderItemList = (item, index, lang) => {
     return (
       <Draggable draggableId={item.id} index={index} key={item.id}>
         {(provided, snapshot) => (
@@ -71,7 +78,7 @@ const PageOrder = ({ initialItems, onPageOrderUpdated }) => {
                 type="checkbox"
                 value={item.id || false}
               />
-              {item.title}
+              {item.title[lang] || item.url}
             </div>
             <DragVerticalIcon />
           </LayoutHeaderListItem>
@@ -79,6 +86,33 @@ const PageOrder = ({ initialItems, onPageOrderUpdated }) => {
       </Draggable>
     )
   }
+
+  useState(() => {
+    if (!curLang) return
+
+    const curLangItems = items
+      .map(item => {
+        if (!Object.keys(item.config).length) return item
+
+        let curConfig = item.config[curLang]
+
+        if (!item.config[curLang])
+          curConfig = item.config[Object.keys(item.config)[0]]
+
+        return {
+          ...item,
+          shownInMenu: curConfig.shownInMenu,
+          sequenceIndex: curConfig.sequenceIndex,
+        }
+      })
+      .sort((page1, page2) => {
+        if (page1.sequenceIndex < page2.sequenceIndex) return -1
+        if (page1.sequenceIndex > page2.sequenceIndex) return 1
+        return 0
+      })
+
+    setItems(curLangItems)
+  }, [curLang, items])
 
   return (
     <div>
@@ -90,7 +124,7 @@ const PageOrder = ({ initialItems, onPageOrderUpdated }) => {
               isDraggingOver={snapshot.isDraggingOver}
               ref={provided.innerRef}
             >
-              {items.map((item, index) => renderItemList(item, index))}
+              {items.map((item, index) => renderItemList(item, index, curLang))}
               {provided.placeholder}
             </LayoutHeaderListContainer>
           )}

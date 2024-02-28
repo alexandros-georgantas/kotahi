@@ -18,6 +18,7 @@ const CMSPageEditSidebar = ({
   currentCMSPage,
   onItemClick,
   onNewItemButtonClick,
+  curLang,
 }) => {
   const { t } = useTranslation()
   return (
@@ -25,7 +26,7 @@ const CMSPageEditSidebar = ({
       {cmsPages.map(cmsPage => (
         <SidebarPageRow key={cmsPage.id}>
           <Heading2 onClick={() => onItemClick(cmsPage)}>
-            {cmsPage.title}
+            {cmsPage.title[curLang] || cmsPage.url}
           </Heading2>
           {cmsPage.id === currentCMSPage.id ? <RightArrow /> : null}
         </SidebarPageRow>

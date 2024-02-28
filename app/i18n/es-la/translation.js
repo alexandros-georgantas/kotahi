@@ -298,6 +298,11 @@ const esLa = {
         Published: 'Publicado',
         'Brand logo': 'Logo de la Marca',
         'Brand Color': 'Color de la Marca',
+        'Choose languages': 'Elegir idiomas',
+        LanguagesDesc:
+          'Puede seleccionar los idiomas de su sitio web y organizarlos en el orden deseado<br/>Si su sitio web solo tiene 1 idioma, puede dejar este campo en blanco',
+        'Add language': 'Agregar idioma',
+        'Remove language': 'quitar idioma',
         fields: {
           primaryColor: 'Color Primario',
           secondaryColor: 'Color Secundario',
@@ -836,6 +841,11 @@ const esLa = {
       deleteField: {
         'Permanently delete this field':
           '¿Eliminar permanentemente este campo?',
+        Ok: 'Ok',
+        Cancel: 'Cancelar',
+      },
+      deleteCMSLang: {
+        'Delete lang': '¿Eliminar idioma?',
         Ok: 'Ok',
         Cancel: 'Cancelar',
       },

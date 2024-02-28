@@ -15,6 +15,7 @@ import { EditPageContainer, EditPageLeft, EditPageRight } from './style'
 import PageHeader from './components/PageHeader'
 
 import {
+  getCMSLayout,
   createCMSPageMutation,
   getCMSPages,
   updateCMSPageDataMutation,
@@ -28,9 +29,14 @@ const CMSPagesPage = ({ match, history }) => {
   const config = useContext(ConfigContext)
   const { urlFrag, groupName } = config
 
+  const [selectedLanguages, setSelectedLanguages] = useState([])
+  const [curLang, setCurLang] = useState()
+
   const { loading, data, error, refetch: refetchCMSPages } = useQuery(
     getCMSPages,
   )
+
+  const cmsLayout = useQuery(getCMSLayout)
 
   const [createNewCMSPage] = useMutation(createCMSPageMutation)
   const [updatePageDataQuery] = useMutation(updateCMSPageDataMutation)
@@ -82,6 +88,7 @@ const CMSPagesPage = ({ match, history }) => {
       <EditPageLeft>
         <CMSPageEditSidebar
           cmsPages={cmsPages}
+          curLang={curLang}
           currentCMSPage={cmsPage}
           isNewPage={isNewPage}
           onItemClick={selectedCmsPage => showPage(selectedCmsPage)}
@@ -98,13 +105,18 @@ const CMSPagesPage = ({ match, history }) => {
         />
         {cmsPage && (
           <CMSPageEditForm
+            cmsLayout={cmsLayout.data?.cmsLayout}
             cmsPage={cmsPage}
             createNewCMSPage={createNewCMSPage}
+            curLang={curLang}
             deleteCMSPage={deleteCMSPage}
             flaxSiteUrlForGroup={flaxSiteUrlForGroup}
             isNewPage={isNewPage}
             key={cmsPage.id}
             rebuildFlaxSiteQuery={rebuildFlaxSiteQuery}
+            selectedLanguages={selectedLanguages}
+            setCurLang={setCurLang}
+            setSelectedLanguages={setSelectedLanguages}
             showPage={showPage}
             updatePageDataQuery={updatePageDataQuery}
           />

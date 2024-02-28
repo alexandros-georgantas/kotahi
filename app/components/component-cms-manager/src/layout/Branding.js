@@ -53,12 +53,34 @@ const Branding = ({
   createFile,
   deleteFile,
   triggerAutoSave,
+  curLang,
 }) => {
+  const dataForLogos = layout => {
+    const prevData = {}
+    const existingData = layout.logo || {}
+
+    Object.keys(existingData).forEach(langKey => {
+      const curLangData = existingData[langKey]
+      prevData[langKey] = curLangData.id
+    })
+    return prevData
+  }
+
   const onDataChanged = (name, value) => {
-    formikProps.setFieldValue(name, value)
+    const prevData =
+      name === 'logoId' ? dataForLogos(cmsLayout) : { ...cmsLayout[name] }
+
+    prevData[curLang] = value
+    formikProps.setFieldValue(name, prevData)
     const data = {}
-    data[name] = value === undefined ? null : value
+    data[name] = prevData === undefined ? null : prevData
     triggerAutoSave(data)
+  }
+
+  const getInputValue = name => {
+    const firstLanguage = cmsLayout.languages[0]
+    if (cmsLayout[name][curLang]) return cmsLayout[name][curLang]
+    return cmsLayout[name][firstLanguage]
   }
 
   const { t } = useTranslation()
@@ -77,12 +99,13 @@ const Branding = ({
 
   return (
     <>
-      <CompactSection key={brandLogoInput.name}>
+      <CompactSection key={brandLogoInput.name + curLang}>
         <LayoutMainHeading>{t('cmsPage.layout.Brand logo')}</LayoutMainHeading>
         <ValidatedFieldFormik
           component={brandLogoInput.component}
           confirmBeforeDelete
           createFile={createFile}
+          curLang={curLang}
           deleteFile={deleteFile}
           entityId={cmsLayout.id}
           name={brandLogoInput.name}
@@ -98,7 +121,7 @@ const Branding = ({
       <LayoutMainHeading>{t('cmsPage.layout.Brand Color')}</LayoutMainHeading>
       {localizeFields(brandColorInput).map(item => {
         return (
-          <CompactSection key={item.name}>
+          <CompactSection key={item.name + curLang}>
             <p style={{ fontSize: '14px' }}>{item.label}</p>
             <ValidatedFieldFormik
               component={item.component}
@@ -108,6 +131,7 @@ const Branding = ({
               setTouched={formikProps.setTouched}
               type={item.type}
               validate={item.isRequired ? required : null}
+              value={getInputValue(item.name)}
               {...item.otherProps}
             />
           </CompactSection>

@@ -85,38 +85,96 @@ const CMSPageEditForm = ({
   key,
   submitButtonText,
   cmsPage,
+  curLang,
   autoSaveData,
   customFormErrors,
   resetCustomErrors,
   currentValues,
   flaxSiteUrlForGroup,
+  selectedLanguages,
 }) => {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
   const autoSave = useCallback(debounce(autoSaveData ?? (() => {}), 1000), [])
   useEffect(() => autoSave.flush, [])
 
+  const [newPageTitle, setNewPageTitle] = useState({})
+  const [newPageContent, setNewPageContent] = useState({})
+  const [mainLanguage, setMainLanguage] = useState('')
+
   const { t } = useTranslation()
+
+  useEffect(() => {
+    if (!selectedLanguages) return
+    setMainLanguage(selectedLanguages[0])
+  }, [selectedLanguages])
+
+  const updateNewPageStates = (itemKey, value) => {
+    if (itemKey === 'title') {
+      setNewPageTitle({ ...newPageTitle, [curLang]: value })
+    }
+
+    if (itemKey === 'content') {
+      setNewPageContent({ ...newPageContent, [curLang]: value })
+    }
+  }
+
+  useEffect(() => {
+    if (!isNewPage) return
+    cmsPage.title = newPageTitle // eslint-disable-line no-param-reassign
+    cmsPage.content = newPageContent // eslint-disable-line no-param-reassign
+  }, [newPageTitle, newPageContent])
 
   const onDataChanged = (itemKey, value) => {
     const data = {}
+
+    if (itemKey === 'url') {
+      value = normalizeUrl(value) // eslint-disable-line no-param-reassign
+    }
+
     data[itemKey] = value
+
+    if (itemKey === 'title') {
+      const newVal = { ...cmsPage.title }
+      newVal[curLang] = value
+      data[itemKey] = newVal
+    }
+
+    if (itemKey === 'content') {
+      const newVal = { ...cmsPage.content }
+      newVal[curLang] = value
+      data[itemKey] = newVal
+    }
+
     autoSave(cmsPage.id, data)
 
     if (Object.keys(customFormErrors).includes(itemKey)) {
       resetCustomErrors()
     }
 
-    if (isNewPage && itemKey === 'title') {
-      setUrlBasedOnTitle(value)
+    // if (isNewPage && itemKey === 'title') {
+    //   setUrlBasedOnTitle(value)
+    // }
+    if (isNewPage) {
+      updateNewPageStates(itemKey, value)
     }
   }
 
-  const setUrlBasedOnTitle = title => {
-    const fieldKey = 'url'
-    const titleSlug = `${kebabCase(title)}/`
-    setFieldValue(fieldKey, titleSlug, false)
-    onDataChanged(fieldKey, titleSlug)
+  // const setUrlBasedOnTitle = title => {
+  //   const fieldKey = 'url'
+  //   const titleSlug = `${kebabCase(title)}/`
+  //   setFieldValue(fieldKey, titleSlug, false)
+  //   onDataChanged(fieldKey, titleSlug)
+  // }
+
+  const normalizeUrl = url => {
+    const slug = `${kebabCase(url)}/`
+    return slug
   }
+
+  useEffect(() => {
+    if (!cmsPage) return
+    setFieldValue('url', cmsPage.url)
+  }, [cmsPage])
 
   const getInputFieldSpecificProps = (item, { onAssetManager }) => {
     let props = {}
@@ -166,6 +224,29 @@ const CMSPageEditForm = ({
     return <ErrorMessage>{error}</ErrorMessage>
   }
 
+  const changeLangValues = lang => {
+    const defaultLang = Object.keys(cmsPage.title)[0]
+
+    const titleValue = lang
+      ? cmsPage.title[lang] ||
+        cmsPage.title[mainLanguage] ||
+        cmsPage.title[defaultLang]
+      : cmsPage.title[mainLanguage] || cmsPage.title[defaultLang]
+
+    const contentValue = lang
+      ? cmsPage.content[lang] ||
+        cmsPage.content[mainLanguage] ||
+        cmsPage.content[defaultLang]
+      : cmsPage.content[mainLanguage] || cmsPage.content[defaultLang]
+
+    setFieldValue('title', titleValue)
+    setFieldValue('content', contentValue)
+  }
+
+  useEffect(() => {
+    changeLangValues(curLang)
+  }, [curLang])
+
   const localizeInputFields = fields => {
     return fields.map(field => {
       if (field.label.length) {
@@ -185,7 +266,10 @@ const CMSPageEditForm = ({
           <EditorForm key={key} onSubmit={onSubmit}>
             {localizeInputFields(inputFields).map(item => {
               return (
-                <Section flexGrow={item.flexGrow || false} key={item.name}>
+                <Section
+                  flexGrow={item.flexGrow || false}
+                  key={item.name + curLang}
+                >
                   <p style={{ fontSize: '10px' }}>{item.label}</p>
                   <ValidatedFieldFormik
                     component={item.component}
@@ -223,7 +307,9 @@ const CMSPageEditForm = ({
               confirmationButtonText={t('modals.cmsPageDelete.Delete')}
               isOpen={isConfirmingDelete}
               message={t('modals.cmsPageDelete.permanentlyDelete', {
-                pageName: cmsPage.title,
+                pageName: cmsPage.title
+                  ? cmsPage.title[Object.keys(cmsPage.title)[0]]
+                  : cmsPage.url,
               })}
             />
           </EditorForm>
