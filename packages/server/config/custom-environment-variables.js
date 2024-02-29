@@ -127,4 +127,11 @@ module.exports = {
   'import-for-prc': {
     default_import: 'USE_COLAB_BIOPHYSICS_IMPORT',
   },
+  'import-from-docmaps': {
+    dataHubURL: 'IMPORT_FROM_DOCMAPS_DATAHUB_URL',
+    dataHubUsername: 'IMPORT_FROM_DOCMAPS_DATAHUB_USERNAME',
+    dataHubPassword: 'IMPORT_FROM_DOCMAPS_DATAHUB_PASSWORD',
+    crossrefURL: 'IMPORT_FROM_DOCMAPS_CROSSREF_URL',
+  },
+
 }
