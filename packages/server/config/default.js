@@ -84,6 +84,7 @@ module.exports = {
       const { protocol, host, port } = cfg['pubsweet-server']
       return `${protocol}://${host}${port ? `:${port}` : ''}`
     }),
+    wsYjsServerPort: '5010',
   },
   'pubsweet-client': {
     API_ENDPOINT: '/api',

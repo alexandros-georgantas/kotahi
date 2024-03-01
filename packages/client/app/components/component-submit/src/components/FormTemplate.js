@@ -192,6 +192,7 @@ const FormTemplate = ({
   fieldsToPublish,
   setShouldPublishField,
   shouldShowOptionToPublish = false,
+  collaborativeObject,
 }) => {
   const config = useContext(ConfigContext)
   const [confirming, setConfirming] = React.useState(false)
@@ -508,6 +509,7 @@ const FormTemplate = ({
                             'labelColor',
                           ])}
                           aria-label={element.placeholder || element.title}
+                          collaborativeObject={collaborativeObject}
                           component={elements[element.component]}
                           data-testid={element.name} // TODO: Improve this
                           key={`validate-${element.id}`}
