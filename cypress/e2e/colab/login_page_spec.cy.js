@@ -6,6 +6,8 @@ import { manuscripts, login, dashboard } from '../../support/routes1'
 
 describe('Login page tests', () => {
   it('page should display prc branding settings', () => {
+
+    cy.task('restore', 'commons/colab_bootstrap')
     // eslint-disable-next-line jest/valid-expect-in-promise
     cy.fixture('branding_settings').then(settings => {
       const primaryAsRgb = Color(settings.prc.primaryColor).string()
