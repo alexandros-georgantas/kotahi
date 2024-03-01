@@ -117,7 +117,6 @@ services:
       - IMPORT_FROM_DOCMAPS_DATAHUB_PASSWORD=${IMPORT_FROM_DOCMAPS_DATAHUB_PASSWORD}
       - IMPORT_FROM_DOCMAPS_CROSSREF_URL=${IMPORT_FROM_DOCMAPS_CROSSREF_URL}
 
-
     volumes:
       - ./uploads:/home/node/app/uploads
       - ./config:/home/node/app/config

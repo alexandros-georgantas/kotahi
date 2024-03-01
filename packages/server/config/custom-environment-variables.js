@@ -133,5 +133,4 @@ module.exports = {
     dataHubPassword: 'IMPORT_FROM_DOCMAPS_DATAHUB_PASSWORD',
     crossrefURL: 'IMPORT_FROM_DOCMAPS_CROSSREF_URL',
   },
-
 }
