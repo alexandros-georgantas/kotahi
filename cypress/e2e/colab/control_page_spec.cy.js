@@ -1,3 +1,5 @@
+/* eslint-disable cypress/no-unnecessary-waiting */
+/* eslint-disable jest/no-disabled-tests */
 /* eslint-disable jest/no-commented-out-tests */
 /* eslint-disable prettier/prettier,jest/valid-expect-in-promise */
 /* eslint-disable jest/expect-expect */
@@ -15,223 +17,255 @@ import { SubmissionFormPage } from '../../page-object/submission-form-page'
 describe('control page tests', () => {
   // the commented part below is because of the issue for shared review that doesn't work as expected because of the issue #1011
 
-  // context('shared message', () => {
-  //   before(() => {
-  //     cy.task('restore', 'initial_state_other')
-  //     cy.task('seedForms')
-  //     cy.fixture('role_names').then(name => {
-  //       cy.login(name.role.admin, dashboard)
-  //       cy.awaitDisappearSpinner()
-  //       DashboardPage.clickSubmit()
-  //       NewSubmissionPage.clickSubmitUrlAndWaitPageLoad()
-  //       Menu.clickManuscriptsAndAssertPageLoad()
-  //       ManuscriptsPage.clickControlAndVerifyPageLoaded()
-  //       ControlPage.clickAssignSeniorEditorDropdown()
-  //       ControlPage.selectDropdownOptionByName(name.role.author)
-  //       ControlPage.inviteReviewer(name.role.reviewers[3])
-  //       ControlPage.inviteReviewer(name.role.reviewers[1])
-  //       ControlPage.inviteReviewer(name.role.reviewers[4])
-  //     })
-  //   })
-  //   it('shared message is visible', () => {
-  //      // eslint-disable-next-line cypress/no-unnecessary-waiting
-  //      cy.wait(500)
-  //     ControlPage.clickInvitedReviewer()
-  //     ControlPage.clickReviewerSharedCheckbox(0)
-  //     ControlPage.clickReviewerSharedCheckbox(1)
-  //     ControlPage.clickReviewerSharedCheckbox(2)
-  //     ControlPage.waitThreeSec()
-  //     cy.fixture('role_names').then(name => {
-  //       cy.login(name.role.reviewers[3], dashboard)
-  //       cy.awaitDisappearSpinner()
-  //       DashboardPage.clickAcceptReviewButton()
-  //       // eslint-disable-next-line cypress/no-unnecessary-waiting
-  //       cy.wait(2000)
-  //       DashboardPage.clickDoReviewAndVerifyPageLoaded()
-  //       cy.fixture('submission_form_data').then(data => {
-  //         ReviewPage.fillInReviewComment(data.review1)
-  //       })
-  //       ReviewPage.clickAcceptRadioButton()
-  //       ReviewPage.clickSubmitButton()
-  //       ReviewPage.clickConfirmSubmitButton()
-  //       ReviewPage.waitThreeSec()
-  //       cy.login(name.role.author, dashboard)
-  //     })
-  //     cy.awaitDisappearSpinner()
-  //     cy.contains('Enter Email').click()
-  //     cy.get('#enter-email').type('emilyaccount@test.com')
-  //     cy.contains('Next').click()
-  //     cy.visit('/kotahi/dashboard')
-  //     ManuscriptsPage.clickControlAndVerifyPageLoaded()
-  //     DashboardPage.clickControlPanel()
-  //     ControlPage.clickShow()
-  //     cy.fixture('submission_form_data').then(data => {
-  //       ControlPage.getReviewMessage().should('contain', data.review1)
-  //     })
-  //   })
-  //   it('shared message is not visible', () => {
-  //     ControlPage.waitThreeSec()
-  //     cy.fixture('role_names').then(name => {
-  //       cy.login(name.role.reviewers[1], dashboard)
-  //       cy.awaitDisappearSpinner()
-  //       cy.contains('Enter Email').click()
-  //       cy.get('#enter-email').type('joane@test.com')
-  //       cy.contains('Next').click()
-  //       cy.visit('/kotahi/dashboard')
-  //       DashboardPage.clickAcceptReviewButton()
-  //       // eslint-disable-next-line cypress/no-unnecessary-waiting
-  //       cy.wait(2000)
-  //       DashboardPage.clickDoReviewAndVerifyPageLoaded()
-  //       cy.fixture('submission_form_data').then(data => {
-  //         ReviewPage.fillInReviewComment(data.review2)
-  //       })
-  //       ReviewPage.clickAcceptRadioButton()
-  //       ReviewPage.clickSubmitButton()
-  //       ReviewPage.clickConfirmSubmitButton()
-  //       ReviewPage.waitThreeSec()
-  //       cy.login(name.role.reviewers[0], dashboard)
-  //     })
-  //     cy.awaitDisappearSpinner()
-  //     DashboardPage.clickControlPanel()
-  //     cy.fixture('submission_form_data').then(data => {
-  //       cy.get('.DecisionReview__Root-sc-1azvco7-6').should(
-  //         'not.contain',
-  //         data.review2,
-  //       )
-  //     })
-  //   })
+  context('shared message', () => {
+    before(() => {
+      cy.task('restore', 'commons/colab_bootstrap')
+      cy.task('seedForms')
+      cy.fixture('role_names').then(name => {
+        cy.login(name.role.admin, dashboard)
+        cy.awaitDisappearSpinner()
+        DashboardPage.clickSubmit()
+        NewSubmissionPage.clickSubmitUrlAndWaitPageLoad()
+        Menu.clickManuscriptsAndAssertPageLoad()
+        ManuscriptsPage.selectOptionWithText('Control')
+        cy.awaitDisappearSpinner()
+        ControlPage.clickAssignSeniorEditorDropdown()
+        ControlPage.selectDropdownOptionByName(name.role.author)
+        ControlPage.inviteReviewer(name.role.reviewers[3])
+        ControlPage.inviteReviewer(name.role.reviewers[1])
+        ControlPage.inviteReviewer(name.role.reviewers[4])
+      })
+    })
+    it('shared message is visible', () => {
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(500)
+      ControlPage.clickInvitedReviewer(0)
+      ControlPage.clickReviewerSharedCheckbox(0)
+      cy.get('[class*=Icon__IconWrapper]:nth(1)').click()
+      ControlPage.clickInvitedReviewer(1)
+      ControlPage.clickReviewerSharedCheckbox(0)
+      cy.get('[class*=Icon__IconWrapper]:nth(1)').click()
+      ControlPage.clickInvitedReviewer(2)
+      ControlPage.clickReviewerSharedCheckbox(0)
+      cy.get('[class*=Icon__IconWrapper]:nth(1)').click()
+      ControlPage.waitThreeSec()
+      cy.fixture('role_names').then(name => {
+        cy.login(name.role.reviewers[1], dashboard)
+        cy.awaitDisappearSpinner()
+        DashboardPage.clickDashboardTab(1)
+        DashboardPage.clickAcceptReviewButton()
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(2000)
+        DashboardPage.clickDoReviewAndVerifyPageLoaded()
+        cy.fixture('submission_form_data').then(data => {
+          ReviewPage.fillInReviewComment(data.review1)
+          cy.wait(2000)
+          ReviewPage.clickAcceptRadioButton()
+          // eslint-disable-next-line cypress/no-unnecessary-waiting
+          cy.wait(3000)
+          cy.contains(data.review1)
+        })
+        ReviewPage.clickSubmitButton()
+        cy.wait(2000)
+        ReviewPage.clickConfirmSubmitButton()
+        cy.awaitDisappearSpinner()
+        cy.contains('Completed')
+        ReviewPage.waitThreeSec()
+        cy.login(name.role.author, dashboard)
+      })
+      cy.awaitDisappearSpinner()
+      // cy.contains('Enter Email').click()
+      // cy.get('#enter-email').type('emilyaccount@test.com')
+      // cy.contains('Next').click()
+      // cy.visit('/kotahi/dashboard')
+      // ManuscriptsPage.selectOptionWithText('Control')
+      // cy.awaitDisappearSpinner()
+      DashboardPage.clickDashboardTab(2)
+      DashboardPage.clickControlPanelDecision()
+      ControlPage.clickShow(0)
+      cy.fixture('submission_form_data').then(data => {
+        ControlPage.getReviewMessage().should('contain', data.review1)
+      })
+    })
+    it('shared message is not visible', () => {
+      ControlPage.waitThreeSec()
+      cy.fixture('role_names').then(name => {
+        cy.login(name.role.reviewers[3], dashboard)
+        cy.awaitDisappearSpinner()
+        // cy.contains('Enter Email').click()
+        // cy.get('#enter-email').type('joane@test.com')
+        // cy.contains('Next').click()
+        // cy.visit('/kotahi/dashboard')
+        DashboardPage.clickDashboardTab(1)
+        DashboardPage.clickAcceptReviewButton()
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(2000)
+        DashboardPage.clickDoReviewAndVerifyPageLoaded()
+        cy.fixture('submission_form_data').then(data => {
+          ReviewPage.fillInReviewComment(data.review2)
+        })
+        ReviewPage.clickAcceptRadioButton()
+        ReviewPage.clickSubmitButton()
+        ReviewPage.clickConfirmSubmitButton()
+        ReviewPage.waitThreeSec()
+        cy.awaitDisappearSpinner()
+        cy.login(name.role.reviewers[0], dashboard)
+      })
+      cy.awaitDisappearSpinner()
+      DashboardPage.clickControlPanelDecision()
+      ControlPage.clickShow(0)
+      cy.fixture('submission_form_data').then(data => {
+        cy.get('.DecisionReview__Root-sc-1azvco7-6').should(
+          'not.contain',
+          data.review2,
+        )
+      })
+    })
 
-  /* commented because this is not visible yet on the reivew page" */
-  //   it('checkbox can be published publicly is visible', () => {
-  //     cy.fixture('role_names').then(name => {
-  //       cy.login(name.role.admin, manuscripts)
-  //     })
-  //     ManuscriptsPage.clickControlAndVerifyPageLoaded()
-  //     ControlPage.clickInvitedReviewer()
-  //     ControlPage.clickReviewerSharedCheckbox(0)
-  //     ControlPage.waitThreeSec()
-  //     cy.fixture('role_names').then(name => {
-  //       cy.login(name.role.reviewers[4], dashboard)
-  //     })
-  //     cy.awaitDisappearSpinner()
-  //     DashboardPage.clickAcceptReviewButton()
-  //     DashboardPage.clickDoReviewAndVerifyPageLoaded()
-  //     cy.fixture('submission_form_data').then(data => {
-  //       ReviewPage.fillInReviewComment(data.review1)
-  //     })
-  //     ReviewPage.getCanBePublishedPubliclyCheckbox()
-  //       .scrollIntoView()
-  //       .should('be.visible')
-  //     ReviewPage.clickCanBePublishedPublicly()
-  //     ReviewPage.getCanBePublishedPubliclyCheckbox().should(
-  //       'have.value',
-  //       'true',
-  //     )
-  //   })
-  //   it('icon for accepted to publish review is visible', () => {
-  //     cy.fixture('role_names').then(name => {
-  //       cy.login(name.role.admin, manuscripts)
-  //     })
-  //     ManuscriptsPage.clickControlAndVerifyPageLoaded()
-  //     ControlPage.clickInvitedReviewer()
-  //     ControlPage.clickReviewerSharedCheckbox(0)
-  //     ControlPage.waitThreeSec()
-  //     cy.fixture('role_names').then(name => {
-  //       cy.login(name.role.reviewers[4], dashboard)
-  //     })
-  //     cy.awaitDisappearSpinner()
-  //     DashboardPage.clickAcceptReviewButton()
-  //     DashboardPage.clickDoReviewAndVerifyPageLoaded()
-  //     cy.fixture('submission_form_data').then(data => {
-  //       ReviewPage.fillInReviewComment(data.review1)
-  //     })
-  //     ReviewPage.clickCanBePublishedPublicly()
-  //     ReviewPage.getCanBePublishedPubliclyCheckbox().should(
-  //       'have.value',
-  //       'true',
-  //     )
-  //     ReviewPage.clickAcceptRadioButton()
-  //     ReviewPage.clickSubmitButton()
-  //     ReviewPage.waitThreeSec()
-  //     DashboardPage.clickControlPanelDecision()
-  //     ControlPage.clickShow()
-  //     ControlPage.getAcceptedToPublishReview().should('be.visible')
-  //   })
-  // })
+    /* commented because this is not visible yet on the reivew page" */
+    it.skip('checkbox can be published publicly is visible', () => {
+      cy.fixture('role_names').then(name => {
+        cy.login(name.role.admin, manuscripts)
+      })
+      ManuscriptsPage.selectOptionWithText('Control')
+      cy.awaitDisappearSpinner()
+      ControlPage.clickInvitedReviewer(2)
+      ControlPage.clickReviewerSharedCheckbox(0)
+      cy.get('[class*=Icon__IconWrapper]:nth(1)').click()
+      ControlPage.waitThreeSec()
+      cy.fixture('role_names').then(name => {
+        cy.login(name.role.reviewers[4], dashboard)
+      })
+      cy.awaitDisappearSpinner()
+      DashboardPage.clickDashboardTab(1)
+      DashboardPage.clickAcceptReviewButton()
+      DashboardPage.clickDoReviewAndVerifyPageLoaded()
+      cy.fixture('submission_form_data').then(data => {
+        ReviewPage.fillInReviewComment(data.review1)
+      })
+      ReviewPage.getCanBePublishedPubliclyCheckbox()
+        .scrollIntoView()
+        .should('be.visible')
+      ReviewPage.clickCanBePublishedPublicly()
+      ReviewPage.getCanBePublishedPubliclyCheckbox().should(
+        'have.value',
+        'true',
+      )
+    })
+    it.skip('icon for accepted to publish review is visible', () => {
+      cy.fixture('role_names').then(name => {
+        cy.login(name.role.admin, manuscripts)
+      })
+      ManuscriptsPage.selectOptionWithText('Control')
+      cy.awaitDisappearSpinner()
+      ControlPage.clickInvitedReviewer(1)
+      ControlPage.clickReviewerSharedCheckbox(0)
+      cy.get('[class*=Icon__IconWrapper]:nth(1)').click()
+      ControlPage.waitThreeSec()
+      cy.fixture('role_names').then(name => {
+        cy.login(name.role.reviewers[4], dashboard)
+      })
+      cy.awaitDisappearSpinner()
+      DashboardPage.clickDashboardTab(1)
+      DashboardPage.clickAcceptReviewButton()
+      DashboardPage.clickDoReviewAndVerifyPageLoaded()
+      cy.fixture('submission_form_data').then(data => {
+        ReviewPage.fillInReviewComment(data.review1)
+      })
+      ReviewPage.clickCanBePublishedPublicly()
+      ReviewPage.getCanBePublishedPubliclyCheckbox().should(
+        'have.value',
+        'true',
+      )
+      ReviewPage.clickAcceptRadioButton()
+      ReviewPage.clickSubmitButton()
+      ReviewPage.waitThreeSec()
+      DashboardPage.clickControlPanelDecision()
+      ControlPage.clickShow()
+      ControlPage.getAcceptedToPublishReview().should('be.visible')
+    })
+  })
 
-  // context('hide review and review name from author', () => {
-  //   beforeEach(() => {
-  //     cy.task('restore', 'initial_state_other')
-  //     cy.task('seedForms')
-  //     cy.fixture('role_names').then(name => {
-  //       cy.login(name.role.admin, dashboard)
-  //       cy.awaitDisappearSpinner()
-  //       DashboardPage.clickSubmit()
-  //       NewSubmissionPage.clickSubmitUrlAndWaitPageLoad()
-  //       Menu.clickManuscriptsAndAssertPageLoad()
-  //       ManuscriptsPage.clickControlAndVerifyPageLoaded()
-  //       ControlPage.clickAssignSeniorEditorDropdown()
-  //       ControlPage.selectDropdownOptionByName(name.role.reviewers[0])
-  //       ControlPage.inviteReviewer(name.role.reviewers[0])
-  //       ControlPage.clickInvitedReviewer()
-  //       ControlPage.clickReviewerSharedCheckbox(0)
-  //       ControlPage.waitThreeSec()
-  //       cy.login(name.role.reviewers[0], dashboard)
-  //       cy.contains('Enter Email').click()
-  //       cy.get('#enter-email').type('emilyaccount@test.com')
-  //       cy.contains('Next').click()
-  //       cy.visit('/kotahi/dashboard')
-  //       cy.awaitDisappearSpinner()
-  //       DashboardPage.clickAcceptReviewButton()
-  //       cy.wait(3000)
-  //       DashboardPage.clickDoReview()
-  //       cy.fixture('submission_form_data').then(data => {
-  //         ReviewPage.fillInReviewComment(data.review1)
-  //       })
-  //       ReviewPage.clickAcceptRadioButton()
-  //       ReviewPage.clickSubmitButton()
-  //       ReviewPage.clickConfirmSubmitButton()
-  //       ReviewPage.waitThreeSec()
-  //       cy.login(name.role.admin, manuscripts)
-  //       cy.awaitDisappearSpinner()
-  //       ManuscriptsPage.clickControlAndVerifyPageLoaded()
-  //       ControlPage.clickShow()
-  //       cy.fixture('submission_form_data').then(data => {
-  //         ControlPage.getReviewMessage().should('contain', data.review1)
-  //       })
-  //       cy.login(name.role.reviewers[0], dashboard)
-  //     })
-  //     cy.awaitDisappearSpinner()
-  //     DashboardPage.clickControlPanelDecision()
-  //   })
-  //   it('review is hidden from the author of the article', () => {
-  //     ControlPage.clickHideReviewToAuthor()
-  //     cy.fixture('role_names').then(name => {
-  //       cy.login(name.role.admin, manuscripts)
-  //       cy.awaitDisappearSpinner()
-  //       ManuscriptsPage.clickControl()
-  //       ControlPage.getNoReviewsMessage().should(
-  //         'contain',
-  //         'No reviews completed yet.',
-  //       )
-  //       ControlPage.getShowButton().should('not.exist')
-  //     })
-  //   })
-  //     it('hide reviewer name is true, reviewer can not see their name', () => {
-  //       // cy.fixture('role_names').then(name => {
-  //       //   cy.login(name.role.admin, manuscripts)
-  //       //   cy.awaitDisappearSpinner()
-  //       //   ManuscriptsPage.clickControlAndVerifyPageLoaded()
-  //       // })
-  //       // ControlPage.clickHideReviewerNameToAuthor()
-  //       cy.fixture('role_names').then(name => {
-  //         cy.login(name.role.reviewers[1], dashboard)
-  //       })
-  //       cy.get('[role="button"]').click()
-  //       ControlPage.getReviewerName().should('contain', 'Anonymous')
-  //     })
-  //   })
-  // })
+  context.skip('hide review and review name from author', () => {
+    beforeEach(() => {
+      cy.task('restore', 'commons/colab_bootstrap')
+      cy.task('seedForms')
+      cy.fixture('role_names').then(name => {
+        cy.login(name.role.admin, dashboard)
+        cy.awaitDisappearSpinner()
+        DashboardPage.clickSubmit()
+        NewSubmissionPage.clickSubmitUrlAndWaitPageLoad()
+        Menu.clickManuscriptsAndAssertPageLoad()
+        ManuscriptsPage.selectOptionWithText('Control')
+        cy.awaitDisappearSpinner()
+        ControlPage.clickAssignSeniorEditorDropdown()
+        ControlPage.selectDropdownOptionByName(name.role.reviewers[0])
+        ControlPage.inviteReviewer(name.role.reviewers[0])
+        ControlPage.clickInvitedReviewer(0)
+        ControlPage.clickReviewerSharedCheckbox(0)
+        cy.get('[class*=Icon__IconWrapper]:nth(1)').click()
+        ControlPage.waitThreeSec()
+        cy.login(name.role.reviewers[0], dashboard)
+        // cy.contains('Enter Email').click()
+        // cy.get('#enter-email').type('emilyaccount@test.com')
+        // cy.contains('Next').click()
+        // cy.visit('/kotahi/dashboard')
+        cy.awaitDisappearSpinner()
+        DashboardPage.clickDashboardTab(1)
+        DashboardPage.clickAcceptReviewButton()
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(3000)
+        DashboardPage.clickDoReview()
+        cy.fixture('submission_form_data').then(data => {
+          ReviewPage.fillInReviewComment(data.review1)
+        })
+        ReviewPage.clickAcceptRadioButton()
+        ReviewPage.clickSubmitButton()
+        ReviewPage.clickConfirmSubmitButton()
+        ReviewPage.waitThreeSec()
+        cy.login(name.role.admin, manuscripts)
+        cy.awaitDisappearSpinner()
+        ManuscriptsPage.selectOptionWithText('Control')
+        cy.awaitDisappearSpinner()
+        // ControlPage.clickShow()
+        ControlPage.clickDecisionTab(1)
+        cy.fixture('submission_form_data').then(data => {
+          ControlPage.getReviewMessage().should('contain', data.review1)
+        })
+        cy.login(name.role.reviewers[0], dashboard)
+      })
+      cy.awaitDisappearSpinner()
+      DashboardPage.clickControlPanelDecision()
+    })
+    it('review is hidden from the author of the article', () => {
+      ControlPage.clickHideReviewToAuthor()
+      cy.fixture('role_names').then(name => {
+        cy.login(name.role.admin, manuscripts)
+        cy.awaitDisappearSpinner()
+        ManuscriptsPage.clickControl()
+        ControlPage.getNoReviewsMessage().should(
+          'contain',
+          'No reviews completed yet.',
+        )
+        ControlPage.getShowButton().should('not.exist')
+      })
+    })
+    it('hide reviewer name is true, reviewer can not see their name', () => {
+      // cy.fixture('role_names').then(name => {
+      //   cy.login(name.role.admin, manuscripts)
+      //   cy.awaitDisappearSpinner()
+      //           ManuscriptsPage.selectOptionWithText('Control')
+      // cy.awaitDisappearSpinner()
+
+      // })
+      // ControlPage.clickHideReviewerNameToAuthor()
+      cy.fixture('role_names').then(name => {
+        cy.login(name.role.reviewers[1], dashboard)
+      })
+      cy.get('[role="button"]').click()
+      ControlPage.getReviewerName().should('contain', 'Anonymous')
+    })
+  })
 
   context('admin user can see the icons', () => {
     beforeEach(() => {
@@ -265,8 +299,9 @@ describe('control page tests', () => {
         ControlPage.clickAssignSeniorEditorDropdown()
         ControlPage.selectDropdownOptionByName(name.role.reviewers[1])
         ControlPage.inviteReviewer(name.role.reviewers[1])
-        ControlPage.clickInvitedReviewer()
+        ControlPage.clickInvitedReviewer(0)
         ControlPage.clickReviewerSharedCheckbox()
+        cy.get('[class*=Icon__IconWrapper]:nth(1)').click()
         ControlPage.waitThreeSec()
         cy.login(name.role.reviewers[1], dashboard)
         cy.awaitDisappearSpinner()
