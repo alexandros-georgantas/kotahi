@@ -2,7 +2,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 // TODO: Sort out the imports, perhaps make DecisionReview a shared component?
 import DecisionReview from '../../../component-review/src/components/decision/DecisionReview'
-import ReadonlyFormTemplate from '../../../component-review/src/components/metadata/ReadonlyFormTemplate'
+// import ReadonlyFormTemplate from '../../../component-review/src/components/metadata/ReadonlyFormTemplate'
 
 import {
   SectionHeader,
@@ -11,44 +11,44 @@ import {
   SectionContent,
 } from '../../../shared'
 
-const Decision = ({
-  decisionForm,
-  manuscript,
-  showEditorOnlyFields,
-  threadedDiscussionProps,
-  allowAuthorsSubmitNewVersion,
-}) => {
-  const decisionDataString = manuscript.reviews.find(
-    r => r.isDecision,
-  )?.jsonData
+// const Decision = ({
+//   decisionForm,
+//   manuscript,
+//   showEditorOnlyFields,
+//   threadedDiscussionProps,
+//   allowAuthorsSubmitNewVersion,
+// }) => {
+//   const decisionDataString = manuscript.reviews.find(
+//     r => r.isDecision,
+//   )?.jsonData
 
-  const decisionData = decisionDataString
-    ? JSON.parse(decisionDataString)
-    : null
+//   const decisionData = decisionDataString
+//     ? JSON.parse(decisionDataString)
+//     : null
 
-  const filteredChildren = !manuscript.decision
-    ? {
-        ...decisionForm,
-        children: decisionForm.children.filter(
-          formComponent => formComponent.component === 'ThreadedDiscussion',
-        ),
-      }
-    : decisionForm
+//   const filteredChildren = !manuscript.decision
+//     ? {
+//         ...decisionForm,
+//         children: decisionForm.children.filter(
+//           formComponent => formComponent.component === 'ThreadedDiscussion',
+//         ),
+//       }
+//     : decisionForm
 
-  return decisionData ? (
-    <ReadonlyFormTemplate
-      allowAuthorsSubmitNewVersion={allowAuthorsSubmitNewVersion}
-      form={filteredChildren}
-      formData={decisionData}
-      hideSpecialInstructions
-      manuscript={manuscript}
-      showEditorOnlyFields={showEditorOnlyFields}
-      threadedDiscussionProps={threadedDiscussionProps}
-    />
-  ) : (
-    <SectionRow>Pending.</SectionRow>
-  )
-}
+//   return decisionData ? (
+//     <ReadonlyFormTemplate
+//       allowAuthorsSubmitNewVersion={allowAuthorsSubmitNewVersion}
+//       form={filteredChildren}
+//       formData={decisionData}
+//       hideSpecialInstructions
+//       manuscript={manuscript}
+//       showEditorOnlyFields={showEditorOnlyFields}
+//       threadedDiscussionProps={threadedDiscussionProps}
+//     />
+//   ) : (
+//     <SectionRow>Pending.</SectionRow>
+//   )
+// }
 
 const DecisionAndReviews = ({
   manuscript,
@@ -60,10 +60,10 @@ const DecisionAndReviews = ({
   currentUser,
   allowAuthorsSubmitNewVersion,
 }) => {
-  const decision =
-    manuscript.reviews &&
-    !!manuscript.reviews.length &&
-    manuscript.reviews.find(review => review.isDecision)
+  // const decision =
+  //   manuscript.reviews &&
+  //   !!manuscript.reviews.length &&
+  //   manuscript.reviews.find(review => review.isDecision)
 
   const reviews =
     (Array.isArray(manuscript.reviews) &&
@@ -93,7 +93,7 @@ const DecisionAndReviews = ({
 
   return (
     <>
-      <SectionContent>
+      {/* <SectionContent>
         <SectionHeader>
           <Title>{decisionForm.name}</Title>
         </SectionHeader>
@@ -105,7 +105,7 @@ const DecisionAndReviews = ({
           showEditorOnlyFields={showEditorOnlyFields}
           threadedDiscussionProps={threadedDiscussionProps}
         />
-      </SectionContent>
+      </SectionContent> */}
       <SectionContent>
         <SectionHeader>
           <Title>{t('manuscriptSubmit.Reviews')}</Title>

@@ -489,6 +489,7 @@ const en = {
       showTabs: {
         Team: 'Team',
         Decision: 'Decision',
+        Reviews: 'Reviews',
         'Manuscript text': 'Manuscript text',
         Metadata: 'Metadata',
         'Tasks & Notifications': 'Tasks & Notifications',

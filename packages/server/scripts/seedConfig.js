@@ -215,6 +215,7 @@ const seedConfig = async (group, instanceName, index, options) => {
             showTabs: [
               'Team',
               'Decision',
+              'Reviews',
               'Manuscript text',
               'Metadata',
               'Tasks & Notifications',

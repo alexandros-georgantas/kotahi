@@ -1949,6 +1949,7 @@ const generateSchema = (
                     default: [
                       'Team',
                       'Decision',
+                      'Reviews',
                       'Manuscript text',
                       'Metadata',
                       'Tasks & Notifications',
@@ -1963,6 +1964,10 @@ const generateSchema = (
                         {
                           const: 'Decision',
                           title: t('configPage.showTabs.Decision'),
+                        },
+                        {
+                          const: 'Reviews',
+                          title: t('configPage.showTabs.Reviews'),
                         },
                         {
                           const: 'Manuscript text',

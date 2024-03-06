@@ -427,6 +427,7 @@ const DecisionPage = ({ currentUser, match }) => {
     firstVersionManuscriptId: manuscript.parentId || manuscript.id,
   }
 
+  // console.log('here1')
   return (
     <DecisionVersions
       addReviewer={addReviewer}
