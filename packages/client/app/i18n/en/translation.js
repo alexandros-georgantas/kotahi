@@ -426,6 +426,7 @@ const en = {
       'Display manuscript short id': 'Display manuscript short id',
       'Author proofing enabled':
         'Allow authors to participate in proofreading rounds',
+      'Editors edit reviews': 'Editors can edit submitted reviews',
       'Reviewers can see submitted reviews':
         'Reviewers can see submitted reviews',
       'Authors can see individual peer reviews':

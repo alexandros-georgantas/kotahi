@@ -1940,6 +1940,11 @@ const generateSchema = (
                     title: t('configPage.Author proofing enabled'),
                     default: false,
                   },
+                  editorsEditReviewsEnabled: {
+                    type: 'boolean',
+                    title: t('configPage.Editors edit reviews'),
+                    default: false,
+                  },
                   showTabs: {
                     type: 'array',
                     description: t(

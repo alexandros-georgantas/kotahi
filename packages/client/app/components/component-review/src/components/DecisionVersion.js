@@ -392,25 +392,10 @@ const DecisionVersion = ({
               manuscript={version}
               readOnly
               reviewForm={reviewForm}
+              showDecision
               showEditorOnlyFields
+              showReviews={false}
               threadedDiscussionProps={threadedDiscussionExtendedProps}
-            />
-          )}
-          {isCurrentVersion && (
-            <DecisionReviews
-              canHideReviews={canHideReviews}
-              currentUser={currentUser}
-              invitations={invitations}
-              manuscript={version}
-              reviewers={reviewers}
-              reviewForm={reviewForm}
-              threadedDiscussionProps={threadedDiscussionExtendedProps}
-              updateReview={updateReview}
-              updateSharedStatusForInvitedReviewer={
-                updateSharedStatusForInvitedReviewer
-              }
-              updateTeamMember={updateTeamMember}
-              urlFrag={urlFrag}
             />
           )}
           {isCurrentVersion && (
@@ -522,7 +507,9 @@ const DecisionVersion = ({
               manuscript={version}
               readOnly
               reviewForm={reviewForm}
+              showDecision={false}
               showEditorOnlyFields
+              showReviews
               threadedDiscussionProps={threadedDiscussionExtendedProps}
             />
           )}

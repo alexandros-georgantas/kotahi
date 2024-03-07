@@ -2,7 +2,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 // TODO: Sort out the imports, perhaps make DecisionReview a shared component?
 import DecisionReview from '../../../component-review/src/components/decision/DecisionReview'
-// import ReadonlyFormTemplate from '../../../component-review/src/components/metadata/ReadonlyFormTemplate'
+import ReadonlyFormTemplate from '../../../component-review/src/components/metadata/ReadonlyFormTemplate'
 
 import {
   SectionHeader,
@@ -11,44 +11,44 @@ import {
   SectionContent,
 } from '../../../shared'
 
-// const Decision = ({
-//   decisionForm,
-//   manuscript,
-//   showEditorOnlyFields,
-//   threadedDiscussionProps,
-//   allowAuthorsSubmitNewVersion,
-// }) => {
-//   const decisionDataString = manuscript.reviews.find(
-//     r => r.isDecision,
-//   )?.jsonData
+const Decision = ({
+  decisionForm,
+  manuscript,
+  showEditorOnlyFields,
+  threadedDiscussionProps,
+  allowAuthorsSubmitNewVersion,
+}) => {
+  const decisionDataString = manuscript.reviews.find(
+    r => r.isDecision,
+  )?.jsonData
 
-//   const decisionData = decisionDataString
-//     ? JSON.parse(decisionDataString)
-//     : null
+  const decisionData = decisionDataString
+    ? JSON.parse(decisionDataString)
+    : null
 
-//   const filteredChildren = !manuscript.decision
-//     ? {
-//         ...decisionForm,
-//         children: decisionForm.children.filter(
-//           formComponent => formComponent.component === 'ThreadedDiscussion',
-//         ),
-//       }
-//     : decisionForm
+  const filteredChildren = !manuscript.decision
+    ? {
+        ...decisionForm,
+        children: decisionForm.children.filter(
+          formComponent => formComponent.component === 'ThreadedDiscussion',
+        ),
+      }
+    : decisionForm
 
-//   return decisionData ? (
-//     <ReadonlyFormTemplate
-//       allowAuthorsSubmitNewVersion={allowAuthorsSubmitNewVersion}
-//       form={filteredChildren}
-//       formData={decisionData}
-//       hideSpecialInstructions
-//       manuscript={manuscript}
-//       showEditorOnlyFields={showEditorOnlyFields}
-//       threadedDiscussionProps={threadedDiscussionProps}
-//     />
-//   ) : (
-//     <SectionRow>Pending.</SectionRow>
-//   )
-// }
+  return decisionData ? (
+    <ReadonlyFormTemplate
+      allowAuthorsSubmitNewVersion={allowAuthorsSubmitNewVersion}
+      form={filteredChildren}
+      formData={decisionData}
+      hideSpecialInstructions
+      manuscript={manuscript}
+      showEditorOnlyFields={showEditorOnlyFields}
+      threadedDiscussionProps={threadedDiscussionProps}
+    />
+  ) : (
+    <SectionRow>Pending.</SectionRow>
+  )
+}
 
 const DecisionAndReviews = ({
   manuscript,
@@ -59,11 +59,13 @@ const DecisionAndReviews = ({
   threadedDiscussionProps,
   currentUser,
   allowAuthorsSubmitNewVersion,
+  showDecision = true,
+  showReviews = true,
 }) => {
-  // const decision =
-  //   manuscript.reviews &&
-  //   !!manuscript.reviews.length &&
-  //   manuscript.reviews.find(review => review.isDecision)
+  const decision =
+    manuscript.reviews &&
+    !!manuscript.reviews.length &&
+    manuscript.reviews.find(review => review.isDecision)
 
   const reviews =
     (Array.isArray(manuscript.reviews) &&
@@ -93,53 +95,57 @@ const DecisionAndReviews = ({
 
   return (
     <>
-      {/* <SectionContent>
-        <SectionHeader>
-          <Title>{decisionForm.name}</Title>
-        </SectionHeader>
-        <Decision
-          allowAuthorsSubmitNewVersion={allowAuthorsSubmitNewVersion}
-          decisionForm={decisionForm}
-          editor={decision?.user}
-          manuscript={manuscript}
-          showEditorOnlyFields={showEditorOnlyFields}
-          threadedDiscussionProps={threadedDiscussionProps}
-        />
-      </SectionContent> */}
-      <SectionContent>
-        <SectionHeader>
-          <Title>{t('manuscriptSubmit.Reviews')}</Title>
-        </SectionHeader>
+      {showDecision && (
+        <SectionContent>
+          <SectionHeader>
+            <Title>{decisionForm.name}</Title>
+          </SectionHeader>
+          <Decision
+            allowAuthorsSubmitNewVersion={allowAuthorsSubmitNewVersion}
+            decisionForm={decisionForm}
+            editor={decision?.user}
+            manuscript={manuscript}
+            showEditorOnlyFields={showEditorOnlyFields}
+            threadedDiscussionProps={threadedDiscussionProps}
+          />
+        </SectionContent>
+      )}
+      {showReviews && (
+        <SectionContent>
+          <SectionHeader>
+            <Title>{t('manuscriptSubmit.Reviews')}</Title>
+          </SectionHeader>
 
-        {reviewsToShow.length ? (
-          reviewsToShow.map((review, index) => (
-            <SectionRow key={review.id}>
-              <DecisionReview
-                currentUser={currentUser}
-                isControlPage={isControlPage}
-                open
-                readOnly
-                review={review}
-                reviewer={{
-                  name: review.user?.username,
-                  ordinal: index + 1,
-                  user: review.user,
-                }}
-                reviewForm={reviewForm}
-                showEditorOnlyFields={showEditorOnlyFields}
-                teams={manuscript.teams}
-                threadedDiscussionProps={threadedDiscussionProps}
-              />
+          {reviewsToShow.length ? (
+            reviewsToShow.map((review, index) => (
+              <SectionRow key={review.id}>
+                <DecisionReview
+                  currentUser={currentUser}
+                  isControlPage={isControlPage}
+                  open
+                  readOnly
+                  review={review}
+                  reviewer={{
+                    name: review.user?.username,
+                    ordinal: index + 1,
+                    user: review.user,
+                  }}
+                  reviewForm={reviewForm}
+                  showEditorOnlyFields={showEditorOnlyFields}
+                  teams={manuscript.teams}
+                  threadedDiscussionProps={threadedDiscussionProps}
+                />
+              </SectionRow>
+            ))
+          ) : (
+            <SectionRow>
+              {reviews.length
+                ? t('manuscriptSubmit.No reviews to show')
+                : t('manuscriptSubmit.No completed reviews')}
             </SectionRow>
-          ))
-        ) : (
-          <SectionRow>
-            {reviews.length
-              ? t('manuscriptSubmit.No reviews to show')
-              : t('manuscriptSubmit.No completed reviews')}
-          </SectionRow>
-        )}
-      </SectionContent>
+          )}
+        </SectionContent>
+      )}
     </>
   )
 }

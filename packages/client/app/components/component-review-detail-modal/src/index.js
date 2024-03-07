@@ -22,6 +22,8 @@ import { ConfigContext } from '../../config/src'
 import localizeReviewFilterOptions from '../../../shared/localizeReviewFilterOptions'
 import localizeRecommendations from '../../../shared/localizeRecommendations'
 
+import SimpleWaxEditor from '../../wax-collab/src/SimpleWaxEditor'
+
 const Header = styled.div`
   font-size: 18px;
   font-weight: 500;
@@ -295,6 +297,7 @@ const ReviewData = ({
     element => isViewable(element) && isFileField(element),
   )
 
+  // console.log('form', reviewFormData)
   return (
     <>
       {recommendationConfig && (
@@ -310,12 +313,18 @@ const ReviewData = ({
         {[...nonFileFields, ...fileFields].map((element, i) => (
           <ReviewItemContainer key={element.id}>
             <Header>{element.shortDescription || element.title}</Header>
-            <ReadonlyFieldData
-              fieldName={element.name}
-              form={reviewForm}
-              formData={reviewFormData}
-              threadedDiscussionProps={threadedDiscussionProps}
-            />
+            {/* <div>{JSON.stringify(element)}</div> */}
+            {element.name === 'comment' ? (
+              <SimpleWaxEditor value={reviewFormData.comment} />
+            ) : (
+              <ReadonlyFieldData
+                fieldName={element.name}
+                form={reviewForm}
+                formData={reviewFormData}
+                threadedDiscussionProps={threadedDiscussionProps}
+              />
+            )}
+            {/* <SimpleWaxEditor value={reviewFormData.comment} /> */}
           </ReviewItemContainer>
         ))}
       </ReviewItemsContainer>
