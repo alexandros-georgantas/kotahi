@@ -454,6 +454,7 @@ const permissions = {
     builtCss: isAuthenticated,
     channels: deny, // Never used
     channelsByTeamName: deny, // Never used
+    cmsLanguages: allow,
     config: isAuthenticated,
     convertToJats: or(userIsEditorOfAnyManuscript, userIsGm, userIsAdmin),
     convertToPdf: or(userIsEditorOfAnyManuscript, userIsGm, userIsAdmin),
@@ -530,6 +531,7 @@ const permissions = {
     assignTeamEditor: deny, // Never used
     assignUserAsAuthor: isAuthenticated, // TODO require the invitation ID to be sent in this mutation
     changeTopic: deny, // Never used
+    updateCMSLanguages: or(userIsGm, userIsAdmin),
     completeComment: isAuthenticated,
     completeComments: isAuthenticated,
     createChannel: deny, // Never used

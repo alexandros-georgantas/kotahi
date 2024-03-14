@@ -42,7 +42,8 @@ class CMSPage extends BaseModel {
         edited: { type: ['string', 'object', 'null'], format: 'date-time' },
         flaxHeaderConfig: flaxConfig,
         flaxFooterConfig: flaxConfig,
-        groupId: { type: ['string'], format: 'uuid' },
+        groupId: { type: 'string', format: 'uuid' },
+        language: { type: 'string' },
       },
     }
   }

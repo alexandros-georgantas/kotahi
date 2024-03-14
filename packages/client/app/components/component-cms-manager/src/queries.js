@@ -34,6 +34,7 @@ const cmsPageFields = `
       id
       username
     }
+    language
 `
 
 const cmsLayoutFields = `
@@ -66,6 +67,7 @@ const cmsLayoutFields = `
     }
     article
     css
+    language
 `
 
 const createCmsPageFields = `
@@ -78,6 +80,7 @@ const createCmsPageFields = `
     error
     column
     errorMessage
+    language
 `
 
 const deleteCmsPageFields = `
@@ -134,10 +137,11 @@ export const rebuildFlaxSiteMutation = gql`
 `
 
 export const getCMSLayout = gql`
-  query cmsLayout {
-    cmsLayout {
+  query cmsLayouts {
+    cmsLayouts {
       ${cmsLayoutFields}
     }
+    cmsLanguages
   }
 `
 
@@ -150,7 +154,7 @@ export const updateCMSLayoutMutation = gql`
 `
 
 export const createFileMutation = gql`
-  mutation ($file: Upload!, $meta: FileMetaInput!) {
+  mutation($file: Upload!, $meta: FileMetaInput!) {
     createFile(file: $file, meta: $meta) {
       id
       created
@@ -169,7 +173,13 @@ export const createFileMutation = gql`
 `
 
 export const deleteFileMutation = gql`
-  mutation ($id: ID!) {
+  mutation($id: ID!) {
     deleteFile(id: $id)
+  }
+`
+
+export const updateCmsLanguagesMutation = gql`
+  mutation($languages: [String!]!) {
+    updateCMSLanguages(languages: $languages)
   }
 `

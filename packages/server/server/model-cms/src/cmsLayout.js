@@ -37,8 +37,8 @@ class CMSLayout extends BaseModel {
 
     return {
       properties: {
-        active: { type: ['boolean'] },
-        isPrivate: { type: ['boolean'] },
+        active: { type: 'boolean' },
+        isPrivate: { type: 'boolean' },
         hexCode: { type: ['string', 'null'] },
         primaryColor: { type: 'string' },
         secondaryColor: { type: 'string' },
@@ -47,7 +47,8 @@ class CMSLayout extends BaseModel {
         footerText: { type: ['string', 'null'] },
         published: { type: ['string', 'object', 'null'], format: 'date-time' },
         edited: { type: ['string', 'object', 'null'], format: 'date-time' },
-        groupId: { type: ['string'], format: 'uuid' },
+        groupId: { type: 'string', format: 'uuid' },
+        language: { type: 'string' },
       },
     }
   }

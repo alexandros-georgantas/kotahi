@@ -13,8 +13,6 @@ const BaseButton = styled.button`
   font-size: ${th('fontSizeBase')};
   font-weight: 500;
   line-height: ${th('lineHeightBase')};
-  min-height: ${grid(3)};
-  min-width: ${grid(5)};
   ${props =>
     props.isCompact
       ? ''

@@ -33,6 +33,7 @@ const en = {
       Save: 'Save',
       Update: 'Update',
       Confirm: 'Confirm',
+      Add: 'Add',
       Delete: 'Delete',
       'Enter search terms...': 'Enter search terms...',
       surroundMultiword:
@@ -323,6 +324,11 @@ const en = {
         Published: 'Published',
         'Brand logo': 'Brand logo',
         'Brand Color': 'Brand Color',
+        'Choose languages': 'Choose languages',
+        LanguagesDesc:
+          'Choose one or more languages for your website, with the default language at the top:',
+        'Add language': 'Add language',
+        'Remove language': 'Remove language',
         fields: {
           primaryColor: 'Primary color',
           secondaryColor: 'Secondary color',
@@ -915,10 +921,12 @@ const en = {
         'Permanently delete this form': 'Permanently delete this form?',
       },
       assignUserRole: {
-        text: 'Do you wish to assign the <strong>{{role}}</strong> role for user {{user}}?',
+        text:
+          'Do you wish to assign the <strong>{{role}}</strong> role for user {{user}}?',
       },
       removeUserRole: {
-        text: 'Do you wish to remove the <strong>{{role}}</strong> role for user {{user}}?',
+        text:
+          'Do you wish to remove the <strong>{{role}}</strong> role for user {{user}}?',
       },
       deleteUser: {
         'Permanently delete user': 'Permanently delete user {{userName}}?',

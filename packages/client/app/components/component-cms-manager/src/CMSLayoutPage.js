@@ -14,6 +14,7 @@ import {
   rebuildFlaxSiteMutation,
   createFileMutation,
   deleteFileMutation,
+  updateCmsLanguagesMutation,
 } from './queries'
 
 const CMSLayoutPage = ({ history }) => {
@@ -38,11 +39,17 @@ const CMSLayoutPage = ({ history }) => {
     },
   })
 
+  const [updateCmsLangsMutation] = useMutation(updateCmsLanguagesMutation)
+
   const { t } = useTranslation()
 
   const [submitButtonText, setSubmitButtonText] = useState(
     t('cmsPage.layout.Publish'),
   )
+
+  const updateCmsLanguages = async languages => {
+    updateCmsLangsMutation({ variables: { languages } })
+  }
 
   const triggerAutoSave = async formData => {
     updateCMSLayout({
@@ -119,10 +126,11 @@ const CMSLayoutPage = ({ history }) => {
 
   if (loading) return <Spinner />
   if (error) return <CommsErrorBanner error={error} />
-  if (!data.cmsLayout) return <CommsErrorBanner error={error} />
+  if (!data.cmsLayouts) return <CommsErrorBanner error={error} />
 
-  const { cmsLayout } = data
+  const { cmsLayouts, cmsLanguages } = data
 
+  // TODO Move this layout code out of the Page-level component
   return (
     <Container>
       <PageHeader
@@ -131,13 +139,14 @@ const CMSLayoutPage = ({ history }) => {
         mainHeading={t('cmsPage.layout.Layout')}
       />
       <Formik
-        initialValues={setInitialData(cmsLayout)}
+        initialValues={setInitialData(cmsLayouts[0])} // TODO Deal with full set of layouts by language
         onSubmit={async values => publish(values)}
       >
         {formikProps => {
           return (
             <LayoutForm
-              cmsLayout={cmsLayout}
+              cmsLanguages={cmsLanguages} // TODO Deal with full set of layouts by language
+              cmsLayout={cmsLayouts[0]}
               createFile={createFile}
               deleteFile={deleteFile}
               flaxSiteUrlForGroup={flaxSiteUrlForGroup}
@@ -146,6 +155,7 @@ const CMSLayoutPage = ({ history }) => {
               onHeaderPageOrderChanged={onHeaderPageOrderChanged}
               submitButtonText={submitButtonText}
               triggerAutoSave={triggerAutoSave}
+              updateCmsLanguages={updateCmsLanguages}
             />
           )
         }}

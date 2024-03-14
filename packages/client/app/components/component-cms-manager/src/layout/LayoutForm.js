@@ -3,6 +3,7 @@ import React from 'react'
 import { SectionContent, PaddedContent } from '../../../shared'
 import { ActionButtonContainer, FormActionButton } from '../style'
 import PublishStatus from '../components/PublishStatus'
+import LanguageList from './LanguageList'
 
 import Header from './Header'
 import Branding from './Branding'
@@ -12,6 +13,7 @@ import SiteStatus from './SiteStatus'
 const LayoutForm = ({
   formikProps,
   flaxSiteUrlForGroup,
+  cmsLanguages,
   cmsLayout,
   submitButtonText,
   onHeaderPageOrderChanged,
@@ -19,7 +21,22 @@ const LayoutForm = ({
   createFile,
   deleteFile,
   triggerAutoSave,
+  updateCmsLanguages,
 }) => {
+  const renderLanguageList = () => {
+    return (
+      <SectionContent>
+        <PaddedContent>
+          <LanguageList
+            languages={cmsLanguages}
+            systemLanguages={['en', 'ru-RU', 'es-LA', 'fr']}
+            updateLanguages={updateCmsLanguages}
+          />
+        </PaddedContent>
+      </SectionContent>
+    )
+  }
+
   const renderPrivateOption = () => {
     return (
       <SectionContent>
@@ -82,6 +99,7 @@ const LayoutForm = ({
 
   return (
     <div>
+      {renderLanguageList()}
       {renderBranding()}
       {renderHeader()}
       {renderFooter()}

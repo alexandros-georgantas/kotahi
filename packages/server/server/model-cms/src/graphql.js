@@ -83,17 +83,21 @@ const resolvers = {
       return cmsPage
     },
 
-    async cmsLayout(_, _vars, ctx) {
+    async cmsLayouts(_, _vars, ctx) {
       const groupId = ctx.req.headers['group-id']
-      let layout = await models.CMSLayout.query()
-        .where('groupId', groupId)
-        .first()
+      let layouts = await models.CMSLayout.query().where('groupId', groupId)
 
-      if (!layout) {
-        layout = await setInitialLayout(groupId) // TODO move this to seedArticleTemplate.js or similar
+      if (!layouts.length) {
+        layouts = [await setInitialLayout(groupId)] // TODO move this to seedArticleTemplate.js or similar
       }
 
-      return layout
+      return layouts
+    },
+
+    async cmsLanguages(_, _vars, ctx) {
+      const groupId = ctx.req.headers['group-id']
+      const result = await models.CMSLanguageList.query().findOne({ groupId })
+      return result.languages
     },
   },
   Mutation: {
@@ -177,6 +181,14 @@ const resolvers = {
       )
 
       return cmsLayout
+    },
+
+    async updateCMSLanguages(_, { languages }, ctx) {
+      const groupId = ctx.req.headers['group-id']
+      await models.CMSLanguageList.query()
+        .patch({ languages })
+        .where({ groupId })
+      return true
     },
   },
 
@@ -306,7 +318,8 @@ const typeDefs = `
   extend type Query {
     cmsPage(id: ID!): CMSPage!
     cmsPages: [CMSPage!]!
-    cmsLayout: CMSLayout!
+    cmsLayouts: [CMSLayout!]!
+    cmsLanguages: [String!]!
   }
 
   extend type Mutation {
@@ -314,6 +327,7 @@ const typeDefs = `
     updateCMSPage(id: ID!, input: CMSPageInput!): CMSPage!
     deleteCMSPage(id: ID!): DeletePageResponse!
     updateCMSLayout(input: CMSLayoutInput!): CMSLayout!
+    updateCMSLanguages(languages: [String!]!): Boolean!
   }
 
   type CMSPage {
@@ -328,6 +342,7 @@ const typeDefs = `
     edited: DateTime
     created: DateTime!
     updated: DateTime
+    language: String!
   }
 
   type CreatePageResponse {
@@ -337,7 +352,6 @@ const typeDefs = `
     error: String
     errorMessage: String
   }
-
 
   type DeletePageResponse {
     success: Boolean!
@@ -371,6 +385,7 @@ const typeDefs = `
     publishConfig: String!
     article: String!
     css: String!
+    language: String!
   }
 
   type FlaxPageHeaderConfig {
@@ -397,6 +412,7 @@ const typeDefs = `
     edited: DateTime
     flaxHeaderConfig: FlaxConfigInput
     flaxFooterConfig: FlaxConfigInput
+    language: String!
   }
 
   input StoredPartnerInput {
@@ -415,6 +431,7 @@ const typeDefs = `
     footerText: String
     published: DateTime
     edited: DateTime
+    language: String!
   }
 
   input FlaxConfigInput {
