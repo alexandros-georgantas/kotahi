@@ -176,7 +176,7 @@ const Langauges = ({
             <TightColumn {...provided.droppableProps} ref={provided.innerRef}>
               {selectedLanguages.map((lang, index) => (
                 <Draggable
-                  draggableId={`dragId-${index}`}
+                  draggableId={`dragId-${lang}-${index}`}
                   index={index}
                   key={lang}
                 >
