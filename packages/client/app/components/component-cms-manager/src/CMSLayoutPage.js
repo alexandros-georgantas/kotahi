@@ -1,11 +1,7 @@
 import React, { useContext, useState } from 'react'
-import { Formik } from 'formik'
 import { useMutation, useQuery } from '@apollo/client'
-import { useTranslation } from 'react-i18next'
 import { ConfigContext } from '../../config/src'
-import LayoutForm from './layout/LayoutForm'
-import { Container, Spinner, CommsErrorBanner } from '../../shared'
-import PageHeader from './components/PageHeader'
+import { Spinner, CommsErrorBanner } from '../../shared'
 
 import {
   getCMSLayout,
@@ -16,6 +12,7 @@ import {
   deleteFileMutation,
   updateCmsLanguagesMutation,
 } from './queries'
+import CmsLayout from './layout/CmsLayout'
 
 const CMSLayoutPage = ({ history }) => {
   const { loading, data, error } = useQuery(getCMSLayout)
@@ -41,30 +38,19 @@ const CMSLayoutPage = ({ history }) => {
 
   const [updateCmsLangsMutation] = useMutation(updateCmsLanguagesMutation)
 
-  const { t } = useTranslation()
-
-  const [submitButtonText, setSubmitButtonText] = useState(
-    t('cmsPage.layout.Publish'),
-  )
+  const [publishingStatus, setPublishingStatus] = useState(null)
 
   const updateCmsLanguages = async languages => {
     updateCmsLangsMutation({ variables: { languages } })
   }
 
+  // TODO Rename to updateLayout, and figure out what is causing save on initial page load
   const triggerAutoSave = async formData => {
     updateCMSLayout({
       variables: {
         input: { ...formData, edited: new Date() },
       },
     })
-  }
-
-  const onHeaderPageOrderChanged = updatedHeaderInfo => {
-    updatePageOrderInfo(updatedHeaderInfo, 'flaxHeaderConfig')
-  }
-
-  const onFooterPageOrderChanged = updatedHeaderInfo => {
-    updatePageOrderInfo(updatedHeaderInfo, 'flaxFooterConfig')
   }
 
   const updatePageOrderInfo = (pageOrderInfo, key) => {
@@ -85,21 +71,22 @@ const CMSLayoutPage = ({ history }) => {
   }
 
   const publish = async formData => {
-    setSubmitButtonText(t('cmsPage.layout.Saving data'))
-    await updateCMSLayout({
-      variables: {
-        input: {
-          primaryColor: formData.primaryColor,
-          secondaryColor: formData.secondaryColor,
-          logoId: formData.logoId,
-          partners: formData.partners,
-          footerText: formData.footerText,
-          published: new Date(),
-        },
-      },
-    })
+    setPublishingStatus('saving')
+    // await updateCMSLayout({
+    //   variables: {
+    //     input: {
+    //       primaryColor: formData.primaryColor,
+    //       secondaryColor: formData.secondaryColor,
+    //       logoId: formData.logoId,
+    //       partners: formData.partners,
+    //       footerText: formData.footerText,
+    //       published: new Date(),
+    //       language: formData.language,
+    //     },
+    //   },
+    // })
 
-    setSubmitButtonText(t('cmsPage.layout.Rebuilding Site'))
+    setPublishingStatus('rebuilding')
     await rebuildFlaxSite({
       variables: {
         params: JSON.stringify({
@@ -107,60 +94,29 @@ const CMSLayoutPage = ({ history }) => {
         }),
       },
     })
-    setSubmitButtonText(t('cmsPage.layout.Published'))
-  }
-
-  const setInitialData = cmsLayoutData => {
-    let initialData = {}
-    const currentPartners = cmsLayoutData.partners || []
-    const partnerData = currentPartners.filter(partner => partner != null)
-    initialData = { ...cmsLayoutData }
-    initialData.partners = partnerData.map(
-      ({ file, ...restProps }) => restProps, // removing the file object
-    )
-    // to show the existing image
-    initialData.logo = cmsLayoutData.logo ? [cmsLayoutData.logo] : []
-    initialData.partnerFiles = partnerData.map(partner => partner.file)
-    return initialData
+    setPublishingStatus('published')
   }
 
   if (loading) return <Spinner />
   if (error) return <CommsErrorBanner error={error} />
-  if (!data.cmsLayouts) return <CommsErrorBanner error={error} />
 
   const { cmsLayouts, cmsLanguages } = data
 
   // TODO Move this layout code out of the Page-level component
   return (
-    <Container>
-      <PageHeader
-        history={history}
-        leftSideOnly
-        mainHeading={t('cmsPage.layout.Layout')}
-      />
-      <Formik
-        initialValues={setInitialData(cmsLayouts[0])} // TODO Deal with full set of layouts by language
-        onSubmit={async values => publish(values)}
-      >
-        {formikProps => {
-          return (
-            <LayoutForm
-              cmsLanguages={cmsLanguages} // TODO Deal with full set of layouts by language
-              cmsLayout={cmsLayouts[0]}
-              createFile={createFile}
-              deleteFile={deleteFile}
-              flaxSiteUrlForGroup={flaxSiteUrlForGroup}
-              formikProps={formikProps}
-              onFooterPageOrderChanged={onFooterPageOrderChanged}
-              onHeaderPageOrderChanged={onHeaderPageOrderChanged}
-              submitButtonText={submitButtonText}
-              triggerAutoSave={triggerAutoSave}
-              updateCmsLanguages={updateCmsLanguages}
-            />
-          )
-        }}
-      </Formik>
-    </Container>
+    <CmsLayout
+      cmsLanguages={cmsLanguages}
+      cmsLayouts={cmsLayouts}
+      createFile={createFile}
+      deleteFile={deleteFile}
+      flaxSiteUrlForGroup={flaxSiteUrlForGroup}
+      history={history}
+      publish={publish}
+      publishingStatus={publishingStatus}
+      triggerAutoSave={triggerAutoSave}
+      updateCmsLanguages={updateCmsLanguages}
+      updatePageOrderInfo={updatePageOrderInfo}
+    />
   )
 }
 
