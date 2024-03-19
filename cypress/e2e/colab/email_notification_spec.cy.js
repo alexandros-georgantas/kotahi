@@ -24,6 +24,7 @@ describe('Email Notification Tests', () => {
       cy.getByDataTestId('choose-receiver').click()
       cy.get('input[aria-label="Choose receiver"]').type('Emily{enter}', {
         force: true,
+        delay: 100,
       })
 
       // Choose Invitation Template Dropdown
@@ -60,6 +61,74 @@ describe('Email Notification Tests', () => {
       ControlPage.getMessageContainer().should(
         'contain',
         'Author Invitation sent by Elaine Barnes to Jon',
+      )
+    })
+  })
+  it('sent reviewer invite', () => {
+    // eslint-disable-next-line jest/valid-expect-in-promise
+    cy.fixture('role_names').then(name => {
+      // login as seniorEditor
+      cy.login(name.role.seniorEditor, dashboard)
+
+      // select Control on the Manuscripts page
+      Menu.clickManuscripts()
+      ManuscriptsPage.selectOptionWithText('Control')
+      cy.contains('Tasks & Notifications').click()
+      cy.getByDataTestId('choose-receiver').click()
+      cy.get('input[aria-label="Choose receiver"]').type('Joane{enter}', {
+        force: true,
+        delay: 200,
+      })
+      // Choose Invitation Template Dropdown
+      ControlPage.getEmailNotificationDropdowns()
+        .eq(1)
+        .type('Reviewer Invitation{enter}')
+
+      cy.contains('Notify').click()
+
+      ControlPage.clickExpandChatButton()
+
+      /* Verify Notification in Editorial Discussion Panel */
+      ControlPage.clickNthChatTab(1)
+
+      ControlPage.getMessageContainer().should(
+        'contain',
+        'Reviewer Invitation sent by Elaine Barnes to Joane Pilger',
+      )
+    })
+  })
+  it('sent task notification invite', () => {
+    // eslint-disable-next-line jest/valid-expect-in-promise
+    cy.fixture('role_names').then(name => {
+      // login as seniorEditor
+      cy.login(name.role.seniorEditor, dashboard)
+
+      // select Control on the Manuscripts page
+      Menu.clickManuscripts()
+      ManuscriptsPage.selectOptionWithText('Control')
+      cy.contains('Tasks & Notifications').click()
+      cy.getByDataTestId('choose-receiver').click()
+      cy.get('input[aria-label="Choose receiver"]')
+        .focus()
+        .type('Gale{enter}', {
+          force: true,
+          delay: 200,
+        })
+      // Choose Invitation Template Dropdown
+      ControlPage.getEmailNotificationDropdowns()
+        .eq(1)
+        .type('Task notification {enter}')
+
+      cy.contains('Notify').click()
+
+      ControlPage.clickExpandChatButton()
+
+      /* Verify Notification in Editorial Discussion Panel */
+      ControlPage.clickNthChatTab(1)
+
+      ControlPage.getMessageContainer().should(
+        'contain',
+        'Task notification sent by Elaine Barnes to Gale Davis',
       )
     })
   })
