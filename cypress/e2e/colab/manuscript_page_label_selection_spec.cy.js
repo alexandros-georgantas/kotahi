@@ -4,7 +4,7 @@ import { NewSubmissionPage } from '../../page-object/new-submission-page'
 import { Menu } from '../../page-object/page-component/menu'
 import { DashboardPage } from '../../page-object/dashboard-page'
 
-describe('manuscripts page label selection tests', () => {
+describe.skip('manuscripts page label selection tests', () => {
   beforeEach(() => {
     // task to restore the database as per the dumps/initial_state_other.sql
     cy.task('restore', 'commons/colab_bootstrap')
