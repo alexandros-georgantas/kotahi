@@ -105,6 +105,10 @@ const fr = {
       Article: "Modèle d' Article",
       'Go to your profile': 'Accéder à votre profil',
     },
+    menuSettings: {
+      KeepMenuVisible: 'Garder le menu visible',
+      MinimalSidebar: 'Barre latérale minimale',
+    },
 
     profilePage: {
       'Your profile': 'Votre profil',
@@ -172,17 +176,13 @@ const fr = {
       'New submission': '+ Nouvelle soumission',
       'New Alerts': 'Nouvelles alertes',
       'My Submissions': 'Mes soumissions',
-      'To Review': 'À réviser',
-      "Manuscripts I'm editor of": 'Manuscrits dont je suis éditeur',
+      'To Review': 'Affectations de révision',
+      "Manuscripts I'm editor of": "File d'attente d'édition",
       mySubmissions: {
-        'My Submissions': 'Mes soumissions',
         'Provide production feedback':
           'Fournir des commentaires sur la production',
         'View production feedback':
           'Afficher les commentaires sur la production',
-      },
-      toReview: {
-        'To Review': 'À réviser',
       },
     },
     reviewPage: {
@@ -401,6 +401,11 @@ const fr = {
       accepted: "A accepté l'invitation {{invitationType}}",
     },
     configPage: {
+      generalTab: 'Général',
+      workflowTab: 'Flux de travail',
+      productionTab: 'Production',
+      integrationsTab: 'Intégrations et points de terminaison de publication',
+      notificationsTab: 'Notifications et courrier électronique',
       Configuration: 'Configuration',
       'Instance Type': "Type d'instance",
       'Group Identity': 'Identité du groupe',
@@ -417,8 +422,8 @@ const fr = {
       pagesVisibleToRegistered:
         'Pages du tableau de bord visibles aux utilisateurs enregistrés',
       'My Submissions': 'Mes soumissions',
-      'To Review': 'À évaluer',
-      "Manuscripts I'm editor of": "Manuscrits dont je suis l'éditeur",
+      'To Review': 'Affectations de révision',
+      "Manuscripts I'm editor of": "File d'attente d'édition",
       'Manuscripts page': 'Page des manuscrits',
       'List columns to display on the Manuscripts page':
         'Liste des colonnes à afficher sur la page des manuscrits',
@@ -509,7 +514,7 @@ const fr = {
         "Tous les utilisateurs sont assignés les rôles de gestionnaire de groupe et d'administrateur",
       kotahiApis: 'API Kotahi',
       tokens: 'Jetons',
-      Submit: 'Soumettre',
+      Update: 'Mise à jour',
       article: 'article',
       'peer review': 'évaluation par les pairs',
       showTabs: {

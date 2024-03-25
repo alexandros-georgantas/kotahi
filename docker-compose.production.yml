@@ -115,11 +115,12 @@ services:
     volumes:
       - ./uploads:/home/node/app/uploads
       - ./packages/server/config:/home/node/app/config
+      - ./packages/client/config/translation:/home/node/app/config/translation
 
   xsweet:
     depends_on:
       - db-xsweet
-    image: cokoapps/xsweet:2.2.4
+    image: cokoapps/xsweet:2.3.0
     ports:
       - ${SERVICE_XSWEET_PORT:-3004}:${SERVICE_XSWEET_PORT:-3004}
     environment:

@@ -106,7 +106,10 @@ const en = {
       Article: 'Article Template',
       'Go to your profile': 'Go to your profile',
     },
-
+    menuSettings: {
+      KeepMenuVisible: 'Keep menu visible',
+      MinimalSidebar: 'Minimal sidebar',
+    },
     profilePage: {
       'Your profile': 'Your profile',
       'Profile: ': 'Profile: ',
@@ -171,16 +174,12 @@ const en = {
       Dashboard: 'Dashboard',
       'New submission': '+ New submission',
       'New Alerts': 'New Alerts',
-      'My Submissions': 'My Submissions',
-      'To Review': 'To Review',
-      "Manuscripts I'm editor of": 'Manuscripts I’m editor of',
+      'My Submissions': 'My submissions',
+      'To Review': 'Review assignments',
+      "Manuscripts I'm editor of": 'Editing queue',
       mySubmissions: {
-        'My Submissions': 'My Submissions',
         'Provide production feedback': 'Provide production feedback',
         'View production feedback': 'View production feedback',
-      },
-      toReview: {
-        'To Review': 'To Review',
       },
     },
     reviewPage: {
@@ -399,6 +398,11 @@ const en = {
       accepted: 'Accepted {{invitationType}} invitation',
     },
     configPage: {
+      generalTab: 'General',
+      workflowTab: 'Workflow',
+      productionTab: 'Production',
+      integrationsTab: 'Integrations and Publishing Endpoints',
+      notificationsTab: 'Notifications and E-mail',
       Configuration: 'Configuration',
       'Instance Type': 'Instance Type',
       'Group Identity': 'Group Identity',
@@ -412,9 +416,9 @@ const en = {
       'Dashboard Page': 'Dashboard Page',
       'Manuscript Page': 'Manuscript Page',
       pagesVisibleToRegistered: 'Dashboard pages visible to registered users',
-      'My Submissions': 'My Submissions',
-      'To Review': 'To Review',
-      "Manuscripts I'm editor of": 'Manuscripts I’m editor of',
+      'My Submissions': 'My submissions',
+      'To Review': 'Review assignments',
+      "Manuscripts I'm editor of": 'Editing queue',
       'Manuscripts page': 'Manuscripts page',
       'List columns to display on the Manuscripts page':
         'List columns to display on the Manuscripts page',
@@ -492,7 +496,7 @@ const en = {
       userIsAdmin: 'All users are assigned Group Manager and Admin roles',
       kotahiApis: 'Kotahi APIs',
       tokens: 'Tokens',
-      Submit: 'Submit',
+      Update: 'Update',
       article: 'article',
       'peer review': 'peer review',
       showTabs: {

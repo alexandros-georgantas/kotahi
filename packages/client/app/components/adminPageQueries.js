@@ -10,7 +10,9 @@ const QUERY = gql`
       groupRoles
       email
       recentTab
+      menuPinned
       preferredLanguage
+      chatExpanded
       defaultIdentity {
         identifier
         email

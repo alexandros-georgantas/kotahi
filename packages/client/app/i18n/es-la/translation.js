@@ -106,7 +106,10 @@ const esLa = {
       'Go to your profile': 'Ir a tu perfil',
       Article: 'Plantilla de Artículo',
     },
-
+    menuSettings: {
+      KeepMenuVisible: 'Mantener menú visible',
+      MinimalSidebar: 'Menu lateral minimo',
+    },
     profilePage: {
       'Your profile': 'Tu perfil',
       'Profile: ': 'Perfil: ',
@@ -172,16 +175,12 @@ const esLa = {
       Dashboard: 'Tablero',
       'New submission': '+ Nueva presentación',
       'New Alerts': 'Nuevas Alertas',
-      'My Submissions': 'Mis Presentaciones',
-      'To Review': 'Para Revisión',
-      "Manuscripts I'm editor of": 'Manuscritos en los que soy editor',
+      'My Submissions': 'Mis presentaciones',
+      'To Review': 'Asignaciones de revisión',
+      "Manuscripts I'm editor of": 'Cola de edición',
       mySubmissions: {
-        'My Submissions': 'Mis Presentaciones',
         'Provide production feedback': 'Proporcionar comentarios de producción',
         'View production feedback': 'Ver comentarios de producción',
-      },
-      toReview: {
-        'To Review': 'Para Revisión',
       },
     },
     reviewPage: {
@@ -398,6 +397,11 @@ const esLa = {
       accepted: 'Invitación {{invitationType}} aceptada',
     },
     configPage: {
+      generalTab: 'General',
+      workflowTab: 'Flujo de trabajo',
+      productionTab: 'Producción',
+      integrationsTab: 'Integraciones y servicios de publicación',
+      notificationsTab: 'Notificaciones y correo electrónico',
       Configuration: 'Configuración',
       'Instance Type': 'Tipo de Instancia',
       'Group Identity': 'Identidad del Grupo',
@@ -414,8 +418,8 @@ const esLa = {
       pagesVisibleToRegistered:
         'Páginas del panel de control visibles para usuarios registrados',
       'My Submissions': 'Mis Envíos',
-      'To Review': 'Por Revisar',
-      "Manuscripts I'm editor of": 'Manuscritos de los que soy editor',
+      'To Review': 'Asignaciones de revisión',
+      "Manuscripts I'm editor of": 'Cola de edición',
       'Manuscripts page': 'Página de Manuscritos',
       'List columns to display on the Manuscripts page':
         'Listar columnas para mostrar en la página de Manuscritos',
@@ -504,7 +508,7 @@ const esLa = {
         'Todos los usuarios tienen roles de Gerente de Grupo y Administrador',
       kotahiApis: 'API de Kotahi',
       tokens: 'Tokens',
-      Submit: 'Enviar',
+      Update: 'Actualizar',
       article: 'artículo',
       'peer review': 'revisión de pares',
       showTabs: {

@@ -107,6 +107,10 @@ const ru = {
       Article: 'Шаблон Статьи',
       'Go to your profile': 'Перейти в ваш профиль',
     },
+    menuSettings: {
+      KeepMenuVisible: 'оставить меню видимым',
+      MinimalSidebar: 'Минимальная боковая панель',
+    },
     profilePage: {
       'Your profile': 'Ваш профиль',
       'Profile: ': 'Профиль: ',
@@ -174,15 +178,11 @@ const ru = {
       'New submission': 'Загрузить новую статью',
       'New Alerts': 'Новые оповещения',
       'My Submissions': 'Мои статьи',
-      'To Review': 'Статьи для рецензирования',
-      "Manuscripts I'm editor of": 'Статьи для редактирования',
+      'To Review': 'Обзор назначений',
+      "Manuscripts I'm editor of": 'Очередь редактирования',
       mySubmissions: {
-        'My Submissions': 'Мои статьи',
         'Provide production feedback': 'Оставьте отзыв о производстве',
         'View production feedback': 'Посмотреть отзывы о производстве',
-      },
-      toReview: {
-        'To Review': 'Статьи для рецензирования',
       },
     },
     reviewPage: {
@@ -400,6 +400,11 @@ const ru = {
       accepted: '{{invitationType}} принял приглашение',
     },
     configPage: {
+      generalTab: 'Общие',
+      workflowTab: 'Рабочий процесс',
+      productionTab: 'Производство',
+      integrationsTab: 'Интеграции и конечные точки публикации',
+      notificationsTab: 'Уведомления и электронная почта',
       Configuration: 'Настройки',
       'Instance Type': 'Тип элемента',
       'Group Identity': 'Групповая идентификация',
@@ -416,8 +421,8 @@ const ru = {
       pagesVisibleToRegistered:
         'Страницы панели управления, доступные зарегистрированным пользователям',
       'My Submissions': 'Мои статьи',
-      'To Review': 'Статьи для рецензирования',
-      "Manuscripts I'm editor of": 'Статьи для редактирования',
+      'To Review': 'Обзор назначений',
+      "Manuscripts I'm editor of": 'Очередь редактирования',
       'Manuscripts page': 'Страница со статьями',
       'List columns to display on the Manuscripts page':
         'Список полей, отображаемых на странице со статьями',
@@ -502,7 +507,7 @@ const ru = {
         'Всем пользователям назначаются роли администратора и редактора',
       kotahiApis: 'Котахи API',
       tokens: 'Токены',
-      Submit: 'Подтвердить',
+      Update: 'Обновлять',
       article: 'Статья',
       'peer review': 'Рецензия',
       showTabs: {

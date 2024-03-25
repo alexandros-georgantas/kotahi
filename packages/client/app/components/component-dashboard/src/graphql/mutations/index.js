@@ -94,4 +94,20 @@ export default {
       }
     }
   `,
+  updateChatUI: gql`
+    mutation ($state: Boolean!) {
+      expandChat(state: $state) {
+        id
+        chatExpanded
+      }
+    }
+  `,
+  updateMenu: gql`
+    mutation ($expanded: Boolean!) {
+      updateMenuUI(expanded: $expanded) {
+        id
+        menuPinned
+      }
+    }
+  `,
 }
