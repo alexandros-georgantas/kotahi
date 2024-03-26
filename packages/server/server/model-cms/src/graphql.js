@@ -1,4 +1,5 @@
 const models = require('@pubsweet/models')
+const fnv = require('fnv-plus')
 
 const File = require('@coko/server/src/models/file/file.model')
 
@@ -83,6 +84,44 @@ const resolvers = {
       return cmsPage
     },
 
+    async cmsLayout(_, _vars, ctx) {
+      const groupId = ctx.req.headers['group-id']
+      let layouts = await models.CMSLayout.query()
+        .where({ groupId })
+        .orderBy('language')
+      if (!layouts.length) layouts = [await setInitialLayout(groupId)] // TODO move this to seedArticleTemplate.js or similar
+
+      // Munge into a single object. // TODO migrate the DB to this structure too
+      const first = layouts[0]
+
+      return {
+        id: groupId,
+        created: first.created,
+        updated: first.updated,
+        edited: first.edited,
+        published: first.published,
+        active: first.active,
+        hexCode: first.isPrivate ? fnv.hash(groupId) : null,
+        isPrivate: first.isPrivate,
+        languageLayouts: layouts.map(x => ({
+          id: x.id,
+          article: x.article ?? '',
+          css: x.css ?? '',
+          flaxFooterConfig: x.flaxFooterConfig ?? [],
+          flaxHeaderConfig: x.flaxHeaderConfig ?? [],
+          footerText: x.footerText,
+          language: x.language,
+          logo: x.logo,
+          favicon: x.favicon,
+          partnerFiles: x.partnerFiles,
+          partners: x.partners ?? [],
+          primaryColor: x.primaryColor,
+          secondaryColor: x.secondaryColor,
+          publishConfig: x.publishConfig,
+        })),
+      }
+    },
+    /** @deprecated Use cmsLayout */
     async cmsLayouts(_, _vars, ctx) {
       const groupId = ctx.req.headers['group-id']
       let layouts = await models.CMSLayout.query().where('groupId', groupId)
@@ -94,6 +133,7 @@ const resolvers = {
       return layouts
     },
 
+    /** @deprecated */
     async cmsLanguages(_, _vars, ctx) {
       const groupId = ctx.req.headers['group-id']
       const result = await models.CMSLanguageList.query().findOne({ groupId })
@@ -157,7 +197,35 @@ const resolvers = {
         }
       }
     },
+    async updateCmsLayout(_, { input }, ctx) {
+      const groupId = ctx.req.headers['group-id']
+      await models.CMSLayout.query()
+        .patch({
+          active: input.active,
+          isPrivate: input.isPrivate,
+          hexCode: input.hexCode,
+          published: input.published,
+          edited: input.edited,
+        })
+        .where({ groupId })
 
+      await Promise.all(
+        input.languageLayouts.map(x => {
+          return models.CMSLayout.query().upsertGraphAndFetch({
+            id: x.id,
+            language: x.language,
+            article: x.article,
+            css: x.css,
+            primaryColor: x.primaryColor,
+            secondaryColor: x.secondaryColor,
+            partners: x.partners,
+            footerText: x.footerText,
+            publishConfig: x.publishConfig,
+          })
+        }),
+      )
+    },
+    /** @deprecated Use updateCmsLayout */
     async updateCMSLayout(_, { _id, input }, ctx) {
       const groupId = ctx.req.headers['group-id']
 
@@ -183,6 +251,7 @@ const resolvers = {
       return cmsLayout
     },
 
+    /** @deprecated */
     async updateCMSLanguages(_, { languages }, ctx) {
       const groupId = ctx.req.headers['group-id']
       await models.CMSLanguageList.query()
@@ -318,6 +387,7 @@ const typeDefs = `
   extend type Query {
     cmsPage(id: ID!): CMSPage!
     cmsPages: [CMSPage!]!
+    cmsLayout: CmsLayout!
     cmsLayouts: [CMSLayout!]!
     cmsLanguages: [String!]!
   }
@@ -327,6 +397,7 @@ const typeDefs = `
     updateCMSPage(id: ID!, input: CMSPageInput!): CMSPage!
     deleteCMSPage(id: ID!): DeletePageResponse!
     updateCMSLayout(input: CMSLayoutInput!): CMSLayout!
+    updateCmsLayout(input: CmsLayoutInput!): CmsLayout!
     updateCMSLanguages(languages: [String!]!): Boolean!
   }
 
@@ -372,7 +443,7 @@ const typeDefs = `
     secondaryColor: String!
     logo: File
     favicon: File
-    partners: [StoredPartner!]
+    partners: [StoredPartner!]!
     footerText: String
     isPrivate:Boolean
     hexCode: String
@@ -380,12 +451,62 @@ const typeDefs = `
     edited: DateTime!
     created: DateTime!
     updated: DateTime
-    flaxHeaderConfig: [FlaxPageHeaderConfig!]
-    flaxFooterConfig: [FlaxPageFooterConfig!]
+    flaxHeaderConfig: [FlaxPageHeaderConfig!]!
+    flaxFooterConfig: [FlaxPageFooterConfig!]!
     publishConfig: String!
     article: String!
     css: String!
     language: String!
+  }
+
+  type CmsLayout {
+    id: ID!
+    active: Boolean!
+    languageLayouts: [CmsLanguageLayout!]!
+    isPrivate: Boolean
+    hexCode: String
+    published: DateTime
+    edited: DateTime!
+    created: DateTime!
+    updated: DateTime
+  }
+
+  type CmsLanguageLayout {
+    id: ID!
+    language: String!
+    article: String!
+    css: String!
+    primaryColor: String!
+    secondaryColor: String!
+    logo: File
+    favicon: File
+    partners: [StoredPartner!]!
+    footerText: String
+    flaxHeaderConfig: [FlaxPageHeaderConfig!]!
+    flaxFooterConfig: [FlaxPageFooterConfig!]!
+    publishConfig: String!
+  }
+
+  input CmsLayoutInput {
+    id: ID!
+    active: Boolean!
+    languageLayouts: [CmsLanguageLayoutInput!]!
+    isPrivate: Boolean
+    hexCode: String
+    published: DateTime
+    edited: DateTime!
+  }
+
+  input CmsLanguageLayoutInput {
+    id: ID!
+    language: String!
+    article: String!
+    css: String!
+    primaryColor: String!
+    secondaryColor: String!
+    partners: [StoredPartnerInput!]!
+    footerText: String
+    publishConfig: String!
   }
 
   type FlaxPageHeaderConfig {

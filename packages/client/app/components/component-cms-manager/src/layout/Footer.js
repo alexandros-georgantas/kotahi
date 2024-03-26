@@ -58,7 +58,7 @@ const Footer = ({
   onPageOrderUpdated,
 }) => {
   const [selectedFiles, setSelectedFiles] = useState(
-    formikProps.values.partners,
+    formikProps.values.partners ?? [],
   )
 
   useEffect(() => onDataChanged('partners', selectedFiles), [selectedFiles])

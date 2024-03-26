@@ -37,6 +37,7 @@ const cmsPageFields = `
     language
 `
 
+/** @deprecated */
 const cmsLayoutFields = `
     id
     created
@@ -68,6 +69,42 @@ const cmsLayoutFields = `
     article
     css
     language
+`
+
+const cmsLayoutFieldsNew = `
+    id
+    created
+    updated
+    languageLayouts {
+      id
+      primaryColor
+      secondaryColor
+      footerText
+      flaxHeaderConfig {
+        ${flaxPageConfigFields}
+      }
+      flaxFooterConfig {
+        ${flaxPageConfigFields}
+      }
+      partners {
+        id
+        url
+        sequenceIndex
+        file {
+         ${fileFields}
+        }
+      }
+      logo {
+        ${fileFields}
+      }
+      article
+      css
+      language
+    }
+    published
+    edited
+    isPrivate
+    hexCode
 `
 
 const createCmsPageFields = `
@@ -136,6 +173,7 @@ export const rebuildFlaxSiteMutation = gql`
   }
 `
 
+/** @deprecated */
 export const getCMSLayout = gql`
   query cmsLayouts {
     cmsLayouts {
@@ -143,6 +181,14 @@ export const getCMSLayout = gql`
     }
     cmsLanguages
   }
+`
+
+export const getCmsLayout = gql`
+query cmsLayout {
+  cmsLayout {
+    ${cmsLayoutFieldsNew}
+  }
+}
 `
 
 export const updateCMSLayoutMutation = gql`

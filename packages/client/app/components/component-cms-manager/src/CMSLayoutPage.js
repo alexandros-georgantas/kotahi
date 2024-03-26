@@ -1,10 +1,11 @@
 import React, { useContext, useState } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
+import fnv from 'fnv-plus'
 import { ConfigContext } from '../../config/src'
 import { Spinner, CommsErrorBanner } from '../../shared'
 
 import {
-  getCMSLayout,
+  getCmsLayout,
   updateCMSLayoutMutation,
   updateCMSPageDataMutation,
   rebuildFlaxSiteMutation,
@@ -12,16 +13,16 @@ import {
   deleteFileMutation,
   updateCmsLanguagesMutation,
 } from './queries'
-import CmsLayout from './layout/CmsLayout'
+import CmsLayouts from './layout/CmsLayouts'
 
 const CMSLayoutPage = ({ history }) => {
-  const { loading, data, error } = useQuery(getCMSLayout)
+  const { loading, data, error } = useQuery(getCmsLayout)
   const [updateCMSLayout] = useMutation(updateCMSLayoutMutation)
   const [updateCMSPageInfo] = useMutation(updateCMSPageDataMutation)
   const [rebuildFlaxSite] = useMutation(rebuildFlaxSiteMutation)
   const [createFile] = useMutation(createFileMutation)
   const config = useContext(ConfigContext)
-  const { groupName } = config
+  const { groupName, groupId } = config
 
   const flaxSiteUrlForGroup = `${process.env.FLAX_SITE_URL}/${groupName}/`
 
@@ -100,17 +101,19 @@ const CMSLayoutPage = ({ history }) => {
   if (loading) return <Spinner />
   if (error) return <CommsErrorBanner error={error} />
 
-  const { cmsLayouts, cmsLanguages } = data
+  const { cmsLayout } = data
+
+  const privatePublishingHash = fnv.hash(groupId)
 
   // TODO Move this layout code out of the Page-level component
   return (
-    <CmsLayout
-      cmsLanguages={cmsLanguages}
-      cmsLayouts={cmsLayouts}
+    <CmsLayouts
+      cmsLayout={cmsLayout}
       createFile={createFile}
       deleteFile={deleteFile}
       flaxSiteUrlForGroup={flaxSiteUrlForGroup}
       history={history}
+      privatePublishingHash={privatePublishingHash}
       publish={publish}
       publishingStatus={publishingStatus}
       triggerAutoSave={triggerAutoSave}

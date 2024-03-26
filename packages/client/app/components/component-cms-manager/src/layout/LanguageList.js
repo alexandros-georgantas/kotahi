@@ -97,7 +97,7 @@ const SmallIcon = withTheme(({ children, theme }) => (
   </UnpaddedIcon>
 ))
 
-const Languages = ({ languages, updateLanguages, systemLanguages }) => {
+const LanguageList = ({ languages, updateLanguages, systemLanguages }) => {
   const [langs, setLangs] = useState(languages)
   const [langBeingDeleted, setLangBeingDeleted] = useState(null)
   const [addModalIsOpen, setAddModalIsOpen] = useState(false)
@@ -230,4 +230,4 @@ const Languages = ({ languages, updateLanguages, systemLanguages }) => {
   )
 }
 
-export default Languages
+export default LanguageList
