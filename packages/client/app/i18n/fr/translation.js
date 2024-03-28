@@ -956,6 +956,7 @@ const fr = {
         'Invite Reviewer': 'Inviter un évaluateur',
         Shared: 'Partagé',
         'Email Notification': 'Notification par email',
+        Collaborate: 'Collaborer',
         Cancel: 'Annuler',
         Invite: 'Inviter',
       },

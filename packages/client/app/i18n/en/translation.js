@@ -926,6 +926,7 @@ const en = {
         'Invite Reviewer': 'Invite Reviewer',
         Shared: 'Shared',
         'Email Notification': 'Email Notification',
+        Collaborate: 'Collaborate',
         Cancel: 'Cancel',
         Invite: 'Invite',
       },
