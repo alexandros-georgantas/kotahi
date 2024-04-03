@@ -39,6 +39,9 @@ const resolvers = {
     async oldConfig(parent) {
       return getConfigJsonString()
     },
+    async docSets(parent) {
+      return models.Group.relatedQuery('docSets').for(parent.id)
+    },
   },
 }
 
@@ -57,6 +60,7 @@ const typeDefs = `
     isArchived: Boolean!
     oldConfig: String!
     configs: [Config!]!
+    docSets: [DocSet!]!
   }
 
   input GroupInput {

@@ -19,6 +19,8 @@ class Group extends BaseModel {
     const Form = require('../../model-form/src/form')
     /* eslint-disable-next-line global-require */
     const Channel = require('../../model-channel/src/channel')
+    /* eslint-disable-next-line global-require */
+    const DocSet = require('../../model-doc-set/docSet')
 
     return {
       configs: {
@@ -51,6 +53,14 @@ class Group extends BaseModel {
         join: {
           from: 'groups.id',
           to: 'channels.groupId',
+        },
+      },
+      docSets: {
+        relation: BaseModel.HasManyRelation,
+        modelClass: DocSet,
+        join: {
+          from: 'groups.id',
+          to: 'doc_sets.groupId',
         },
       },
     }
