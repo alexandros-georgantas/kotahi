@@ -1,12 +1,13 @@
 const moment = require('moment-timezone')
-const models = require('@pubsweet/models')
-const Task = require('./task')
-const TaskAlert = require('./taskAlert')
-const TaskEmailNotification = require('./taskEmailNotification')
-const taskConfigs = require('../../../config/journal/tasks.json')
 
+const models = require('@pubsweet/models')
+const Task = require('../../../models/task/task.model')
+const TaskAlert = require('../../../models/taskAlert/taskAlert.model')
+const TaskEmailNotification = require('../../../models/taskEmailNotification/taskEmailNotification.model')
+const TaskEmailNotificationLog = require('../../../models/taskEmailNotificationLog/taskEmailNotificationLog.model')
+
+const taskConfigs = require('../../../config/journal/tasks.json')
 const { createNewTaskAlerts, updateAlertsForTask } = require('./taskCommsUtils')
-const TaskEmailNotificationLog = require('./taskEmailNotificationLog')
 
 const resolvers = {
   Mutation: {

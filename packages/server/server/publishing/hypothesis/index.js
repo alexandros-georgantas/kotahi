@@ -6,7 +6,7 @@ const { getUsersById } = require('../../model-user/src/userCommsUtils')
 const { getActiveForms } = require('../../model-form/src/formCommsUtils')
 const { getPublishableFields, normalizeUri } = require('./hypothesisTools')
 const { upsertArtifact, deleteArtifact } = require('../publishingCommsUtils')
-const Config = require('../../config/src/config')
+const Config = require('../../../models/config/config.model')
 
 const {
   getThreadedDiscussionsForManuscript,

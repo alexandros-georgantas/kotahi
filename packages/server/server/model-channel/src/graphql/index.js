@@ -2,7 +2,7 @@ const fetch = require('node-fetch')
 
 const models = require('@pubsweet/models')
 const { updateChannelLastViewed } = require('../channelCommsUtils')
-const Channel = require('../channel')
+const Channel = require('../../../../models/channel/channel.model')
 
 const resolvers = {
   Query: {

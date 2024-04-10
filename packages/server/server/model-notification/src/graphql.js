@@ -1,5 +1,5 @@
 const models = require('@pubsweet/models')
-const NotificationUserOption = require('./notificationUserOption')
+const NotificationUserOption = require('../../../models/notificationUserOption/notificationUserOption.model')
 
 const tryGetObjectIdFromPath = path => {
   if (!path.length) return null
