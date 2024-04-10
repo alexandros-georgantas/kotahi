@@ -148,7 +148,9 @@ const KanbanBoard = ({
   const findReview = reviewer => {
     return allReviews.find(
       review =>
-        review.user?.id === reviewer.user?.id && review.isDecision === false,
+        (review.isCollaborative === true ||
+          review?.user.id === reviewer.user?.id) &&
+        review.isDecision === false,
     )
   }
 
@@ -159,7 +161,7 @@ const KanbanBoard = ({
       )
       .filter((reviewer, index) => {
         const hasTheRightStatus =
-          reviewer.status === normalizeStatus(status.value)
+          reviewer.status === normalizeStatus(status.value) || (reviewer.status === 'çlosed' && status.value === 'completed')
 
         const isDuplicate =
           !!reviewer.user &&
@@ -206,7 +208,8 @@ const KanbanBoard = ({
                       manuscript={version}
                       removeReviewer={removeReviewer}
                       review={
-                        status.value === 'completed'
+                        status.value === 'completed' ||
+                        status.value === 'closed'
                           ? findReview(reviewer)
                           : null
                       }
