@@ -25,7 +25,7 @@ class Team extends BaseModel {
 
   static get relationMappings() {
     /* eslint-disable-next-line global-require */
-    const { Alias, User, Manuscript } = require('@pubsweet/models')
+    const { Alias, User } = require('@pubsweet/models')
 
     return {
       members: {
@@ -64,7 +64,7 @@ class Team extends BaseModel {
       },
       manuscript: {
         relation: BaseModel.BelongsToOneRelation,
-        modelClass: Manuscript,
+        modelClass: require.resolve('../manuscript/manuscript.model'),
         join: {
           from: 'teams.objectId',
           to: 'manuscripts.id',

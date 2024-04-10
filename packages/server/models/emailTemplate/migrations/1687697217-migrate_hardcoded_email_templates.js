@@ -10,7 +10,7 @@ const TaskEmailNotificationLog = require('../models/taskEmailNotificationLog/tas
 /* eslint-disable-next-line import/no-unresolved */
 const existingEmailTemplates =
   /* eslint-disable-next-line import/no-unresolved, import/extensions */
-  require('../models/existingEmailTemplates/existingEmailTemplates.model')
+  require('../server/model-email-templates/src/existingEmailTemplates')
 
 exports.up = async knex => {
   try {

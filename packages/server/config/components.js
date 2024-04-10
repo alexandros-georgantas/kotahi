@@ -1,7 +1,7 @@
-const { models } = require('../models')
+const modelComponents = require('../models/modelComponents')
 
 module.exports = [
-  ...models,
+  ...modelComponents,
   './server/model-notification/src/',
   './server/model-team/src',
   './server/model-user/src',
@@ -18,7 +18,6 @@ module.exports = [
   './server/model-message/src',
   './server/reports/src',
   './server/coar-notify',
-  './server/coar-notify/src',
   './server/profile-upload',
   './server/auth-orcid',
   '@coko/server/src/models/file',
@@ -35,8 +34,6 @@ module.exports = [
   './server/flax-site',
   './server/model-group/src',
   './server/reference/src',
-  './server/coar-notify',
-  './server/coar-notify/src',
   './server/model-article-templates/src',
   './server/asset-upload',
   './server/chat-gpt-service',
