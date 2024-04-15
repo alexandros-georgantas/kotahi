@@ -2,8 +2,6 @@
 
 const { LRUCache } = require('lru-cache')
 
-const { File } = require('@coko/server')
-
 const cache = new LRUCache({
   max: 500,
   ttl: 10000,
@@ -24,6 +22,7 @@ const queryFunctions = {
    * such as CMS files.
    */
   msOfFile: async fileId => {
+    const { File } = require('@coko/server')
     const Review = require('../../models/review/review.model')
     const Manuscript = require('../../models/manuscript/manuscript.model')
 
