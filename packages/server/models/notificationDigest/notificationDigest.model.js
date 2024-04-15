@@ -1,11 +1,5 @@
 const { BaseModel } = require('@coko/server')
 const { debounce } = require('lodash')
-const { sendAutomatedNotifications } = require('../../server/utils/jobUtils')
-
-const debounceSendAutomatedNotifications = debounce(
-  sendAutomatedNotifications,
-  5000,
-)
 
 class NotificationDigest extends BaseModel {
   static get tableName() {
@@ -14,6 +8,16 @@ class NotificationDigest extends BaseModel {
 
   async $afterInsert(queryContext) {
     await super.$afterInsert(queryContext)
+
+    const {
+      sendAutomatedNotifications,
+    } = require('../../server/utils/jobUtils') /* eslint-disable-line global-require */
+
+    const debounceSendAutomatedNotifications = debounce(
+      sendAutomatedNotifications,
+      5000,
+    )
+
     await debounceSendAutomatedNotifications(this.groupId)
   }
 
