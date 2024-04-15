@@ -734,15 +734,15 @@ const resolvers = {
 
       if (!team) throw new Error('No team was found')
 
-      for (let i = 0; i < team.members.length; i += 1) {
-        if (
-          team.members[i].userId === ctx.user &&
-          team.members[i].status !== 'completed'
-        )
-          team.members[i].status = action
-      }
-
-      await new Team(team).saveGraph()
+      await Promise.all(
+        team.members.map(async member => {
+          if (member.userId === ctx.user && member.status !== 'completed') {
+            await TeamMember.query().patchAndFetchById(member.id, {
+              status: action,
+            })
+          }
+        }),
+      )
 
       if (action === 'accepted') {
         await addUserToManuscriptChatChannel({
@@ -1220,13 +1220,18 @@ const resolvers = {
 
       // Create a new team of reviewers if it doesn't exist
 
-      const newTeam = await new Team({
+      const newTeam = await Team.query().insert({
         objectId: manuscriptId,
         objectType: 'manuscript',
-        members: [{ status, userId }],
         role: 'reviewer',
         name: 'Reviewers',
-      }).saveGraph()
+      })
+
+      await TeamMember.query().insert({
+        userId,
+        teamId: newTeam.id,
+        status,
+      })
 
       return newTeam
     },

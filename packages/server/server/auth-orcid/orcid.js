@@ -41,12 +41,12 @@ const addUserToUserTeam = async (userId, groupId) => {
 }
 
 module.exports = app => {
-  // eslint-disable-next-line global-require
+  /* eslint-disable global-require */
   const Config = require('../../models/config/config.model')
-  // eslint-disable-next-line global-require
   const Group = require('../../models/group/group.model')
-  // eslint-disable-next-line global-require
   const User = require('../../models/user/user.model')
+  const Identity = require('../../models/identity/identity.model')
+  /* eslint-enable global-require */
 
   // set up OAuth client
   passport.use(
@@ -98,27 +98,34 @@ module.exports = app => {
         // TODO: Update the user details on every login, asynchronously
         try {
           if (!user) {
-            user = await new User({
+            user = await User.query().insert({
               username: params.name,
-              defaultIdentity: {
-                identifier: params.orcid,
-                oauth: { accessToken, refreshToken },
-                type: 'orcid',
-                isDefault: true,
-              },
-            }).saveGraph()
+            })
+
+            const identity = await Identity.query().insert({
+              identifier: params.orcid,
+              oauth: { accessToken, refreshToken },
+              type: 'orcid',
+              isDefault: true,
+            })
 
             if (usersCountString === '0' || activeConfig.formData.user.isAdmin)
               await addUserToAdminAndGroupManagerTeams(user.id, groupId)
 
             // Do another request to the ORCID API for aff/name
             const userDetails = await fetchUserDetails(user)
-            user.defaultIdentity.name = `${userDetails.firstName || ''} ${
-              userDetails.lastName || ''
-            }`
-            user.defaultIdentity.aff = userDetails.institution || ''
-            user.email = userDetails.email || null
-            user.saveGraph()
+
+            await identity.$query().patchAndFetch({
+              name: `${userDetails.firstName || ''} ${
+                userDetails.lastName || ''
+              }`,
+              aff: userDetails.institution || '',
+            })
+
+            await user.$query().patchAndFetch({
+              email: userDetails.email || null,
+            })
+
             firstLogin = true
           }
         } catch (err) {
