@@ -370,16 +370,10 @@ const resolvers = {
       }
     },
     async updateUsername(_, { id, username }, ctx) {
-      const user = await User.find(id)
-      user.username = username
-      await user.save()
-      return user
+      return User.query().patchAndFetchById(id, { username })
     },
     async updateLanguage(_, { id, preferredLanguage }, ctx) {
-      const user = await User.find(id)
-      user.preferredLanguage = preferredLanguage
-      await user.save()
-      return user
+      return User.query().patchAndFetchById(id, { preferredLanguage })
     },
     async updateEmail(_, { id, email }, ctx) {
       const user = await User.find(id)

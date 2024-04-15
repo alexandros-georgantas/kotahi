@@ -86,7 +86,7 @@ const resolvers = {
       return result
     },
     async addEmailToBlacklist(_, { email, groupId }, ctx) {
-      const result = await new BlacklistEmail({ email, groupId }).save()
+      const result = await BlacklistEmail.query().insert({ email, groupId })
 
       return result
     },
@@ -112,10 +112,10 @@ const resolvers = {
             .resultSize()) > 0
 
         if (!authorExists) {
-          await new TeamMember({
+          await TeamMember.query().insert({
             teamId: existingTeam.id,
             userId,
-          }).save()
+          })
         }
 
         return existingTeam.$query().withGraphFetched('members.[user]')

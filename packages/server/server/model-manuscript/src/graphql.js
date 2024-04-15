@@ -769,7 +769,7 @@ const resolvers = {
           jsonData: '{}',
         }
 
-        await new ReviewModel(review).save()
+        await ReviewModel.query().insert(review)
       }
 
       if (action === 'rejected') {
@@ -1207,12 +1207,12 @@ const resolvers = {
             .resultSize()) > 0
 
         if (!reviewerExists) {
-          await new TeamMember({
+          await TeamMember.query().insert({
             teamId: existingTeam.id,
             status,
             userId,
             isShared: invitationData ? invitationData.isShared : null,
-          }).save()
+          })
         }
 
         return existingTeam.$query()

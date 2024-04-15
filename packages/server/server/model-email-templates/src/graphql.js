@@ -58,12 +58,10 @@ const resolvers = {
           ccEditors: input.emailContent.ccEditors,
         }
 
-        const newEmailTemplate = new EmailTemplate({
+        const createdEmailTemplate = await EmailTemplate.query().insert({
           emailContent: emailContents,
           groupId,
         })
-
-        const createdEmailTemplate = await newEmailTemplate.save()
 
         return {
           success: true,

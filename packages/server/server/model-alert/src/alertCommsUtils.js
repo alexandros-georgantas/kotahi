@@ -119,13 +119,13 @@ const sendAlertForMessage = async ({
   }
 
   // Alert does not exist?
-  // await new Alert({
+  // await Alert.query().insert({
   //   title,
   //   userId: user.id,
   //   messageId,
   //   triggerTime,
   //   isSent: true,
-  // }).save()
+  // })
 }
 
 module.exports = {

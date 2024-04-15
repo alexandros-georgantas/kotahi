@@ -138,14 +138,15 @@ class User extends BaseModel {
     return Object.keys(roles).map(id => ({ id, roles: roles[id] }))
   }
 
-  async save() {
-    if (this.password) {
-      this.passwordHash = await User.hashPassword(this.password)
-      delete this.password
-    }
+  // NOT USED
+  // async save() {
+  //   if (this.password) {
+  //     this.passwordHash = await User.hashPassword(this.password)
+  //     delete this.password
+  //   }
 
-    return super.save()
-  }
+  //   return super.save()
+  // }
 
   async validPassword(password) {
     return password && this.passwordHash
