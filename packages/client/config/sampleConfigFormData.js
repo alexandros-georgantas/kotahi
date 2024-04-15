@@ -1,6 +1,6 @@
 module.exports = {
   instanceName: 'journal',
-  user: { isAdmin: false, kotahiApiTokens: 'test:123456' },
+  user: { isAdmin: false },
   report: { showInMenu: true },
   review: { showSummary: false },
   dashboard: {
@@ -16,15 +16,14 @@ module.exports = {
     autoImportHourUtc: 21,
     paginationCount: 10,
     archivePeriodDays: 60,
-    semanticScholarImportsRecencyPeriodDays: 42,
   },
   submission: {
     allowAuthorsSubmitNewVersion: true,
   },
   production: {
-    crossrefRetrievalEmail: 'test@coko.foundation',
     styleName: 'apa',
     localeName: 'en-US',
+    crossrefRetrievalEmail: 'test@coko.foundation',
     crossrefSearchResultCount: 3,
   },
   publishing: {
@@ -87,5 +86,19 @@ module.exports = {
     primaryColor: '#3aae2a',
     secondaryColor: '#9e9e9e',
     logoPath: '/assets/logo-kotahi.png',
+  },
+  semanticScholar: {
+    enableSemanticScholar: true,
+    semanticScholarPublishingServers: [],
+    semanticScholarImportsRecencyPeriodDays: 42,
+  },
+  coarNotify: {
+    repoIpAddress: '127.0.0.1',
+  },
+  kotahiApis: {
+    tokens: 'test:123456',
+  },
+  aiDesignStudio: {
+    apiKey: 'text',
   },
 }

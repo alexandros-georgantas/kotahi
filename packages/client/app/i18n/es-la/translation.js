@@ -23,6 +23,7 @@ const esLa = {
       inProgress: 'En Progreso',
       completed: 'Completado',
       unanswered: 'Sin Respuesta',
+      notAssignedForThisVersion: 'No es revisor de la versión actual',
     },
     common: {
       cms: 'CMS',
@@ -35,6 +36,7 @@ const esLa = {
       Update: 'Actualizar',
       Confirm: 'Confirmar',
       Delete: 'Eliminar',
+      View: 'Ver',
       'Enter search terms...': 'Ingrese términos de búsqueda...',
       surroundMultiword:
         'Agrupe frases de varias palabras entre comillas "". Excluya un término anteponiendo -. Especifique coincidencias alternativas usando O. Use * como comodín para el final de las palabras. Encierre subexpresiones entre paréntesis ().',
@@ -153,6 +155,7 @@ const esLa = {
       reviewDo: 'Hacer Revisión',
       reviewCompleted: 'Completado',
       reviewContinue: 'Continuar Revisión',
+      viewOldReviews: 'Ver revisiones anteriores',
       all: 'Todo',
       Search: 'Buscar',
       actions: {
@@ -187,6 +190,7 @@ const esLa = {
       Versions: 'Versiones',
       'Anonymous Reviewer': 'Revisor Anónimo',
       Submit: 'Enviar',
+      neverSubmitted: 'Esta revisión no fue enviada',
     },
     reviewVerdict: {
       accept: 'aceptar',
@@ -448,6 +452,8 @@ const esLa = {
       'Control pages visible to editors':
         'Páginas de control visibles para editores',
       Team: 'Equipo',
+      aiDesignStudio: 'AI Design Studio',
+      openAiApiKey: `Clave de acceso de OpenAI`,
       Submission: 'Envío',
       allowToSubmitNewVersion:
         'Permitir a un autor enviar una nueva versión de su manuscrito en cualquier momento',

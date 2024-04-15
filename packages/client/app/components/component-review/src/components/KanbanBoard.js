@@ -72,21 +72,41 @@ const KanbanBoard = ({
   const { t } = useTranslation()
 
   const emailAndWebReviewers = [
-    ...invitations.map(invitation => {
-      return { ...invitation, isEmail: true }
-    }),
     ...reviewers.map(reviewer => {
-      return { ...reviewer, isEmail: false }
+      return {
+        ...reviewer,
+        // Set isEmail flag true if the reviewer has pending reviewer invitations
+        isEmail: !!invitations.find(
+          invitation =>
+            invitation.invitedPersonType === 'REVIEWER' &&
+            invitation.user?.id === reviewer.user.id,
+        ),
+      }
     }),
+    ...invitations
+      .filter(invitation => {
+        const reviewerAlreadyExist = reviewers.find(
+          reviewer =>
+            invitation.invitedPersonType === 'REVIEWER' &&
+            invitation.user?.id === reviewer.user.id,
+        )
+
+        // Filter only REVIEWER invitations to avoid other invitedPersonType's to be listed here
+        // Exclude invitation record if user is already a reviewer to avoid duplicate kanban cards
+        return (
+          invitation.invitedPersonType === 'REVIEWER' && !reviewerAlreadyExist
+        )
+      })
+      .map(invitation => {
+        return { ...invitation, isEmail: true }
+      }),
   ]
 
   const LocalizedReviewFilterOptions = localizeReviewFilterOptions(statuses, t)
 
   emailAndWebReviewers.sort((a, b) => {
     const aDate = a.responseComment ? a.responseDate : a.updated
-
     const bDate = b.responseComment ? b.responseDate : b.updated
-
     return new Date(bDate) - new Date(aDate)
   })
 
@@ -102,6 +122,24 @@ const KanbanBoard = ({
         review.user.id === reviewer.user.id && review.isDecision === false,
     )
   }
+
+  const getReviewersWithoutDuplicates = (status, someReviewers) =>
+    someReviewers
+      .sort(
+        (a, b) => (a.isEmail ? 0 : 1) - (b.isEmail ? 0 : 1), // to prioritize those with email sent
+      )
+      .filter((reviewer, index) => {
+        const hasTheRightStatus =
+          reviewer.status === status.value ||
+          (reviewer.status === 'UNANSWERED' && status.value === 'invited')
+
+        const isDuplicate =
+          !!reviewer.user &&
+          someReviewers.findIndex(r => r.user?.id === reviewer.user.id) !==
+            index
+
+        return hasTheRightStatus && !isDuplicate
+      })
 
   return (
     <AdminSection>
@@ -129,38 +167,34 @@ const KanbanBoard = ({
                   {status.label}
                 </StatusLabel>
                 <CardsWrapper>
-                  {emailAndWebReviewers
-                    .filter(
-                      reviewer =>
-                        reviewer.status === status.value ||
-                        (reviewer.status === 'UNANSWERED' &&
-                          status.value === 'invited'),
-                    )
-                    .map(reviewer => (
-                      <KanbanCard
-                        isCurrentVersion={isCurrentVersion}
-                        isInvitation={reviewer.isEmail}
-                        key={reviewer.id}
-                        manuscript={version}
-                        removeReviewer={removeReviewer}
-                        review={
-                          status.value === 'completed'
-                            ? findReview(reviewer)
-                            : null
-                        }
-                        reviewer={reviewer}
-                        reviewForm={reviewForm}
-                        showEmailInvitation={
-                          reviewer.isEmail && status.value === 'invited'
-                        }
-                        status={status.value}
-                        updateReview={updateReview}
-                        updateSharedStatusForInvitedReviewer={
-                          updateSharedStatusForInvitedReviewer
-                        }
-                        updateTeamMember={updateTeamMember}
-                      />
-                    ))}
+                  {getReviewersWithoutDuplicates(
+                    status,
+                    emailAndWebReviewers,
+                  ).map(reviewer => (
+                    <KanbanCard
+                      isCurrentVersion={isCurrentVersion}
+                      isInvitation={reviewer.isEmail}
+                      key={reviewer.id}
+                      manuscript={version}
+                      removeReviewer={removeReviewer}
+                      review={
+                        status.value === 'completed'
+                          ? findReview(reviewer)
+                          : null
+                      }
+                      reviewer={reviewer}
+                      reviewForm={reviewForm}
+                      showEmailInvitation={
+                        reviewer.isEmail && status.value === 'invited'
+                      }
+                      status={status.value}
+                      updateReview={updateReview}
+                      updateSharedStatusForInvitedReviewer={
+                        updateSharedStatusForInvitedReviewer
+                      }
+                      updateTeamMember={updateTeamMember}
+                    />
+                  ))}
                 </CardsWrapper>
               </Column>
             ))}

@@ -1,25 +1,25 @@
 import React from 'react'
-import i18next from 'i18next'
+import { t } from 'i18next'
 import { ConfigurableStatus } from '../../../shared'
 import reviewStatuses from '../../../../../config/journal/review-status'
-import { getMembersOfTeam } from '../../../../shared/manuscriptUtils'
 import localizeReviewFilterOptions from '../../../../shared/localizeReviewFilterOptions'
+import { findReviewerStatus } from './reviewStatusUtils'
 
 const ReviewerStatusBadge = ({ manuscript, currentUser }) => {
-  const members = getMembersOfTeam(manuscript, 'reviewer')
-
-  const status = members?.find(
-    member => member.user.id === currentUser.id,
-  )?.status
+  const status = findReviewerStatus(manuscript, currentUser.id)
 
   const LocalizedReviewFilterOptions = localizeReviewFilterOptions(
     reviewStatuses,
-    i18next.t,
+    t,
   )
 
   const statusConfig = LocalizedReviewFilterOptions.find(
     item => item.value === status,
   )
+
+  if (status === 'closed') {
+    return <ConfigurableStatus color="#eeeeee">Closed</ConfigurableStatus>
+  }
 
   return (
     <ConfigurableStatus

@@ -73,6 +73,13 @@ const Footer = styled.div`
     transition: opacity 0.2s;
   }
 `
+
+// TODO Improve on this hardcoded hack to hide the "Publishing" heading.
+const StyledWrapper = styled.div`
+  #form-integrations_publishing > legend:nth-of-type(1) {
+    display: ${p => (p.$hideFirstLegend ? 'none' : 'block')};
+  }
+`
 // #endregion Styleds
 
 const FieldTemplate = props => {
@@ -81,10 +88,12 @@ const FieldTemplate = props => {
   // eslint-disable-next-line no-nested-ternary
   return !showInstanceType ? (
     !currentFieldName('instanceName') ? (
-      <div className={classNames}>
-        {description}
-        {children}
-      </div>
+      <StyledWrapper $hideFirstLegend={currentFieldName('publishing')}>
+        <div className={classNames}>
+          {description}
+          {children}
+        </div>
+      </StyledWrapper>
     ) : (
       ''
     )
@@ -123,7 +132,11 @@ const ConfigManagerForm = ({
     setPendingChanges(prev => {
       const isChanged = properties
         .flat()
-        .some(p => !isEqual(formData[p], initialFormData.current[p]))
+        .some(
+          p =>
+            initialFormData.current[p] &&
+            !isEqual(formData[p], initialFormData.current[p]),
+        )
 
       return { ...prev, [key]: isChanged }
     })

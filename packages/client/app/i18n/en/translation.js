@@ -22,6 +22,7 @@ const en = {
       inProgress: 'In Progress',
       completed: 'Completed',
       unanswered: 'Unanswered',
+      notAssignedForThisVersion: 'Not a reviewer of the current version',
     },
     common: {
       cms: 'CMS',
@@ -35,6 +36,7 @@ const en = {
       Confirm: 'Confirm',
       Add: 'Add',
       Delete: 'Delete',
+      View: 'View',
       'Enter search terms...': 'Enter search terms...',
       surroundMultiword:
         'Surround multi-word phrases with quotes "". Exclude a term by prefixing with -. Specify alternate matches using OR. Use * as wildcard for word endings. Wrap subexpressions in parentheses ().',
@@ -153,6 +155,7 @@ const en = {
       reviewDo: 'Do Review',
       reviewCompleted: 'Completed',
       reviewContinue: 'Continue Review',
+      viewOldReviews: 'View old review(s)',
       all: 'All',
       Search: 'Search',
       actions: {
@@ -174,9 +177,9 @@ const en = {
       Dashboard: 'Dashboard',
       'New submission': '+ New submission',
       'New Alerts': 'New Alerts',
-      'My Submissions': 'My submissions',
-      'To Review': 'Review assignments',
-      "Manuscripts I'm editor of": 'Editing queue',
+      'My Submissions': 'My Submissions',
+      'To Review': 'Review Assignments',
+      "Manuscripts I'm editor of": 'Editing Queue',
       mySubmissions: {
         'Provide production feedback': 'Provide production feedback',
         'View production feedback': 'View production feedback',
@@ -186,6 +189,7 @@ const en = {
       Versions: 'Versions',
       'Anonymous Reviewer': 'Anonymous Reviewer',
       Submit: 'Submit',
+      neverSubmitted: 'This review was not submitted',
     },
     reviewVerdict: {
       accept: 'accept',
@@ -416,9 +420,9 @@ const en = {
       'Dashboard Page': 'Dashboard Page',
       'Manuscript Page': 'Manuscript Page',
       pagesVisibleToRegistered: 'Dashboard pages visible to registered users',
-      'My Submissions': 'My submissions',
-      'To Review': 'Review assignments',
-      "Manuscripts I'm editor of": 'Editing queue',
+      'My Submissions': 'My Submissions',
+      'To Review': 'Review Assignments',
+      "Manuscripts I'm editor of": 'Editing Queue',
       'Manuscripts page': 'Manuscripts page',
       'List columns to display on the Manuscripts page':
         'List columns to display on the Manuscripts page',
@@ -446,6 +450,8 @@ const en = {
       'Control pages visible to editors': 'Control pages visible to editors',
       Team: 'Team',
       Submission: 'Submission',
+      aiDesignStudio: 'AI Design Studio',
+      openAiApiKey: `OpenAI access key`,
       allowToSubmitNewVersion:
         'Allow an author to submit a new version of their manuscript at any time',
       'Review page': 'Review page',

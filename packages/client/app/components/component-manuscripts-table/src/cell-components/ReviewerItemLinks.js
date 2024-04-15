@@ -1,9 +1,10 @@
 import React from 'react'
 import { useHistory } from 'react-router-dom'
-import { Action, ActionGroup } from '@pubsweet/ui'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import { Action, MediumRow } from '../../../shared'
 import { color } from '../../../../theme'
+import { findReviewerStatus } from './reviewStatusUtils'
 
 const Divider = styled.div`
   background-image: linear-gradient(${color.brand2.base}, ${color.brand2.base});
@@ -20,14 +21,8 @@ const ReviewerItemLinks = ({
   updateReviewerStatus,
   getMainActionLink,
 }) => {
-  const team =
-    (manuscript.teams || []).find(team_ => team_.role === 'reviewer') || {}
-
-  const currentMember =
-    team.members &&
-    team.members.find(member => member.user.id === currentUser.id)
-
-  const status = currentMember && currentMember.status
+  const status = findReviewerStatus(manuscript, currentUser.id)
+  const team = (manuscript.teams || []).find(t => t.role === 'reviewer')
 
   const history = useHistory()
 
@@ -35,40 +30,39 @@ const ReviewerItemLinks = ({
   const { t } = useTranslation()
 
   const reviewLinkText = {
-    completed: t('manuscriptsTable.reviewCompleted'),
+    completed: t('common.View'),
     accepted: t('manuscriptsTable.reviewDo'),
     inProgress: t('manuscriptsTable.reviewContinue'),
+    closed: t('common.View'),
   }
 
-  if (['accepted', 'completed', 'inProgress'].includes(status)) {
+  if (['accepted', 'completed', 'inProgress', 'closed'].includes(status)) {
     return (
-      <ActionGroup>
-        <Action
-          onClick={async e => {
-            e.stopPropagation()
-            // on click, update review status before forwarding to link
+      <Action
+        onClick={async e => {
+          e.stopPropagation()
+          // on click, update review status before forwarding to link
 
-            if (status === 'accepted') {
-              await updateReviewerStatus({
-                variables: {
-                  manuscriptId: manuscript.id,
-                  status: 'inProgress',
-                },
-              })
-            }
+          if (status === 'accepted') {
+            await updateReviewerStatus({
+              variables: {
+                manuscriptId: manuscript.id,
+                status: 'inProgress',
+              },
+            })
+          }
 
-            history.push(mainActionLink)
-          }}
-        >
-          {reviewLinkText[status]}
-        </Action>
-      </ActionGroup>
+          history.push(mainActionLink)
+        }}
+      >
+        {reviewLinkText[status]}
+      </Action>
     )
   }
 
   if (status === 'invited') {
     return (
-      <ActionGroup>
+      <MediumRow>
         <Action
           data-testid="accept-review"
           onClick={e => {
@@ -100,15 +94,11 @@ const ReviewerItemLinks = ({
         >
           {t('manuscriptsTable.reviewReject')}
         </Action>
-      </ActionGroup>
+      </MediumRow>
     )
   }
 
-  return (
-    <ActionGroup>
-      <Action disabled>{t(`reviewerStatus.${status}`)}</Action>
-    </ActionGroup>
-  )
+  return null
 }
 
 export default ReviewerItemLinks

@@ -22,6 +22,7 @@ const ru = {
       inProgress: 'В работе',
       completed: 'Завершено',
       unanswered: 'Без ответа',
+      notAssignedForThisVersion: 'Не рецензент текущей версии',
     },
     common: {
       cms: 'CMS',
@@ -34,6 +35,7 @@ const ru = {
       Update: 'Обновить',
       Confirm: 'Подтвердить',
       Delete: 'Удалить',
+      View: 'Просмотреть',
       'Enter search terms...': 'Найти',
       surroundMultiword:
         'Фразы, состоящие из нескольких слов, заключайте в кавычки «». Исключите термин, добавив префикс -. Укажите альтернативные совпадения, используя OR. Используйте * в качестве подстановочного знака для окончаний слов. Заключите подвыражения в круглые скобки ().',
@@ -155,6 +157,7 @@ const ru = {
       reviewDo: 'Рецензировать',
       reviewCompleted: 'Готово',
       reviewContinue: 'Продолжить',
+      viewOldReviews: 'Просмотреть старые отзывы',
       all: 'Все',
       Search: 'Поиск',
       actions: {
@@ -189,6 +192,7 @@ const ru = {
       Versions: 'Версии',
       'Anonymous Reviewer': 'Анонимный рецензент',
       Submit: 'Отправить',
+      neverSubmitted: 'Этот отзыв не был отправлен',
     },
     reviewVerdict: {
       accept: 'Принять',
@@ -450,6 +454,8 @@ const ru = {
         'Редакторам доступен просмотр разделов управления',
       Team: 'Исполнители',
       coarNotify: 'COAR-Уведомить',
+      aiDesignStudio: 'AI Design Studio',
+      openAiApiKey: `Ключ доступа OpenAI`,
       acceptedIPs: 'Принятые IP-адреса',
       Submission: 'Подача',
       allowToSubmitNewVersion:

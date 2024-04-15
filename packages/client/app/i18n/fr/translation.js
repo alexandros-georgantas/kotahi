@@ -22,6 +22,7 @@ const fr = {
       inProgress: 'En cours',
       completed: 'Terminé',
       unanswered: 'Sans réponse',
+      notAssignedForThisVersion: "N'est pas évaluateur de la version actuelle",
     },
     common: {
       cms: 'CMS',
@@ -34,6 +35,7 @@ const fr = {
       Update: 'Mettre à jour',
       Confirm: 'Confirmer',
       Delete: 'Supprimer',
+      View: 'Voir',
       'Enter search terms...': 'Saisissez des termes de recherche...',
       surroundMultiword:
         'Entourez les expressions à plusieurs mots avec des guillemets "". Excluez un terme en le préfixant avec -. Spécifiez des correspondances alternatives en utilisant OU. Utilisez * comme joker pour les fins de mots. Enveloppez les sous-expressions entre parenthèses ().',
@@ -153,6 +155,7 @@ const fr = {
       reviewDo: 'Faire la révision',
       reviewCompleted: 'Terminé',
       reviewContinue: 'Continuer la révision',
+      viewOldReviews: 'Voir les anciennes évaluations',
       all: 'Tous',
       Search: 'Rechercher',
       actions: {
@@ -189,6 +192,7 @@ const fr = {
       Versions: 'Versions',
       'Anonymous Reviewer': 'Réviseur anonyme',
       Submit: 'Soumettre',
+      neverSubmitted: "Cette évaluation n'a pas été soumise",
     },
     reviewVerdict: {
       accept: 'accepter',
@@ -455,6 +459,8 @@ const fr = {
       Team: 'Équipe',
       Submission: 'Soumission',
       coarNotify: 'COAR-Notifier',
+      aiDesignStudio: 'AI Design Studio',
+      openAiApiKey: `Clé d'accès OpenAI`,
       acceptedIPs: 'IP acceptées',
       allowToSubmitNewVersion:
         'Permettre à un auteur de soumettre une nouvelle version de son manuscrit à tout moment',

@@ -129,6 +129,11 @@ const seedConfig = async (group, instanceName, index, options) => {
           eventNotification: {},
           groupIdentity,
           kotahiApis: {},
+          coarNotify: {},
+          aiDesignStudio: {},
+          semanticScholar: {
+            enableSemanticScholar: false,
+          },
         },
         type: 'Config',
       }
@@ -170,6 +175,11 @@ const seedConfig = async (group, instanceName, index, options) => {
           eventNotification: {},
           groupIdentity,
           kotahiApis: {},
+          coarNotify: {},
+          aiDesignStudio: {},
+          semanticScholar: {
+            enableSemanticScholar: false,
+          },
         },
         type: 'Config',
       }
@@ -199,10 +209,6 @@ const seedConfig = async (group, instanceName, index, options) => {
             archivePeriodDays: process.env.ARCHIVE_PERIOD_DAYS
               ? Number(process.env.ARCHIVE_PERIOD_DAYS)
               : 60,
-            semanticScholarImportsRecencyPeriodDays: process.env
-              .SEMANTIC_SCHOLAR_IMPORTS_RECENCY_PERIOD_DAYS
-              ? Number(process.env.SEMANTIC_SCHOLAR_IMPORTS_RECENCY_PERIOD_DAYS)
-              : 42,
           },
           submission: {
             allowAuthorsSubmitNewVersion: false,
@@ -228,6 +234,11 @@ const seedConfig = async (group, instanceName, index, options) => {
           eventNotification: {},
           groupIdentity,
           kotahiApis: {},
+          coarNotify: {},
+          aiDesignStudio: {},
+          semanticScholar: {
+            enableSemanticScholar: false,
+          },
         },
         type: 'Config',
       }
@@ -239,7 +250,6 @@ const seedConfig = async (group, instanceName, index, options) => {
           instanceName: 'journal',
           user: {
             isAdmin: false,
-            kotahiApiTokens,
           },
           report: { showInMenu: true },
           review: { showSummary: false },
@@ -274,7 +284,14 @@ const seedConfig = async (group, instanceName, index, options) => {
           notification,
           eventNotification: {},
           groupIdentity,
-          kotahiApis: {},
+          kotahiApis: {
+            tokens: kotahiApiTokens,
+          },
+          coarNotify: {},
+          aiDesignStudio: {},
+          semanticScholar: {
+            enableSemanticScholar: false,
+          },
         },
         type: 'Config',
       }
@@ -321,6 +338,8 @@ const seedConfig = async (group, instanceName, index, options) => {
           eventNotification: {},
           groupIdentity,
           kotahiApis: {},
+          coarNotify: {},
+          aiDesignStudio: {},
         },
         type: 'Config',
       }
