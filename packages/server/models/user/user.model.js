@@ -23,10 +23,12 @@ class User extends BaseModel {
   }
 
   static get relationMappings() {
-    // eslint-disable-next-line global-require
-    const { Identity, Review } = require('@pubsweet/models')
-    /* eslint-disable-next-line global-require */
+    /* eslint-disable global-require */
     const File = require('@coko/server/src/models/file/file.model')
+
+    const Identity = require('../identity/identity.model')
+    const Review = require('../review/review.model')
+    /* eslint-enable global-require */
 
     return {
       identities: {
@@ -165,7 +167,7 @@ class User extends BaseModel {
 
   static async findOneWithIdentity(userId, identityType) {
     // eslint-disable-next-line global-require
-    const { Identity } = require('@pubsweet/models')
+    const Identity = require('../identity/identity.model')
 
     const user = (
       await this.query()

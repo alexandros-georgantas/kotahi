@@ -22,7 +22,7 @@ class PublishedArtifact extends BaseModel {
 
   static get relationMappings() {
     /* eslint-disable global-require */
-    const { Manuscript } = require('@pubsweet/models')
+    const Manuscript = require('../manuscript/manuscript.model')
 
     return {
       manuscript: {

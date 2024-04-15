@@ -5,7 +5,6 @@
 // const config = require('config')
 // const sharp = require('sharp')
 const map = require('lodash/map')
-const models = require('@pubsweet/models')
 
 const {
   pubsubManager,
@@ -16,6 +15,8 @@ const {
 } = require('@coko/server')
 
 const { uniq } = require('lodash')
+
+const Manuscript = require('../../../models/manuscript/manuscript.model')
 
 const {
   getFileWithUrl,
@@ -114,7 +115,7 @@ const resolvers = {
       )
 
       if (includeInUse) {
-        const manuscript = await models.Manuscript.query().findById(entityId)
+        const manuscript = await Manuscript.query().findById(entityId)
 
         if (manuscript) {
           imageFiles.forEach(file => {

@@ -6,17 +6,14 @@ class Channel extends BaseModel {
   }
 
   static get relationMappings() {
-    const {
-      ChannelMember,
-      User,
-      Message,
-      Manuscript,
-      Group,
-      /* eslint-disable-next-line global-require */
-    } = require('@pubsweet/models')
-
-    /* eslint-disable-next-line global-require */
+    /* eslint-disable global-require */
     const Team = require('../team/team.model')
+    const ChannelMember = require('../channelMember/channelMember.model')
+    const User = require('../user/user.model')
+    const Manuscript = require('../manuscript/manuscript.model')
+    const Message = require('../message/message.model')
+    const Group = require('../group/group.model')
+    /* eslint-emable global-require */
 
     return {
       messages: {

@@ -12,8 +12,10 @@ class File extends BaseModel {
   }
 
   static get relationMappings() {
-    /* eslint-disable-next-line global-require */
-    const { Manuscript, Review } = require('@pubsweet/models')
+    /* eslint-disable global-require */
+    const Review = require('../review/review.model')
+    const Manuscript = require('../manuscript/manuscript.model')
+    /* eslint-enable global-require */
 
     return {
       manuscript: {

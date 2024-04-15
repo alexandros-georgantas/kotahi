@@ -11,7 +11,7 @@ class Review extends BaseModel {
   }
 
   // async user() {
-  //   const { User } = require('@pubsweet/models')
+  //   const User = require('../user/user.model')
   //   return User.find(this.userId)
   // }
 
@@ -56,7 +56,9 @@ class Review extends BaseModel {
 
   static get relationMappings() {
     /* eslint-disable global-require */
-    const { Manuscript, User } = require('@pubsweet/models')
+    const User = require('../user/user.model')
+    const Manuscript = require('../manuscript/manuscript.model')
+    /* eslint-enable global-require */
 
     return {
       manuscript: {

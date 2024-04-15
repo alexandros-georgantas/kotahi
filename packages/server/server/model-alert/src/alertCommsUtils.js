@@ -1,13 +1,19 @@
 const config = require('config')
-const models = require('@pubsweet/models')
 const sendEmailNotification = require('../../email-notifications')
+
+const Channel = require('../../../models/channel/channel.model')
+const Group = require('../../../models/group/group.model')
+const ChannelMember = require('../../../models/channelMember/channelMember.model')
+const Message = require('../../../models/message/message.model')
+const Config = require('../../../models/config/config.model')
+const EmailTemplate = require('../../../models/emailTemplate/emailTemplate.model')
 
 const {
   getUserRolesInManuscript,
 } = require('../../model-user/src/userCommsUtils')
 
 const sendAlerts = async () => {
-  const channelMembers = await models.ChannelMember.query()
+  const channelMembers = await ChannelMember.query()
     .whereNull('lastAlertTriggeredTime')
     .where(
       'lastViewed',
@@ -24,7 +30,7 @@ const sendAlerts = async () => {
       }
 
       // check if there are messages in the channel that have a larger timestamp than channelMemberlastviewed
-      const earliestUnreadMessage = await models.Message.query()
+      const earliestUnreadMessage = await Message.query()
         .where({ channelId: channelMember.channelId })
         .where('created', '>', channelMember.lastViewed)
         .orderBy('created')
@@ -40,7 +46,7 @@ const sendAlerts = async () => {
         title: 'Unread messages in channel',
       })
 
-      await models.ChannelMember.query().updateAndFetchById(channelMember.id, {
+      await ChannelMember.query().updateAndFetchById(channelMember.id, {
         lastAlertTriggeredTime: new Date(),
       })
     }),
@@ -53,10 +59,10 @@ const sendAlertForMessage = async ({
   title,
   triggerTime = new Date(),
 }) => {
-  const message = await models.Message.query().findById(messageId)
-  const channel = await models.Channel.query().findById(message.channelId)
+  const message = await Message.query().findById(messageId)
+  const channel = await Channel.query().findById(message.channelId)
   const { groupId } = channel
-  const group = await models.Group.query().findById(groupId)
+  const group = await Group.query().findById(groupId)
 
   // send email notification
   const baseUrl = `${config['pubsweet-client'].baseUrl}/${group.name}`
@@ -89,13 +95,13 @@ const sendAlertForMessage = async ({
     discussionUrl,
   }
 
-  const activeConfig = await models.Config.getCached(groupId)
+  const activeConfig = await Config.getCached(groupId)
 
   const selectedTemplate =
     activeConfig.formData.eventNotification?.alertUnreadMessageDigestTemplate
 
   if (selectedTemplate) {
-    const selectedEmailTemplate = await models.EmailTemplate.query().findById(
+    const selectedEmailTemplate = await EmailTemplate.query().findById(
       selectedTemplate,
     )
 
@@ -112,13 +118,14 @@ const sendAlertForMessage = async ({
     )
   }
 
-  await new models.Alert({
-    title,
-    userId: user.id,
-    messageId,
-    triggerTime,
-    isSent: true,
-  }).save()
+  // Alert does not exist?
+  // await new Alert({
+  //   title,
+  //   userId: user.id,
+  //   messageId,
+  //   triggerTime,
+  //   isSent: true,
+  // }).save()
 }
 
 module.exports = {

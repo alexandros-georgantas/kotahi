@@ -18,7 +18,9 @@ class Docmap extends BaseModel {
 
   static get relationMappings() {
     /* eslint-disable global-require */
-    const { Manuscript, Group } = require('@pubsweet/models')
+    const Group = require('../group/group.model')
+    const Manuscript = require('../manuscript/manuscript.model')
+    /* eslint-enable global-require */
 
     return {
       manuscript: {

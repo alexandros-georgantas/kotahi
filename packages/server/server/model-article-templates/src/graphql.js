@@ -1,18 +1,20 @@
-const models = require('@pubsweet/models')
+const File = require('@coko/server/src/models/file/file.model')
+
+const ArticleTemplate = require('../../../models/articleTemplate/articleTemplate.model')
 
 const { getFilesWithUrl } = require('../../utils/fileStorageUtils')
 
 const resolvers = {
   Query: {
     articleTemplate: async (_, { groupId, isCms = false }) => {
-      return models.ArticleTemplate.query()
+      return ArticleTemplate.query()
         .findOne({ groupId, isCms })
         .throwIfNotFound()
     },
   },
   Mutation: {
     async updateTemplate(_, { id, input }) {
-      return models.ArticleTemplate.query()
+      return ArticleTemplate.query()
         .patchAndFetchById(id, input)
         .throwIfNotFound()
     },
@@ -20,7 +22,7 @@ const resolvers = {
   ArticleTemplate: {
     async files(articleTemplate) {
       return getFilesWithUrl(
-        await models.File.query().where({ objectId: articleTemplate.groupId }),
+        await File.query().where({ objectId: articleTemplate.groupId }),
       )
     },
   },

@@ -1,6 +1,9 @@
-const models = require('@pubsweet/models')
-
 const File = require('@coko/server/src/models/file/file.model')
+
+const CMSPage = require('../../../models/cmsPage/cmsPage.model')
+const CMSLayout = require('../../../models/cmsLayout/cmsLayout.model')
+const Config = require('../../../models/config/config.model')
+const ArticleTemplate = require('../../../models/articleTemplate/articleTemplate.model')
 
 const {
   replaceImageSrc,
@@ -10,10 +13,10 @@ const {
 } = require('../../utils/fileStorageUtils')
 
 const setInitialLayout = async groupId => {
-  const { formData } = await models.Config.getCached(groupId)
+  const { formData } = await Config.getCached(groupId)
   const { primaryColor, secondaryColor } = formData.groupIdentity
 
-  const layout = await new models.CMSLayout({
+  const layout = await new CMSLayout({
     primaryColor,
     secondaryColor,
     groupId,
@@ -23,7 +26,7 @@ const setInitialLayout = async groupId => {
 }
 
 const getFlaxPageConfig = async (configKey, groupId) => {
-  const pages = await models.CMSPage.query()
+  const pages = await CMSPage.query()
     .where('groupId', groupId)
     .select(['id', 'title', 'url', configKey])
     .orderBy('title')
@@ -71,7 +74,7 @@ const resolvers = {
     async cmsPages(_, vars, ctx) {
       const groupId = ctx.req.headers['group-id']
 
-      const cmsPages = await models.CMSPage.query()
+      const cmsPages = await CMSPage.query()
         .where('groupId', groupId)
         .orderBy('title')
 
@@ -79,15 +82,13 @@ const resolvers = {
     },
 
     async cmsPage(_, { id }, _ctx) {
-      const cmsPage = await models.CMSPage.query().findById(id)
+      const cmsPage = await CMSPage.query().findById(id)
       return cmsPage
     },
 
     async cmsLayout(_, _vars, ctx) {
       const groupId = ctx.req.headers['group-id']
-      let layout = await models.CMSLayout.query()
-        .where('groupId', groupId)
-        .first()
+      let layout = await CMSLayout.query().where('groupId', groupId).first()
 
       if (!layout) {
         layout = await setInitialLayout(groupId) // TODO move this to seedArticleTemplate.js or similar
@@ -101,11 +102,11 @@ const resolvers = {
       try {
         const groupId = ctx.req.headers['group-id']
 
-        const savedCmsPage = await new models.CMSPage(
+        const savedCmsPage = await new CMSPage(
           cleanCMSPageInput({ ...input, groupId }),
         ).save()
 
-        const cmsPage = await models.CMSPage.query().findById(savedCmsPage.id)
+        const cmsPage = await CMSPage.query().findById(savedCmsPage.id)
         return { success: true, error: null, cmsPage }
       } catch (e) {
         if (e.constraint === 'cms_pages_url_group_id_key') {
@@ -128,13 +129,13 @@ const resolvers = {
         attrs.creatorId = ctx.user
       }
 
-      const cmsPage = await models.CMSPage.query().updateAndFetchById(id, attrs)
+      const cmsPage = await CMSPage.query().updateAndFetchById(id, attrs)
       return cmsPage
     },
 
     async deleteCMSPage(_, { id }, ctx) {
       try {
-        const response = await models.CMSPage.query().where({ id }).delete()
+        const response = await CMSPage.query().where({ id }).delete()
 
         if (response) {
           return {
@@ -157,21 +158,17 @@ const resolvers = {
     async updateCMSLayout(_, { _id, input }, ctx) {
       const groupId = ctx.req.headers['group-id']
 
-      const layout = await models.CMSLayout.query()
-        .where('groupId', groupId)
-        .first()
+      const layout = await CMSLayout.query().where('groupId', groupId).first()
 
       if (!layout) {
-        const savedCmsLayout = await new models.CMSLayout(input).save()
+        const savedCmsLayout = await new CMSLayout(input).save()
 
-        const cmsLayout = await models.CMSLayout.query().findById(
-          savedCmsLayout.id,
-        )
+        const cmsLayout = await CMSLayout.query().findById(savedCmsLayout.id)
 
         return cmsLayout
       }
 
-      const cmsLayout = await models.CMSLayout.query().updateAndFetchById(
+      const cmsLayout = await CMSLayout.query().updateAndFetchById(
         layout.id,
         input,
       )
@@ -198,13 +195,13 @@ const resolvers = {
         return null
       }
 
-      return models.CMSPage.relatedQuery('creator').for(parent.id).first()
+      return CMSPage.relatedQuery('creator').for(parent.id).first()
     },
 
     async content(parent) {
       if (!parent.content) return parent.content
 
-      let files = await models.File.query().where('object_id', parent.id)
+      let files = await File.query().where('object_id', parent.id)
       files = await getFilesWithUrl(files)
 
       return replaceImageSrc(parent.content, files, 'medium')
@@ -217,7 +214,7 @@ const resolvers = {
         return null
       }
 
-      const logoFile = await models.CMSLayout.relatedQuery('logo')
+      const logoFile = await CMSLayout.relatedQuery('logo')
         .for(parent.id)
         .first()
 
@@ -230,7 +227,7 @@ const resolvers = {
       try {
         const { groupId } = parent
 
-        const activeConfig = await models.Config.query().findOne({
+        const activeConfig = await Config.query().findOne({
           groupId,
           active: true,
         })
@@ -255,7 +252,7 @@ const resolvers = {
     },
 
     async publishConfig(parent) {
-      const { formData } = await models.Config.getCached(parent.groupId)
+      const { formData } = await Config.getCached(parent.groupId)
 
       return JSON.stringify({
         licenseUrl: formData.publishing.crossref.licenseUrl,
@@ -265,12 +262,12 @@ const resolvers = {
     async article(parent) {
       if (parent.article || parent.article === '') return parent.article
 
-      const { article } = await models.ArticleTemplate.query().findOne({
+      const { article } = await ArticleTemplate.query().findOne({
         groupId: parent.groupId,
         isCms: true,
       })
 
-      let files = await models.File.query().where({ objectId: parent.groupId })
+      let files = await File.query().where({ objectId: parent.groupId })
       files = await getFilesWithUrl(files)
 
       return replaceImageFromNunjucksTemplate(article, files, 'medium') ?? ''
@@ -279,7 +276,7 @@ const resolvers = {
     async css(parent) {
       if (parent.css || parent.css === '') return parent.css
 
-      const { css } = await models.ArticleTemplate.query().findOne({
+      const { css } = await ArticleTemplate.query().findOne({
         groupId: parent.groupId,
         isCms: true,
       })

@@ -1,16 +1,13 @@
-const { BaseModel } = require('@coko/server')
 const omit = require('lodash/omit')
 const cloneDeep = require('lodash/cloneDeep')
 const { raw } = require('objection')
 const sortBy = require('lodash/sortBy')
 
+const { BaseModel } = require('@coko/server')
+
 const {
   getDecisionForm,
 } = require('../../server/model-review/src/reviewCommsUtils')
-
-const {
-  deleteAlertsForManuscript,
-} = require('../../server/model-task/src/taskCommsUtils')
 
 const { evictFromCache } = require('../../server/querycache')
 
@@ -131,8 +128,11 @@ class Manuscript extends BaseModel {
   }
 
   async createNewVersion() {
-    // eslint-disable-next-line global-require
+    /* eslint-disable global-require */
     const Config = require('../config/config.model')
+    const Task = require('../task/task.model')
+    const TaskAlert = require('../taskAlert/taskAlert.model')
+    /* eslint-enable global-require */
 
     // Copy authors and editors to the new version
     const teams = await this.$relatedQuery('teams')
@@ -202,14 +202,17 @@ class Manuscript extends BaseModel {
       omit(cloneDeep(newVersion), ['id', 'created', 'updated', 'decision']),
     )
 
-    await deleteAlertsForManuscript(this.id)
+    await TaskAlert.query()
+      .delete()
+      .whereIn(
+        'taskId',
+        Task.query().select('id').where({ manuscriptId: this.id }),
+      )
 
     return manuscript
   }
 
   async getManuscriptVersions() {
-    // const { File } = require('@pubsweet/models')
-
     const id = this.parentId || this.id
 
     const manuscripts = await Manuscript.query()
@@ -259,22 +262,19 @@ class Manuscript extends BaseModel {
   }
 
   static get relationMappings() {
-    /* eslint-disable-next-line global-require */
-    const { Channel, User, Review } = require('@pubsweet/models')
-    /* eslint-disable-next-line global-require */
+    /* eslint-disable global-require */
     const File = require('@coko/server/src/models/file/file.model')
-    /* eslint-disable-next-line global-require */
+
+    const Channel = require('../channel/channel.model')
+    const User = require('../user/user.model')
+    const Review = require('../review/review.model')
     const Team = require('../team/team.model')
-    /* eslint-disable-next-line global-require */
     const Task = require('../task/task.model')
-    /* eslint-disable-next-line global-require */
     const Invitation = require('../invitation/invitation.model')
-    /* eslint-disable-next-line global-require */
     const PublishedArtifact = require('../publishedArtifact/publishedArtifact.model')
-    /* eslint-disable-next-line global-require */
     const ThreadedDiscussion = require('../threadedDiscussion/threadedDiscussion.model')
-    /* eslint-disable-next-line global-require */
     const Group = require('../group/group.model')
+    /* eslint-enable global-require */
 
     return {
       submitter: {

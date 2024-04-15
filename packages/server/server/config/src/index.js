@@ -1,5 +1,6 @@
-/* eslint-disable global-require */
+const { typeDefs, resolvers } = require('./graphql')
 
 module.exports = {
-  ...require('./graphql'),
+  typeDefs,
+  resolvers,
 }

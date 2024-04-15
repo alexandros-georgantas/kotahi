@@ -15,12 +15,11 @@ class TaskEmailNotification extends BaseModel {
   }
 
   static get relationMappings() {
-    /* eslint-disable-next-line global-require */
-    const { User } = require('@pubsweet/models')
-    /* eslint-disable-next-line global-require */
+    /* eslint-disable global-require */
+    const User = require('../user/user.model')
     const Task = require('../task/task.model')
-    /* eslint-disable-next-line global-require */
     const EmailTemplate = require('../emailTemplate/emailTemplate.model')
+    /* eslint-enable global-require */
 
     return {
       recipientUser: {

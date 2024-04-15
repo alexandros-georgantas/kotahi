@@ -24,8 +24,10 @@ class Team extends BaseModel {
   }
 
   static get relationMappings() {
-    /* eslint-disable-next-line global-require */
-    const { Alias, User } = require('@pubsweet/models')
+    /* eslint-disable global-require */
+    const User = require('../user/user.model')
+    const Alias = require('../alias/alias.model')
+    /* eslint-enable global-require */
 
     return {
       members: {

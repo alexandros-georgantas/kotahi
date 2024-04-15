@@ -1,4 +1,4 @@
-const models = require('@pubsweet/models')
+const NotificationDigest = require('../../../models/notificationDigest/notificationDigest.model')
 const NotificationUserOption = require('../../../models/notificationUserOption/notificationUserOption.model')
 
 const tryGetObjectIdFromPath = path => {
@@ -79,7 +79,7 @@ const resolvers = {
       if (path) {
         const pathString = path.join('/')
 
-        await models.NotificationDigest.query().delete().where({
+        await NotificationDigest.query().delete().where({
           userId: context.user,
           pathString,
           actioned: false,

@@ -31,8 +31,10 @@ class Message extends BaseModel {
   }
 
   static get relationMappings() {
-    /* eslint-disable-next-line global-require */
-    const { User, Channel } = require('@pubsweet/models')
+    /* eslint-disable global-require */
+    const User = require('../user/user.model')
+    const Channel = require('../channel/channel.model')
+    /* eslint-enable global-require */
 
     return {
       channel: {

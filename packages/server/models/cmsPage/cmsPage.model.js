@@ -7,7 +7,7 @@ class CMSPage extends BaseModel {
 
   static get relationMappings() {
     /* eslint-disable-next-line global-require */
-    const { User } = require('@pubsweet/models')
+    const User = require('../user/user.model')
 
     return {
       creator: {

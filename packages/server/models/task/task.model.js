@@ -15,16 +15,13 @@ class Task extends BaseModel {
   }
 
   static get relationMappings() {
-    /* eslint-disable-next-line global-require */
-    const { User } = require('@pubsweet/models')
-    /* eslint-disable-next-line global-require */
+    /* eslint-disable global-require */
+    const User = require('../user/user.model')
     const TaskEmailNotification = require('../taskEmailNotification/taskEmailNotification.model')
-    /* eslint-disable-next-line global-require */
     const TaskEmailNotificationLog = require('../taskEmailNotificationLog/taskEmailNotificationLog.model')
-    /* eslint-disable-next-line global-require */
     const Manuscript = require('../manuscript/manuscript.model')
-    /* eslint-disable-next-line global-require */
     const Group = require('../group/group.model')
+    /* eslint-enable global-require */
 
     return {
       assignee: {
