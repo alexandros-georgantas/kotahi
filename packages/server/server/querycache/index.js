@@ -2,6 +2,8 @@
 
 const { LRUCache } = require('lru-cache')
 
+const { File } = require('@coko/server')
+
 const cache = new LRUCache({
   max: 500,
   ttl: 10000,
