@@ -1242,12 +1242,10 @@ const resolvers = {
         .where('role', 'reviewer')
         .first()
 
-      await TeamMember.query()
-        .where({
-          userId,
-          teamId: reviewerTeam.id,
-        })
-        .delete()
+      await TeamMember.query().delete().where({
+        userId,
+        teamId: reviewerTeam.id,
+      })
 
       await removeUserFromManuscriptChatChannel({
         manuscriptId,

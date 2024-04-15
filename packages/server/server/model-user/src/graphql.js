@@ -58,7 +58,7 @@ const setUserMembershipInTeam = async (ctx, userId, team, shouldBeMember) => {
 
             // Skips removing reviewer team members with completed reviews
             if (member && (!member.status || member.status !== 'completed')) {
-              member.delete()
+              await TeamMember.query().deleteById(member.id)
             }
           }),
         )
@@ -78,7 +78,7 @@ const setUserMembershipInTeam = async (ctx, userId, team, shouldBeMember) => {
               invitation.userId === userId &&
               invitation.status === 'UNANSWERED'
             ) {
-              invitation.delete()
+              await Invitation.query().deleteById(invitation.id)
             } else if (invitation.senderId === userId) {
               // TODO: Fix database validation error sender_id is set not null 1647493905-invitations.sql
               // await Invitation.query(

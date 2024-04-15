@@ -135,7 +135,7 @@ const resolvers = {
 
     async deleteCMSPage(_, { id }, ctx) {
       try {
-        const response = await CMSPage.query().where({ id }).delete()
+        const response = await CMSPage.query().delete().where({ id })
 
         if (response) {
           return {
