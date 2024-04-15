@@ -354,7 +354,7 @@ const resolvers = {
       let user
 
       try {
-        user = await User.findByUsername(input.username)
+        user = await User.query.findOne({ username: input.username })
         isValid = await user.validPassword(input.password)
       } catch (err) {
         logger.debug(err)

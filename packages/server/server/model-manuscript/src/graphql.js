@@ -683,10 +683,9 @@ const resolvers = {
       toDeleteList.push(manuscript.id)
 
       if (manuscript.parentId) {
-        const parentManuscripts = await Manuscript.findByField(
-          'parent_id',
-          manuscript.parentId,
-        )
+        const parentManuscripts = await Manuscript.query().where({
+          parent_id: manuscript.parentId,
+        })
 
         parentManuscripts.forEach(ms => {
           toDeleteList.push(ms.id)

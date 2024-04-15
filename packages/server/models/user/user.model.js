@@ -158,13 +158,15 @@ class User extends BaseModel {
     return bcrypt.hash(password, BCRYPT_COST)
   }
 
-  static findByEmail(email) {
-    return this.findByField('email', email).then(users => users[0])
-  }
+  // NOT USED
+  // static findByEmail(email) {
+  //   return this.findByField('email', email).then(users => users[0])
+  // }
 
-  static findByUsername(username) {
-    return this.findByField('username', username).then(users => users[0])
-  }
+  // NOT USED
+  // static findByUsername(username) {
+  //   return this.findByField('username', username).then(users => users[0])
+  // }
 
   static async findOneWithIdentity(userId, identityType) {
     // eslint-disable-next-line global-require
