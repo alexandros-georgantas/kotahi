@@ -198,7 +198,7 @@ class User extends BaseModel {
   static ownersWithUsername(object) {
     return Promise.all(
       object.owners.map(async ownerId => {
-        const owner = await this.find(ownerId)
+        const owner = await this.findById(ownerId)
         return pick(owner, ['id', 'username'])
       }),
     )

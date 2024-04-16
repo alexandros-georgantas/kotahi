@@ -15,7 +15,7 @@ const { setFileUrls } = require('../../utils/fileStorageUtils')
 const getFile = async (config, fieldName) => {
   try {
     const { groupIdentity } = JSON.parse(config.formData)
-    const file = await File.find(groupIdentity[fieldName])
+    const file = await File.findById(groupIdentity[fieldName])
 
     const updatedStoredObjects = await setFileUrls(file.storedObjects)
 

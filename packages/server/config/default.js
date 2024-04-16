@@ -8,25 +8,44 @@ const journal = require('./journal')
 
 module.exports = {
   teams: {
-    seniorEditor: {
-      name: 'Senior Editor',
+    global: {
+      admin: {
+        displayName: 'Admin',
+        role: 'admin',
+      },
+      groupManager: {
+        displayName: 'Group Manager',
+        role: 'groupManager',
+      },
     },
-    handlingEditor: {
-      name: 'Handling Editor',
-    },
-    editor: {
-      name: 'Editor',
-    },
-    managingEditor: {
-      name: 'Managing Editor',
-    },
-    reviewer: {
-      name: 'Reviewer',
-    },
-    author: {
-      name: 'Author',
+    nonGlobal: {
+      seniorEditor: {
+        displayName: 'Senior Editor',
+        role: 'seniorEditor',
+      },
+      handlingEditor: {
+        displayName: 'Handling Editor',
+        role: 'handlingEditor',
+      },
+      editor: {
+        displayName: 'Editor',
+        role: 'editor',
+      },
+      managingEditor: {
+        displayName: 'Managing Editor',
+        role: 'managingEditor',
+      },
+      reviewer: {
+        displayName: 'Reviewer',
+        role: 'reviewer',
+      },
+      author: {
+        displayName: 'Author',
+        role: 'author',
+      },
     },
   },
+
   authsome: {
     mode: path.resolve(__dirname, 'authsome.js'),
   },

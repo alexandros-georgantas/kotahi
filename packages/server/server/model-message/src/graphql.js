@@ -22,7 +22,7 @@ const {
 const resolvers = {
   Query: {
     message: async (_, { messageId }) => {
-      Message.find(messageId)
+      Message.findById(messageId)
     },
     messages: async (_, { channelId, first = 20, before }, context) => {
       let messagesQuery = Message.query()

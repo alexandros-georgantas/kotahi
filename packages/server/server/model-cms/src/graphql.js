@@ -232,7 +232,7 @@ const resolvers = {
           active: true,
         })
 
-        const file = await File.find(
+        const file = await File.findById(
           activeConfig.formData.groupIdentity.favicon,
         )
 
@@ -288,7 +288,7 @@ const resolvers = {
   StoredPartner: {
     async file(parent) {
       try {
-        const file = await File.find(parent.id)
+        const file = await File.findById(parent.id)
         const updatedStoredObjects = await setFileUrls(file.storedObjects)
         file.storedObjects = updatedStoredObjects
         return file
