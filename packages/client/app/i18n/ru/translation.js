@@ -938,6 +938,7 @@ const ru = {
       },
       reviewReport: {
         reviewReport: 'Отчет о рецензировании от {{name}}',
+        collaborativeReview: 'Коллективные обзоры от {{name}}',
         anonymousReviewReport: 'Отчет о рецензировании',
         'Last Updated': 'Последнее обновление: {{dateString}}',
         Reviewer: 'Рецензент:',
