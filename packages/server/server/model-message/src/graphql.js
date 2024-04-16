@@ -110,11 +110,11 @@ const resolvers = {
       const pubsub = await getPubsub()
       const currentUserId = context.user
 
-      const savedMessage = await new Message({
+      const savedMessage = await Message.query().insert({
         content,
         userId: currentUserId,
         channelId,
-      }).save()
+      })
 
       const message = await Message.query()
         .findById(savedMessage.id)

@@ -683,10 +683,9 @@ const resolvers = {
       toDeleteList.push(manuscript.id)
 
       if (manuscript.parentId) {
-        const parentManuscripts = await Manuscript.findByField(
-          'parent_id',
-          manuscript.parentId,
-        )
+        const parentManuscripts = await Manuscript.query().where({
+          parent_id: manuscript.parentId,
+        })
 
         parentManuscripts.forEach(ms => {
           toDeleteList.push(ms.id)
@@ -734,15 +733,15 @@ const resolvers = {
 
       if (!team) throw new Error('No team was found')
 
-      for (let i = 0; i < team.members.length; i += 1) {
-        if (
-          team.members[i].userId === ctx.user &&
-          team.members[i].status !== 'completed'
-        )
-          team.members[i].status = action
-      }
-
-      await new Team(team).saveGraph()
+      await Promise.all(
+        team.members.map(async member => {
+          if (member.userId === ctx.user && member.status !== 'completed') {
+            await TeamMember.query().patchAndFetchById(member.id, {
+              status: action,
+            })
+          }
+        }),
+      )
 
       if (action === 'accepted') {
         await addUserToManuscriptChatChannel({
@@ -769,7 +768,7 @@ const resolvers = {
           jsonData: '{}',
         }
 
-        await new ReviewModel(review).save()
+        await ReviewModel.query().insert(review)
       }
 
       if (action === 'rejected') {
@@ -1207,12 +1206,12 @@ const resolvers = {
             .resultSize()) > 0
 
         if (!reviewerExists) {
-          await new TeamMember({
+          await TeamMember.query().insert({
             teamId: existingTeam.id,
             status,
             userId,
             isShared: invitationData ? invitationData.isShared : null,
-          }).save()
+          })
         }
 
         return existingTeam.$query()
@@ -1220,13 +1219,18 @@ const resolvers = {
 
       // Create a new team of reviewers if it doesn't exist
 
-      const newTeam = await new Team({
+      const newTeam = await Team.query().insert({
         objectId: manuscriptId,
         objectType: 'manuscript',
-        members: [{ status, userId }],
         role: 'reviewer',
         name: 'Reviewers',
-      }).saveGraph()
+      })
+
+      await TeamMember.query().insert({
+        userId,
+        teamId: newTeam.id,
+        status,
+      })
 
       return newTeam
     },
@@ -1238,12 +1242,10 @@ const resolvers = {
         .where('role', 'reviewer')
         .first()
 
-      await TeamMember.query()
-        .where({
-          userId,
-          teamId: reviewerTeam.id,
-        })
-        .delete()
+      await TeamMember.query().delete().where({
+        userId,
+        teamId: reviewerTeam.id,
+      })
 
       await removeUserFromManuscriptChatChannel({
         manuscriptId,

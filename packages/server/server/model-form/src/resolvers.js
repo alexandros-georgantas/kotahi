@@ -65,7 +65,7 @@ const resolvers = {
   },
   Query: {
     form: async (_, { formId }) => Form.find(formId),
-    forms: async () => Form.all(),
+    forms: async () => Form.query(),
     formsByCategory: async (_, { category, groupId }) =>
       Form.query().where({
         category,

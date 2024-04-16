@@ -53,11 +53,11 @@ const resolvers = {
   },
   Mutation: {
     createChannel: async (_, { name, teamId }, context) => {
-      const channel = await new Channel({
+      const channel = await Channel.query().insert({
         name,
         teamId,
         userId: context.user,
-      }).save()
+      })
 
       return channel
     },
@@ -65,25 +65,21 @@ const resolvers = {
       const res = await fetch(`https://api.crossref.org/works/${doi}`)
       const { message: work } = await res.json()
 
-      const channel = await new Channel({
+      const channel = await Channel.query().insert({
         doi: work.DOI,
         topic: work.title.join(', '),
         userId: context.user,
-      }).save()
+      })
 
       return channel
     },
     changeTopic: async (_, { channelId, topic }, context) => {
-      const channel = await context.connectors.Channel.model.find(channelId)
-      channel.topic = topic
-      return channel.save()
+      return Channel.query().patchAndFetchById(channelId, { topic })
     },
     channelViewed: async (_, { channelId }, context) => {
       return updateChannelLastViewed({ channelId, userId: context.user })
     },
   },
-  // Subscription: {
-  // },
 }
 
 const typeDefs = `
