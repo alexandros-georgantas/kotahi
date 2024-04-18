@@ -1,5 +1,5 @@
 const { logger, fileStorage } = require('@coko/server')
-const { AuthorizationError, ConflictError } = require('@pubsweet/errors')
+const { AuthorizationError, ConflictError } = require('@coko/server/src/errors')
 const { parseISO, addSeconds } = require('date-fns')
 const { chunk } = require('lodash')
 

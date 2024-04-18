@@ -1,4 +1,4 @@
-const { NotFoundError } = require('@pubsweet/errors')
+const { NotFoundError } = require('@coko/server/src/errors')
 const Form = require('../../../models/form/form.model')
 
 const notFoundError = (property, value, className) =>

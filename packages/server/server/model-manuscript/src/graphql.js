@@ -1,10 +1,9 @@
 /* eslint-disable prefer-destructuring */
-const { ref } = require('objection')
+const { ref, raw } = require('objection')
 const axios = require('axios')
 const { map, chunk, orderBy } = require('lodash')
 const { pubsubManager, File } = require('@coko/server')
 const cheerio = require('cheerio')
-const { raw } = require('objection')
 const { importManuscripts } = require('./importManuscripts')
 const { manuscriptHasOverdueTasksForUser } = require('./manuscriptCommsUtils')
 const { rebuildCMSSite } = require('../../flax-site/flax-api')

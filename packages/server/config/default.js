@@ -1,5 +1,4 @@
 const path = require('path')
-const logger = require('winston')
 const { deferConfig } = require('config/defer')
 
 const permissions = require('./permissions')
@@ -45,7 +44,6 @@ module.exports = {
       },
     },
   },
-
   authsome: {
     mode: path.resolve(__dirname, 'authsome.js'),
   },
@@ -97,7 +95,6 @@ module.exports = {
       createRetryIntervalMillis: 100,
       propagateCreateError: false,
     },
-    logger,
     uploads: 'uploads',
     baseUrl: deferConfig(cfg => {
       const { protocol, host, port } = cfg['pubsweet-server']

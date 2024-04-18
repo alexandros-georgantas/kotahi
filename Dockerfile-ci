@@ -1,4 +1,4 @@
-FROM cypress/base:18.16.1
+FROM cypress/base:16.18.1
 
 # Install dependencies
 RUN apt-get update && \
