@@ -1,10 +1,9 @@
 /* eslint-disable prefer-destructuring */
-const { ref } = require('objection')
+const { ref, raw } = require('objection')
 const axios = require('axios')
 const { map, chunk, orderBy } = require('lodash')
 const { pubsubManager, File } = require('@coko/server')
 const cheerio = require('cheerio')
-const { raw } = require('objection')
 const { importManuscripts } = require('./importManuscripts')
 const { manuscriptHasOverdueTasksForUser } = require('./manuscriptCommsUtils')
 const { rebuildCMSSite } = require('../../flax-site/flax-api')
@@ -549,7 +548,7 @@ const resolvers = {
 
     async archiveManuscript(_, { id }, ctx) {
       await deleteAlertsForManuscript(id)
-      const manuscript = await Manuscript.find(id)
+      const manuscript = await Manuscript.findById(id)
 
       // getting the ID of the firstVersion for all manuscripts.
       const firstVersionId = manuscript.parentId || manuscript.id
@@ -676,7 +675,7 @@ const resolvers = {
     },
     async deleteManuscript(_, { id }, ctx) {
       const toDeleteList = []
-      const manuscript = await Manuscript.find(id)
+      const manuscript = await Manuscript.findById(id)
 
       const activeConfig = await Config.getCached(manuscript.groupId)
 

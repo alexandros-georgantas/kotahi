@@ -9,7 +9,7 @@ const resolvers = {
   Query: {
     manuscriptChannel: async (_, { manuscriptId }, context) => {
       const manuscript = context.connectors.Manuscript.fetchOne(manuscriptId)
-      return Channel.find(manuscript.channelId)
+      return Channel.findById(manuscript.channelId)
     },
     teamByName: async (_, { name }, context) => {
       const Team = context.connectors.Team.model

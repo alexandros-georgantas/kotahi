@@ -1,5 +1,5 @@
 const { logger, fileStorage } = require('@coko/server')
-const { AuthorizationError, ConflictError } = require('@pubsweet/errors')
+const { AuthorizationError, ConflictError } = require('@coko/server/src/errors')
 const { parseISO, addSeconds } = require('date-fns')
 const { chunk } = require('lodash')
 
@@ -326,7 +326,7 @@ const resolvers = {
     async setGlobalRole(_, { userId, role, shouldEnable }, ctx) {
       const team = await Team.query().findOne({ role, global: true })
       await setUserMembershipInTeam(ctx, userId, team, shouldEnable)
-      const user = await User.find(userId)
+      const user = await User.findById(userId)
       await addGlobalAndGroupRolesToUserObject(ctx, user)
       delete user.updated
       return user
@@ -340,7 +340,7 @@ const resolvers = {
       })
 
       await setUserMembershipInTeam(ctx, userId, team, shouldEnable)
-      const user = await User.find(userId)
+      const user = await User.findById(userId)
       await addGlobalAndGroupRolesToUserObject(ctx, user)
       delete user.updated
       return user
@@ -376,7 +376,7 @@ const resolvers = {
       return User.query().patchAndFetchById(id, { preferredLanguage })
     },
     async updateEmail(_, { id, email }, ctx) {
-      const user = await User.find(id)
+      const user = await User.findById(id)
 
       if (user.email === email) {
         return { success: true }

@@ -89,6 +89,7 @@ module.exports = defineConfig({
       // important: return the changed config
     },
     baseUrl: 'http://localhost:4000',
+    // experimentalRunAllSpecs: true,
   },
   screenshotOnRunFailure: false,
   video: false,
