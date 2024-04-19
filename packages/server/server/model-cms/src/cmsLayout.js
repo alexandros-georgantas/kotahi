@@ -49,6 +49,7 @@ class CMSLayout extends BaseModel {
         edited: { type: ['string', 'object', 'null'], format: 'date-time' },
         groupId: { type: 'string', format: 'uuid' },
         language: { type: 'string' },
+        languagePriority: { type: 'integer' },
       },
     }
   }

@@ -463,7 +463,7 @@ const permissions = {
     builtCss: isAuthenticated,
     channels: deny, // Never used
     channelsByTeamName: deny, // Never used
-    cmsLanguages: allow,
+    cmsLayoutSet: allow,
     config: isAuthenticated,
     convertToJats: or(userIsEditorOfAnyManuscript, userIsGm, userIsAdmin),
     convertToPdf: or(userIsEditorOfAnyManuscript, userIsGm, userIsAdmin),
@@ -540,7 +540,7 @@ const permissions = {
     assignTeamEditor: deny, // Never used
     assignUserAsAuthor: isAuthenticated, // TODO require the invitation ID to be sent in this mutation
     changeTopic: deny, // Never used
-    updateCMSLanguages: or(userIsGm, userIsAdmin),
+    updateCmsLanguages: or(userIsGm, userIsAdmin),
     completeComment: isAuthenticated,
     completeComments: isAuthenticated,
     createChannel: deny, // Never used
@@ -591,6 +591,7 @@ const permissions = {
       userIsAdmin,
     ),
     submitAuthorProofingFeedback: userIsAuthorOfManuscript,
+    updateCmsLayout: or(userIsGm, userIsAdmin),
     updateEmail: or(userIsCurrentUser, userIsGm, userIsAdmin),
     updateConfig: or(userIsGm, userIsAdmin),
     updateUsername: or(userIsCurrentUser, userIsGm, userIsAdmin),
@@ -634,7 +635,6 @@ const permissions = {
     updateCMSPage: or(userIsGm, userIsAdmin),
     createCMSPage: or(userIsGm, userIsAdmin),
     deleteCMSPage: or(userIsGm, userIsAdmin),
-    updateCMSLayout: or(userIsGm, userIsAdmin),
     rebuildFlaxSite: or(userIsGm, userIsAdmin),
     updateMessage: or(userOwnsMessage, userIsGm, userIsAdmin),
   },

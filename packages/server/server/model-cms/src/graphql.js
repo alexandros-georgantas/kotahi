@@ -18,6 +18,8 @@ const setInitialLayout = async groupId => {
     primaryColor,
     secondaryColor,
     groupId,
+    language: 'en',
+    languagePriority: 0,
   }).save()
 
   return layout
@@ -67,6 +69,44 @@ const cleanCMSPageInput = inputData => {
   return inputData
 }
 
+/** Simulate a data structure where certain fields of the different language layouts are common,
+ * stored in a parent "CmsLayoutSet" object. In fact these values are set individually in each
+ * CMSLayout object, but program logic causes them to be shared.
+ * TODO: This is hacky and we should modify the DB schema to follow this structure, rather than faking it.
+ */
+const mungeGroupLayoutsIntoSingleObject = layouts => {
+  const first = layouts[0]
+  if (!first) return null
+
+  return {
+    id: first.groupId,
+    created: first.created,
+    updated: first.updated,
+    edited: first.edited,
+    published: first.published,
+    active: first.active,
+    hexCode: first.isPrivate ? fnv.hash(first.groupId).str() : null,
+    isPrivate: first.isPrivate,
+    languageLayouts: layouts.map(x => ({
+      id: x.id,
+      article: x.article ?? '',
+      css: x.css ?? '',
+      flaxFooterConfig: x.flaxFooterConfig ?? [],
+      flaxHeaderConfig: x.flaxHeaderConfig ?? [],
+      footerText: x.footerText,
+      language: x.language,
+      logoId: x.logoId,
+      logo: x.logo,
+      favicon: x.favicon,
+      partnerFiles: x.partnerFiles,
+      partners: x.partners ?? [],
+      primaryColor: x.primaryColor,
+      secondaryColor: x.secondaryColor,
+      publishConfig: x.publishConfig,
+    })),
+  }
+}
+
 const resolvers = {
   Query: {
     async cmsPages(_, vars, ctx) {
@@ -84,60 +124,15 @@ const resolvers = {
       return cmsPage
     },
 
-    async cmsLayout(_, _vars, ctx) {
+    async cmsLayoutSet(_, _vars, ctx) {
       const groupId = ctx.req.headers['group-id']
       let layouts = await models.CMSLayout.query()
         .where({ groupId })
-        .orderBy('language')
+        .orderBy('languagePriority')
+
       if (!layouts.length) layouts = [await setInitialLayout(groupId)] // TODO move this to seedArticleTemplate.js or similar
 
-      // Munge into a single object. // TODO migrate the DB to this structure too
-      const first = layouts[0]
-
-      return {
-        id: groupId,
-        created: first.created,
-        updated: first.updated,
-        edited: first.edited,
-        published: first.published,
-        active: first.active,
-        hexCode: first.isPrivate ? fnv.hash(groupId) : null,
-        isPrivate: first.isPrivate,
-        languageLayouts: layouts.map(x => ({
-          id: x.id,
-          article: x.article ?? '',
-          css: x.css ?? '',
-          flaxFooterConfig: x.flaxFooterConfig ?? [],
-          flaxHeaderConfig: x.flaxHeaderConfig ?? [],
-          footerText: x.footerText,
-          language: x.language,
-          logo: x.logo,
-          favicon: x.favicon,
-          partnerFiles: x.partnerFiles,
-          partners: x.partners ?? [],
-          primaryColor: x.primaryColor,
-          secondaryColor: x.secondaryColor,
-          publishConfig: x.publishConfig,
-        })),
-      }
-    },
-    /** @deprecated Use cmsLayout */
-    async cmsLayouts(_, _vars, ctx) {
-      const groupId = ctx.req.headers['group-id']
-      let layouts = await models.CMSLayout.query().where('groupId', groupId)
-
-      if (!layouts.length) {
-        layouts = [await setInitialLayout(groupId)] // TODO move this to seedArticleTemplate.js or similar
-      }
-
-      return layouts
-    },
-
-    /** @deprecated */
-    async cmsLanguages(_, _vars, ctx) {
-      const groupId = ctx.req.headers['group-id']
-      const result = await models.CMSLanguageList.query().findOne({ groupId })
-      return result.languages
+      return mungeGroupLayoutsIntoSingleObject(layouts)
     },
   },
   Mutation: {
@@ -199,65 +194,110 @@ const resolvers = {
     },
     async updateCmsLayout(_, { input }, ctx) {
       const groupId = ctx.req.headers['group-id']
-      await models.CMSLayout.query()
+
+      // TODO delete old logo if a new one replaces it
+
+      if (input.languageLayouts) {
+        await Promise.all(
+          input.languageLayouts.map(langLayout =>
+            models.CMSLayout.query()
+              .patch(langLayout)
+              .where({ id: langLayout.id }),
+          ),
+        )
+      }
+
+      // Update the common fields of layouts for all languages for this group.
+      // TODO Change DB schema to reflect graphql schema: Separate these common fields into a separate table
+      const updatedLayouts = await models.CMSLayout.query()
         .patch({
           active: input.active,
           isPrivate: input.isPrivate,
-          hexCode: input.hexCode,
           published: input.published,
-          edited: input.edited,
+          edited: new Date(),
         })
         .where({ groupId })
+        .returning('*')
+        .orderBy('languagePriority')
 
-      await Promise.all(
-        input.languageLayouts.map(x => {
-          return models.CMSLayout.query().upsertGraphAndFetch({
-            id: x.id,
-            language: x.language,
-            article: x.article,
-            css: x.css,
-            primaryColor: x.primaryColor,
-            secondaryColor: x.secondaryColor,
-            partners: x.partners,
-            footerText: x.footerText,
-            publishConfig: x.publishConfig,
-          })
-        }),
+      const result = mungeGroupLayoutsIntoSingleObject(
+        updatedLayouts.sort((a, b) => a.languagePriority - b.languagePriority),
       )
+
+      return result
     },
-    /** @deprecated Use updateCmsLayout */
-    async updateCMSLayout(_, { _id, input }, ctx) {
-      const groupId = ctx.req.headers['group-id']
 
-      const layout = await models.CMSLayout.query()
-        .where('groupId', groupId)
-        .first()
-
-      if (!layout) {
-        const savedCmsLayout = await new models.CMSLayout(input).save()
-
-        const cmsLayout = await models.CMSLayout.query().findById(
-          savedCmsLayout.id,
+    async updateCmsLanguages(_, { languages }, ctx) {
+      // eslint-disable-next-line no-console
+      console.log('updateCmsLanguages', languages)
+      if (!languages.length)
+        throw new Error(
+          "Deleting the last language-layout for the group's CMS is not permitted!",
         )
 
-        return cmsLayout
-      }
+      const groupId = ctx.req.headers['group-id']
 
-      const cmsLayout = await models.CMSLayout.query().updateAndFetchById(
-        layout.id,
-        input,
+      const existingLayouts = await models.CMSLayout.query()
+        .where({ groupId })
+        .orderBy('languagePriority')
+
+      const defaultLangLayout = existingLayouts[0]
+
+      const promises = []
+
+      existingLayouts.forEach(layout => {
+        const position = languages.findIndex(lang => layout.language === lang)
+
+        if (position < 0) {
+          // eslint-disable-next-line no-console
+          console.log(
+            `Deleting CMS layout for language ${layout.language} in group ${groupId}`,
+          )
+          promises.push(
+            models.CMSLayout.query().delete().where({ id: layout.id }),
+          )
+        } else if (layout.languagePriority !== position) {
+          promises.push(
+            models.CMSLayout.query()
+              .patch({ languagePriority: position })
+              .where({ id: layout.id }),
+          )
+        }
+      })
+
+      const newLanguages = languages.filter(
+        lang => !existingLayouts.some(layout => layout.language === lang),
       )
 
-      return cmsLayout
-    },
+      newLanguages.forEach(lang => {
+        // eslint-disable-next-line no-console
+        console.log(`Adding language ${lang}`)
+        promises.push(
+          models.CMSLayout.query().upsertGraphAndFetch({
+            active: true,
+            isPrivate: true,
+            hexCode: defaultLangLayout.hexCode,
+            primaryColor: defaultLangLayout.primaryColor,
+            secondaryColor: defaultLangLayout.secondaryColor,
+            logoId: defaultLangLayout.logoId, // TODO
+            partners: defaultLangLayout.partners, // TODO
+            footerText: defaultLangLayout.footerText,
+            published: null,
+            edited: new Date(),
+            groupId,
+            language: lang,
+            languagePriority: languages.findIndex(x => x === lang),
+          }),
+        )
+      })
 
-    /** @deprecated */
-    async updateCMSLanguages(_, { languages }, ctx) {
-      const groupId = ctx.req.headers['group-id']
-      await models.CMSLanguageList.query()
-        .patch({ languages })
-        .where({ groupId })
-      return true
+      await Promise.all(promises)
+
+      return mungeGroupLayoutsIntoSingleObject(
+        await models.CMSLayout.query()
+          .where({ groupId })
+          .orderBy('languagePriority'),
+      )
     },
   },
 
@@ -381,24 +421,30 @@ const resolvers = {
       }
     },
   },
+  CmsLanguageLayout: {
+    async logo(parent) {
+      if (!parent.logoId) return null
+      const file = await File.find(parent.logoId)
+      const updatedStoredObjects = await setFileUrls(file.storedObjects)
+      file.storedObjects = updatedStoredObjects
+      return file
+    },
+  },
 }
 
 const typeDefs = `
   extend type Query {
     cmsPage(id: ID!): CMSPage!
     cmsPages: [CMSPage!]!
-    cmsLayout: CmsLayout!
-    cmsLayouts: [CMSLayout!]!
-    cmsLanguages: [String!]!
+    cmsLayoutSet: CmsLayoutSet!
   }
 
   extend type Mutation {
     createCMSPage(input: CMSPageInput!): CreatePageResponse!
     updateCMSPage(id: ID!, input: CMSPageInput!): CMSPage!
     deleteCMSPage(id: ID!): DeletePageResponse!
-    updateCMSLayout(input: CMSLayoutInput!): CMSLayout!
-    updateCmsLayout(input: CmsLayoutInput!): CmsLayout!
-    updateCMSLanguages(languages: [String!]!): Boolean!
+    updateCmsLayout(input: CmsLayoutInput!): CmsLayoutSet!
+    updateCmsLanguages(languages: [String!]!): CmsLayoutSet!
   }
 
   type CMSPage {
@@ -459,7 +505,7 @@ const typeDefs = `
     language: String!
   }
 
-  type CmsLayout {
+  type CmsLayoutSet {
     id: ID!
     active: Boolean!
     languageLayouts: [CmsLanguageLayout!]!
@@ -478,6 +524,7 @@ const typeDefs = `
     css: String!
     primaryColor: String!
     secondaryColor: String!
+    logoId: ID
     logo: File
     favicon: File
     partners: [StoredPartner!]!
@@ -488,25 +535,23 @@ const typeDefs = `
   }
 
   input CmsLayoutInput {
-    id: ID!
-    active: Boolean!
-    languageLayouts: [CmsLanguageLayoutInput!]!
+    active: Boolean
+    languageLayouts: [CmsLanguageLayoutInput!]
     isPrivate: Boolean
-    hexCode: String
     published: DateTime
-    edited: DateTime!
   }
 
   input CmsLanguageLayoutInput {
     id: ID!
-    language: String!
-    article: String!
-    css: String!
-    primaryColor: String!
-    secondaryColor: String!
-    partners: [StoredPartnerInput!]!
+    language: String
+    article: String
+    css: String
+    primaryColor: String
+    secondaryColor: String
+    logoId: ID
+    partners: [StoredPartnerInput!]
     footerText: String
-    publishConfig: String!
+    publishConfig: String
   }
 
   type FlaxPageHeaderConfig {

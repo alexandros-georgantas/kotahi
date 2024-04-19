@@ -7,7 +7,7 @@ const SiteStatus = ({
   flaxSiteUrlForGroup,
   isPrivate,
   privatePublishingHash,
-  triggerAutoSave,
+  updateCmsLayout,
 }) => {
   const { t } = useTranslation()
 
@@ -16,21 +16,14 @@ const SiteStatus = ({
   }`
 
   const toggleChange = isChecked => {
-    const data = {}
-    data.isPrivate = isChecked
-    data.hexCode = privatePublishingHash
-
-    if (!isChecked) {
-      data.hexCode = null
-    }
-
-    triggerAutoSave(data)
+    updateCmsLayout({ isPrivate: isChecked })
   }
 
   return (
     <>
       <LayoutMainHeading>{t('cmsPage.layout.Status')}</LayoutMainHeading>
-      <div>
+      {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+      <label>
         <input
           checked={isPrivate}
           name="isPrivate"
@@ -40,9 +33,13 @@ const SiteStatus = ({
           value={false}
         />
         {t('cmsPage.layout.DraftCheckbox')}
-      </div>
+      </label>
       <LayoutSecondaryHeading>
-        {t('cmsPage.layout.MakeFlaxSitePrivate')}
+        {t(
+          isPrivate
+            ? 'cmsPage.layout.MakeFlaxSitePrivate'
+            : 'cmsPage.layout.publishingTo',
+        )}
       </LayoutSecondaryHeading>
       <div>
         <a href={`${url}`} target="blank">{`${url}`}</a>

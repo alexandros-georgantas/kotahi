@@ -77,6 +77,7 @@ const HiddenTabs = ({
   background,
   hideChat,
   shouldFillFlex,
+  extraControls,
 }) => {
   const config = useContext(ConfigContext)
   const [activeKey, setActiveKey] = useState(defaultActiveKey)
@@ -129,8 +130,10 @@ const HiddenTabs = ({
             </TabContainer>
           ))}
         </div>
+        {extraControls && <div>{extraControls}</div>}
 
-        {/* TODO: Hide Chat could be a seperate component */}
+        {/* TODO: use ExtraControls to hide chat, instead of the hideChat prop.
+            HiddenTabs shouldn't know anything about chat! */}
         {hideChat && (
           <CompactChatButton
             iconName="ChevronRight"

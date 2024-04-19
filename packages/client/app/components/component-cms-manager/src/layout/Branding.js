@@ -9,13 +9,13 @@ import { inputComponents } from '../FormSettings'
 
 import { FilesUpload } from '../../../shared'
 
-const FileInputComponent = ({ entityId, ...restProps }) => {
+const FileInputComponent = ({ entityId, language, ...restProps }) => {
   return (
     <FilesUpload
       acceptMultiple={false}
-      fieldName="logo"
+      fieldName={`${language}.logo`}
       fileType="cms"
-      manuscriptId={entityId}
+      manuscriptId={entityId} // TODO This actually sets the file's objectId. Need to rationalise FilesUpload to use objectId rather than manuscriptId and reviewId.
       mimeTypesToAccept="image/*"
       {...restProps}
     />
@@ -48,17 +48,18 @@ const brandColorInput = [
 ]
 
 const Branding = ({
+  language,
   formikProps,
   cmsLayout,
   createFile,
   deleteFile,
-  triggerAutoSave,
+  updateCmsLayout,
 }) => {
   const onDataChanged = (name, value) => {
-    formikProps.setFieldValue(name, value)
-    const data = {}
-    data[name] = value === undefined ? null : value
-    triggerAutoSave(data)
+    formikProps.setFieldValue(`${language}.${name}`, value)
+    const delta = {}
+    delta[name] = value === undefined ? null : value
+    updateCmsLayout(delta)
   }
 
   const { t } = useTranslation()
@@ -85,7 +86,8 @@ const Branding = ({
           createFile={createFile}
           deleteFile={deleteFile}
           entityId={cmsLayout.id}
-          name={brandLogoInput.name}
+          language={language}
+          name={`${language}.${brandLogoInput.name}`}
           onChange={value => onDataChanged(brandLogoInput.name, value[0])}
           setFieldValue={formikProps.setFieldValue}
           setTouched={formikProps.setTouched}
@@ -102,8 +104,11 @@ const Branding = ({
             <p style={{ fontSize: '14px' }}>{item.label}</p>
             <ValidatedFieldFormik
               component={item.component}
-              name={item.name}
-              onChange={value => onDataChanged(item.name, value.target.value)}
+              name={`${language}.${item.name}`}
+              onChange={value => {
+                if (value.target) onDataChanged(item.name, value.target.value)
+                else onDataChanged(item.name, value)
+              }}
               setFieldValue={formikProps.setFieldValue}
               setTouched={formikProps.setTouched}
               type={item.type}

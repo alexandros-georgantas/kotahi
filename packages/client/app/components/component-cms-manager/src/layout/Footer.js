@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { ValidatedFieldFormik } from '@pubsweet/ui'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -21,11 +21,11 @@ const CompactSectionWithFullWidth = styled(CompactSection)`
   }
 `
 
-const PartnerInputComponent = ({ entityId, ...restProps }) => {
+const PartnerInputComponent = ({ entityId, language, ...restProps }) => {
   return (
     <FilesUpload
       acceptMultiple
-      fieldName="partnerFiles"
+      fieldName={`${language}.partnerFiles`}
       fileType="cms"
       manuscriptId={entityId}
       mimeTypesToAccept="image/*"
@@ -54,19 +54,19 @@ const Footer = ({
   cmsLayout,
   createFile,
   deleteFile,
-  triggerAutoSave,
+  updateCmsLayout,
   onPageOrderUpdated,
+  language,
 }) => {
   const [selectedFiles, setSelectedFiles] = useState(
     formikProps.values.partners ?? [],
   )
 
-  useEffect(() => onDataChanged('partners', selectedFiles), [selectedFiles])
   const { t } = useTranslation()
 
   const onDataChanged = (name, value) => {
     formikProps.setFieldValue(name, value)
-    triggerAutoSave({ [name]: value })
+    updateCmsLayout({ [name]: value })
   }
 
   const onFileAdded = file => {
@@ -77,13 +77,16 @@ const Footer = ({
         url: '',
         sequenceIndex: currentFiles.length,
       })
+      onDataChanged('partners', currentFiles)
       return currentFiles
     })
   }
 
   const onFileRemoved = file => {
     setSelectedFiles(current => {
-      return current.filter(currFile => currFile.id !== file.id)
+      const newFiles = current.filter(currFile => currFile.id !== file.id)
+      onDataChanged('partners', newFiles)
+      return newFiles
     })
   }
 
@@ -100,7 +103,8 @@ const Footer = ({
           deleteFile={deleteFile}
           entityId={cmsLayout.id}
           key={selectedFiles.length}
-          name={partnersInput.name}
+          language={language}
+          name={`${language}.${partnersInput.name}`}
           onFileAdded={onFileAdded}
           onFileRemoved={onFileRemoved}
           renderFileList={(files, props) => (
@@ -108,7 +112,7 @@ const Footer = ({
               files={files}
               formikProps={formikProps}
               key={files?.length}
-              triggerAutoSave={triggerAutoSave}
+              updateCmsLayout={updateCmsLayout}
               {...props}
             />
           )}

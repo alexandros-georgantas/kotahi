@@ -19,13 +19,14 @@ const PageHeader = ({
   mainHeading,
   newItemButtonText,
   hideSearch,
+  className,
 }) => {
   const applyQueryParams = useQueryParams()
   const uriQueryParams = new URLSearchParams(history?.location?.search)
   const currentSearchQuery = uriQueryParams.get(URI_SEARCH_PARAM)
 
   const renderLeftSide = () => {
-    return <Heading>{mainHeading}</Heading>
+    return <Heading className={className}>{mainHeading}</Heading>
   }
 
   const renderRightSide = () => {

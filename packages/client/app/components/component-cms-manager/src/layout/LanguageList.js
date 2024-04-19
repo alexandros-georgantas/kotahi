@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
-import { useTranslation, Trans } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import styled, { withTheme } from 'styled-components'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import { grid } from '@pubsweet/ui-toolkit'
 import { Icon, Action } from '@pubsweet/ui'
-import { LayoutMainHeading, LayoutSecondaryHeading } from '../style'
 import {
   ActionButton,
   LooseRow,
@@ -116,13 +115,6 @@ const LanguageList = ({ languages, updateLanguages, systemLanguages }) => {
 
   return (
     <>
-      <LayoutMainHeading>
-        {t('cmsPage.layout.Choose languages')}
-        <LayoutSecondaryHeading>
-          <Trans i18nKey="cmsPage.layout.LanguagesDesc" />
-        </LayoutSecondaryHeading>
-      </LayoutMainHeading>
-
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="droppable">
           {(provided, snapshot) => (

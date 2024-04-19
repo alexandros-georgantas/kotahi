@@ -6,6 +6,5 @@ module.exports = {
   models: [
     { modelName: 'CMSPage', model: require('./cmsPage') },
     { modelName: 'CMSLayout', model: require('./cmsLayout') },
-    { modelName: 'CMSLanguageList', model: require('./cmsLanguageList') },
   ],
 }

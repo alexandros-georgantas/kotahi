@@ -1,11 +1,15 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Form, Formik } from 'formik'
+import { Edit } from 'react-feather'
+import styled from 'styled-components'
 import {
   Container,
   HiddenTabs,
   SectionContent,
   PaddedContent,
+  Action,
+  ActionButton,
 } from '../../../shared'
 import PageHeader from '../components/PageHeader'
 import LayoutForm from './LayoutForm'
@@ -14,22 +18,60 @@ import SiteStatus from './SiteStatus'
 import PublishStatus from '../components/PublishStatus'
 import { ActionButtonContainer, FormActionButton } from '../style'
 import { languagesLabels } from '../../../../i18n/index'
+import { color } from '../../../../theme'
+import Modal from '../../../component-modal/src/Modal'
+
+const EditIcon = styled(Edit)`
+  stroke: ${color.brand1.base};
+`
+
+const Header = styled(PageHeader)`
+  padding-bottom: 8px;
+`
+
+const EditLanguagesControl = ({ languages, updateCmsLanguages }) => {
+  const { t } = useTranslation()
+  const [modalIsOpen, setModalIsOpen] = useState(false)
+  return (
+    <>
+      <Action
+        onClick={() => setModalIsOpen(true)}
+        title="Edit CMS languages..."
+      >
+        <EditIcon height="18px" />
+      </Action>
+      <Modal
+        hideCloseButton
+        isOpen={modalIsOpen}
+        onClose={() => setModalIsOpen(false)}
+        rightActions={
+          <ActionButton onClick={() => setModalIsOpen(false)}>OK</ActionButton>
+        }
+        subtitle={t('cmsPage.layout.LanguagesDesc')}
+        title={t('cmsPage.layout.Choose languages')}
+      >
+        <LanguageList
+          languages={languages}
+          systemLanguages={['en', 'ru-RU', 'es-LA', 'fr']}
+          updateLanguages={updateCmsLanguages}
+        />
+      </Modal>
+    </>
+  )
+}
 
 const CmsLayouts = ({
   deleteFile,
-  cmsLayout,
+  cmsLayoutSet,
   createFile,
   flaxSiteUrlForGroup,
   history,
-  privatePublishingHash,
   publish,
   publishingStatus,
-  triggerAutoSave,
   updateCmsLanguages,
-  updatePageOrderInfo,
+  updateCmsLayout,
 }) => {
   const { t } = useTranslation()
-
   let submitButtonText
 
   switch (publishingStatus) {
@@ -49,7 +91,7 @@ const CmsLayouts = ({
   const initialData = useMemo(() => {
     const result = {}
 
-    cmsLayout.languageLayouts.forEach(langLayout => {
+    cmsLayoutSet.languageLayouts.forEach(langLayout => {
       const currentPartners = langLayout.partners || []
       const partnerData = currentPartners.filter(partner => partner != null)
       result[langLayout.language] = {
@@ -63,57 +105,52 @@ const CmsLayouts = ({
     return result
   }, [])
 
-  const getSections = (langs, formikProps) => {
-    return langs.map(lang => ({
+  const getSections = formikProps => {
+    return Object.entries(formikProps.values).map(([lang, layout]) => ({
       label: languagesLabels.find(x => x.value === lang)?.label ?? lang,
       key: lang,
       content: (
         <LayoutForm
-          cmsLayout={formikProps.values[lang]}
+          cmsLayout={layout}
           createFile={createFile}
           deleteFile={deleteFile}
           formikProps={formikProps}
-          triggerAutoSave={
-            formData => triggerAutoSave({ language: 'en', ...formData }) // TODO set language correctly
-          }
+          language={lang}
+          updateCmsLayout={updateCmsLayout}
         />
       ),
     }))
   }
 
+  const languages = cmsLayoutSet.languageLayouts.map(x => x.language)
+
   return (
     <Container>
-      <PageHeader
+      <Header
         history={history}
         leftSideOnly
         mainHeading={t('cmsPage.layout.Layout')}
       />
-      <SectionContent>
-        <PaddedContent>
-          <LanguageList
-            languages={cmsLayout.languageLayouts.map(x => x.language)}
-            systemLanguages={['en', 'ru-RU', 'es-LA', 'fr']}
-            updateLanguages={updateCmsLanguages}
-          />
-        </PaddedContent>
-      </SectionContent>
       <Formik initialValues={initialData} onSubmit={values => publish(values)}>
         {formikProps => (
           <Form>
             <HiddenTabs
-              defaultActiveKey={cmsLayout.languageLayouts[0].language}
-              sections={getSections(
-                cmsLayout.languageLayouts.map(x => x.language),
-                formikProps,
-              )}
+              defaultActiveKey={languages[0]}
+              extraControls={
+                <EditLanguagesControl
+                  languages={languages}
+                  updateCmsLanguages={updateCmsLanguages}
+                />
+              }
+              sections={getSections(formikProps)}
             />
             <SectionContent>
               <PaddedContent>
                 <SiteStatus
                   flaxSiteUrlForGroup={flaxSiteUrlForGroup}
-                  isPrivate={cmsLayout.isPrivate /* TODO more sensible */}
-                  privatePublishingHash={privatePublishingHash}
-                  triggerAutoSave={triggerAutoSave}
+                  isPrivate={cmsLayoutSet.isPrivate}
+                  privatePublishingHash={cmsLayoutSet.hexCode}
+                  updateCmsLayout={updateCmsLayout}
                 />
               </PaddedContent>
             </SectionContent>
@@ -127,7 +164,7 @@ const CmsLayouts = ({
                   {submitButtonText}
                 </FormActionButton>
               </div>
-              <PublishStatus cmsComponent={cmsLayout} />
+              <PublishStatus cmsComponent={cmsLayoutSet} />
             </ActionButtonContainer>
           </Form>
         )}

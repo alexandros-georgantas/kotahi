@@ -25,14 +25,14 @@ const PartnerFileListing = ({
   deleteFile,
   remove,
   formikProps,
-  triggerAutoSave,
+  updateCmsLayout,
 }) => {
   const [orderedPartnerFiles, setOrderedPartnerFiles] = useState(files)
   useEffect(() => setOrderedPartnerFiles(files), files.length + 1)
 
   const onPartnerDataChanged = partnerData => {
     formikProps.setFieldValue('partners', partnerData)
-    triggerAutoSave({ partners: partnerData })
+    updateCmsLayout({ partners: partnerData })
   }
 
   const addUrlToFile = (url, id) => {
