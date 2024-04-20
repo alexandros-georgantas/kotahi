@@ -887,6 +887,7 @@ const esLa = {
         'Registered Users': 'Usuarios Registrados',
         userRoles: {
           Reviewer: 'Revisor',
+          'Collaborative reviewer': 'Colaborativa revisor',
           Editor: 'Editor',
           Author: 'Autor',
         },

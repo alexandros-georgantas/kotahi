@@ -864,6 +864,7 @@ const en = {
         'Registered Users': 'Registered Users',
         userRoles: {
           Reviewer: 'Reviewer',
+          'Collaborative reviewer': 'Collaborative reviewer',
           Editor: 'Editor',
           Author: 'Author',
         },
