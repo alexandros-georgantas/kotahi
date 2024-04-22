@@ -1,3 +1,6 @@
+/* stylelint-disable shorthand-property-no-redundant-values */
+/* stylelint-disable custom-property-pattern, string-quotes */
+
 import React, { useState, useContext } from 'react'
 import { th, override } from '@pubsweet/ui-toolkit'
 import { WaxContext } from 'wax-prosemirror-core'
@@ -39,7 +42,7 @@ const Tabs = styled.div`
 
 const activeTab = css`
   background: ${color.gray90};
-  /*box-shadow: 0 0 1px ${color.gray40};*/
+  /* box-shadow: 0 0 1px ${color.gray40}; */
   margin-bottom: -1px;
   /* stylelint-disable-next-line declaration-no-important */
   opacity: 1 !important;
@@ -53,7 +56,7 @@ const disabledTab = css`
 
 const Tab = styled.div`
   cursor: pointer;
-  margin: 0 4px 4px 4px;
+  margin: 0 4px 4px;
 
   ${props => props.active && activeTab}
   ${props => props.disabled && disabledTab}
@@ -158,7 +161,7 @@ const BlockElementWrapper = styled.div`
     position: relative;
     transition: 0.25s;
 
-    &:before {
+    &::before {
       --circleWidth: 5px;
       background-color: ${props => th(props.color) || 'transparent'};
       border: 1px solid ${props => th(props.color) || 'transparent'};

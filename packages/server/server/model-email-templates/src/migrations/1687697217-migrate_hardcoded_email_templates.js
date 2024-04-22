@@ -17,13 +17,13 @@ exports.up = async knex => {
   try {
     return useTransaction(async trx => {
       // eslint-disable-next-line func-names
-      await trx.schema.alterTable(EmailTemplate.tableName, function (table) {
+      await trx.schema.alterTable(EmailTemplate.tableName, table => {
         table.text('email_template_key')
       })
       await trx.schema.alterTable(
         TaskEmailNotification.tableName,
         // eslint-disable-next-line func-names
-        function (table) {
+        table => {
           table
             .uuid('email_template_id')
             .nullable()
@@ -34,7 +34,7 @@ exports.up = async knex => {
       await trx.schema.alterTable(
         TaskEmailNotificationLog.tableName,
         // eslint-disable-next-line func-names
-        function (table) {
+        table => {
           table
             .uuid('email_template_id')
             .nullable()
@@ -133,7 +133,7 @@ exports.up = async knex => {
       }
 
       // eslint-disable-next-line func-names
-      await trx.schema.alterTable(EmailTemplate.tableName, function (table) {
+      await trx.schema.alterTable(EmailTemplate.tableName, table => {
         table.dropColumn('email_template_key')
       })
     })

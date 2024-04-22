@@ -3,6 +3,7 @@ const models = require('@pubsweet/models')
 
 // const logger = require('@coko/server')
 
+/* eslint-disable-next-line default-param-last */
 const chatGPT = async (input, history = [], groupId) => {
   try {
     const CHAT_GPT_URL = 'https://api.openai.com/v1/chat/completions'
