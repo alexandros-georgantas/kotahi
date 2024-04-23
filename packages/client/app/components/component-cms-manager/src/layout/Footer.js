@@ -67,7 +67,7 @@ const Footer = ({
 
   const onDataChanged = (name, value) => {
     formikProps.setFieldValue(`${language}.${name}`, value)
-    updateCmsLayout({ languageLayouts: { id: cmsLayout.id, [name]: value } })
+    updateCmsLayout({ [name]: value })
   }
 
   const onFileAdded = file => {
@@ -149,7 +149,14 @@ const Footer = ({
         </LayoutSecondaryHeading>
         <PageOrder
           initialItems={cmsLayout.flaxFooterConfig}
-          onPageOrderUpdated={onPageOrderUpdated}
+          onPageOrderUpdated={newOrder =>
+            updateCmsLayout({
+              flaxFooterConfig: newOrder.map(x => ({
+                sequenceIndex: x.sequenceIndex,
+                shownInMenu: x.shownInMenu,
+              })),
+            })
+          }
         />
       </CompactSectionWithFullWidth>
     </FullWidthAndHeightContainer>

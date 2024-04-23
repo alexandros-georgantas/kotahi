@@ -7,8 +7,6 @@ import Footer from './Footer'
 const LayoutForm = ({
   formikProps,
   cmsLayout,
-  onHeaderPageOrderChanged,
-  onFooterPageOrderChanged,
   createFile,
   deleteFile,
   updateCmsLayout,
@@ -32,7 +30,9 @@ const LayoutForm = ({
       <Header
         cmsLayout={cmsLayout}
         formikProps={formikProps}
-        onPageOrderUpdated={onHeaderPageOrderChanged}
+        updateCmsLayout={delta =>
+          updateCmsLayout({ languageLayouts: [{ ...delta, id: cmsLayout.id }] })
+        }
       />
     )
   }
@@ -44,8 +44,9 @@ const LayoutForm = ({
         createFile={createFile}
         deleteFile={deleteFile}
         formikProps={formikProps}
-        onPageOrderUpdated={onFooterPageOrderChanged}
-        updateCmsLayout={updateCmsLayout}
+        updateCmsLayout={delta =>
+          updateCmsLayout({ languageLayouts: [{ ...delta, id: cmsLayout.id }] })
+        }
       />
     )
   }

@@ -35,9 +35,7 @@ const PartnerFileListing = ({
 
   const onPartnerDataChanged = partnerData => {
     formikProps.setFieldValue(`${language}.partners`, partnerData)
-    updateCmsLayout({
-      languageLayouts: { id: cmsLayout.id, partners: partnerData },
-    })
+    updateCmsLayout({ partners: partnerData })
   }
 
   const addUrlToFile = (url, id) => {

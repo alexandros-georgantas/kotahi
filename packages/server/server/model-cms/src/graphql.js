@@ -90,8 +90,6 @@ const mungeGroupLayoutsIntoSingleObject = layouts => {
       id: x.id,
       article: x.article ?? '',
       css: x.css ?? '',
-      flaxFooterConfig: x.flaxFooterConfig ?? [],
-      flaxHeaderConfig: x.flaxHeaderConfig ?? [],
       footerText: x.footerText,
       language: x.language,
       logoId: x.logoId,
@@ -198,11 +196,18 @@ const resolvers = {
 
       if (input.languageLayouts) {
         await Promise.all(
-          input.languageLayouts.map(langLayout =>
-            models.CMSLayout.query()
-              .patch(langLayout)
-              .where({ id: langLayout.id }),
-          ),
+          input.languageLayouts.map(langLayout => {
+            const { id, flaxHeaderConfig, flaxFooterConfig, ...newLayout } =
+              langLayout
+
+            // TODO save flaxHeaderConfig/flaxFooterConfig if present
+
+            if (Object.keys(newLayout).length) {
+              return models.CMSLayout.query().patch(newLayout).where({ id })
+            }
+
+            return null
+          }),
         )
       }
 
@@ -271,6 +276,7 @@ const resolvers = {
       newLanguages.forEach(lang => {
         // eslint-disable-next-line no-console
         console.log(`Adding language ${lang}`)
+        // TODO duplicate file records and anything else that lives outside cms_layouts table
         promises.push(
           models.CMSLayout.query().upsertGraphAndFetch({
             active: true,
@@ -307,7 +313,7 @@ const resolvers = {
           ...parent.meta,
           title: parent.submission.$title,
           abstract: parent.submission.$abstract,
-        }) // TODO update flax so we can remove these bogus title and abstract fields
+        }) // TODO modify flax so we can remove these bogus title and abstract fields
       }
 
       return null
@@ -421,6 +427,16 @@ const resolvers = {
     },
   },
   CmsLanguageLayout: {
+    async flaxHeaderConfig(parent, _, ctx) {
+      const groupId = ctx.req.headers['group-id']
+      return getFlaxPageConfig('flaxHeaderConfig', groupId)
+    },
+
+    async flaxFooterConfig(parent, _, ctx) {
+      const groupId = ctx.req.headers['group-id']
+      return getFlaxPageConfig('flaxFooterConfig', groupId)
+    },
+
     async logo(parent) {
       if (!parent.logoId) return null
       const file = await File.find(parent.logoId)
@@ -550,6 +566,8 @@ const typeDefs = `
     partners: [StoredPartnerInput!]
     footerText: String
     publishConfig: String
+    flaxHeaderConfig: [FlaxConfigInput!]
+    flaxFooterConfig: [FlaxConfigInput!]
   }
 
   type FlaxPageHeaderConfig {
