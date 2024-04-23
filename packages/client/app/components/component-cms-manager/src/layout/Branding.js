@@ -48,13 +48,14 @@ const brandColorInput = [
 ]
 
 const Branding = ({
-  language,
   formikProps,
   cmsLayout,
   createFile,
   deleteFile,
   updateCmsLayout,
 }) => {
+  const { language } = cmsLayout
+
   const onDataChanged = (name, value) => {
     formikProps.setFieldValue(`${language}.${name}`, value)
     const delta = {}

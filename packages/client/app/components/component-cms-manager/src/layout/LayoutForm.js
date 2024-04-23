@@ -5,7 +5,6 @@ import Branding from './Branding'
 import Footer from './Footer'
 
 const LayoutForm = ({
-  language,
   formikProps,
   cmsLayout,
   onHeaderPageOrderChanged,
@@ -21,7 +20,6 @@ const LayoutForm = ({
         createFile={createFile}
         deleteFile={deleteFile}
         formikProps={formikProps}
-        language={language}
         updateCmsLayout={delta =>
           updateCmsLayout({ languageLayouts: [{ ...delta, id: cmsLayout.id }] })
         }
@@ -34,7 +32,6 @@ const LayoutForm = ({
       <Header
         cmsLayout={cmsLayout}
         formikProps={formikProps}
-        language={language}
         onPageOrderUpdated={onHeaderPageOrderChanged}
       />
     )
@@ -47,7 +44,6 @@ const LayoutForm = ({
         createFile={createFile}
         deleteFile={deleteFile}
         formikProps={formikProps}
-        language={language}
         onPageOrderUpdated={onFooterPageOrderChanged}
         updateCmsLayout={updateCmsLayout}
       />

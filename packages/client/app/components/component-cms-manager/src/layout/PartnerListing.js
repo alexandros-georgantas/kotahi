@@ -22,21 +22,26 @@ const reorder = (list, startIndex, endIndex) => {
 
 const PartnerFileListing = ({
   files,
+  cmsLayout,
   deleteFile,
   remove,
   formikProps,
   updateCmsLayout,
 }) => {
+  const { language } = cmsLayout
+
   const [orderedPartnerFiles, setOrderedPartnerFiles] = useState(files)
   useEffect(() => setOrderedPartnerFiles(files), files.length + 1)
 
   const onPartnerDataChanged = partnerData => {
-    formikProps.setFieldValue('partners', partnerData)
-    updateCmsLayout({ partners: partnerData })
+    formikProps.setFieldValue(`${language}.partners`, partnerData)
+    updateCmsLayout({
+      languageLayouts: { id: cmsLayout.id, partners: partnerData },
+    })
   }
 
   const addUrlToFile = (url, id) => {
-    const partnerFiles = formikProps.values.partners
+    const partnerFiles = formikProps.values[language].partners
     const currentPartnerIndex = partnerFiles.findIndex(file => file.id === id)
     if (currentPartnerIndex < 0) return
     partnerFiles[currentPartnerIndex].url = url
@@ -44,7 +49,7 @@ const PartnerFileListing = ({
   }
 
   const getFileUrl = fileId => {
-    const partnerFiles = formikProps.values.partners
+    const partnerFiles = formikProps.values[language].partners
 
     const currentPartnerIndex = partnerFiles.findIndex(
       file => file.id === fileId,
@@ -55,7 +60,7 @@ const PartnerFileListing = ({
   }
 
   const setOrderedPartners = reorderedFiles => {
-    const partnerFiles = formikProps.values.partners
+    const partnerFiles = formikProps.values[language].partners
     const reorderedFileIds = reorderedFiles.map(file => file.id)
 
     const orderedPartnerData = reorderedFileIds.map((fileId, index) => {

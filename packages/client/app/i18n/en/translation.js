@@ -341,6 +341,7 @@ const en = {
           'Use checkbox to show and hide the page in the menu. Click and Drag to order them.',
         Footer: 'Footer',
         Status: 'Status',
+        publishingTo: 'This site will publish to:',
         MakeFlaxSitePrivate:
           'Your publishing website will only be visible to those who have access to the Draft link',
         DraftCheckbox: 'Draft',
@@ -931,12 +932,10 @@ const en = {
         'Permanently delete this form': 'Permanently delete this form?',
       },
       assignUserRole: {
-        text:
-          'Do you wish to assign the <strong>{{role}}</strong> role for user {{user}}?',
+        text: 'Do you wish to assign the <strong>{{role}}</strong> role for user {{user}}?',
       },
       removeUserRole: {
-        text:
-          'Do you wish to remove the <strong>{{role}}</strong> role for user {{user}}?',
+        text: 'Do you wish to remove the <strong>{{role}}</strong> role for user {{user}}?',
       },
       deleteUser: {
         'Permanently delete user': 'Permanently delete user {{userName}}?',

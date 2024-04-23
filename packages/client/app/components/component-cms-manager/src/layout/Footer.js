@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { ValidatedFieldFormik } from '@pubsweet/ui'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import ValidatedField from '../../../component-submit/src/components/ValidatedField'
 import PageOrder from './PageOrder'
 import {
   CompactSection,
@@ -56,17 +56,18 @@ const Footer = ({
   deleteFile,
   updateCmsLayout,
   onPageOrderUpdated,
-  language,
 }) => {
+  const { language } = cmsLayout
+
   const [selectedFiles, setSelectedFiles] = useState(
-    formikProps.values.partners ?? [],
+    formikProps.values[language].partners ?? [],
   )
 
   const { t } = useTranslation()
 
   const onDataChanged = (name, value) => {
-    formikProps.setFieldValue(name, value)
-    updateCmsLayout({ [name]: value })
+    formikProps.setFieldValue(`${language}.${name}`, value)
+    updateCmsLayout({ languageLayouts: { id: cmsLayout.id, [name]: value } })
   }
 
   const onFileAdded = file => {
@@ -97,7 +98,7 @@ const Footer = ({
         <LayoutSecondaryHeading>
           {t('cmsPage.layout.Partners')}
         </LayoutSecondaryHeading>
-        <ValidatedFieldFormik
+        <ValidatedField
           component={partnersInput.component}
           createFile={createFile}
           deleteFile={deleteFile}
@@ -109,6 +110,7 @@ const Footer = ({
           onFileRemoved={onFileRemoved}
           renderFileList={(files, props) => (
             <PartnerListing
+              cmsLayout={cmsLayout}
               files={files}
               formikProps={formikProps}
               key={files?.length}
@@ -130,9 +132,9 @@ const Footer = ({
         <LayoutSecondaryHeading>
           {t('cmsPage.layout.Footer Text')}
         </LayoutSecondaryHeading>
-        <ValidatedFieldFormik
+        <ValidatedField
           component={footerTextInput.component}
-          name={footerTextInput.name}
+          name={`${language}.${footerTextInput.name}`}
           onChange={value => onDataChanged(footerTextInput.name, value)}
           setFieldValue={formikProps.setFieldValue}
           setTouched={formikProps.setTouched}

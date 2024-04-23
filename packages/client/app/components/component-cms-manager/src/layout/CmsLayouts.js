@@ -115,7 +115,6 @@ const CmsLayouts = ({
           createFile={createFile}
           deleteFile={deleteFile}
           formikProps={formikProps}
-          language={lang}
           updateCmsLayout={updateCmsLayout}
         />
       ),
