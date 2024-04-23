@@ -106,8 +106,11 @@ const ru = {
       CMS: 'Система управления контентом',
       Pages: 'Страницы',
       Layout: 'Макет',
-      Article: 'Шаблон Статьи',
+      Article: 'Шаблон cтатьи',
       'Go to your profile': 'Перейти в ваш профиль',
+      FileBrowser: 'Файловый браузер',
+      Metadata: 'Metadannye publikatsii',
+      Collections: 'Коллекции',
     },
     menuSettings: {
       KeepMenuVisible: 'оставить меню видимым',
@@ -307,6 +310,21 @@ const ru = {
       article: {
         title: 'Шаблон Статьи',
       },
+      metadata: {
+        title: 'Заголовок',
+        description: 'Описание',
+        publicationDate: 'Дата публикации',
+        image: 'Изображение',
+        deleteImage: 'Удалить изображение',
+        issueNumber: 'Номер выпуска',
+        delete: 'Удалить',
+        create: 'Создать',
+        update: 'Обновить',
+        isActive: 'Активен',
+        noCollections: 'Нет коллекций',
+        addCollection: 'Добавить коллекцию',
+        copy: 'Копировать',
+      },
       pages: {
         addNew: 'Добавить новую страницу',
         'New Page': 'Новая страница',
@@ -348,6 +366,10 @@ const ru = {
         MakeFlaxSitePrivate:
           'Ваш веб-сайт публикации будет виден только тем, у кого есть доступ к ссылке на черновик.',
         DraftCheckbox: 'Черновик',
+      },
+      fileBrowser: {
+        confirmDelete: 'Удалить',
+        deleteResource: 'Вы уверены, что хотите удалить этот ресурс?',
       },
     },
     authorsInput: {
@@ -413,6 +435,10 @@ const ru = {
       'Instance Type': 'Тип элемента',
       'Group Identity': 'Групповая идентификация',
       'Brand name': 'Название журнала',
+      title: 'Название',
+      description: 'Описание',
+      issn: 'ISSN',
+      contact: 'Контакт',
       'Brand primary colour': 'Основной фирменный цвет',
       'Brand secondary colour': 'Дополнительный фирменный цвет',
       Logo: 'Логотип',
@@ -505,6 +531,8 @@ const ru = {
         'Приглашение, подтвержденное автором',
       authorProofingSubmittedEmailTemplate:
         'Автор завершил проверку и отправил отзыв',
+      'Editors edit reviews':
+        'Редакторы могут редактировать отправленные отзывы.',
       Reports: 'Аналитика',
       reportShowInMenu:
         'Администратору и редактору доступен раздел “Аналитика”',
@@ -519,6 +547,7 @@ const ru = {
       showTabs: {
         Team: 'Исполнители',
         Decision: 'Решение',
+        Reviews: 'Отзывы',
         'Manuscript text': 'Текст статьи',
         Metadata: 'Основные данные',
         'Tasks & Notifications': 'Задачи и уведомления',
@@ -977,6 +1006,9 @@ const ru = {
       deleteFile: {
         'Are you sure you want to delete this file?':
           'Вы уверены, что хотите удалить этот файл?',
+      },
+      metadata: {
+        deleteCollection: 'Вы уверены, что хотите удалить эту коллекцию?',
       },
     },
     newSubmission: {

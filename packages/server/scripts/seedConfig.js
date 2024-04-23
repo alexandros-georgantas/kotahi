@@ -90,6 +90,10 @@ const seedConfig = async (group, instanceName, index, options) => {
     primaryColor: '#3aae2a',
     secondaryColor: '#9e9e9e',
     logoPath: '/assets/logo-kotahi.png',
+    title: '',
+    description: '',
+    contact: '',
+    issn: '',
   }
 
   const kotahiApiTokens =
@@ -221,6 +225,7 @@ const seedConfig = async (group, instanceName, index, options) => {
             showTabs: [
               'Team',
               'Decision',
+              'Reviews',
               'Manuscript text',
               'Metadata',
               'Tasks & Notifications',
@@ -229,6 +234,7 @@ const seedConfig = async (group, instanceName, index, options) => {
             sharedReview: process.env.REVIEW_SHARED === 'true',
             displayManuscriptShortId: true,
             authorProofingEnabled: false,
+            editorsEditReviewsEnabled: false,
           },
           notification,
           eventNotification: {},
@@ -272,6 +278,7 @@ const seedConfig = async (group, instanceName, index, options) => {
             showTabs: [
               'Team',
               'Decision',
+              'Reviews',
               'Manuscript text',
               'Metadata',
               'Tasks & Notifications',
@@ -280,6 +287,7 @@ const seedConfig = async (group, instanceName, index, options) => {
             sharedReview: process.env.REVIEW_SHARED === 'true',
             displayManuscriptShortId: true,
             authorProofingEnabled: false,
+            editorsEditReviewsEnabled: false,
           },
           notification,
           eventNotification: {},
@@ -325,6 +333,7 @@ const seedConfig = async (group, instanceName, index, options) => {
             showTabs: [
               'Team',
               'Decision',
+              'Reviews',
               'Manuscript text',
               'Metadata',
               'Tasks & Notifications',
@@ -333,6 +342,7 @@ const seedConfig = async (group, instanceName, index, options) => {
             sharedReview: process.env.REVIEW_SHARED === 'true',
             displayManuscriptShortId: true,
             authorProofingEnabled: false,
+            editorsEditReviewsEnabled: false,
           },
           notification,
           eventNotification: {},

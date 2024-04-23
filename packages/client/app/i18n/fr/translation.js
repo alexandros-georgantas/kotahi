@@ -104,8 +104,11 @@ const fr = {
       CMS: 'CMS',
       Pages: 'Pages',
       Layout: 'Mise en page',
-      Article: "Modèle d' Article",
+      Article: "Modèle d' article",
       'Go to your profile': 'Accéder à votre profil',
+      FileBrowser: 'Explorateur de fichiers',
+      Metadata: 'Métadonnées de Publication',
+      Collections: 'Colecciones',
     },
     menuSettings: {
       KeepMenuVisible: 'Garder le menu visible',
@@ -308,6 +311,22 @@ const fr = {
       article: {
         title: "Modèle d' Article",
       },
+      metadata: {
+        cmsMetadata: 'Métadonnées du CMS',
+        title: 'Titre',
+        description: 'Description',
+        publicationDate: 'Date de publication',
+        image: 'Image',
+        deleteImage: "Supprimer l'image",
+        issueNumber: 'Numéro de parution',
+        delete: 'Supprimer',
+        create: 'Créer',
+        update: 'Mettre à jour',
+        isActive: 'Est actif/active',
+        noCollections: 'Aucune collection',
+        addCollection: 'Ajouter une collection',
+        copy: 'Copier',
+      },
       pages: {
         addNew: 'Ajouter une nouvelle page',
         'New Page': 'Nouvelle Page',
@@ -349,6 +368,10 @@ const fr = {
         MakeFlaxSitePrivate:
           'Votre site Web de publication ne sera visible que par ceux qui ont accès au lien Draft.',
         DraftCheckbox: 'Brouillon',
+      },
+      fileBrowser: {
+        confirmDelete: 'Supprimer',
+        deleteResource: 'Êtes-vous sûr de vouloir supprimer cette ressource ?',
       },
     },
     authorsInput: {
@@ -414,6 +437,10 @@ const fr = {
       'Instance Type': "Type d'instance",
       'Group Identity': 'Identité du groupe',
       'Brand name': 'Nom de la marque',
+      title: 'Titre',
+      description: 'Decription',
+      issn: 'ISSN',
+      contact: 'Contact',
       'Brand primary colour': 'Couleur principale de la marque',
       'Brand secondary colour': 'Couleur secondaire de la marque',
       Logo: 'Logo',
@@ -512,6 +539,7 @@ const fr = {
         "Invitation attribuée à l'épreuve d'auteur",
       authorProofingSubmittedEmailTemplate:
         "Preuve d'auteur complétée et commentaires soumis",
+      'Editors edit reviews': 'Les éditeurs peuvent modifier les avis soumis',
       Reports: 'Rapports',
       reportShowInMenu:
         "Le gestionnaire de groupe et l'administrateur peuvent accéder aux rapports",
@@ -526,6 +554,7 @@ const fr = {
       showTabs: {
         Team: 'Équipe',
         Decision: 'Décision',
+        Reviews: 'Commentaires',
         'Manuscript text': 'Texte du manuscrit',
         Metadata: 'Métadonnées',
         'Tasks & Notifications': 'Tâches et notifications',
@@ -987,6 +1016,10 @@ const fr = {
       deleteFile: {
         'Are you sure you want to delete this file?':
           'Êtes-vous sûr de vouloir supprimer ce fichier ?',
+      },
+      metadata: {
+        deleteCollection:
+          'Êtes-vous sûr de vouloir supprimer cette collection ?',
       },
     },
 
