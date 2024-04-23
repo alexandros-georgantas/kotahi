@@ -1,3 +1,5 @@
+const isEmpty = require('lodash/isEmpty')
+
 const { File } = require('@coko/server')
 
 const Review = require('../../../models/review/review.model')
@@ -36,7 +38,7 @@ const resolvers = {
         isHiddenReviewerName: false,
         ...deepMergeObjectsReplacingArrays(existingReview, reviewDelta),
         // Prevent reassignment of userId or manuscriptId:
-        userId: existingReview.userId || ctx.user,
+        userId: !isEmpty(existingReview) ? existingReview.userId : ctx.user,
         manuscriptId: existingReview.manuscriptId || input.manuscriptId,
       }
 
@@ -108,7 +110,15 @@ const resolvers = {
   Review: {
     async user(parent, { id }, ctx) {
       // TODO redact user if it's an anonymous review and ctx.user is not editor or admin
-      return parent.user || User.query().findById(parent.userId)
+      if (parent.user) {
+        return parent.user
+      }
+
+      if (parent.userId) {
+        return User.query().findById(parent.userId)
+      }
+
+      return null
     },
     async isSharedWithCurrentUser(parent, _, ctx) {
       if (

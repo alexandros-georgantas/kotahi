@@ -5,7 +5,12 @@ const { map, chunk, orderBy } = require('lodash')
 const { pubsubManager, File } = require('@coko/server')
 const cheerio = require('cheerio')
 const { raw } = require('objection')
-const { importManuscripts } = require('./importManuscripts')
+
+const {
+  importManuscripts,
+  importManuscriptsFromSemanticScholar,
+} = require('./importManuscripts')
+
 const { manuscriptHasOverdueTasksForUser } = require('./manuscriptCommsUtils')
 const { rebuildCMSSite } = require('../../flax-site/flax-api')
 
@@ -524,7 +529,12 @@ const resolvers = {
     },
 
     async importManuscripts(_, { groupId }, ctx) {
-      return importManuscripts(groupId, ctx)
+      const importsSucceeded = await importManuscripts(groupId, ctx)
+
+      const semanticScholarSucceeded =
+        await importManuscriptsFromSemanticScholar(groupId, ctx)
+
+      return importsSucceeded && semanticScholarSucceeded
     },
 
     async archiveManuscripts(_, { ids }, ctx) {
@@ -1010,27 +1020,26 @@ const resolvers = {
 
       const activeConfig = await Config.getCached(manuscript.groupId)
 
-      const sender = await User.query().findById(ctx.user)
-
-      const receiverEmail = manuscript.submitter.email
-      /* eslint-disable-next-line */
-      const receiverName =
-        manuscript.submitter.username ||
-        manuscript.submitter.defaultIdentity.name ||
-        ''
-
       const selectedTemplate =
         activeConfig.formData.eventNotification
           ?.submissionConfirmationEmailTemplate
 
-      const emailValidationRegexp = /^[^\s@]+@[^\s@]+$/
-      const emailValidationResult = emailValidationRegexp.test(receiverEmail)
+      if (selectedTemplate && manuscript.submitter) {
+        const sender = await User.query().findById(ctx.user)
+        const receiverEmail = manuscript.submitter.email
 
-      if (!emailValidationResult || !receiverName) {
-        return commonUpdateManuscript(id, input, ctx)
-      }
+        const receiverName =
+          manuscript.submitter.username ||
+          manuscript.submitter.defaultIdentity.name ||
+          ''
 
-      if (selectedTemplate) {
+        const emailValidationRegexp = /^[^\s@]+@[^\s@]+$/
+        const emailValidationResult = emailValidationRegexp.test(receiverEmail)
+
+        if (!emailValidationResult || !receiverName) {
+          return commonUpdateManuscript(id, input, ctx)
+        }
+
         const notificationInput = {
           manuscript,
           selectedEmail: receiverEmail,

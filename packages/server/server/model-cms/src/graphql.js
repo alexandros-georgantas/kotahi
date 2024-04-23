@@ -1,14 +1,22 @@
-const File = require('@coko/server/src/models/file/file.model')
+const axios = require('axios')
+const { Readable } = require('stream')
 
+const { createFile, fileStorage } = require('@coko/server')
+const File = require('@coko/server/src/models/file/file.model')
+const { uploadFileHandler } = require('@coko/server/src/services/fileStorage')
+
+const CMSFileTemplate = require('../../../models/cmsFileTemplate/cmsFileTemplate.model')
 const CMSPage = require('../../../models/cmsPage/cmsPage.model')
 const CMSLayout = require('../../../models/cmsLayout/cmsLayout.model')
 const Config = require('../../../models/config/config.model')
 const ArticleTemplate = require('../../../models/articleTemplate/articleTemplate.model')
+const PublishingCollection = require('../../../models/publishingCollection/publishingCollection.model')
 
 const {
   replaceImageSrc,
   replaceImageFromNunjucksTemplate,
   getFilesWithUrl,
+  getFileWithUrl,
   setFileUrls,
 } = require('../../utils/fileStorageUtils')
 
@@ -69,6 +77,49 @@ const cleanCMSPageInput = inputData => {
   return inputData
 }
 
+const cmsFileTree = async (groupId, folderId) => {
+  const AllFiles = await CMSFileTemplate.query().where('groupId', groupId)
+
+  const fileIds = AllFiles.filter(file => file.fileId !== null).map(
+    f => f.fileId,
+  )
+
+  const files = await File.query().whereIn('id', fileIds)
+  const filesWithUrl = await getFilesWithUrl(files)
+
+  const getChildren = children =>
+    children.map(child => {
+      const nestedChildren = AllFiles.filter(f => f.parentId === child.id)
+      const file = filesWithUrl.find(fu => fu.id === child.fileId)
+
+      const fileUrl = file
+        ? file.storedObjects.find(f => f.type === 'original')
+        : { url: null }
+
+      return {
+        id: child.id,
+        name: child.name,
+        children: getChildren(nestedChildren),
+        fileId: child.fileId,
+        url: fileUrl.url,
+      }
+    })
+
+  const rootNode = folderId
+    ? AllFiles.find(f => f.id === folderId)
+    : AllFiles.find(f => f.parentId === null)
+
+  const children = AllFiles.filter(f => f.parentId === rootNode.id)
+
+  return {
+    id: rootNode.id,
+    name: rootNode.name,
+    children: getChildren(children),
+    fileId: null,
+    url: null,
+  }
+}
+
 const resolvers = {
   Query: {
     async cmsPages(_, vars, ctx) {
@@ -95,6 +146,78 @@ const resolvers = {
       }
 
       return layout
+    },
+
+    async getCmsFilesTree(_, { folderId }, ctx) {
+      const groupId = ctx.req.headers['group-id']
+
+      return cmsFileTree(groupId, folderId)
+    },
+
+    async getActiveCmsFilesTree(_, _vars, ctx) {
+      const groupId = ctx.req.headers['group-id']
+
+      const cmsFileTemplate = await CMSFileTemplate.query().findOne({
+        groupId,
+        rootFolder: true,
+      })
+
+      return JSON.stringify(await cmsFileTree(groupId, cmsFileTemplate.id))
+    },
+    async getCmsFileContent(_, { id }, ctx) {
+      const file = await File.query().findById(id)
+
+      const { storedObjects } = await getFileWithUrl(file)
+
+      const fileUrl = storedObjects.find(f => f.type === 'original')
+
+      const response = await axios({
+        method: 'get',
+        url: fileUrl.url,
+      })
+
+      return {
+        id,
+        content:
+          typeof response.data === 'object'
+            ? JSON.stringify(response.data)
+            : response.data.toString(),
+        name: file.name,
+        url: fileUrl.url,
+      }
+    },
+    async getFoldersList(_, vars, ctx) {
+      const groupId = ctx.req.headers['group-id']
+
+      let folderArray = []
+
+      const AllFiles = await CMSFileTemplate.query().where({ groupId })
+      const folders = AllFiles.filter(file => file.fileId === null)
+
+      const rootNodes = AllFiles.filter(f => f.parentId === null).map(f => ({
+        ...f,
+        name: `/${f.name}`,
+      }))
+
+      const getChildren = children =>
+        children.forEach(child => {
+          const nestedChildren = folders
+            .filter(f => f.parentId === child.id)
+            .map(cld => ({
+              ...cld,
+              name: `${child.name}/${cld.name}`,
+            }))
+
+          folderArray = folderArray.concat(nestedChildren)
+          // getChildren(nestedChildren)
+        })
+
+      rootNodes.forEach(node => {
+        // folderArray.push(node)
+        getChildren([node])
+      })
+
+      return folderArray
     },
   },
   Mutation: {
@@ -174,6 +297,125 @@ const resolvers = {
       )
 
       return cmsLayout
+    },
+
+    async addResourceToFolder(_, { id, type }, ctx) {
+      const parent = await CMSFileTemplate.query().findOne({ id })
+
+      const name = type ? 'new folder' : 'new file'
+
+      const insertedResource = await CMSFileTemplate.query()
+        .insertGraph({
+          name,
+          parentId: parent.id,
+          groupId: parent.groupId,
+        })
+        .returning('id')
+
+      let fileId = null
+
+      if (!type) {
+        const insertedFile = await createFile(
+          Readable.from(' '),
+          name,
+          null,
+          null,
+          ['cmsTemplateFile'],
+          insertedResource.id,
+        )
+
+        fileId = insertedFile.id
+
+        await CMSFileTemplate.query()
+          .update({ fileId })
+          .where({ id: insertedResource.id })
+        return {
+          id: insertedResource.id,
+          fileId,
+          name,
+        }
+      }
+
+      return {
+        id: insertedResource.id,
+        fileId: null,
+        name,
+        children: [],
+      }
+    },
+
+    async deleteResource(_, { id }, ctx) {
+      const item = await CMSFileTemplate.query().findOne({ id })
+
+      if (item.fileId) {
+        await CMSFileTemplate.query().findOne({ id }).delete()
+        const file = await File.query().findOne({ id: item.fileId })
+        const keys = file.storedObjects.map(f => f.key)
+
+        try {
+          if (keys.length > 0) {
+            await fileStorage.deleteFiles(keys)
+            await File.query().deleteById(id)
+          }
+        } catch (e) {
+          throw new Error('The was a problem deleting the file')
+        }
+      } else {
+        const hasChildren = await CMSFileTemplate.query().where({
+          parentId: item.id,
+        })
+
+        if (hasChildren.length === 0) {
+          await CMSFileTemplate.query().findOne({ id }).delete()
+        }
+      }
+
+      return {
+        id: item.id,
+        fileId: item.fileId,
+        name: item.name,
+        parentId: item.parentId,
+      }
+    },
+
+    async renameResource(_, { id, name }, ctx) {
+      const item = await CMSFileTemplate.query().findOne({ id })
+
+      const updatedItem = await CMSFileTemplate.query()
+        .patch({ name })
+        .findOne({ id })
+        .returning('*')
+
+      if (item.fileId) {
+        await File.query().patch({ name }).findOne({ id: item.fileId })
+      }
+
+      return updatedItem
+    },
+
+    async updateResource(_, { id, content }, ctx) {
+      const file = await File.query().findOne({ id })
+
+      const { key, mimetype } = file.storedObjects.find(
+        obj => obj.type === 'original',
+      )
+
+      await uploadFileHandler(Readable.from(content), key, mimetype)
+
+      return { id, content }
+    },
+
+    async updateFlaxRootFolder(_, { id }, ctx) {
+      const groupId = ctx.req.headers['group-id']
+
+      await CMSFileTemplate.query()
+        .patch({ rootFolder: false })
+        .where({ groupId })
+
+      return CMSFileTemplate.query()
+        .patch({ rootFolder: true })
+        .findOne({ id, groupId })
+        .returning('*')
     },
   },
 
@@ -256,6 +498,11 @@ const resolvers = {
 
       return JSON.stringify({
         licenseUrl: formData.publishing.crossref.licenseUrl,
+        title: formData.groupIdentity.title,
+        description: formData.groupIdentity.description,
+        contact: formData.groupIdentity.contact,
+        issn: formData.groupIdentity.issn,
+        logoPath: formData.groupIdentity.logoPath,
       })
     },
 
@@ -283,6 +530,13 @@ const resolvers = {
 
       return css ?? ''
     },
+
+    async publishingCollection(parent) {
+      return PublishingCollection.query().where({
+        groupId: parent.groupId,
+        active: true,
+      })
+    },
   },
 
   StoredPartner: {
@@ -304,6 +558,10 @@ const typeDefs = `
     cmsPage(id: ID!): CMSPage!
     cmsPages: [CMSPage!]!
     cmsLayout: CMSLayout!
+    getCmsFilesTree(folderId: ID): CmsFileTree!
+    getCmsFileContent(id: ID!): FileContent!
+    getFoldersList: [FolderView!]
+    getActiveCmsFilesTree: String!
   }
 
   extend type Mutation {
@@ -311,6 +569,11 @@ const typeDefs = `
     updateCMSPage(id: ID!, input: CMSPageInput!): CMSPage!
     deleteCMSPage(id: ID!): DeletePageResponse!
     updateCMSLayout(input: CMSLayoutInput!): CMSLayout!
+    addResourceToFolder(id: ID!, type: Boolean!): CmsFileTree!
+    deleteResource(id: ID!): CmsFileTree!
+    renameResource(id: ID!, name: String!): CmsFileTree!
+    updateResource(id: ID!, content: String!): FileContent!
+    updateFlaxRootFolder(id: ID!): FolderView!
   }
 
   type CMSPage {
@@ -368,6 +631,29 @@ const typeDefs = `
     publishConfig: String!
     article: String!
     css: String!
+    publishingCollection: PublishCollection! 
+  }
+
+  type CmsFileTree {
+    id: ID!
+    name: String!
+    children: [CmsFileTree!]
+    fileId: ID
+    parentId: ID
+    url: String
+  }
+
+  type FolderView {
+    id: ID!
+    name: String!
+    rootFolder: Boolean!
+  }
+
+  type FileContent {
+    id: ID!
+    content: String!
+    name: String!
+    url: String!
   }
 
   type FlaxPageHeaderConfig {

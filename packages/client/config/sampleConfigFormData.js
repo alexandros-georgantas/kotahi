@@ -61,6 +61,7 @@ module.exports = {
     showTabs: [
       'Team',
       'Decision',
+      'Reviews',
       'Manuscript text',
       'Metadata',
       'Tasks & Notifications',
@@ -83,6 +84,10 @@ module.exports = {
   },
   groupIdentity: {
     brandName: 'Kotahi',
+    title: '',
+    description: '',
+    issn: '',
+    contact: '',
     primaryColor: '#3aae2a',
     secondaryColor: '#9e9e9e',
     logoPath: '/assets/logo-kotahi.png',
