@@ -34,7 +34,6 @@ const cmsPageFields = `
       id
       username
     }
-    language
 `
 
 const cmsLayoutFields = `
@@ -84,7 +83,6 @@ const createCmsPageFields = `
     error
     column
     errorMessage
-    language
 `
 
 const deleteCmsPageFields = `
@@ -112,6 +110,14 @@ export const createCMSPageMutation = gql`
   mutation createCMSPage($input: CMSPageInput!) {
     createCMSPage(input: $input) {
       ${createCmsPageFields}
+    }
+  }
+`
+
+export const updateCMSPageDataMutation = gql`
+  mutation updateCMSPage($id: ID!, $input: CMSPageInput!) {
+    updateCMSPage(id: $id, input: $input) {
+        ${cmsPageFields}
     }
   }
 `

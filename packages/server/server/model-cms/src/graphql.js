@@ -63,10 +63,9 @@ const addSlashes = inputString => {
 }
 
 const cleanCMSPageInput = inputData => {
-  if (!inputData.url) return inputData
-  const attrs = { ...inputData }
-  attrs.url = addSlashes(inputData.url)
-  return inputData
+  const result = { language: 'en', ...inputData } // TODO don't use this placeholder language once language support is properly built
+  if (inputData.url) result.url = addSlashes(inputData.url)
+  return result
 }
 
 /** Simulate a data structure where certain fields of the different language layouts are common,
@@ -459,7 +458,6 @@ const typeDefs = `
     edited: DateTime
     created: DateTime!
     updated: DateTime
-    language: String!
   }
 
   type CreatePageResponse {
@@ -578,7 +576,6 @@ const typeDefs = `
     edited: DateTime
     flaxHeaderConfig: FlaxConfigInput
     flaxFooterConfig: FlaxConfigInput
-    language: String!
   }
 
   input StoredPartnerInput {
