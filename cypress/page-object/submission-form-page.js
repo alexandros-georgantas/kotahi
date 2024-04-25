@@ -284,7 +284,10 @@ export const SubmissionFormPage = {
     return cy.getByClass(SUBMISSION_FORM_INPUT_BOX).eq(1)
   },
   fillInReview2(review2) {
-    this.getReview2().clear().type(`{selectall}${review2}`, { force: true })
+    this.getReview2()
+      .clear()
+      .focus()
+      .type(`{selectall}${review2}`, { delay: 300 })
   },
   getReview2Creator() {
     return cy.getByDataTestId(REVIEW_2_CREATOR_FIELD)
@@ -302,7 +305,10 @@ export const SubmissionFormPage = {
     return cy.getByClass(SUBMISSION_FORM_INPUT_BOX).eq(2)
   },
   fillInReview3(review3) {
-    this.getReview3().clear().type(`{selectall}${review3}`, { delay: 200 })
+    this.getReview3()
+      .clear()
+      .focus()
+      .type(`{selectall}${review3}`, { delay: 300 })
   },
   getReview3Creator() {
     return cy.getByDataTestId(REVIEW_3_CREATOR_FIELD)
@@ -320,7 +326,10 @@ export const SubmissionFormPage = {
     return cy.getByClass(SUBMISSION_FORM_INPUT_BOX).eq(3)
   },
   fillInSummary(summary) {
-    this.getSummary().type(`{selectall}${summary}`, { force: true })
+    this.getSummary()
+      .clear()
+      .focus()
+      .type(`{selectall}${summary}`, { delay: 300 })
   },
   getSummaryCreator() {
     return cy.getByDataTestId(SUMMARY_CREATOR_FIELD)
