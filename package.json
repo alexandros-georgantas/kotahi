@@ -28,7 +28,7 @@
     "test:server-and-client": "start-test server:test 'http://localhost:3000/healthcheck' client",
     "test:all:chrome": "start-test test:server-and-client 4000 test:chrome",
     "test:all:firefox": "start-test test:server-and-client 4000 test:firefox",
-    "test:chrome": "cypress run --record --browser chrome --spec 'cypress/e2e/**/**.js'",
+    "test:chrome": "cypress run --browser chrome --spec 'cypress/e2e/**/**.js'",
     "test:firefox": "cypress run --browser firefox --headless --spec 'cypress/e2e/**/**.js'",
     "test": "dotenv cypress open"
   },
@@ -46,7 +46,7 @@
     "@coko/lint": "^1.4.0",
     "@coko/storybook": "^1.2.2",
     "color": "^4.2.3",
-    "cypress": "^12.13.0",
+    "cypress": "^13.8.0",
     "dotenv": "^16.4.1",
     "dotenv-cli": "^4.0.0",
     "eslint-plugin-prettier": "^3.1.2",
