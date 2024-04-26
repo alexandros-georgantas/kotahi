@@ -274,10 +274,10 @@ export const SubmissionFormPage = {
   },
   fillInReview1(review1) {
     this.getReview1()
+      .scrollIntoView()
       .clear()
       .focus()
-      .type(`{selectall}${review1}`, { force: true, delay: 10 })
-      .blur()
+      .type(`{selectall}${review1}`, { force: true, delay: 200 })
   },
   getReview1Creator() {
     return cy.getByDataTestId(REVIEW_1_CREATOR_FIELD)
@@ -290,10 +290,10 @@ export const SubmissionFormPage = {
   },
   fillInReview2(review2) {
     this.getReview2()
+      .scrollIntoView()
       .clear()
       .focus()
-      .type(`{selectall}${review2}`, { force: true, delay: 10 })
-      .blur()
+      .type(`{selectall}${review2}`, { force: true, delay: 200 })
   },
   getReview2Creator() {
     return cy.getByDataTestId(REVIEW_2_CREATOR_FIELD)
@@ -312,10 +312,10 @@ export const SubmissionFormPage = {
   },
   fillInReview3(review3) {
     this.getReview3()
+      .scrollIntoView()
       .clear()
       .focus()
-      .type(`{selectall}${review3}`, { force: true, delay: 10 })
-      .blur()
+      .type(`{selectall}${review3}`, { force: true, delay: 200 })
   },
   getReview3Creator() {
     return cy.getByDataTestId(REVIEW_3_CREATOR_FIELD)
@@ -334,10 +334,10 @@ export const SubmissionFormPage = {
   },
   fillInSummary(summary) {
     this.getSummary()
+      .scrollIntoView()
       .clear()
       .focus()
-      .type(`{selectall}${summary}`, { force: true, delay: 10 })
-      .blur()
+      .type(`{selectall}${summary}`, { force: true, delay: 200 })
   },
   getSummaryCreator() {
     return cy.getByDataTestId(SUMMARY_CREATOR_FIELD)
