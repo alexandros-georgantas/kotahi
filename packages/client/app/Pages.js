@@ -1,6 +1,6 @@
 import React from 'react'
 import { Route, Switch, useLocation, Redirect } from 'react-router-dom'
-import { grid } from '@pubsweet/ui-toolkit'
+import { grid } from '@coko/client'
 import styled from 'styled-components'
 import { useQuery } from '@apollo/client'
 import { ConfigProvider } from './components/config/src'

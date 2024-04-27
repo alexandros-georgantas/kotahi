@@ -2,7 +2,7 @@
 import styled from 'styled-components'
 import { Icon } from '@pubsweet/ui/dist/atoms'
 import { Link } from 'react-router-dom'
-import { th, grid } from '@pubsweet/ui-toolkit'
+import { th, grid } from '@coko/client'
 import { color } from '../../../theme'
 import { menuStyles } from './styleGlobals'
 import PinButton from './PinButton'

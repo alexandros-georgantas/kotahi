@@ -1,4 +1,4 @@
-import { grid, th } from '@pubsweet/ui-toolkit'
+import { grid, th } from '@coko/client'
 import PropTypes from 'prop-types'
 import React, { useState } from 'react'
 import { Mail } from 'react-feather'

@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { sanitize } from 'isomorphic-dompurify'
 import { Button, PlainButton } from '@pubsweet/ui'
 import { unescape } from 'lodash'
-import { th } from '@pubsweet/ui-toolkit'
+import { th } from '@coko/client'
 import { useTranslation } from 'react-i18next'
 import { Heading1 } from '../style'
 

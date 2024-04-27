@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Action } from '@pubsweet/ui'
-import { th, grid } from '@pubsweet/ui-toolkit'
+import { th, grid } from '@coko/client'
 import { useTranslation } from 'react-i18next'
 import { color } from '../../theme'
 import { ConfirmationModal } from '../component-modal/src/ConfirmationModal'

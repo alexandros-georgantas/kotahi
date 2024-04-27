@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Icon } from '@pubsweet/ui'
-import { grid } from '@pubsweet/ui-toolkit'
+import { grid } from '@coko/client'
 import { useTranslation } from 'react-i18next'
 import { color } from '../../../../theme'
 

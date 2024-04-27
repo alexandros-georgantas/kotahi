@@ -3,7 +3,7 @@ import styled from 'styled-components'
 // import { map } from 'lodash'
 // import Moment from 'react-moment'
 import { Avatar } from '@pubsweet/ui'
-import { th } from '@pubsweet/ui-toolkit'
+import { th } from '@coko/client'
 
 const Root = styled.div`
   font-family: ${th('fontReviewer')};

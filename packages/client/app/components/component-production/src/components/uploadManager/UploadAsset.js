@@ -2,7 +2,7 @@
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useMutation, gql } from '@apollo/client'
-import { grid, th } from '@pubsweet/ui-toolkit'
+import { grid, th } from '@coko/client'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { color } from '../../../../../theme'

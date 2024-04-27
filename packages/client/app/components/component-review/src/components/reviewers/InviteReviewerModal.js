@@ -1,5 +1,5 @@
 import { CheckboxGroup } from '@pubsweet/ui'
-import { grid, th } from '@pubsweet/ui-toolkit'
+import { grid, th } from '@coko/client'
 import React, { useState, useContext } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'

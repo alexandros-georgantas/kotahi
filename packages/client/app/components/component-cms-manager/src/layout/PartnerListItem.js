@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { Action } from '@pubsweet/ui'
-import { th, grid } from '@pubsweet/ui-toolkit'
+import { th, grid } from '@coko/client'
 import { debounce } from 'lodash'
 import { TextInput } from '../../../shared'
 import { ConfirmationModal } from '../../../component-modal/src/ConfirmationModal'

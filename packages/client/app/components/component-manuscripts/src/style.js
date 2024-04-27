@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { grid } from '@pubsweet/ui-toolkit'
+import { grid } from '@coko/client'
 import { Button } from '@pubsweet/ui'
 
 export const SelectAllField = styled.div`

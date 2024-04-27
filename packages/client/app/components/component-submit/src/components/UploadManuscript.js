@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import styled, { css, keyframes, withTheme } from 'styled-components'
 import { Icon } from '@pubsweet/ui'
-import { th } from '@pubsweet/ui-toolkit'
+import { th } from '@coko/client'
 import { useTranslation } from 'react-i18next'
 import { ConfigContext } from '../../../config/src'
 import { XpubContext } from '../../../xpub-with-context/src'

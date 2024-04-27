@@ -2,7 +2,7 @@
 
 import styled, { css } from 'styled-components'
 import { Button, Action } from '@pubsweet/ui'
-import { th, grid } from '@pubsweet/ui-toolkit'
+import { th, grid } from '@coko/client'
 import { AlertCircle } from 'react-feather'
 import { color } from '../../../theme'
 

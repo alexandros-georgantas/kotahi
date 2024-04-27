@@ -1,5 +1,5 @@
 import { Button, Checkbox } from '@pubsweet/ui'
-import { grid } from '@pubsweet/ui-toolkit'
+import { grid } from '@coko/client'
 import { TextField } from '@pubsweet/ui/dist/atoms'
 import { Field } from 'formik'
 import PropTypes from 'prop-types'

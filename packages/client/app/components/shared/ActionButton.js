@@ -3,7 +3,7 @@ import styled, { ThemeContext } from 'styled-components'
 import PropTypes from 'prop-types'
 import Color from 'color'
 import { Check, AlertCircle } from 'react-feather'
-import { th, grid, rotate360 } from '@pubsweet/ui-toolkit'
+import { th, grid, rotate360 } from '@coko/client'
 import { color } from '../../theme'
 
 const BaseButton = styled.button`

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { Redirect } from 'react-router-dom'
-import { th, grid } from '@pubsweet/ui-toolkit'
+import { th, grid } from '@coko/client'
 import { Button } from '@pubsweet/ui'
 import styled from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'

@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react'
-import { th } from '@pubsweet/ui-toolkit'
+import { th } from '@coko/client'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { SectionHeader, SectionRowGrid, Title } from '../style'

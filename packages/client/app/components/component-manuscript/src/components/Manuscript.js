@@ -3,7 +3,7 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import styled from 'styled-components'
-import { th } from '@pubsweet/ui-toolkit'
+import { th } from '@coko/client'
 import FullWaxEditor from '../../../wax-collab/src/FullWaxEditor'
 
 import MessageContainer from '../../../component-chat/src/MessageContainer'
