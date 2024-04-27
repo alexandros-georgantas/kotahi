@@ -17,6 +17,7 @@
     "bcrypt": "^5.1.1",
     "fs-capacitor": "^6.1.0",
     "graphql": "15.5.0",
+    "libxmljs2": "0.32.0",
     "pg": "8.4.0"
   },
   "dependencies": {

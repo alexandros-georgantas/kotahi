@@ -661,7 +661,7 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@mapbox/node-pre-gyp@^1.0.11", "@mapbox/node-pre-gyp@^1.0.5":
+"@mapbox/node-pre-gyp@^1.0.10", "@mapbox/node-pre-gyp@^1.0.11":
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/@mapbox/node-pre-gyp/-/node-pre-gyp-1.0.11.tgz#417db42b7f5323d79e93b34a6d7a2a12c0df43fa"
   integrity sha512-Yhlar6v9WQgUp/He7BdgzOz8lqMQ8sU+jkCq7Wx8Myc5YFJLbEe7lgui/V7G1qB1DJykHSGwreceSaD60Y0PUQ==
@@ -5276,14 +5276,14 @@ libxmljs2-xsd@^0.28.0:
     libxmljs2 "^0.28.0"
     nan "^2.14.1"
 
-libxmljs2@^0.28.0:
-  version "0.28.0"
-  resolved "https://registry.yarnpkg.com/libxmljs2/-/libxmljs2-0.28.0.tgz#ba217cf7d8dadd80449fdd81b147575fa969c942"
-  integrity sha512-Se1vTSn1rjquUlm9V4FHbfwJh4n5lLgP9I109f98kzWpm8YN5JD3myP96JAHiIxSmFIzYXnRfyImBvj9R3Ei5Q==
+libxmljs2@0.32.0, libxmljs2@^0.28.0:
+  version "0.32.0"
+  resolved "https://registry.yarnpkg.com/libxmljs2/-/libxmljs2-0.32.0.tgz#408e35c54a5ad5e0366bc8299ba20ed35224d0d9"
+  integrity sha512-DuvKfSQZeUzw0A4UWZXfcBpr3VqlcJY1b3aw99PxTiX3T5t1rEO4gSpobNrP9S74LIhyDKaAs/lphuErV+n+7w==
   dependencies:
-    "@mapbox/node-pre-gyp" "^1.0.5"
+    "@mapbox/node-pre-gyp" "^1.0.10"
     bindings "~1.5.0"
-    nan "~2.15.0"
+    nan "~2.17.0"
 
 lie@~3.3.0:
   version "3.3.0"
@@ -5722,10 +5722,10 @@ nan@^2.14.1:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.18.0.tgz#26a6faae7ffbeb293a39660e88a76b82e30b7554"
   integrity sha512-W7tfG7vMOGtD30sHoZSSc/JVYiyDPEyQVso/Zz+/uQd0B0L46gtC+pHha5FFMRpil6fm/AoEcRWyOVi4+E/f8w==
 
-nan@~2.15.0:
-  version "2.15.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.15.0.tgz#3f34a473ff18e15c1b5626b62903b5ad6e665fee"
-  integrity sha512-8ZtvEnA2c5aYCZYd1cvgdnU6cqwixRoYg70xPLWUws5ORTa/lnw+u4amixRS/Ac5U5mQVgp9pnlSUnbNWFaWZQ==
+nan@~2.17.0:
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.17.0.tgz#c0150a2368a182f033e9aa5195ec76ea41a199cb"
+  integrity sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==
 
 nanoclone@^0.2.1:
   version "0.2.1"

@@ -1,6 +1,6 @@
-FROM node:18-bullseye
+FROM node:18-bookworm-slim
 
-RUN apt-get update && apt-get install -y ranger vim curl nano
+RUN apt-get update && apt-get install -y make g++ ranger vim curl nano
 
 WORKDIR /home/node/app
 RUN mkdir ./uploads
