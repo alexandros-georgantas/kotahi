@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import ReactModal from 'react-modal'
 import styled, { ThemeContext } from 'styled-components'
 import { th, grid } from '@coko/client'
-import { Button } from '@pubsweet/ui'
+import { Button } from '../../pubsweet'
 import { color } from '../../../theme'
 
 import {

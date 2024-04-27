@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { grid } from '@coko/client'
-import { Button } from '@pubsweet/ui'
+import { Button } from '../../pubsweet'
 
 export const SelectAllField = styled.div`
   align-items: center;

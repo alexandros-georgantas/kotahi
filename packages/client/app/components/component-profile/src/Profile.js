@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
 import React, { useCallback, useState, useEffect } from 'react'
-import { Button, Checkbox } from '@pubsweet/ui'
 import { useDropzone } from 'react-dropzone'
 import styled from 'styled-components'
 import { th, grid } from '@coko/client'
 import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
+import { Button, Checkbox } from '../../pubsweet'
 import Modal from '../../component-modal/src/ConfirmationModal'
 import { convertCamelCaseToTitleCase } from '../../../shared/textUtils'
 

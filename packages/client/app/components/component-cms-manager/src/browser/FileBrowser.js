@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 import FolderTree from 'react-folder-tree'
 import 'react-folder-tree/dist/style.css'
 
-import { Link } from '@pubsweet/ui'
+import { Link } from '../../../pubsweet'
 
 import DeleteIcon from './DeleteIcon'
 import { Select } from '../../../shared'

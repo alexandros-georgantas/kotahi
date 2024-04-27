@@ -1,8 +1,8 @@
 /* stylelint-disable declaration-no-important, string-quotes */
 import styled from 'styled-components'
-import { Icon } from '@pubsweet/ui/dist/atoms'
 import { Link } from 'react-router-dom'
 import { th, grid } from '@coko/client'
+import { Icon } from '../../pubsweet'
 import { color } from '../../../theme'
 import { menuStyles } from './styleGlobals'
 import PinButton from './PinButton'
