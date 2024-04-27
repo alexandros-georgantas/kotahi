@@ -127,4 +127,5 @@ module.exports = {
   'import-for-prc': {
     default_import: 'USE_COLAB_BIOPHYSICS_IMPORT',
   },
+  e2eTestingApi: 'E2E_TESTING_API',
 }

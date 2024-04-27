@@ -1,5 +1,5 @@
 # IMAGE FOR BUILDING
-FROM node:16.19.0-alpine as build
+FROM node:16-bullseye as build
 
 ARG node_env
 ARG server_protocol
@@ -27,7 +27,7 @@ ENV PUBLIC_CLIENT_PROTOCOL $public_client_protocol
 ENV USE_COLAB_EMAIL $use_colab_email
 ENV FLAX_SITE_URL $flax_site_url
 
-RUN apk add --no-cache git python3 make g++ bash
+# RUN apk add --no-cache git python3 make g++ bash
 
 WORKDIR /home/node/app
 
@@ -42,14 +42,16 @@ COPY ./packages/client .
 RUN yarn webpack --config webpack/webpack.production.config.js
 
 # IMAGE FOR RUNNING
-FROM node:16.19.0-alpine as server
+FROM node:16-bullseye as server
 
 WORKDIR /home/node/app
 
 RUN mkdir ./uploads
 
 RUN chown -R node:node .
-RUN apk add --no-cache bash coreutils postgresql-client git python3 make g++
+# RUN apk add --no-cache bash coreutils postgresql-client git python3 make g++
+RUN apt-get update
+RUN apt-get install -y python3 make g++
 USER node
 
 COPY ./packages/server/package.json .

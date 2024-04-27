@@ -11,6 +11,7 @@ import { setContext } from '@apollo/client/link/context'
 import { InMemoryCache } from '@apollo/client/cache'
 import { createUploadLink } from 'apollo-upload-client'
 import Pages from './Pages'
+import { serverUrl } from './getUrl'
 
 // See https://github.com/apollographql/apollo-feature-requests/issues/6#issuecomment-465305186
 export function stripTypenames(obj) {
@@ -28,6 +29,12 @@ export function stripTypenames(obj) {
     }
   })
   return obj
+}
+
+const replaceHttpWithWs = url => {
+  let wsUrl = url.replace(/^http:/, 'ws:')
+  wsUrl = wsUrl.replace(/^https:/, 'wss:')
+  return wsUrl
 }
 
 // Construct an ApolloClient. If a function is passed as the first argument,
@@ -66,10 +73,10 @@ const makeApolloClient = (makeConfig, connectToWebSocket) => {
   let link = ApolloLink.from([removeTypename, authLink, groupLink, uploadLink])
 
   if (connectToWebSocket) {
-    const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+    const webSocketUrl = `${replaceHttpWithWs(serverUrl)}/subscriptions`
 
     const wsLink = new WebSocketLink({
-      uri: `${wsProtocol}://${window.location.host}/subscriptions`,
+      uri: webSocketUrl,
       options: {
         reconnect: true,
         connectionParams: () => ({ authToken: localStorage.getItem('token') }),

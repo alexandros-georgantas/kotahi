@@ -6,6 +6,22 @@ const permissions = require('./permissions')
 const components = require('./components')
 const journal = require('./journal')
 
+// console.log('helloooooooo')
+
+// Object.keys(process.env)
+//   .filter(k =>
+//     [
+//       'POSTGRES_PORT',
+//       'POSTGRES_HOST',
+//       'POSTGRES_DB',
+//       'POSTGRES_USER',
+//       'POSTGRES_PASSWORD',
+//     ].includes(k),
+//   )
+//   .map(i => {
+//     console.log(`${k}: ${process.env[k]}`)
+//   })
+
 module.exports = {
   teams: {
     seniorEditor: {

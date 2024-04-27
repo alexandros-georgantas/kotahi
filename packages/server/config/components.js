@@ -1,6 +1,10 @@
+// const config = require('config')
+
+// const { logger } = require('@coko/server')
+
 const modelComponents = require('../models/modelComponents')
 
-module.exports = [
+const components = [
   ...modelComponents,
   './server/model-notification/src/',
   './server/model-team/src',
@@ -40,3 +44,17 @@ module.exports = [
   './server/cms-upload',
   './server/model-publishing-collection/src',
 ]
+
+// if (
+//   config.has('e2eTestingApi') &&
+//   (config.get('e2eTestingApi') === '1' ||
+//     config.get('e2eTestingApi') === 'true')
+// ) {
+//   logger.warn(
+//     'IMPORTANT! Using E2E_TESTING_API should never be on in production deployments!',
+//   )
+
+//   components.push('./api/rest/e2e')
+// }
+
+module.exports = components

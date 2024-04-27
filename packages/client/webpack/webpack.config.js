@@ -8,6 +8,7 @@ const rules = require('./common-rules')
 
 const context = path.resolve(__dirname, '..', 'app')
 const contentBase = path.resolve(__dirname, '..', '_build', 'assets')
+// const contentBase = path.resolve(__dirname, '..', '_build')
 
 // can't use node-config in webpack so save whitelisted client config into the build and alias it below
 const clientConfig = pick(config, config.publicKeys)
@@ -68,7 +69,8 @@ module.exports = webpackEnv => {
     },
     output: {
       path: contentBase,
-      publicPath: isEnvDevelopment ? '/' : '/assets/',
+      // publicPath: isEnvDevelopment ? '/' : '/assets/',
+      publicPath: '/',
       filename: isEnvProduction
         ? 'js/[name].[contenthash:8].js'
         : isEnvDevelopment && 'js/bundle.js',

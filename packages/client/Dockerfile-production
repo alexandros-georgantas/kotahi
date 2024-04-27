@@ -1,0 +1,37 @@
+##############################################################
+# IMAGE FOR BUILDING
+
+FROM node:16-bullseye-slim
+
+ENV NODE_ENV "production"
+ENV SERVER_PROTOCOL $server_protocol
+ENV SERVER_HOST $server_host
+ENV SERVER_PORT $server_port
+
+WORKDIR /home/node/app
+
+COPY package.json .
+COPY yarn.lock .
+
+# Install development node modules for building webpack bundle
+RUN yarn install --frozen-lockfile --production=false
+
+COPY . .
+
+RUN yarn webpack --config webpack/webpack.production.config.js
+
+##############################################################
+# IMAGE FOR RUNNING
+
+FROM node:16-bullseye-slim
+
+WORKDIR /home/node/app
+
+RUN yarn global add serve
+
+COPY --from=0 /home/node/app/_build/assets ./_build/assets
+
+RUN chown -R node:node .
+USER node
+
+CMD ["npx", "serve", "-p", "4000", "--single", "./_build/assets"]
