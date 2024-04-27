@@ -221,7 +221,7 @@ const sendEmailWithPreparedData = async (
         ? 'AUTHOR'
         : 'REVIEWER'
 
-    const newInvitation = await new Invitation({
+    const newInvitation = await Invitation.query().insert({
       manuscriptId,
       toEmail,
       purpose,
@@ -230,7 +230,7 @@ const sendEmailWithPreparedData = async (
       invitedPersonType,
       invitedPersonName,
       userId,
-    }).saveGraph() // no trx!!
+    }) // no trx!!
 
     invitationId = newInvitation.id
   }

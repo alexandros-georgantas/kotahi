@@ -1,28 +1,38 @@
 const passport = require('passport')
 const OrcidStrategy = require('passport-orcid')
 const config = require('config')
-const { createJWT } = require('@coko/server')
+const { createJWT, useTransaction } = require('@coko/server')
 const fetchUserDetails = require('./fetchUserDetails')
 
 const CALLBACK_URL = '/auth/orcid/callback'
 
 const orcidBackURL = config['pubsweet-client'].baseUrl
 
-const addUserToAdminAndGroupManagerTeams = async (userId, groupId) => {
+const addUserToAdminAndGroupManagerTeams = async (
+  userId,
+  groupId,
+  options = {},
+) => {
   // eslint-disable-next-line global-require
   const Team = require('../../models/team/team.model')
   // eslint-disable-next-line global-require
   const TeamMember = require('../../models/teamMember/teamMember.model')
 
-  const groupManagerTeam = await Team.query().findOne({
+  const { trx } = options
+
+  const groupManagerTeam = await Team.query(trx).findOne({
     role: 'groupManager',
     objectId: groupId,
     objectType: 'Group',
   })
 
-  const adminTeam = await Team.query().findOne({ role: 'admin', global: true })
-  await TeamMember.query().insert({ userId, teamId: adminTeam.id })
-  await TeamMember.query().insert({ userId, teamId: groupManagerTeam.id })
+  const adminTeam = await Team.query(trx).findOne({
+    role: 'admin',
+    global: true,
+  })
+
+  await TeamMember.query(trx).insert({ userId, teamId: adminTeam.id })
+  await TeamMember.query(trx).insert({ userId, teamId: groupManagerTeam.id })
 }
 
 const addUserToUserTeam = async (userId, groupId) => {
@@ -41,12 +51,12 @@ const addUserToUserTeam = async (userId, groupId) => {
 }
 
 module.exports = app => {
-  // eslint-disable-next-line global-require
+  /* eslint-disable global-require */
   const Config = require('../../models/config/config.model')
-  // eslint-disable-next-line global-require
   const Group = require('../../models/group/group.model')
-  // eslint-disable-next-line global-require
   const User = require('../../models/user/user.model')
+  const Identity = require('../../models/identity/identity.model')
+  /* eslint-enable global-require */
 
   // set up OAuth client
   passport.use(
@@ -98,28 +108,44 @@ module.exports = app => {
         // TODO: Update the user details on every login, asynchronously
         try {
           if (!user) {
-            user = await new User({
-              username: params.name,
-              defaultIdentity: {
+            await useTransaction(async trx => {
+              user = await User.query(trx).insert({
+                username: params.name,
+              })
+
+              const identity = await Identity.query(trx).insert({
                 identifier: params.orcid,
                 oauth: { accessToken, refreshToken },
                 type: 'orcid',
                 isDefault: true,
-              },
-            }).saveGraph()
+                userId: user.id,
+              })
 
-            if (usersCountString === '0' || activeConfig.formData.user.isAdmin)
-              await addUserToAdminAndGroupManagerTeams(user.id, groupId)
+              if (
+                usersCountString === '0' ||
+                activeConfig.formData.user.isAdmin
+              ) {
+                await addUserToAdminAndGroupManagerTeams(user.id, groupId, {
+                  trx,
+                })
+              }
 
-            // Do another request to the ORCID API for aff/name
-            const userDetails = await fetchUserDetails(user)
-            user.defaultIdentity.name = `${userDetails.firstName || ''} ${
-              userDetails.lastName || ''
-            }`
-            user.defaultIdentity.aff = userDetails.institution || ''
-            user.email = userDetails.email || null
-            user.saveGraph()
-            firstLogin = true
+              // Do another request to the ORCID API for aff/name
+              const userDetails = await fetchUserDetails(user, { trx })
+
+              await identity.$query(trx).patchAndFetch({
+                name: `${userDetails.firstName || ''} ${
+                  userDetails.lastName || ''
+                }`,
+                aff: userDetails.institution || '',
+              })
+
+              await user.$query(trx).patchAndFetch({
+                email: userDetails.email || null,
+              })
+
+              firstLogin = true
+            })
           }
         } catch (err) {
           done(err)

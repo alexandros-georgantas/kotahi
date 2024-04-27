@@ -22,8 +22,7 @@ const waitForDbToSettle = async () => {
 /** Clears all objects from the public schema and reruns all the migrations. */
 const resetDb = async () => {
   /* eslint-disable no-await-in-loop, global-require */
-  const { logger, db } = require('@coko/server')
-  const { migrate } = require('@pubsweet/db-manager')
+  const { logger, db, migrate } = require('@coko/server')
   const seedGroups = require('./seedGroups')
   /* eslint-enable no-await-in-loop, global-require */
 
