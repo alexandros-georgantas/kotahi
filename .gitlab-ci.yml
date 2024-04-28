@@ -42,6 +42,7 @@ build production client:
   # - docker push $IMAGE_ORG/$IMAGE_NAME:$CI_COMMIT_SHA
   # - docker push $IMAGE_ORG/$IMAGE_NAME:latest
   before_script:
+    - echo $CI_REGISTRY $CI_REGISTRY_USER
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin <<<$CI_REGISTRY_PASSWORD
   script:
     - cd packages/client
