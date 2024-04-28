@@ -31,6 +31,7 @@ build production client:
   services:
     - docker:23-dind
   before_script:
+    - echo $SHELL
     - echo $CI_REGISTRY $CI_REGISTRY_USER
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin <<<$CI_REGISTRY_PASSWORD
   script:
