@@ -37,7 +37,7 @@ build production client:
     - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   script:
     - cd packages/client
-    - docker pull $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.latest
+    - docker pull $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.latest || true
     - docker build
       --cache-from $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.latest
       --tag $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
