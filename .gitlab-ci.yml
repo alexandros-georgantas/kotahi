@@ -42,5 +42,8 @@ build production client:
   # - docker push $IMAGE_ORG/$IMAGE_NAME:$CI_COMMIT_SHA
   # - docker push $IMAGE_ORG/$IMAGE_NAME:latest
   script:
+    - cd packages/client
     - docker build
+      -f Dockerfile-production
       --tag IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_SHA
+      .
