@@ -15,8 +15,8 @@ variables:
   # COMPOSE_FILE_STORYBOOK: docker-compose.storybook-deploy.yml
   # COMPOSE_FILE_DEPLOY_DEVELOP: docker-compose.develop-deploy.yml
   # COMPOSE_FILE_DEPLOY_DEMO: docker-compose.demo-deploy.yml
-  IMAGE_NAME_PREPRODUCTION_CLIENT: kotahi-client-preproduction
-  IMAGE_NAME_PREPRODUCTION_SERVER: kotahi-server-preproduction
+  IMAGE_NAME_PREPRODUCTION_CLIENT: kotahi/kotahi/client-preproduction
+  IMAGE_NAME_PREPRODUCTION_SERVER: kotahi/kotahi/server-preproduction
 
 stages:
   # - Build development
@@ -52,7 +52,7 @@ build production server:
     - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   script:
     - cd packages/server
-    - docker pull $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.latest
+    - docker pull $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.latest || true
     - docker build
       --cache-from $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.latest
       --tag $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
