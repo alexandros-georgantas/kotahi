@@ -29,6 +29,7 @@ module.exports = {
     },
     tempFolderPath: 'TEMP_FOLDER_PATH',
     useFileStorage: 'USE_FILE_STORAGE',
+    serverUrl: 'SERVER_URL',
   },
   'client-features': {
     displayShortIdAsIdentifier: 'DISPLAY_SHORTID_AS_IDENTIFIER',
@@ -128,4 +129,5 @@ module.exports = {
     default_import: 'USE_COLAB_BIOPHYSICS_IMPORT',
   },
   e2eTestingApi: 'E2E_TESTING_API',
+  clientUrl: 'CLIENT_URL',
 }

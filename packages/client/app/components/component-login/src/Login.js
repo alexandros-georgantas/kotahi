@@ -1,8 +1,10 @@
 import React, { useContext } from 'react'
 import { Redirect } from 'react-router-dom'
-import { th, grid } from '@coko/client'
 import styled from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
+
+import { th, grid, serverUrl } from '@coko/client'
+
 import { Button } from '../../pubsweet'
 import { ConfigContext } from '../../config/src'
 import { getQueryStringByName } from '../../../shared/urlUtils'
@@ -132,7 +134,7 @@ const Login = ({ logo = null, ...props }) => {
     return <Redirect to={redirectLink} />
   }
 
-  const nextpage = `/auth/orcid?group_id=${config?.groupId}`
+  const nextpage = `${serverUrl}/auth/orcid?group_id=${config?.groupId}`
   return redirectLink ? (
     <Redirect to={redirectLink} />
   ) : (

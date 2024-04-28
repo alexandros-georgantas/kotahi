@@ -3,9 +3,11 @@
 import React, { useCallback, useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import styled from 'styled-components'
-import { th, grid } from '@coko/client'
 import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
+
+import { th, grid, serverUrl } from '@coko/client'
+
 import { Button, Checkbox } from '../../pubsweet'
 import Modal from '../../component-modal/src/ConfirmationModal'
 import { convertCamelCaseToTitleCase } from '../../../shared/textUtils'
@@ -70,7 +72,12 @@ const ProfileDropzone = ({
   return (
     <div {...getRootProps()}>
       <input {...getInputProps()} />
-      <BigProfileImage src={profilePicture || '/profiles/default_avatar.svg'} />
+      <BigProfileImage
+        src={
+          `${serverUrl}${profilePicture}` ||
+          `${serverUrl}/profiles/default_avatar.svg`
+        }
+      />
       <Button>
         {isDragActive
           ? t('profilePage.Drop it here')
@@ -181,8 +188,8 @@ const Profile = ({
                 <BigProfileImage
                   src={
                     user.profilePicture === null
-                      ? '/profiles/default_avatar.svg'
-                      : user.profilePicture
+                      ? `${serverUrl}/profiles/default_avatar.svg`
+                      : `${serverUrl}${user.profilePicture}`
                   }
                 />
               )}

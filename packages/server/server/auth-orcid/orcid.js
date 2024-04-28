@@ -1,12 +1,18 @@
 const passport = require('passport')
 const OrcidStrategy = require('passport-orcid')
 const config = require('config')
-const { createJWT, useTransaction } = require('@coko/server')
+
+const {
+  createJWT,
+  useTransaction,
+  clientUrl,
+  serverUrl,
+} = require('@coko/server')
+
 const fetchUserDetails = require('./fetchUserDetails')
 
 const CALLBACK_URL = '/auth/orcid/callback'
-
-const orcidBackURL = config['pubsweet-client'].baseUrl
+const orcidBackURL = `${serverUrl}${CALLBACK_URL}`
 
 const addUserToAdminAndGroupManagerTeams = async (
   userId,
@@ -68,7 +74,7 @@ module.exports = app => {
         scope: '/authenticate',
         // this works here only with webpack dev server's proxy (ie. clientUrl/auth -> serverUrl/auth)
         // or when the server and client are served from the same url
-        callbackURL: orcidBackURL + CALLBACK_URL,
+        callbackURL: orcidBackURL,
         passReqToCallback: true,
         ...config.get('auth-orcid'),
       },
@@ -189,8 +195,6 @@ module.exports = app => {
         throw new Error(`Group not found or archived!`)
       }
 
-      const urlFrag = `/${group.name}`
-
       const activeConfig = await Config.getCached(groupId)
 
       // Based on configuration User Management -> All users are assigned Group Manager and Admin roles flag
@@ -227,6 +231,7 @@ module.exports = app => {
       if (!isGroupUser) await addUserToUserTeam(req.user.id, groupId)
 
       let redirectionUrl
+      const urlFrag = `/${group.name}`
 
       if (req.user.firstLogin) {
         redirectionUrl = `${urlFrag}/profile`
@@ -237,7 +242,7 @@ module.exports = app => {
       }
 
       res.redirect(
-        `${urlFrag}/login?token=${jwt}&redirectUrl=${redirectionUrl}`,
+        `${clientUrl}${urlFrag}/login?token=${jwt}&redirectUrl=${redirectionUrl}`,
       )
     },
   )
