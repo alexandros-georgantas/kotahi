@@ -40,7 +40,7 @@ build production client:
       --tag $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
       --tag $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.latest
       -f Dockerfile-production .
-    - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME,.$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
     - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.latest
 
 build production server:
@@ -49,7 +49,7 @@ build production server:
   services:
     - docker:23-dind
   before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin <<<$CI_REGISTRY_PASSWORD
+    - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   script:
     - cd packages/server
     - docker pull $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.latest
@@ -58,5 +58,5 @@ build production server:
       --tag $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
       --tag $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.latest
       -f Dockerfile-production .
-    - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME_$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
     - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.latest
