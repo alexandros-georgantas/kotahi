@@ -29,25 +29,16 @@ build production client:
   image: docker:23
   services:
     - docker:23-dind
-  # before_script:
-  #   - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-  #   - if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_PASSWORD" ]; then echo "Non-existent or incomplete docker credentials" && exit 0; fi
-  # script:
-  # - docker pull $IMAGE_ORG/$IMAGE_NAME:latest || true
-  # - docker build
-  #   --cache-from $IMAGE_ORG/$IMAGE_NAME:latest
-  #   --tag $IMAGE_ORG/$IMAGE_NAME:$CI_COMMIT_SHA
-  #   --tag $IMAGE_ORG/$IMAGE_NAME:latest
-  #   $BUILD_PATH -f $BUILD_PATH/Dockerfile-production
-  # - docker push $IMAGE_ORG/$IMAGE_NAME:$CI_COMMIT_SHA
-  # - docker push $IMAGE_ORG/$IMAGE_NAME:latest
   before_script:
     - echo $CI_REGISTRY $CI_REGISTRY_USER
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin <<<$CI_REGISTRY_PASSWORD
   script:
     - cd packages/client
+    - docker pull $IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME_latest
     - docker build
-      -f Dockerfile-production
+      --cache-from $IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME_latest
       --tag $IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME_$CI_COMMIT_SHA
+      --tag $IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME_latest
+      -f Dockerfile-production
       .
     - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME_$CI_COMMIT_SHA
