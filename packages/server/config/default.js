@@ -133,21 +133,6 @@ module.exports = {
       }`
     }),
   },
-  // 'pubsweet-component-xpub-dashboard': {
-  //   acceptUploadFiles: [
-  //     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  //     'application/x-latex',
-  //     'text/vnd.latex-z',
-  //     'text/plain',
-  //     'text/x-tex',
-  //     'application/x-tex',
-  //     'application/x-dvi',
-  //     'application/pdf',
-  //     'application/epub+zip',
-  //     'application/zip',
-  //     '.tex',
-  //   ],
-  // },
   pagedjs: {
     clientId: '',
     clientSecret: '',
@@ -170,7 +155,6 @@ module.exports = {
   /** These named configuration sections will be available to webpack */
   publicKeys: [
     'pubsweet-client',
-    'pubsweet-component-xpub-dashboard',
     'pubsweet-component-xpub-formbuilder',
     'pubsweet',
     'detectionMethodCorrelations',

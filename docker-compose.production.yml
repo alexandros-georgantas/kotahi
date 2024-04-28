@@ -11,6 +11,8 @@ services:
         - server_protocol=${SERVER_PROTOCOL}
         - server_host=${SERVER_HOST}
         - server_port=${SERVER_PORT}
+    depends_on:
+      - server
     ports:
       - ${CLIENT_PORT:-4000}:4000
     command: 'npx serve -p 4000 --single ./_build/assets'
@@ -18,23 +20,7 @@ services:
   server:
     build:
       context: ./packages/server
-      # context: .
       dockerfile: ./Dockerfile-production
-      # target: server
-      # args:
-      #   - node_env=${NODE_ENV:-production}
-      #   - server_protocol=${SERVER_PROTOCOL}
-      #   - server_host=${SERVER_HOST}
-      #   - server_port=${SERVER_PORT}
-      # - client_protocol=${CLIENT_PROTOCOL}
-      # - client_host=${CLIENT_HOST}
-      # - client_port=${CLIENT_PORT}
-      # - public_client_protocol=${PUBLIC_CLIENT_PROTOCOL}
-      # - public_client_host=${PUBLIC_CLIENT_HOST}
-      # - public_client_port=${PUBLIC_CLIENT_PORT}
-      # - use_colab_email=${USE_COLAB_EMAIL:-false}
-      # - flax_site_url=${FLAX_SITE_URL:-https://site.kotahidev.cloud68.co/}
-      # - USE_COLAB_BIOPHYSICS_IMPORT=${USE_COLAB_BIOPHYSICS_IMPORT:-false}
     depends_on:
       - db
       - xsweet

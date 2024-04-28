@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const webpack = require('webpack')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
@@ -46,11 +48,7 @@ module.exports = (opts = {}) => {
       // 'CLIENT_PROTOCOL',
       // 'CLIENT_HOST',
       // 'CLIENT_PORT',
-      // 'PUBLIC_CLIENT_PROTOCOL',
-      // 'PUBLIC_CLIENT_HOST',
-      // 'PUBLIC_CLIENT_PORT',
-      // 'USE_COLAB_EMAIL',
-      // 'FLAX_SITE_URL',
+      'FLAX_SITE_URL',
     ]),
   )
 

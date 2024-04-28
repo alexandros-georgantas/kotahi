@@ -1,3 +1,5 @@
+# This file is meant for running a development environment locally
+
 version: '3'
 
 services:
@@ -7,30 +9,20 @@ services:
       dockerfile: ./Dockerfile-development
     depends_on:
       - server
-    command:
-      [
-        'node_modules/.bin/webpack-dev-server',
-        '--config',
-        './webpack/webpack.development.config.js',
-      ]
+    command: ['node_modules/.bin/coko-client-dev']
     ports:
       - ${CLIENT_PORT:-4000}:${CLIENT_PORT:-4000}
     environment:
       - NODE_ENV=development
-      - CLIENT_PROTOCOL=${CLIENT_PROTOCOL:-http}
-      - CLIENT_HOST=0.0.0.0
+      - SERVER_URL=http://localhost:3000
       - CLIENT_PORT=${CLIENT_PORT:-4000}
-      - SERVER_PROTOCOL=http
-      - SERVER_HOST=server
-      - SERVER_PORT=3000
-      - PUBLIC_CLIENT_HOST=${PUBLIC_CLIENT_HOST:-0.0.0.0}
-      - USE_COLAB_EMAIL=${USE_COLAB_EMAIL:-false}
-      - USE_COLAB_BIOPHYSICS_IMPORT=${USE_COLAB_BIOPHYSICS_IMPORT:-false}
+      - CLIENT_STATIC_FOLDER_PATH=../public
       - FLAX_SITE_URL=${FLAX_SITE_URL:-http://localhost:8081}
     volumes:
       - ./packages/client/app:/home/node/app/app
-      - ./packages/client/certs:/home/node/app/certs
-      - ./packages/client/config/translation:/home/node/app/config/translation
+      - ./packages/client/config:/home/node/app/config
+      - ./packages/client/public:/home/node/app/public
+    tty: true
 
   server:
     build:
