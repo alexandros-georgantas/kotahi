@@ -8,13 +8,13 @@ services:
       context: ./packages/client
       dockerfile: ./Dockerfile-production
       args:
-        - server_url=http://localhost:3000
         - flax_site_url=${FLAX_SITE_URL:-http://localhost:8081}
     depends_on:
       - server
     ports:
       - ${CLIENT_PORT:-4000}:4000
-    # command: 'npx serve -p 4000 --single ./_build/assets'
+    environment:
+      - SERVER_URL=${SERVER_URL}
 
   server:
     build:

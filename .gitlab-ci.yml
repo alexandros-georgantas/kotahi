@@ -1,84 +1,46 @@
+# include:
+#   - project: 'cokoapps/ci'
+#     ref: main
+#     file: 'ci-templates.yml'
+
+variables:
+  # IMAGE_NAME_DEVELOPMENT: ketty-client-ci-development
+  # IMAGE_NAME_PREPRODUCTION_DEVELOP: ketty-client-ci-production-develop
+  # IMAGE_NAME_PREPRODUCTION_DEMO: ketty-client-ci-production-demo
+  # IMAGE_NAME_PRODUCTION_DEVELOP: ketty-client-deploy-develop
+  # IMAGE_NAME_PRODUCTION_DEMO: ketty-client
+  # IMAGE_NAME_STORYBOOK: ketty-client-storybook
+  # PATH_TO_BUILD: .
+  # PATH_INSIDE_CONTAINER: /home/node/ketida
+  # COMPOSE_FILE_STORYBOOK: docker-compose.storybook-deploy.yml
+  # COMPOSE_FILE_DEPLOY_DEVELOP: docker-compose.develop-deploy.yml
+  # COMPOSE_FILE_DEPLOY_DEMO: docker-compose.demo-deploy.yml
+  IMAGE_NAME_PREPRODUCTION_CLIENT: kotahi-client-preproduction
+
 stages:
-  - run-pipeline
+  # - Build development
+  # - Lint & Unit test
+  - Build production
+  # - Publish
+  # - Deploy
 
-test-pipeline:
-  except:
-    - schedules
-  stage: run-pipeline
-  trigger:
-    include:
-      - local: .gitlab-ci.config.yml
-    strategy: depend
-# preprint1-pipeline:
-#   except:
-#     - schedules
-#   stage: run-pipeline
-#   trigger:
-#     include:
-#       - local: .gitlab-ci.preprint1.yml
-#     strategy: depend
-
-# preprint1-test-firefox:
-#   only:
-#     refs:
-#       - schedules
-#     variables:
-#       - $SCHEDULE_TYPE == "test-firefox"
-#   stage: run-pipeline
-#   trigger:
-#     include:
-#       - local: .gitlab-ci.preprint1-test-firefox.yml
-#     strategy: depend
-
-# preprint2-test-firefox:
-#   only:
-#     refs:
-#       - schedules
-#     variables:
-#       - $SCHEDULE_TYPE == "test-firefox"
-#   stage: run-pipeline
-#   trigger:
-#     include:
-#       - local: .gitlab-ci.preprint2-test-firefox.yml
-#     strategy: depend
-
-# preprint2-pipeline:
-#   except:
-#     - schedules
-#   only:
-#     refs:
-#       - main
-#   stage: run-pipeline
-#   trigger:
-#     include:
-#       - local: .gitlab-ci.preprint2.yml
-#     strategy: depend
-
-# prc-test-firefox:
-#   only:
-#     refs:
-#       - schedules
-#     variables:
-#       - $SCHEDULE_TYPE == "test-firefox"
-#   stage: run-pipeline
-#   trigger:
-#     include:
-#       - local: .gitlab-ci.prc-test-firefox.yml
-#     strategy: depend
-# prc-pipeline:
-#   except:
-#     - schedules
-#   stage: run-pipeline
-#   trigger:
-#     include:
-#       - local: .gitlab-ci.prc.yml
-#     strategy: depend
-
-# journal-pipeline:
-#   except:
-#     - schedules
-#   stage: run-pipeline
-#   trigger:
-#     include:
-#       - local: .gitlab-ci.journal.yml
-#     strategy: depend
+build production client:
+  stage: Build production
+  image: docker:23
+  services:
+    - docker:23-dind
+  # before_script:
+  #   - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+  #   - if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_PASSWORD" ]; then echo "Non-existent or incomplete docker credentials" && exit 0; fi
+  # script:
+  # - docker pull $IMAGE_ORG/$IMAGE_NAME:latest || true
+  # - docker build
+  #   --cache-from $IMAGE_ORG/$IMAGE_NAME:latest
+  #   --tag $IMAGE_ORG/$IMAGE_NAME:$CI_COMMIT_SHA
+  #   --tag $IMAGE_ORG/$IMAGE_NAME:latest
+  #   $BUILD_PATH -f $BUILD_PATH/Dockerfile-production
+  # - docker push $IMAGE_ORG/$IMAGE_NAME:$CI_COMMIT_SHA
+  # - docker push $IMAGE_ORG/$IMAGE_NAME:latest
+  script:
+    - docker build
+      --tag IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_SHA
