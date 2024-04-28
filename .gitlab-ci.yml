@@ -33,7 +33,8 @@ build production client:
   before_script:
     - echo $SHELL
     - echo $CI_REGISTRY $CI_REGISTRY_USER
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin <<<$CI_REGISTRY_PASSWORD
+    # - docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin <<<$CI_REGISTRY_PASSWORD
+    - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   script:
     - cd packages/client
     - docker pull $IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME_latest
