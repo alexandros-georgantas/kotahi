@@ -37,28 +37,28 @@ build production client:
     - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   script:
     - cd packages/client
-    - docker pull $IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME_latest
+    - docker pull $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.latest
     - docker build
-      --cache-from $IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME_latest
-      --tag $IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME_$CI_COMMIT_SHA
-      --tag $IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME_latest
+      --cache-from $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.latest
+      --tag $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
+      --tag $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.latest
       -f Dockerfile-production .
-    - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME_$CI_COMMIT_SHA
-
-build production server:
-  stage: Build production
-  image: docker:23
-  services:
-    - docker:23-dind
-  before_script:
-    - echo $CI_REGISTRY $CI_REGISTRY_USER
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin <<<$CI_REGISTRY_PASSWORD
-  script:
-    - cd packages/server
-    - docker pull $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME_latest
-    - docker build
-      --cache-from $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME_latest
-      --tag $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME_$CI_COMMIT_SHA
-      --tag $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME_latest
-      -f Dockerfile-production .
-    - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME_$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME,.$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.latest
+# build production server:
+#   stage: Build production
+#   image: docker:23
+#   services:
+#     - docker:23-dind
+#   before_script:
+#     - echo $CI_REGISTRY $CI_REGISTRY_USER
+#     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin <<<$CI_REGISTRY_PASSWORD
+#   script:
+#     - cd packages/server
+#     - docker pull $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME_latest
+#     - docker build
+#       --cache-from $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME_latest
+#       --tag $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME_$CI_COMMIT_SHA
+#       --tag $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME_latest
+#       -f Dockerfile-production .
+#     - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME_$CI_COMMIT_SHA
