@@ -1,6 +1,4 @@
-// const config = require('config')
-
-// const { logger } = require('@coko/server')
+const { isEnvVariableTrue } = require('@coko/server/src/utils/env')
 
 const modelComponents = require('../models/modelComponents')
 
@@ -45,16 +43,12 @@ const components = [
   './server/model-publishing-collection/src',
 ]
 
-// if (
-//   config.has('e2eTestingApi') &&
-//   (config.get('e2eTestingApi') === '1' ||
-//     config.get('e2eTestingApi') === 'true')
-// ) {
-//   logger.warn(
-//     'IMPORTANT! Using E2E_TESTING_API should never be on in production deployments!',
-//   )
+if (isEnvVariableTrue(process.env.E2E_TESTING_API)) {
+  console.warn(
+    '\n>>>>> IMPORTANT! Using E2E_TESTING_API should never be done on production deployments!\n',
+  )
 
-//   components.push('./api/rest/e2e')
-// }
+  components.push('./api/rest/e2e')
+}
 
 module.exports = components

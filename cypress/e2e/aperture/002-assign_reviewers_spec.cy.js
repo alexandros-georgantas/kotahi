@@ -8,12 +8,11 @@ import { dashboard } from '../../support/routes'
 
 describe('Editor assigning reviewers', () => {
   before(() => {
-    // Restore Database (dumps/senior_editor_assigned.sql)
-    // cy.task('restore', 'commons/bootstrap')
-
     const restoreUrl = Cypress.config('restoreUrl')
+    const seedUrl = Cypress.config('seedUrl')
+
     cy.request('POST', `${restoreUrl}/commons.bootstrap`)
-    cy.task('seed', 'senior_editor_assigned')
+    cy.request('POST', `${seedUrl}/senior_editor_assigned`)
   })
 
   it('can assign 3 reviewers', () => {

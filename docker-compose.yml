@@ -17,6 +17,7 @@ services:
       - SERVER_URL=http://localhost:3000
       - CLIENT_PORT=${CLIENT_PORT:-4000}
       - CLIENT_STATIC_FOLDER_PATH=../public
+      - CLIENT_FAST_REFRESH=1
       - FLAX_SITE_URL=${FLAX_SITE_URL:-http://localhost:8081}
     volumes:
       - ./packages/client/app:/home/node/app/app
@@ -155,6 +156,7 @@ services:
       - USE_COLAB_BIOPHYSICS_IMPORT=${USE_COLAB_BIOPHYSICS_IMPORT:-false}
       - E2E_TESTING_API=${E2E_TESTING_API}
     volumes:
+      - ./packages/server/api:/home/node/app/api
       - ./packages/server/config:/home/node/app/config
       - ./packages/server/models:/home/node/app/models
       - ./packages/server/scripts:/home/node/app/scripts

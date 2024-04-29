@@ -9,6 +9,9 @@ const dumpFile = name => path.join(__dirname, 'cypress', 'dumps', `${name}.sql`)
 const serverUrl = process.env.SERVER_URL
 const e2eApiUrl = `${serverUrl}/api/e2e`
 const restoreUrl = `${e2eApiUrl}/restore`
+const seedUrl = `${e2eApiUrl}/seed`
+const createTokenUrl = `${e2eApiUrl}/createToken`
+const seedFormsUrl = `${e2eApiUrl}/seedForms`
 
 module.exports = defineConfig({
   defaultCommandTimeout: 20000,
@@ -97,4 +100,7 @@ module.exports = defineConfig({
 
   // custom config options
   restoreUrl,
+  seedUrl,
+  createTokenUrl,
+  seedFormsUrl,
 })
