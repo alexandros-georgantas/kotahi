@@ -5,20 +5,16 @@ RUN apt-get install -y python3 make g++
 
 WORKDIR /home/node/app
 
-# RUN mkdir ./uploads
-# RUN chown -R node:node .
+RUN chown -R node:node .
+USER node
 
-COPY /package.json .
-COPY /yarn.lock .
+COPY package.json .
+COPY yarn.lock .
 
 RUN yarn install --frozen-lockfile --production=true
 RUN yarn cache clean
 
-COPY --chown=node:node . .
-
-USER node
-
-# VOLUME /home/node/app/uploads
+COPY . .
 
 ENTRYPOINT ["sh", "./scripts/setupProdServer.sh"]
 CMD ["node", "./startServer.js"]

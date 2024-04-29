@@ -341,7 +341,7 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@coko/server@^3.12.0":
+"@coko/server@3.12.0":
   version "3.12.0"
   resolved "https://registry.yarnpkg.com/@coko/server/-/server-3.12.0.tgz#81711f687d5cd3c773bfcb8f15d195a598579614"
   integrity sha512-KZYi4MPSimWU1lj2ns2ge4+nxcGraAJHRdCoUkv+49lA7tfeD47eHYWubqbsCe6tNM/TurMKtBqZE0IqRXnaLg==
