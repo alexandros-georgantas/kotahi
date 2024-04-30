@@ -27,7 +27,7 @@ stages:
 
 build development:
   stage: Build development
-  image: $CI_REGISTRY/docker:23-dind
+  image: $CI_REGISTRY/kotahi/kotahi/docker:23-dind
   script:
     - echo hello world
 # build production client:
