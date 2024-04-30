@@ -27,6 +27,8 @@ RUN yarn install --frozen-lockfile
 
 WORKDIR /home/node/app
 
+RUN rm -rf /root/.cache/Cypress
+
 COPY . .
 
 # USER node
