@@ -81,7 +81,7 @@ export const generateSchemas = (
             // Default logo
             logoPath: {
               type: 'string',
-              default: '/assets/logo-kotahi.png',
+              default: '/logo-kotahi.png',
             },
             logoId: {
               description: t('configPage.Logo'),
@@ -905,7 +905,7 @@ export const generateSchemas = (
             // Default logo
             logoPath: {
               type: 'string',
-              default: '/assets/logo-kotahi.png',
+              default: '/logo-kotahi.png',
             },
             logoId: {
               description: t('configPage.Logo'),
@@ -1729,7 +1729,7 @@ export const generateSchemas = (
             // Default logo
             logoPath: {
               type: 'string',
-              default: '/assets/logo-kotahi.png',
+              default: '/logo-kotahi.png',
             },
             logoId: {
               description: t('configPage.Logo'),
@@ -2559,7 +2559,7 @@ export const generateSchemas = (
             // Default logo
             logoPath: {
               type: 'string',
-              default: '/assets/logo-kotahi.png',
+              default: '/logo-kotahi.png',
             },
             logoId: {
               description: t('configPage.Logo'),

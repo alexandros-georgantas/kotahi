@@ -9,7 +9,14 @@ services:
       dockerfile: ./Dockerfile-development
     depends_on:
       - server
-    command: ['node_modules/.bin/coko-client-dev']
+    # command: ['node_modules/.bin/coko-client-dev']
+    # entrypoint: ['ls -la']
+    command:
+      [
+        'node_modules/.bin/webpack-dev-server',
+        '--config',
+        './app/webpack.config.js',
+      ]
     ports:
       - ${CLIENT_PORT:-4000}:${CLIENT_PORT:-4000}
     environment:
