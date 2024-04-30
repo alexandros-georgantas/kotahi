@@ -9,8 +9,8 @@ import { FormsPage } from '../../page-object/forms-page'
 describe('Submission with errors test', () => {
   describe('Form builder', () => {
     it('views a form field', () => {
-      // task to restore the database as per the  dumps/commons/bootstrap.sql
-      cy.task('restore', 'commons/bootstrap')
+      const restoreUrl = Cypress.config('restoreUrl')
+      cy.request('POST', `${restoreUrl}/commons.bootstrap`)
 
       // login as admin
       // eslint-disable-next-line jest/valid-expect-in-promise
