@@ -27,9 +27,10 @@ stages:
 
 build development:
   stage: Build development
-  image: $CI_REGISTRY/kotahi/kotahi/docker:23-dind
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:23-dind
   script:
     - echo hello world
+    - echo ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}
 # build production client:
 #   stage: Build production
 #   image: docker:23
