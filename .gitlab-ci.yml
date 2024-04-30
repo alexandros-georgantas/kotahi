@@ -4,9 +4,6 @@
 #     file: 'ci-templates.yml'
 
 variables:
-  # IMAGE_NAME_DEVELOPMENT: ketty-client-ci-development
-  # IMAGE_NAME_PREPRODUCTION_DEVELOP: ketty-client-ci-production-develop
-  # IMAGE_NAME_PREPRODUCTION_DEMO: ketty-client-ci-production-demo
   # IMAGE_NAME_PRODUCTION_DEVELOP: ketty-client-deploy-develop
   # IMAGE_NAME_PRODUCTION_DEMO: ketty-client
   # IMAGE_NAME_STORYBOOK: ketty-client-storybook
@@ -15,6 +12,7 @@ variables:
   # COMPOSE_FILE_STORYBOOK: docker-compose.storybook-deploy.yml
   # COMPOSE_FILE_DEPLOY_DEVELOP: docker-compose.develop-deploy.yml
   # COMPOSE_FILE_DEPLOY_DEMO: docker-compose.demo-deploy.yml
+  IMAGE_NAME_DEVELOPMENT: kotahi/kotahi/development
   IMAGE_NAME_PREPRODUCTION_CLIENT: kotahi/kotahi/client-preproduction
   IMAGE_NAME_PREPRODUCTION_SERVER: kotahi/kotahi/server-preproduction
 
@@ -28,9 +26,17 @@ stages:
 build development:
   stage: Build development
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:23-dind
+  services:
+    - docker:23-dind
   script:
-    - echo hello world
-    - echo ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}
+    - docker pull $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest || true
+    - docker build
+      --cache-from $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest
+      --tag $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
+      --tag $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest
+      -f Dockerfile .
+    - docker push $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest
 # build production client:
 #   stage: Build production
 #   image: docker:23

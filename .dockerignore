@@ -41,13 +41,13 @@ CONTRIBUTING.md
 packages/*/node_modules
 
 # development config files
-.eslintrc.js
+# .eslintrc.js
 .commitlintrc.js
 .cz-config.js
 .gitlab-ci.yml
 .linstagedrc.js
-.prettierrc.js
-.stylelintrc.js
-cypress.json
+# .prettierrc.js
+# .stylelintrc.js
+# cypress.json
 
 .nvmrc
