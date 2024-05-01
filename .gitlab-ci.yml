@@ -40,6 +40,7 @@ lint:
   script:
     - ls
     - pwd
+    - cd /home/node/app
     - yarn coko-lint run
 # build production client:
 #   stage: Build production
