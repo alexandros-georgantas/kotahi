@@ -6,8 +6,6 @@ services:
   client:
     # image will be replaced in the ci
     image: kotahi/kotahi/client-preproduction
-    depends_on:
-      - server
     ports:
       - ${CLIENT_PORT}:4000
     environment:
