@@ -14,7 +14,8 @@ stages:
   - Build development
   - Lint & Unit test
   - Build production
-  - Deploy
+  - Deploy test
+  - Tear down test
   # - Publish
 
 .build development:
@@ -78,14 +79,15 @@ build production server:
     - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.latest
 
 deploy test:
-  stage: Deploy
+  stage: Deploy test
   image: $CI_REGISTRY/cokoinfra/ansible-deployer
   services:
     - docker:23-dind
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: https://$CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_COMMIT_REF_NAME.coko.app
-  # rules: k
+    on_stop: teardown test
+  # rules:
   #   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   variables:
     ANSCOMPOSE_POSTGRES_ALLOW_SELF_SIGNED_CERTIFICATES: true
@@ -98,10 +100,8 @@ deploy test:
     COMPOSE_SERVICES: client,server
     COMPOSE_SERVICES_CLIENT_URL: $CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_COMMIT_REF_NAME.coko.app
     COMPOSE_SERVICES_CLIENT_IMAGE: $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
-    # COMPOSE_SERVICES_CLIENT_IMAGE: $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.latest
     COMPOSE_SERVICES_SERVER_URL: $CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_COMMIT_REF_NAME.server.coko.app
     COMPOSE_SERVICES_SERVER_IMAGE: $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
-    # COMPOSE_SERVICES_SERVER_IMAGE: $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.latest
     do_spaces_access_key: $DIGITAL_OCEAN_SPACES_ACCESS_KEY
     do_spaces_secret_key: $DIGITAL_OCEAN_SPACES_SECRET_KEY
   script:
@@ -110,3 +110,25 @@ deploy test:
     - cp $DEPLOY_COMPOSE_FILE /ansible
     - cd /ansible
     - ANSIBLE_FORCE_COLOR=true ansible-playbook bootstrap.yml -e "compose_file=$DEPLOY_COMPOSE_FILE"
+
+teardown test:
+  stage: Tear down test
+  image: $CI_REGISTRY/cokoinfra/ansible-deployer
+  services:
+    - docker:23-dind
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
+  variables:
+    COMPOSE_SERVICES: client,server
+    COMPOSE_SERVICES_CLIENT_URL: $CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_COMMIT_REF_NAME.coko.app
+    COMPOSE_SERVICES_CLIENT_IMAGE: $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
+    COMPOSE_SERVICES_SERVER_URL: $CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_COMMIT_REF_NAME.server.coko.app
+    COMPOSE_SERVICES_SERVER_IMAGE: $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
+    do_spaces_access_key: $DIGITAL_OCEAN_SPACES_ACCESS_KEY
+    do_spaces_secret_key: $DIGITAL_OCEAN_SPACES_SECRET_KEY
+  script:
+    - kubectl config get-contexts
+    - kubectl config use-context kotahi/agent:agent-1
+    - cd /ansible
+    - ANSIBLE_FORCE_COLOR=true ansible-playbook teardown.yml
