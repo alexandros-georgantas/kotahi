@@ -99,9 +99,9 @@ deploy test:
     do_spaces_access_key: $DIGITAL_OCEAN_SPACES_ACCESS_KEY
     do_spaces_secret_key: $DIGITAL_OCEAN_SPACES_SECRET_KEY
   script:
-    - kubectl config get-contexts
-    - kubectl config use-context kotahi/agent:agent-1
-    - cp $DEPLOY_COMPOSE_FILE /ansible
-    - cd /ansible
-    - ANSIBLE_FORCE_COLOR=true ansible-playbook bootstrap.yml -e "compose_file=$DEPLOY_COMPOSE_FILE"
-    # - ANSIBLE_FORCE_COLOR=true ansible-playbook /ansible/bootstrap.yml -e "compose_file=$(pwd)/$DEPLOY_COMPOSE_FILE"
+    - echo $COMPOSE_SERVICES_CLIENT_IMAGE
+    # - kubectl config get-contexts
+    # - kubectl config use-context kotahi/agent:agent-1
+    # - cp $DEPLOY_COMPOSE_FILE /ansible
+    # - cd /ansible
+    # - ANSIBLE_FORCE_COLOR=true ansible-playbook bootstrap.yml -e "compose_file=$DEPLOY_COMPOSE_FILE"
