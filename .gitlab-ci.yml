@@ -11,7 +11,7 @@ variables:
 
 stages:
   - Build development
-  # - Lint & Unit test
+  - Lint & Unit test
   - Build production
   # - Publish
   # - Deploy
@@ -32,6 +32,12 @@ build development:
       -f Dockerfile .
     - docker push $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
     # - docker push $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest
+
+lint:
+  stage: Lint & Unit test
+  image: $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
+  script:
+    - yarn coko-lint run
 # build production client:
 #   stage: Build production
 #   image: docker:23
