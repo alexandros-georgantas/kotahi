@@ -94,6 +94,8 @@ deploy test:
     COMPOSE_SERVICES_SERVER_IMAGE: $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
     do_spaces_access_key: $DIGITAL_OCEAN_SPACES_ACCESS_KEY
     do_spaces_secret_key: $DIGITAL_OCEAN_SPACES_SECRET_KEY
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   script:
     - kubectl config get-contexts
     - kubectl config use-context kotahi/agent:agent-1
