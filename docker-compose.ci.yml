@@ -5,14 +5,14 @@ version: '3'
 
 services:
   client:
-    image: kotahi/kotahi/client-preproduction
+    image: kotahi/kotahi/client-preproduction:latest
     ports:
       - ${CLIENT_PORT}:4000
     environment:
       - SERVER_URL=${SERVER_URL}
 
   server:
-    image: kotahi/kotahi/server-preproduction
+    image: kotahi/kotahi/server-preproduction:latest
     ports:
       - ${SERVER_PORT:-3000}:${SERVER_PORT:-3000}
     environment:
