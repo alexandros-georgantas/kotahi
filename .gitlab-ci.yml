@@ -41,7 +41,7 @@ stages:
     - cd /home/node/app
     - yarn coko-lint run
 
-build production client:
+.build production client:
   stage: Build production
   image: docker:23
   services:
@@ -59,7 +59,7 @@ build production client:
     - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
     - docker push $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.latest
 
-build production server:
+.build production server:
   stage: Build production
   image: docker:23
   services:
@@ -89,13 +89,13 @@ deploy test:
     ANSCOMPOSE_MANUSCRIPTS_TABLE_COLUMNS: 'shortId, submission.$title, created, updated, status, author'
     COMPOSE_SERVICES: client,server
     COMPOSE_SERVICES_CLIENT_URL: kotahi.coko.app
-    COMPOSE_SERVICES_CLIENT_IMAGE: $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
+    # COMPOSE_SERVICES_CLIENT_IMAGE: $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
+    COMPOSE_SERVICES_CLIENT_IMAGE: $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_CLIENT:$CI_COMMIT_REF_NAME.latest
     COMPOSE_SERVICES_SERVER_URL: server.kotahi.coko.app
-    COMPOSE_SERVICES_SERVER_IMAGE: $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
+    # COMPOSE_SERVICES_SERVER_IMAGE: $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
+    COMPOSE_SERVICES_SERVER_IMAGE: $CI_REGISTRY/$IMAGE_NAME_PREPRODUCTION_SERVER:$CI_COMMIT_REF_NAME.latest
     do_spaces_access_key: $DIGITAL_OCEAN_SPACES_ACCESS_KEY
     do_spaces_secret_key: $DIGITAL_OCEAN_SPACES_SECRET_KEY
-  before_script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   script:
     - kubectl config get-contexts
     - kubectl config use-context kotahi/agent:agent-1
