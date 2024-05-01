@@ -36,10 +36,7 @@ build development:
 lint:
   stage: Lint & Unit test
   image: $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
-  # image: gitlabregistry-coko.cloud68.systems/kotahi/kotahi/root-development:cypress-api-only.9aa64acbfb24d17785f92589fb903549a9fa18d0
   script:
-    # - ls
-    # - pwd
     - cd /home/node/app
     - yarn coko-lint run
 # build production client:

@@ -8,9 +8,12 @@
     "url": "https://gitlab.coko.foundation/kotahi/kotahi"
   },
   "license": "MIT",
+  "scripts": {
+    "storybook": "coko-storybook"
+  },
   "resolutions": {
     "@apollo/client": "3.2.2",
-    "commander": "11",
+    "@storybook/react": "6.5.10",
     "formik": "2.2.6",
     "prosemirror-inputrules": "1.2.0",
     "prosemirror-model": "1.19.0",
@@ -104,6 +107,7 @@
     "xpub-validators": "0.0.28"
   },
   "devDependencies": {
+    "@coko/storybook": "^2.0.0",
     "babel-jest": "23.6.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",
