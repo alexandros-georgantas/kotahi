@@ -1,10 +1,10 @@
-# This file is meant for running a production environment locally
+# This file is meant only for use in deploying through the project's ci pipeline
+# Image values will be replaced during the pipeline run
 
 version: '3'
 
 services:
   client:
-    # image will be replaced in the ci
     image: kotahi/kotahi/client-preproduction
     ports:
       - ${CLIENT_PORT}:4000
@@ -12,7 +12,6 @@ services:
       - SERVER_URL=${SERVER_URL}
 
   server:
-    # image will be replaced in the ci
     image: kotahi/kotahi/server-preproduction
     ports:
       - ${SERVER_PORT:-3000}:${SERVER_PORT:-3000}
