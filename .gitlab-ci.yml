@@ -24,14 +24,14 @@ build development:
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   script:
-    - docker pull $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest || true
+    # - docker pull $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest || true
+    # --cache-from $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest
+    # --tag $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest
     - docker build
-      --cache-from $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest
       --tag $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
-      --tag $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest
       -f Dockerfile .
     - docker push $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
-    - docker push $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest
+    # - docker push $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest
 # build production client:
 #   stage: Build production
 #   image: docker:23
