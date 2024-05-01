@@ -1,7 +1,4 @@
-FROM node:18-bookworm-slim
-
-RUN apt-get update
-RUN apt-get install -y python3 make g++
+FROM cokoapps/base:18
 
 WORKDIR /home/node/app
 
@@ -9,7 +6,6 @@ COPY package.json .
 COPY yarn.lock .
 
 RUN yarn install --frozen-lockfile
-RUN yarn cache clean
 
 WORKDIR /home/node/app/packages/server
 COPY packages/server/package.json .
@@ -27,7 +23,8 @@ RUN yarn install --frozen-lockfile
 
 WORKDIR /home/node/app
 
-RUN rm -rf /root/.cache/Cypress
+RUN yarn cypress cache clear
+RUN yarn cache clean
 
 COPY . .
 
