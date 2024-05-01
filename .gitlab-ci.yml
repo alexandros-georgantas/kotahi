@@ -80,6 +80,8 @@ stages:
 deploy test:
   stage: Deploy
   image: $CI_REGISTRY/cokoinfra/ansible-deployer
+  services:
+    - docker:23-dind
   variables:
     ANSCOMPOSE_POSTGRES_ALLOW_SELF_SIGNED_CERTIFICATES: true
     ANSCOMPOSE_ORCID_CLIENT_ID: $ORCID_CLIENT_ID_2
