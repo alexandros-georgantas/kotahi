@@ -208,7 +208,6 @@ const DecisionVersion = ({
                 onChange={(value, path) => {
                   onChange(value, path, versionId)
                 }}
-                republish={() => null}
                 setShouldPublishField={async (fieldName, shouldPublish) =>
                   setShouldPublishField({
                     variables: {

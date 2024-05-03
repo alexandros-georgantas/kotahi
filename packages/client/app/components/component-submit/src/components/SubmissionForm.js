@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useState, useContext } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PaddedSectionContent } from '../../../shared'
 import FormTemplate, { FormIntro } from '../../../component-form'
 import { articleStatuses } from '../../../../globals'
+import { ConfigContext } from '../../../config/src'
+import Modal from '../../../component-modal/src/Modal'
+import PublishingResponse from '../../../component-review/src/components/publishing/PublishingResponse'
 
 const SubmissionForm = ({
   versionValues,
@@ -19,7 +22,13 @@ const SubmissionForm = ({
   validateDoi,
   validateSuffix,
 }) => {
+  const config = useContext(ConfigContext)
   const { t } = useTranslation()
+
+  const [publishingResponse, setPublishingResponse] = useState([])
+
+  const [publishErrorsModalIsOpen, setPublishErrorsModalIsOpen] =
+    useState(false)
 
   let submissionButtonText = t('manuscriptSubmit.Submit your research object')
   let submitButtonShouldRepublish = false
@@ -53,11 +62,30 @@ const SubmissionForm = ({
         onSubmit={async (values, { validateForm, setSubmitting, ...other }) => {
           // TODO: Change this to a more Formik idiomatic form
           const isValid = Object.keys(await validateForm()).length === 0
-          return isValid
-            ? onSubmit(manuscript.id, values) // values are currently ignored!
-            : setSubmitting(false)
+
+          if (isValid && submitButtonShouldRepublish && republish) {
+            const response = (await republish(
+              manuscript.id,
+              config.groupId,
+            )) || {
+              steps: [],
+            }
+
+            setPublishingResponse(response)
+
+            if (response.steps.some(step => !step.succeeded)) {
+              setPublishErrorsModalIsOpen(true)
+              setSubmitting(false)
+              return 'failure'
+            }
+          }
+
+          if (isValid) onSubmit(manuscript.id, values)
+          // values are currently ignored!
+          else setSubmitting(false)
+
+          return 'success'
         }}
-        republish={submitButtonShouldRepublish && republish}
         setShouldPublishField={async (fieldName, shouldPublish) =>
           setShouldPublishField({
             variables: {
@@ -75,6 +103,14 @@ const SubmissionForm = ({
         validateDoi={validateDoi}
         validateSuffix={validateSuffix}
       />
+      <Modal
+        isOpen={publishErrorsModalIsOpen}
+        onClose={() => setPublishErrorsModalIsOpen(false)}
+        subtitle={t('modals.publishError.Some targets failed to publish')}
+        title={t('modals.publishError.Publishing error')}
+      >
+        <PublishingResponse response={publishingResponse} />
+      </Modal>
     </PaddedSectionContent>
   )
 }

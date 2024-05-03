@@ -6,7 +6,6 @@ import { unescape, get, set, debounce } from 'lodash'
 import { sanitize } from 'isomorphic-dompurify'
 import { RadioGroup } from '@pubsweet/ui'
 import { th } from '@pubsweet/ui-toolkit'
-import { useTranslation } from 'react-i18next'
 import {
   Select,
   FilesUpload,
@@ -27,8 +26,6 @@ import ThreadedDiscussion from '../component-formbuilder/src/components/builderC
 import ActionButton from '../shared/ActionButton'
 import { hasValue } from '../../shared/htmlUtils'
 import { ConfigContext } from '../config/src'
-import Modal from '../component-modal/src/Modal'
-import PublishingResponse from '../component-review/src/components/publishing/PublishingResponse'
 import theme from '../../theme'
 
 const ModalWrapper = styled.div`
@@ -128,7 +125,6 @@ const FormTemplate = ({
   manuscriptId,
   submissionButtonText,
   onChange,
-  republish,
   onSubmit,
   showEditorOnlyFields,
   validateDoi,
@@ -147,6 +143,9 @@ const FormTemplate = ({
 }) => {
   const config = useContext(ConfigContext)
   const [confirming, setConfirming] = React.useState(false)
+
+  const [submitButtonOverrideStatus, setSubmitButtonOverrideStatus] =
+    useState(null)
 
   const toggleConfirming = () => {
     setConfirming(confirm => !confirm)
@@ -198,7 +197,12 @@ const FormTemplate = ({
       initialValues={initialValuesWithDummyValues}
       onSubmit={async (values, actions) => {
         await sumbitPendingThreadedDiscussionComments(values)
-        if (onSubmit) await onSubmit(values, actions)
+
+        if (onSubmit) {
+          setSubmitButtonOverrideStatus(null)
+          const status = await onSubmit(values, actions)
+          if (status) setSubmitButtonOverrideStatus(status)
+        }
       }}
       validateOnBlur
       validateOnChange={false}
@@ -224,11 +228,6 @@ const FormTemplate = ({
 
         const [submitSucceeded, setSubmitSucceeded] = useState(false)
         const [buttonIsPending, setButtonIsPending] = useState(false)
-        const [publishingResponse, setPublishingResponse] = useState([])
-        const { t } = useTranslation()
-
-        const [publishErrorsModalIsOpen, setPublishErrorsModalIsOpen] =
-          useState(false)
 
         const submitButton = (text, haspopup = false) => {
           return (
@@ -258,33 +257,19 @@ const FormTemplate = ({
                     toggleConfirming()
                   }
 
-                  if (!hasErrors && republish) {
-                    const response = (await republish(
-                      manuscriptId,
-                      config.groupId,
-                    )) || {
-                      steps: [],
-                    }
-
-                    setPublishingResponse(response)
-                    if (response.steps.some(step => !step.succeeded))
-                      setPublishErrorsModalIsOpen(true)
-                  }
-
                   setButtonIsPending(false)
                 }}
                 primary
                 status={
                   /* eslint-disable no-nested-ternary */
-                  buttonIsPending || isSubmitting
+                  submitButtonOverrideStatus ??
+                  (buttonIsPending || isSubmitting
                     ? 'pending'
-                    : publishingResponse?.steps?.some(step => !step.succeeded)
-                    ? 'failure'
                     : Object.keys(errors).length && submitCount
                     ? '' // TODO Make this case 'failure', once we've fixed the validation delays in the form
                     : submitSucceeded
                     ? 'success'
-                    : ''
+                    : '')
                   /* eslint-enable no-nested-ternary */
                 }
               >
@@ -504,14 +489,6 @@ const FormTemplate = ({
                 />
               </ModalWrapper>
             )}
-            <Modal
-              isOpen={publishErrorsModalIsOpen}
-              onClose={() => setPublishErrorsModalIsOpen(false)}
-              subtitle={t('modals.publishError.Some targets failed to publish')}
-              title={t('modals.publishError.Publishing error')}
-            >
-              <PublishingResponse response={publishingResponse} />
-            </Modal>
           </Form>
         )
       }}
@@ -558,7 +535,6 @@ FormTemplate.propTypes = {
   }),
   onChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func,
-  republish: PropTypes.func,
   submissionButtonText: PropTypes.string,
   showEditorOnlyFields: PropTypes.bool.isRequired,
   shouldStoreFilesInForm: PropTypes.bool,
@@ -569,7 +545,6 @@ FormTemplate.propTypes = {
 FormTemplate.defaultProps = {
   onSubmit: undefined,
   initialValues: null,
-  republish: null,
   submissionButtonText: '',
   shouldStoreFilesInForm: false,
   tagForFiles: null,
