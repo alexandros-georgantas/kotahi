@@ -12,15 +12,15 @@ import {
   Columns,
   Manuscript,
   Chat,
-  SectionContent,
   HiddenTabs,
   ErrorBoundary,
   VersionSwitcher,
+  PaddedSectionContent,
 } from '../../../../shared'
 import { ChatButton, CollapseButton } from '../style'
 import MessageContainer from '../../../../component-chat/src/MessageContainer'
 import SharedReviewerGroupReviews from './SharedReviewerGroupReviews'
-import FormTemplate from '../../../../component-form/FormTemplate'
+import FormTemplate, { FormIntro } from '../../../../component-form'
 import { ConfigContext } from '../../../../config/src'
 
 const ReviewLayout = ({
@@ -198,15 +198,15 @@ const ReviewLayout = ({
             threadedDiscussionProps={threadedDiscussionProps}
           />
         ) : (
-          <SectionContent>
+          <PaddedSectionContent>
+            <FormIntro form={reviewForm} manuscriptId={manuscript.id} />
+            <hr />
             <FormTemplate
               createFile={createFile}
               deleteFile={deleteFile}
               form={reviewForm}
               initialValues={reviewData}
               manuscriptId={latestManuscript.id}
-              manuscriptShortId={latestManuscript.shortId}
-              manuscriptStatus={latestManuscript.status}
               onChange={(value, path) =>
                 updateReviewJsonData(
                   latestManuscript.id,
@@ -224,7 +224,7 @@ const ReviewLayout = ({
               validateDoi={validateDoi}
               validateSuffix={validateSuffix}
             />
-          </SectionContent>
+          </PaddedSectionContent>
         )}
       </div>
     )

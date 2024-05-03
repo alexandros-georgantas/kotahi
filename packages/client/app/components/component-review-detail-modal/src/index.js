@@ -19,7 +19,7 @@ import recommendations from '../../../../config/journal/recommendations'
 import { UserAvatar } from '../../component-avatar/src'
 import DeleteReviewerModal from '../../component-review/src/components/reviewers/DeleteReviewerModal'
 import ReadonlyFieldData from '../../component-review/src/components/metadata/ReadonlyFieldData'
-import FormTemplate from '../../component-form/FormTemplate'
+import FormTemplate from '../../component-form'
 import { ConfigContext } from '../../config/src'
 import localizeReviewFilterOptions from '../../../shared/localizeReviewFilterOptions'
 import localizeRecommendations from '../../../shared/localizeRecommendations'
@@ -374,17 +374,15 @@ const ReviewData = ({
           </ConfigurableStatus>
         </StatusContainer>
       )}
-
+      {recommendationConfig && !readOnly && canEditReviews && <hr />}
       {!readOnly && canEditReviews ? (
         <FormTemplate
           createFile={createFile}
           deleteFile={deleteFile}
-          form={{ ...reviewForm, name: null, description: null }} // suppresses the form title and description
+          form={reviewForm}
           formData={reviewFormData}
           initialValues={reviewFormData}
           manuscriptId={manuscriptId}
-          noHeader
-          noPadding
           onChange={(value, path) => {
             updateReview(
               review.id,

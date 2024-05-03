@@ -1,7 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { SectionContent } from '../../../shared'
-import FormTemplate from '../../../component-form/FormTemplate'
+import { PaddedSectionContent } from '../../../shared'
+import FormTemplate, { FormIntro } from '../../../component-form'
 import { articleStatuses } from '../../../../globals'
 
 const SubmissionForm = ({
@@ -32,7 +32,9 @@ const SubmissionForm = ({
   }
 
   return (
-    <SectionContent>
+    <PaddedSectionContent>
+      <FormIntro form={form} manuscriptId={manuscript.id} />
+      <hr />
       <FormTemplate
         createFile={createFile}
         deleteFile={deleteFile}
@@ -45,8 +47,6 @@ const SubmissionForm = ({
         initialValues={versionValues}
         isSubmission
         manuscriptId={manuscript.id}
-        manuscriptShortId={manuscript.shortId}
-        manuscriptStatus={manuscript.status}
         onChange={(value, path) => {
           onChange(value, path, manuscript.id)
         }}
@@ -75,7 +75,7 @@ const SubmissionForm = ({
         validateDoi={validateDoi}
         validateSuffix={validateSuffix}
       />
-    </SectionContent>
+    </PaddedSectionContent>
   )
 }
 

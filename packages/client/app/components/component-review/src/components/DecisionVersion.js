@@ -15,13 +15,17 @@ import Publish from './Publish'
 import { AdminSection } from './style'
 import {
   HiddenTabs,
+  PaddedSectionContent,
   SectionContent,
   SectionHeader,
   SectionRow,
   Title,
 } from '../../../shared'
 import DecisionAndReviews from '../../../component-submit/src/components/DecisionAndReviews'
-import FormTemplate from '../../../component-form/FormTemplate'
+import FormTemplate, {
+  ManuscriptNumberLabel,
+  FormIntro,
+} from '../../../component-form'
 import TaskList from '../../../component-task-manager/src/TaskList'
 import KanbanBoard from './KanbanBoard'
 import InviteReviewer from './reviewers/InviteReviewer'
@@ -182,11 +186,15 @@ const DecisionVersion = ({
               threadedDiscussionProps={threadedDiscussionExtendedProps}
             />
           ) : (
-            <SectionContent>
+            <PaddedSectionContent>
+              {displayShortIdAsIdentifier && (
+                <ManuscriptNumberLabel manuscriptShortId={version.shortId} />
+              )}
+              <FormIntro form={form} manuscriptId={version.id} />
+              <hr />
               <FormTemplate
                 createFile={createFile}
                 deleteFile={deleteFile}
-                displayShortIdAsIdentifier={displayShortIdAsIdentifier}
                 fieldsToPublish={
                   version.formFieldsToPublish.find(
                     ff => ff.objectId === version.id,
@@ -196,8 +204,6 @@ const DecisionVersion = ({
                 initialValues={versionValues}
                 isSubmission
                 manuscriptId={version.id}
-                manuscriptShortId={version.shortId}
-                manuscriptStatus={version.status}
                 match={{ url: 'decision' }}
                 onChange={(value, path) => {
                   onChange(value, path, versionId)
@@ -216,11 +222,10 @@ const DecisionVersion = ({
                 shouldShowOptionToPublish
                 showEditorOnlyFields
                 threadedDiscussionProps={threadedDiscussionExtendedProps}
-                urlFrag={urlFrag}
                 validateDoi={validateDoi}
                 validateSuffix={validateSuffix}
               />
-            </SectionContent>
+            </PaddedSectionContent>
           )}
         </>
       ),
@@ -399,7 +404,9 @@ const DecisionVersion = ({
           )}
           {isCurrentVersion && (
             <AdminSection key="decision-form">
-              <SectionContent>
+              <PaddedSectionContent>
+                <FormIntro form={decisionForm} manuscriptId={version.id} />
+                <hr />
                 <FormTemplate
                   createFile={createFile}
                   deleteFile={deleteFile}
@@ -416,8 +423,6 @@ const DecisionVersion = ({
                   }
                   isSubmission={false}
                   manuscriptId={version.id}
-                  manuscriptShortId={version.shortId}
-                  manuscriptStatus={version.status}
                   onChange={updateReviewJsonData}
                   onSubmit={async (values, actions) => {
                     await makeDecision({
@@ -445,11 +450,10 @@ const DecisionVersion = ({
                   submissionButtonText={t('decisionPage.decisionTab.Submit')}
                   tagForFiles="decision"
                   threadedDiscussionProps={threadedDiscussionExtendedProps}
-                  urlFrag={urlFrag}
                   validateDoi={validateDoi}
                   validateSuffix={validateSuffix}
                 />
-              </SectionContent>
+              </PaddedSectionContent>
             </AdminSection>
           )}
           {isCurrentVersion && (

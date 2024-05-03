@@ -8,7 +8,6 @@ import { RadioGroup } from '@pubsweet/ui'
 import { th } from '@pubsweet/ui-toolkit'
 import { useTranslation } from 'react-i18next'
 import {
-  Section as Container,
   Select,
   FilesUpload,
   Attachment,
@@ -17,12 +16,7 @@ import {
   CheckboxGroup,
   RichTextEditor,
 } from '../shared'
-import {
-  Heading1,
-  Section,
-  Legend,
-  SubNote,
-} from '../component-submit/src/style'
+import { Section, Legend, SubNote } from '../component-submit/src/style'
 import AuthorsInput from '../component-submit/src/components/AuthorsInput'
 import LinksInput from '../component-submit/src/components/LinksInput'
 import ValidatedFieldFormik from '../component-submit/src/components/ValidatedField'
@@ -36,42 +30,6 @@ import { ConfigContext } from '../config/src'
 import Modal from '../component-modal/src/Modal'
 import PublishingResponse from '../component-review/src/components/publishing/PublishingResponse'
 import theme from '../../theme'
-
-const FormContainer = styled(Container)`
-  background: white;
-  padding: 0;
-
-  header {
-    border-bottom: 1px solid #e8e8e8;
-    display: ${({ noHeader }) => (noHeader ? 'none' : 'flex')};
-    flex-direction: column;
-    justify-content: center;
-    /* account for <NoteRight> */
-    padding: 28px 28px 44px 28px;
-
-    h1 {
-      font-weight: 700;
-      margin: 0;
-      padding: 0;
-    }
-  }
-
-  form {
-    padding: ${({ noPadding }) => (noPadding ? 0 : '30px')};
-
-    section {
-      margin: 0 0 44px 0;
-    }
-  }
-`
-
-const Intro = styled.div`
-  line-height: 1.4;
-
-  p {
-    margin: 0;
-  }
-`
 
 const ModalWrapper = styled.div`
   align-items: center;
@@ -100,13 +58,6 @@ const SafeRadioGroup = styled(RadioGroup)`
   position: relative;
 `
 
-const NoteRight = styled.div`
-  font-size: ${th('fontSizeBaseSmall')};
-  line-height: ${th('lineHeightBaseSmall')};
-  padding: ${theme.spacing.e} ${theme.spacing.f};
-  text-align: right;
-`
-
 const FieldHead = styled.div`
   align-items: baseline;
   display: flex;
@@ -115,6 +66,12 @@ const FieldHead = styled.div`
   & > label {
     /* this is to make "publish" on decision page go flush right */
     margin-left: auto;
+  }
+`
+
+const Form = styled.form`
+  section {
+    margin: 0 0 44px 0;
   }
 `
 
@@ -148,9 +105,6 @@ const rejectProps = (obj, keys) =>
       {},
     )
 
-const link = (urlFrag, manuscriptId) =>
-  String.raw`<a href=${urlFrag}/versions/${manuscriptId}/manuscript>view here</a>`
-
 const createMarkup = encodedHtml => ({
   __html: sanitize(unescape(encodedHtml)),
 })
@@ -172,15 +126,11 @@ const FormTemplate = ({
   form,
   initialValues,
   manuscriptId,
-  manuscriptShortId,
-  manuscriptStatus,
   submissionButtonText,
   onChange,
   republish,
   onSubmit,
   showEditorOnlyFields,
-  urlFrag,
-  displayShortIdAsIdentifier,
   validateDoi,
   validateSuffix,
   createFile,
@@ -190,8 +140,6 @@ const FormTemplate = ({
   shouldStoreFilesInForm,
   initializeReview,
   tagForFiles,
-  noPadding,
-  noHeader,
   threadedDiscussionProps: tdProps,
   fieldsToPublish,
   setShouldPublishField,
@@ -368,229 +316,203 @@ const FormTemplate = ({
           isSubmission && manuscriptFiles.length ? manuscriptFiles[0] : null
 
         return (
-          <FormContainer noHeader={noHeader} noPadding={noPadding}>
-            {displayShortIdAsIdentifier && (
-              <NoteRight>
-                {t('decisionPage.metadataTab.Manuscript Number')}{' '}
-                {manuscriptShortId}
-              </NoteRight>
-            )}
-            <header>
-              <Heading1>{form.name}</Heading1>
-              <Intro
-                dangerouslySetInnerHTML={createMarkup(
-                  (form.description || '').replace(
-                    '###link###',
-                    link(urlFrag, manuscriptId),
-                  ),
-                )}
-              />
-            </header>
-            <form>
-              {(form.children || [])
-                .filter(
-                  element =>
-                    element.component &&
-                    (showEditorOnlyFields ||
-                      element.hideFromAuthors !== 'true'),
-                )
-                .map(prepareFieldProps)
-                .map((element, i) => {
-                  let threadedDiscussionProps
+          <Form>
+            {(form.children || [])
+              .filter(
+                element =>
+                  element.component &&
+                  (showEditorOnlyFields || element.hideFromAuthors !== 'true'),
+              )
+              .map(prepareFieldProps)
+              .map((element, i) => {
+                let threadedDiscussionProps
 
-                  if (element.component === 'ThreadedDiscussion') {
-                    const setShouldPublishComment =
-                      shouldShowOptionToPublish &&
-                      element.permitPublishing === 'true' &&
-                      ((id, val) =>
-                        setShouldPublishField(`${element.name}:${id}`, val))
+                if (element.component === 'ThreadedDiscussion') {
+                  const setShouldPublishComment =
+                    shouldShowOptionToPublish &&
+                    element.permitPublishing === 'true' &&
+                    ((id, val) =>
+                      setShouldPublishField(`${element.name}:${id}`, val))
 
-                    threadedDiscussionProps = {
-                      ...tdProps,
-                      threadedDiscussion: tdProps.threadedDiscussions.find(
-                        d => d.id === values[element.name],
-                      ),
-                      threadedDiscussions: undefined,
-                      commentsToPublish: fieldsToPublish
-                        .filter(f => f.startsWith(`${element.name}:`))
-                        .map(f => f.split(':')[1]),
-                      setShouldPublishComment,
-                      userCanAddThread: true,
-                    }
+                  threadedDiscussionProps = {
+                    ...tdProps,
+                    threadedDiscussion: tdProps.threadedDiscussions.find(
+                      d => d.id === values[element.name],
+                    ),
+                    threadedDiscussions: undefined,
+                    commentsToPublish: fieldsToPublish
+                      .filter(f => f.startsWith(`${element.name}:`))
+                      .map(f => f.split(':')[1]),
+                    setShouldPublishComment,
+                    userCanAddThread: true,
                   }
+                }
 
-                  let markup = createMarkup(element.title)
+                let markup = createMarkup(element.title)
 
-                  // add an '*' to the markup if it is marked required
-                  if (Array.isArray(element.validate)) {
-                    // element.validate can specify multiple validation functions; we're looking for 'required'
-                    if (element.validate.some(v => v.value === 'required'))
-                      markup = createMarkup(`${element.title} *`)
-                  }
+                // add an '*' to the markup if it is marked required
+                if (Array.isArray(element.validate)) {
+                  // element.validate can specify multiple validation functions; we're looking for 'required'
+                  if (element.validate.some(v => v.value === 'required'))
+                    markup = createMarkup(`${element.title} *`)
+                }
 
-                  return (
-                    <Section
-                      cssOverrides={JSON.parse(element.sectioncss || '{}')}
-                      key={`${element.id}`}
-                    >
-                      <FieldHead>
-                        <Legend dangerouslySetInnerHTML={markup} />
-                        {shouldShowOptionToPublish &&
-                          element.permitPublishing === 'true' &&
-                          element.component !== 'ThreadedDiscussion' && (
-                            <FieldPublishingSelector
-                              onChange={val =>
-                                setShouldPublishField(element.name, val)
-                              }
-                              value={fieldsToPublish.includes(element.name)}
-                            />
-                          )}
-                        <MessageWrapper>
-                          <ErrorMessage name={element.name} />
-                        </MessageWrapper>
-                      </FieldHead>
-                      {element.component === 'SupplementaryFiles' && (
-                        <FilesUpload
-                          createFile={createFile}
-                          deleteFile={deleteFile}
-                          fieldName={
-                            shouldStoreFilesInForm ? element.name : 'files'
-                          } // TODO Store files in form for submissions too: should simplify code both frontend and back.
-                          fileType={tagForFiles || 'supplementary'}
-                          initializeReview={initializeReview}
-                          manuscriptId={manuscriptId}
-                          onChange={
-                            shouldStoreFilesInForm ? innerOnChange : null
-                          }
-                          reviewId={reviewId}
-                          values={values}
-                        />
-                      )}
-                      {element.component === 'VisualAbstract' && (
-                        <FilesUpload
-                          acceptMultiple={false}
-                          createFile={createFile}
-                          deleteFile={deleteFile}
-                          fieldName={
-                            shouldStoreFilesInForm ? element.name : 'files'
-                          }
-                          fileType={tagForFiles || 'visualAbstract'}
-                          initializeReview={initializeReview}
-                          manuscriptId={manuscriptId}
-                          mimeTypesToAccept="image/*"
-                          onChange={
-                            shouldStoreFilesInForm ? innerOnChange : null
-                          }
-                          reviewId={reviewId}
-                          values={values}
-                        />
-                      )}
-                      {element.component === 'ManuscriptFile' &&
-                      submittedManuscriptFile ? (
-                        <Attachment
-                          file={submittedManuscriptFile}
-                          key={submittedManuscriptFile.storedObjects[0].url}
-                          uploaded
-                        />
-                      ) : null}
-                      {![
-                        'SupplementaryFiles',
-                        'VisualAbstract',
-                        'ManuscriptFile',
-                      ].includes(element.component) && (
-                        <ValidatedFieldFormik
-                          {...rejectProps(element, [
-                            'component',
-                            'title',
-                            'sectioncss',
-                            'parse',
-                            'format',
-                            'validate',
-                            'validateValue',
-                            'description',
-                            'shortDescription',
-                            'labelColor',
-                          ])}
-                          aria-label={element.placeholder || element.title}
-                          component={elements[element.component]}
-                          data-testid={element.name} // TODO: Improve this
-                          isClearable={
-                            element.component === 'Select' &&
-                            element.name === 'submission.$customStatus'
-                          }
-                          key={`validate-${element.id}`}
-                          name={element.name}
-                          onChange={value => {
-                            // TODO: Perhaps split components remove conditions here
-                            let val
-
-                            if (value?.target) {
-                              val = value.target.value
-                            } else if (value?.value) {
-                              val = value.value
-                            } else {
-                              val = value
+                return (
+                  <Section
+                    cssOverrides={JSON.parse(element.sectioncss || '{}')}
+                    key={`${element.id}`}
+                  >
+                    <FieldHead>
+                      <Legend dangerouslySetInnerHTML={markup} />
+                      {shouldShowOptionToPublish &&
+                        element.permitPublishing === 'true' &&
+                        element.component !== 'ThreadedDiscussion' && (
+                          <FieldPublishingSelector
+                            onChange={val =>
+                              setShouldPublishField(element.name, val)
                             }
+                            value={fieldsToPublish.includes(element.name)}
+                          />
+                        )}
+                      <MessageWrapper>
+                        <ErrorMessage name={element.name} />
+                      </MessageWrapper>
+                    </FieldHead>
+                    {element.component === 'SupplementaryFiles' && (
+                      <FilesUpload
+                        createFile={createFile}
+                        deleteFile={deleteFile}
+                        fieldName={
+                          shouldStoreFilesInForm ? element.name : 'files'
+                        } // TODO Store files in form for submissions too: should simplify code both frontend and back.
+                        fileType={tagForFiles || 'supplementary'}
+                        initializeReview={initializeReview}
+                        manuscriptId={manuscriptId}
+                        onChange={shouldStoreFilesInForm ? innerOnChange : null}
+                        reviewId={reviewId}
+                        values={values}
+                      />
+                    )}
+                    {element.component === 'VisualAbstract' && (
+                      <FilesUpload
+                        acceptMultiple={false}
+                        createFile={createFile}
+                        deleteFile={deleteFile}
+                        fieldName={
+                          shouldStoreFilesInForm ? element.name : 'files'
+                        }
+                        fileType={tagForFiles || 'visualAbstract'}
+                        initializeReview={initializeReview}
+                        manuscriptId={manuscriptId}
+                        mimeTypesToAccept="image/*"
+                        onChange={shouldStoreFilesInForm ? innerOnChange : null}
+                        reviewId={reviewId}
+                        values={values}
+                      />
+                    )}
+                    {element.component === 'ManuscriptFile' &&
+                    submittedManuscriptFile ? (
+                      <Attachment
+                        file={submittedManuscriptFile}
+                        key={submittedManuscriptFile.storedObjects[0].url}
+                        uploaded
+                      />
+                    ) : null}
+                    {![
+                      'SupplementaryFiles',
+                      'VisualAbstract',
+                      'ManuscriptFile',
+                    ].includes(element.component) && (
+                      <ValidatedFieldFormik
+                        {...rejectProps(element, [
+                          'component',
+                          'title',
+                          'sectioncss',
+                          'parse',
+                          'format',
+                          'validate',
+                          'validateValue',
+                          'description',
+                          'shortDescription',
+                          'labelColor',
+                        ])}
+                        aria-label={element.placeholder || element.title}
+                        component={elements[element.component]}
+                        data-testid={element.name} // TODO: Improve this
+                        isClearable={
+                          element.component === 'Select' &&
+                          element.name === 'submission.$customStatus'
+                        }
+                        key={`validate-${element.id}`}
+                        name={element.name}
+                        onChange={value => {
+                          // TODO: Perhaps split components remove conditions here
+                          let val
 
-                            setFieldValue(element.name, val, false)
-                            innerOnChange(val, element.name)
-                          }}
-                          setTouched={setTouched}
-                          spellCheck
-                          threadedDiscussionProps={threadedDiscussionProps}
-                          validate={validateFormField(
-                            element.validate,
-                            element.validateValue,
-                            element.name,
-                            JSON.parse(element.doiValidation || false),
-                            JSON.parse(
-                              element.doiUniqueSuffixValidation || false,
-                            ),
-                            validateDoi,
-                            validateSuffix,
-                            element.component,
-                            threadedDiscussionProps,
-                          )}
-                          values={values}
-                        />
-                      )}
-                      {hasValue(element.description) && (
-                        <SubNote
-                          dangerouslySetInnerHTML={createMarkup(
-                            element.description,
-                          )}
-                        />
-                      )}
-                    </Section>
-                  )
-                })}
+                          if (value?.target) {
+                            val = value.target.value
+                          } else if (value?.value) {
+                            val = value.value
+                          } else {
+                            val = value
+                          }
 
-              {showSubmitButton
-                ? submitButton(submissionButtonText, showPopup)
-                : null}
+                          setFieldValue(element.name, val, false)
+                          innerOnChange(val, element.name)
+                        }}
+                        setTouched={setTouched}
+                        spellCheck
+                        threadedDiscussionProps={threadedDiscussionProps}
+                        validate={validateFormField(
+                          element.validate,
+                          element.validateValue,
+                          element.name,
+                          JSON.parse(element.doiValidation || false),
+                          JSON.parse(
+                            element.doiUniqueSuffixValidation || false,
+                          ),
+                          validateDoi,
+                          validateSuffix,
+                          element.component,
+                          threadedDiscussionProps,
+                        )}
+                        values={values}
+                      />
+                    )}
+                    {hasValue(element.description) && (
+                      <SubNote
+                        dangerouslySetInnerHTML={createMarkup(
+                          element.description,
+                        )}
+                      />
+                    )}
+                  </Section>
+                )
+              })}
 
-              {confirming && (
-                <ModalWrapper>
-                  <Confirm
-                    errors={errors}
-                    form={form}
-                    submit={handleSubmit}
-                    toggleConfirming={toggleConfirming}
-                  />
-                </ModalWrapper>
-              )}
-              <Modal
-                isOpen={publishErrorsModalIsOpen}
-                onClose={() => setPublishErrorsModalIsOpen(false)}
-                subtitle={t(
-                  'modals.publishError.Some targets failed to publish',
-                )}
-                title={t('modals.publishError.Publishing error')}
-              >
-                <PublishingResponse response={publishingResponse} />
-              </Modal>
-            </form>
-          </FormContainer>
+            {showSubmitButton
+              ? submitButton(submissionButtonText, showPopup)
+              : null}
+
+            {confirming && (
+              <ModalWrapper>
+                <Confirm
+                  errors={errors}
+                  form={form}
+                  submit={handleSubmit}
+                  toggleConfirming={toggleConfirming}
+                />
+              </ModalWrapper>
+            )}
+            <Modal
+              isOpen={publishErrorsModalIsOpen}
+              onClose={() => setPublishErrorsModalIsOpen(false)}
+              subtitle={t('modals.publishError.Some targets failed to publish')}
+              title={t('modals.publishError.Publishing error')}
+            >
+              <PublishingResponse response={publishingResponse} />
+            </Modal>
+          </Form>
         )
       }}
     </Formik>
@@ -623,8 +545,6 @@ FormTemplate.propTypes = {
     haspopup: PropTypes.string.isRequired, // bool as string
   }).isRequired,
   manuscriptId: PropTypes.string.isRequired,
-  manuscriptShortId: PropTypes.number.isRequired,
-  manuscriptStatus: PropTypes.string,
   initialValues: PropTypes.shape({
     files: PropTypes.arrayOf(
       PropTypes.shape({
@@ -651,7 +571,6 @@ FormTemplate.defaultProps = {
   initialValues: null,
   republish: null,
   submissionButtonText: '',
-  manuscriptStatus: null,
   shouldStoreFilesInForm: false,
   tagForFiles: null,
   initializeReview: null,
