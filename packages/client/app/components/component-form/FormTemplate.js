@@ -16,20 +16,26 @@ import {
   TextInput,
   CheckboxGroup,
   RichTextEditor,
-} from '../../../shared'
-import { Heading1, Section, Legend, SubNote } from '../style'
-import AuthorsInput from './AuthorsInput'
-import LinksInput from './LinksInput'
-import ValidatedFieldFormik from './ValidatedField'
-import Confirm from './Confirm'
-import { articleStatuses } from '../../../../globals'
-import { validateFormField } from '../../../../shared/formValidation'
-import ThreadedDiscussion from '../../../component-formbuilder/src/components/builderComponents/ThreadedDiscussion/ThreadedDiscussion'
-import ActionButton from '../../../shared/ActionButton'
-import { hasValue } from '../../../../shared/htmlUtils'
-import { ConfigContext } from '../../../config/src'
-import Modal from '../../../component-modal/src/Modal'
-import PublishingResponse from '../../../component-review/src/components/publishing/PublishingResponse'
+} from '../shared'
+import {
+  Heading1,
+  Section,
+  Legend,
+  SubNote,
+} from '../component-submit/src/style'
+import AuthorsInput from '../component-submit/src/components/AuthorsInput'
+import LinksInput from '../component-submit/src/components/LinksInput'
+import ValidatedFieldFormik from '../component-submit/src/components/ValidatedField'
+import Confirm from '../component-submit/src/components/Confirm'
+import { articleStatuses } from '../../globals'
+import { validateFormField } from '../../shared/formValidation'
+import ThreadedDiscussion from '../component-formbuilder/src/components/builderComponents/ThreadedDiscussion/ThreadedDiscussion'
+import ActionButton from '../shared/ActionButton'
+import { hasValue } from '../../shared/htmlUtils'
+import { ConfigContext } from '../config/src'
+import Modal from '../component-modal/src/Modal'
+import PublishingResponse from '../component-review/src/components/publishing/PublishingResponse'
+import theme from '../../theme'
 
 const FormContainer = styled(Container)`
   background: white;
@@ -87,7 +93,7 @@ const MessageWrapper = styled.div`
   font-size: ${th('fontSizeBaseSmall')};
   line-height: ${th('lineHeightBaseSmall')};
   margin-left: 12px;
-  margin-top: -${({ theme }) => theme.spacing[1]}px;
+  margin-top: -${theme.spacing.b};
 `
 
 const SafeRadioGroup = styled(RadioGroup)`
@@ -97,7 +103,7 @@ const SafeRadioGroup = styled(RadioGroup)`
 const NoteRight = styled.div`
   font-size: ${th('fontSizeBaseSmall')};
   line-height: ${th('lineHeightBaseSmall')};
-  padding: ${({ theme }) => `${theme.spacing.e} ${theme.spacing.f}`};
+  padding: ${theme.spacing.e} ${theme.spacing.f};
   text-align: right;
 `
 

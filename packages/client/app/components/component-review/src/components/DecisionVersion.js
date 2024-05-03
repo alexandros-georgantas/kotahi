@@ -21,7 +21,7 @@ import {
   Title,
 } from '../../../shared'
 import DecisionAndReviews from '../../../component-submit/src/components/DecisionAndReviews'
-import FormTemplate from '../../../component-submit/src/components/FormTemplate'
+import FormTemplate from '../../../component-form/FormTemplate'
 import TaskList from '../../../component-task-manager/src/TaskList'
 import KanbanBoard from './KanbanBoard'
 import InviteReviewer from './reviewers/InviteReviewer'

@@ -20,7 +20,7 @@ import {
 import { ChatButton, CollapseButton } from '../style'
 import MessageContainer from '../../../../component-chat/src/MessageContainer'
 import SharedReviewerGroupReviews from './SharedReviewerGroupReviews'
-import FormTemplate from '../../../../component-submit/src/components/FormTemplate'
+import FormTemplate from '../../../../component-form/FormTemplate'
 import { ConfigContext } from '../../../../config/src'
 
 const ReviewLayout = ({
