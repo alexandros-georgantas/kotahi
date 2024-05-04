@@ -2,11 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { sanitize } from 'isomorphic-dompurify'
-import { Button, PlainButton } from '@pubsweet/ui'
 import { unescape } from 'lodash'
 import { th } from '@pubsweet/ui-toolkit'
 import { useTranslation } from 'react-i18next'
-import { Heading1 } from '../style'
+import { Heading1 } from '../component-submit/src/style'
+import { Action, ActionButton } from '../shared'
 
 const Wrapper = styled.div`
   background: ${th('colorBackground')};
@@ -37,35 +37,22 @@ const Confirm = ({ toggleConfirming, form, submit, errors }) => {
   return (
     <Wrapper>
       <article>
-        {Object.keys(errors).length > 0 ? (
-          <>
-            <Heading1>
-              {t('manuscriptSubmit.Errors in your submission')}
-            </Heading1>
-            <Paragraph>
-              {t('manuscriptSubmit.errorsList')} {JSON.stringify(errors)}
-            </Paragraph>
-          </>
-        ) : (
-          <>
-            <Heading1 dangerouslySetInnerHTML={createMarkup(form.popuptitle)} />
-            <Paragraph
-              dangerouslySetInnerHTML={createMarkup(form.popupdescription)}
-            />
-            <Button
-              data-testid="confirm-submit"
-              onClick={submit}
-              primary
-              type="submit"
-            >
-              {t('manuscriptSubmit.Submit')}
-            </Button>
-            <Divider> {t('manuscriptSubmit.or')} </Divider>
-          </>
-        )}
-        <PlainButton onClick={toggleConfirming}>
+        <Heading1 dangerouslySetInnerHTML={createMarkup(form.popuptitle)} />
+        <Paragraph
+          dangerouslySetInnerHTML={createMarkup(form.popupdescription)}
+        />
+        <ActionButton
+          data-testid="confirm-submit"
+          onClick={submit}
+          primary
+          type="submit"
+        >
+          {t('manuscriptSubmit.Submit')}
+        </ActionButton>
+        <Divider> {t('manuscriptSubmit.or')} </Divider>
+        <Action onClick={toggleConfirming}>
           {t('manuscriptSubmit.get back to your submission')}
-        </PlainButton>
+        </Action>
       </article>
     </Wrapper>
   )
@@ -78,7 +65,6 @@ Confirm.propTypes = {
     popupdescription: PropTypes.string.isRequired,
   }).isRequired,
   submit: PropTypes.func.isRequired,
-  errors: PropTypes.objectOf(PropTypes.any).isRequired, // eslint-disable-line react/forbid-prop-types
 }
 
 export default Confirm

@@ -19,27 +19,12 @@ import { Section, Legend, SubNote } from '../component-submit/src/style'
 import AuthorsInput from '../component-submit/src/components/AuthorsInput'
 import LinksInput from '../component-submit/src/components/LinksInput'
 import ValidatedFieldFormik from '../component-submit/src/components/ValidatedField'
-import Confirm from '../component-submit/src/components/Confirm'
-import { articleStatuses } from '../../globals'
 import { validateFormField } from '../../shared/formValidation'
 import ThreadedDiscussion from '../component-formbuilder/src/components/builderComponents/ThreadedDiscussion/ThreadedDiscussion'
-import ActionButton from '../shared/ActionButton'
 import { hasValue } from '../../shared/htmlUtils'
 import { ConfigContext } from '../config/src'
 import theme from '../../theme'
-
-const ModalWrapper = styled.div`
-  align-items: center;
-  background: rgba(255, 255, 255, 0.95);
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  left: 0;
-  position: fixed;
-  right: 0;
-  top: 0;
-  z-index: 10000;
-`
+import FormSubmitButton from './FormSubmitButton'
 
 const MessageWrapper = styled.div`
   color: ${th('colorError')};
@@ -140,14 +125,9 @@ const FormTemplate = ({
   shouldShowOptionToPublish = false,
 }) => {
   const config = useContext(ConfigContext)
-  const [confirming, setConfirming] = React.useState(false)
 
   const [submitButtonOverrideStatus, setSubmitButtonOverrideStatus] =
     useState(null)
-
-  const toggleConfirming = () => {
-    setConfirming(confirm => !confirm)
-  }
 
   const sumbitPendingThreadedDiscussionComments = async values => {
     await Promise.all(
@@ -224,67 +204,7 @@ const FormTemplate = ({
           debounceChange(value, fieldName)
         }
 
-        const [submitSucceeded, setSubmitSucceeded] = useState(false)
-        const [buttonIsPending, setButtonIsPending] = useState(false)
-
-        const submitButton = (text, haspopup = false) => {
-          return (
-            <div>
-              <ActionButton
-                dataTestid={`${form.name
-                  ?.toLowerCase()
-                  .replace(/ /g, '-')
-                  .replace(/[^\w-]+/g, '')}-action-btn`}
-                onClick={async () => {
-                  setButtonIsPending(true)
-
-                  const hasErrors =
-                    Object.keys(await validateForm()).length !== 0
-
-                  // If there are errors, do a fake submit
-                  // to focus on the error
-                  if (
-                    hasErrors ||
-                    values.status === articleStatuses.evaluated ||
-                    values.status === articleStatuses.submitted ||
-                    !haspopup
-                  ) {
-                    handleSubmit()
-                    setSubmitSucceeded(!hasErrors)
-                  } else {
-                    toggleConfirming()
-                  }
-
-                  setButtonIsPending(false)
-                }}
-                primary
-                status={
-                  /* eslint-disable no-nested-ternary */
-                  submitButtonOverrideStatus ??
-                  (buttonIsPending || isSubmitting
-                    ? 'pending'
-                    : Object.keys(errors).length && submitCount
-                    ? '' // TODO Make this case 'failure', once we've fixed the validation delays in the form
-                    : submitSucceeded
-                    ? 'success'
-                    : '')
-                  /* eslint-enable no-nested-ternary */
-                }
-              >
-                {text}
-              </ActionButton>
-            </div>
-          )
-        }
-
-        // this is whether the form includes a popup
-        const hasPopup = form.haspopup ? JSON.parse(form.haspopup) : false
-
-        // this is whether to show a popup
-        const showPopup = hasPopup && values.status !== 'revise'
-
         // this is whether or not to show a submit button
-
         const showSubmitButton =
           submissionButtonText &&
           (isSubmission
@@ -469,19 +389,18 @@ const FormTemplate = ({
                 )
               })}
 
-            {showSubmitButton
-              ? submitButton(submissionButtonText, showPopup)
-              : null}
-
-            {confirming && (
-              <ModalWrapper>
-                <Confirm
-                  errors={errors}
-                  form={form}
-                  submit={handleSubmit}
-                  toggleConfirming={toggleConfirming}
-                />
-              </ModalWrapper>
+            {showSubmitButton && (
+              <FormSubmitButton
+                errors={errors}
+                form={form}
+                handleSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+                submitButtonOverrideStatus={submitButtonOverrideStatus}
+                submitCount={submitCount}
+                text={submissionButtonText}
+                validateForm={validateForm}
+                values={values}
+              />
             )}
           </Form>
         )
@@ -515,7 +434,8 @@ FormTemplate.propTypes = {
     popupdescription: PropTypes.string,
     haspopup: PropTypes.string.isRequired, // bool as string
   }).isRequired,
-  manuscriptId: PropTypes.string.isRequired,
+  /** The object the form data belongs to, e.g. a manuscript or review */
+  objectId: PropTypes.string.isRequired,
   initialValues: PropTypes.shape({
     files: PropTypes.arrayOf(
       PropTypes.shape({
