@@ -382,7 +382,7 @@ const ReviewData = ({
           form={reviewForm}
           formData={reviewFormData}
           initialValues={reviewFormData}
-          manuscriptId={manuscriptId}
+          objectId={manuscriptId}
           onChange={(value, path) => {
             updateReview(
               review.id,

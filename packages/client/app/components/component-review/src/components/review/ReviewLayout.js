@@ -206,7 +206,7 @@ const ReviewLayout = ({
               deleteFile={deleteFile}
               form={reviewForm}
               initialValues={reviewData}
-              manuscriptId={latestManuscript.id}
+              objectId={latestManuscript.id}
               onChange={(value, path) =>
                 updateReviewJsonData(
                   latestManuscript.id,

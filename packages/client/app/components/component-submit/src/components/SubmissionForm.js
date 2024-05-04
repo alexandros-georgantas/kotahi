@@ -55,7 +55,7 @@ const SubmissionForm = ({
         form={form}
         initialValues={versionValues}
         isSubmission
-        manuscriptId={manuscript.id}
+        objectId={manuscript.id}
         onChange={(value, path) => {
           onChange(value, path, manuscript.id)
         }}

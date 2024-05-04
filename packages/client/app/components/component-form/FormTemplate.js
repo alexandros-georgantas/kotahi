@@ -122,7 +122,7 @@ let lastChangedField = null
 const FormTemplate = ({
   form,
   initialValues,
-  manuscriptId,
+  objectId,
   submissionButtonText,
   onChange,
   onSubmit,
@@ -132,9 +132,7 @@ const FormTemplate = ({
   createFile,
   deleteFile,
   isSubmission,
-  reviewId,
   shouldStoreFilesInForm,
-  initializeReview,
   tagForFiles,
   threadedDiscussionProps: tdProps,
   fieldsToPublish,
@@ -371,10 +369,8 @@ const FormTemplate = ({
                           shouldStoreFilesInForm ? element.name : 'files'
                         } // TODO Store files in form for submissions too: should simplify code both frontend and back.
                         fileType={tagForFiles || 'supplementary'}
-                        initializeReview={initializeReview}
-                        manuscriptId={manuscriptId}
+                        objectId={objectId}
                         onChange={shouldStoreFilesInForm ? innerOnChange : null}
-                        reviewId={reviewId}
                         values={values}
                       />
                     )}
@@ -387,11 +383,9 @@ const FormTemplate = ({
                           shouldStoreFilesInForm ? element.name : 'files'
                         }
                         fileType={tagForFiles || 'visualAbstract'}
-                        initializeReview={initializeReview}
-                        manuscriptId={manuscriptId}
                         mimeTypesToAccept="image/*"
+                        objectId={objectId}
                         onChange={shouldStoreFilesInForm ? innerOnChange : null}
-                        reviewId={reviewId}
                         values={values}
                       />
                     )}
@@ -540,7 +534,6 @@ FormTemplate.propTypes = {
   shouldStoreFilesInForm: PropTypes.bool,
   /** If supplied, any uploaded files will be tagged with this rather than 'supplementary' or 'visualAbstract' */
   tagForFiles: PropTypes.string,
-  initializeReview: PropTypes.func,
 }
 FormTemplate.defaultProps = {
   onSubmit: undefined,
@@ -548,7 +541,6 @@ FormTemplate.defaultProps = {
   submissionButtonText: '',
   shouldStoreFilesInForm: false,
   tagForFiles: null,
-  initializeReview: null,
 }
 
 export default FormTemplate

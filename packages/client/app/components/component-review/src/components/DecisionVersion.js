@@ -203,8 +203,8 @@ const DecisionVersion = ({
                 form={form}
                 initialValues={versionValues}
                 isSubmission
-                manuscriptId={version.id}
                 match={{ url: 'decision' }}
+                objectId={version.id}
                 onChange={(value, path) => {
                   onChange(value, path, versionId)
                 }}
@@ -422,6 +422,7 @@ const DecisionVersion = ({
                   }
                   isSubmission={false}
                   manuscriptId={version.id}
+                  objectId={currentDecisionData.id}
                   onChange={updateReviewJsonData}
                   onSubmit={async (values, actions) => {
                     await makeDecision({
@@ -432,7 +433,6 @@ const DecisionVersion = ({
                     })
                     actions.setSubmitting(false)
                   }}
-                  reviewId={currentDecisionData.id}
                   setShouldPublishField={async (fieldName, shouldPublish) =>
                     setShouldPublishField({
                       variables: {

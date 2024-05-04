@@ -163,9 +163,7 @@ const FilesUpload = ({
   fileType,
   fieldName,
   persistentFileLabel,
-  manuscriptId,
-  reviewId,
-  initializeReview,
+  objectId,
   acceptMultiple = true,
   mimeTypesToAccept,
   createFile: createF,
@@ -177,21 +175,19 @@ const FilesUpload = ({
   onFileRemoved,
   confirmBeforeDelete,
 }) => {
-  let existingFiles = []
+  /** This will be empty if file IDs are not stored in the form data. */
+  let existingFileIds = []
 
-  if (values?.[fieldName]) {
-    existingFiles = values[fieldName]
+  if (values) {
+    existingFileIds = get(values, fieldName)
+    if (!existingFileIds) existingFileIds = []
   }
 
   const createFile = async file => {
     const meta = {
       fileType,
-      manuscriptId,
-      reviewId,
+      objectId,
     }
-
-    if (!meta.reviewId && initializeReview)
-      meta.reviewId = (await initializeReview()) || null
 
     const { data } = await createF({
       variables: {
@@ -201,7 +197,7 @@ const FilesUpload = ({
     })
 
     if (onFileAdded) onFileAdded(data.createFile)
-    if (onChange) onChange([...existingFiles, data.createFile.id], fieldName)
+    if (onChange) onChange([...existingFileIds, data.createFile.id], fieldName)
 
     return data
   }
@@ -211,7 +207,7 @@ const FilesUpload = ({
     remove(index)
 
     if (onChange) {
-      const filteredFiles = existingFiles.filter(
+      const filteredFiles = existingFileIds.filter(
         currFile => currFile !== file.id,
       )
 

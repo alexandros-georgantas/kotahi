@@ -27,8 +27,8 @@ const PartnerInputComponent = ({ entityId, ...restProps }) => {
       acceptMultiple
       fieldName="partnerFiles"
       fileType="cms"
-      manuscriptId={entityId}
       mimeTypesToAccept="image/*"
+      objectId={entityId}
       {...restProps}
       onChange={() => {}}
     />

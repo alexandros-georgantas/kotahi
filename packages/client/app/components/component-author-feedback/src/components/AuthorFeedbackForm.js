@@ -39,7 +39,7 @@ const FileInputComponent = ({ entityId, disabled, ...restProps }) => {
       disabled={disabled}
       fieldName="files"
       fileType="authorFeedback"
-      manuscriptId={entityId}
+      objectId={entityId}
       {...restProps}
       onChange={() => {}}
     />

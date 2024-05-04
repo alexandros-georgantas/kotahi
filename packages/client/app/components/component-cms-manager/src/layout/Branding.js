@@ -15,8 +15,8 @@ const FileInputComponent = ({ entityId, ...restProps }) => {
       acceptMultiple={false}
       fieldName="logo"
       fileType="cms"
-      manuscriptId={entityId}
       mimeTypesToAccept="image/*"
+      objectId={entityId}
       {...restProps}
     />
   )

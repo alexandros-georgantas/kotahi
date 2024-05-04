@@ -71,8 +71,8 @@ const BrandIcon = ({
         fieldName={fieldName}
         fileType={fileType}
         handleFileChange={handleFileChange}
-        manuscriptId={config?.id}
         mimeTypesToAccept={mimeTypesToAccept}
+        objectId={config?.id}
         {...restProps}
       />
     </Formik>
