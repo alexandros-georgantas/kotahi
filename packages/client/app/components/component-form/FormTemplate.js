@@ -195,6 +195,9 @@ const FormTemplate = ({
         isSubmitting,
         submitCount,
       }) => {
+        /** Handle a value change on any field by passing it via debounce to onChange.
+         * Because we only use a single debounce, we need to flush the debounce whenever
+         * editing shifts to a new field. */
         const innerOnChange = (value, fieldName) => {
           if (fieldName !== lastChangedField) {
             debounceChange.flush()

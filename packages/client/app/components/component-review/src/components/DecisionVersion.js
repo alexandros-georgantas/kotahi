@@ -219,7 +219,9 @@ const DecisionVersion = ({
                   })
                 }
                 shouldShowOptionToPublish
+                shouldStoreFilesInForm
                 showEditorOnlyFields
+                tagForFiles="submission"
                 threadedDiscussionProps={threadedDiscussionExtendedProps}
                 validateDoi={validateDoi}
                 validateSuffix={validateSuffix}

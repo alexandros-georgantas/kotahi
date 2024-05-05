@@ -12,7 +12,11 @@ const {
   importManuscriptsFromSemanticScholar,
 } = require('./importManuscripts')
 
-const { manuscriptHasOverdueTasksForUser } = require('./manuscriptCommsUtils')
+const {
+  manuscriptHasOverdueTasksForUser,
+  convertFilesToFullObjects: convertSubmissionFilesToFullObjects,
+} = require('./manuscriptCommsUtils')
+
 const { rebuildCMSSite } = require('../../flax-site/flax-api')
 
 const {
@@ -68,7 +72,7 @@ const {
 } = require('../../model-task/src/taskCommsUtils')
 
 const {
-  convertFilesToFullObjects,
+  convertFilesToFullObjects: convertReviewFilesToFullObjects,
 } = require('../../model-review/src/reviewUtils')
 
 const {
@@ -147,7 +151,7 @@ const getRelatedReviews = async (manuscript, ctx) => {
   // eslint-disable-next-line no-restricted-syntax
   for (const review of reviews) {
     // eslint-disable-next-line no-await-in-loop
-    await convertFilesToFullObjects(
+    await convertReviewFilesToFullObjects(
       review,
       review.isDecision ? decisionForm : reviewForm,
       async ids => File.query().findByIds(ids),
@@ -234,8 +238,19 @@ const manuscriptAndPublishedManuscriptSharedResolvers = {
   /** We want submission info to come out as a stringified JSON, so that we don't have to
    * change our queries if the submission form changes. We still want to store it as JSONB
    * so that we can easily search through the information within. */
-  submission(parent) {
-    return JSON.stringify(parent.submission)
+  async submission(parent) {
+    const result = parent.submission
+    const { groupId } = parent
+    const submissionForm = await getSubmissionForm(groupId)
+
+    await convertSubmissionFilesToFullObjects(
+      result,
+      submissionForm,
+      async ids => File.query().findByIds(ids),
+      getFilesWithUrl,
+    )
+
+    return JSON.stringify(result)
   },
   async files(parent, _, ctx) {
     const files = (

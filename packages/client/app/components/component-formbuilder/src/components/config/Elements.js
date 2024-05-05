@@ -447,6 +447,12 @@ const genericFieldOptions = [
     fieldType: 'links',
     component: 'LinksInput',
   },
+  {
+    label: 'Attachments',
+    isCustom: true,
+    fieldType: 'attachments',
+    component: 'SupplementaryFiles',
+  },
 ]
 
 /** Field options for use in the submission form. Some are specialised, imposing
@@ -488,13 +494,6 @@ const submissionFieldOptions = [
     format: null,
     permitPublishing: { ...permitPublishingField, defaultValue: 'always' },
   },
-  {
-    fieldType: 'visualAbstract',
-    label: 'Visual abstract',
-    component: 'VisualAbstract',
-    title: requiredTextFieldWithDefault('Visual abstract'),
-    name: presetTextField('visualAbstract'),
-  },
   /* {
     fieldType: 'keywords',
     label: 'Keywords',
@@ -502,13 +501,6 @@ const submissionFieldOptions = [
     title: requiredTextFieldWithDefault('Keywords'),
     name: presetTextField('submission.keywords'),
   }, */
-  {
-    fieldType: 'attachments',
-    label: 'Attachments',
-    component: 'SupplementaryFiles',
-    title: requiredTextFieldWithDefault('Attachments'),
-    name: presetTextField('fileName'),
-  },
   {
     fieldType: 'doi',
     label: 'DOI',
@@ -599,6 +591,12 @@ const submissionFieldOptions = [
     validate: null,
   },
   ...genericFieldOptions,
+  {
+    isCustom: true,
+    fieldType: 'visualAbstract',
+    label: 'Visual abstract',
+    component: 'VisualAbstract',
+  },
 ]
 
 /** Field options for use in the decision form, including specialised and
@@ -619,12 +617,6 @@ const decisionFieldOptions = [
     component: 'ThreadedDiscussion',
   },
   ...genericFieldOptions,
-  {
-    isCustom: true,
-    fieldType: 'attachments',
-    label: 'Attachments',
-    component: 'SupplementaryFiles',
-  },
   {
     fieldType: 'doiSuffix',
     label: 'DOI suffix',
@@ -653,12 +645,6 @@ const reviewFieldOptions = [
     name: presetTextField('$verdict'),
   },
   ...genericFieldOptions,
-  {
-    isCustom: true,
-    fieldType: 'attachments',
-    label: 'Attachments',
-    component: 'SupplementaryFiles',
-  },
   {
     fieldType: 'doiSuffix',
     label: 'DOI suffix',

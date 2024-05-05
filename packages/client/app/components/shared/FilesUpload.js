@@ -175,12 +175,11 @@ const FilesUpload = ({
   onFileRemoved,
   confirmBeforeDelete,
 }) => {
-  /** This will be empty if file IDs are not stored in the form data. */
-  let existingFileIds = []
+  let existingFiles = []
 
   if (values) {
-    existingFileIds = get(values, fieldName)
-    if (!existingFileIds) existingFileIds = []
+    existingFiles = get(values, fieldName)
+    if (!existingFiles) existingFiles = []
   }
 
   const createFile = async file => {
@@ -197,7 +196,7 @@ const FilesUpload = ({
     })
 
     if (onFileAdded) onFileAdded(data.createFile)
-    if (onChange) onChange([...existingFileIds, data.createFile.id], fieldName)
+    if (onChange) onChange([...existingFiles, data.createFile.id], fieldName)
 
     return data
   }
@@ -207,7 +206,7 @@ const FilesUpload = ({
     remove(index)
 
     if (onChange) {
-      const filteredFiles = existingFileIds.filter(
+      const filteredFiles = existingFiles.filter(
         currFile => currFile !== file.id,
       )
 
