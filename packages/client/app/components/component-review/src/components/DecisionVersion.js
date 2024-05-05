@@ -219,7 +219,6 @@ const DecisionVersion = ({
                   })
                 }
                 shouldShowOptionToPublish
-                shouldStoreFilesInForm
                 showEditorOnlyFields
                 tagForFiles="submission"
                 threadedDiscussionProps={threadedDiscussionExtendedProps}
@@ -446,7 +445,6 @@ const DecisionVersion = ({
                     })
                   }
                   shouldShowOptionToPublish
-                  shouldStoreFilesInForm
                   showEditorOnlyFields
                   submissionButtonText={t('decisionPage.decisionTab.Submit')}
                   tagForFiles="decision"

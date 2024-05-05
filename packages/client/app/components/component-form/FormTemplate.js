@@ -117,7 +117,6 @@ const FormTemplate = ({
   createFile,
   deleteFile,
   isSubmission,
-  shouldStoreFilesInForm,
   tagForFiles,
   threadedDiscussionProps: tdProps,
   fieldsToPublish,
@@ -288,12 +287,10 @@ const FormTemplate = ({
                       <FilesUpload
                         createFile={createFile}
                         deleteFile={deleteFile}
-                        fieldName={
-                          shouldStoreFilesInForm ? element.name : 'files'
-                        } // TODO Store files in form for submissions too: should simplify code both frontend and back.
-                        fileType={tagForFiles || 'supplementary'}
+                        fieldName={element.name}
+                        fileType={tagForFiles}
                         objectId={objectId}
-                        onChange={shouldStoreFilesInForm ? innerOnChange : null}
+                        onChange={innerOnChange}
                         values={values}
                       />
                     )}
@@ -302,13 +299,11 @@ const FormTemplate = ({
                         acceptMultiple={false}
                         createFile={createFile}
                         deleteFile={deleteFile}
-                        fieldName={
-                          shouldStoreFilesInForm ? element.name : 'files'
-                        }
-                        fileType={tagForFiles || 'visualAbstract'}
+                        fieldName={element.name}
+                        fileType={tagForFiles}
                         mimeTypesToAccept="image/*"
                         objectId={objectId}
-                        onChange={shouldStoreFilesInForm ? innerOnChange : null}
+                        onChange={innerOnChange}
                         values={values}
                       />
                     )}
@@ -454,16 +449,13 @@ FormTemplate.propTypes = {
   onSubmit: PropTypes.func,
   submissionButtonText: PropTypes.string,
   showEditorOnlyFields: PropTypes.bool.isRequired,
-  shouldStoreFilesInForm: PropTypes.bool,
-  /** If supplied, any uploaded files will be tagged with this rather than 'supplementary' or 'visualAbstract' */
-  tagForFiles: PropTypes.string,
+  /** The tag to give new files: e.g. 'submission', 'review' or 'decision' */
+  tagForFiles: PropTypes.string.isRequired,
 }
 FormTemplate.defaultProps = {
   onSubmit: undefined,
   initialValues: null,
   submissionButtonText: '',
-  shouldStoreFilesInForm: false,
-  tagForFiles: null,
 }
 
 export default FormTemplate

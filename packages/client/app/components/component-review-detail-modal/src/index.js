@@ -393,7 +393,6 @@ const ReviewData = ({
               manuscriptId,
             )
           }}
-          shouldStoreFilesInForm
           showEditorOnlyFields={false}
           tagForFiles="review"
           threadedDiscussionProps={threadedDiscussionProps}

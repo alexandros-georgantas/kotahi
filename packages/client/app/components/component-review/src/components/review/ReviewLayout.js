@@ -216,7 +216,6 @@ const ReviewLayout = ({
                 )
               }
               onSubmit={handleSubmit}
-              shouldStoreFilesInForm
               showEditorOnlyFields={false}
               submissionButtonText={t('reviewPage.Submit')}
               tagForFiles="review"

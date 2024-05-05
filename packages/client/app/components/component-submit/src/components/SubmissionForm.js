@@ -97,7 +97,6 @@ const SubmissionForm = ({
           })
         }
         shouldShowOptionToPublish={!!setShouldPublishField}
-        shouldStoreFilesInForm
         showEditorOnlyFields={false}
         submissionButtonText={submissionButtonText}
         tagForFiles="submission"
