@@ -1,55 +1,16 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { Formik, ErrorMessage } from 'formik'
 import { unescape, get, set, debounce } from 'lodash'
 import { sanitize } from 'isomorphic-dompurify'
-import { RadioGroup } from '@pubsweet/ui'
-import { th } from '@pubsweet/ui-toolkit'
-import {
-  Select,
-  FilesUpload,
-  Attachment,
-  FieldPublishingSelector,
-  TextInput,
-  CheckboxGroup,
-  RichTextEditor,
-} from '../shared'
-import { Section, Legend, SubNote } from '../component-submit/src/style'
-import AuthorsInput from '../component-submit/src/components/AuthorsInput'
-import LinksInput from '../component-submit/src/components/LinksInput'
+import { Attachment, FieldPublishingSelector } from '../shared'
 import ValidatedField from '../component-submit/src/components/ValidatedField'
 import { validateFormField } from '../../shared/formValidation'
-import ThreadedDiscussion from '../component-formbuilder/src/components/builderComponents/ThreadedDiscussion/ThreadedDiscussion'
 import { hasValue } from '../../shared/htmlUtils'
-import { ConfigContext } from '../config/src'
-import theme from '../../theme'
 import FormSubmitButton from './FormSubmitButton'
-
-const MessageWrapper = styled.div`
-  color: ${th('colorError')};
-  display: flex;
-  font-family: ${th('fontInterface')};
-  font-size: ${th('fontSizeBaseSmall')};
-  line-height: ${th('lineHeightBaseSmall')};
-  margin-left: 12px;
-  margin-top: -${theme.spacing.b};
-`
-
-const SafeRadioGroup = styled(RadioGroup)`
-  position: relative;
-`
-
-const FieldHead = styled.div`
-  align-items: baseline;
-  display: flex;
-  width: auto;
-
-  & > label {
-    /* this is to make "publish" on decision page go flush right */
-    margin-left: auto;
-  }
-`
+import fieldComponents from './fieldComponents'
+import FieldLayout from './FieldLayout'
 
 const Form = styled.form`
   section {
@@ -57,30 +18,8 @@ const Form = styled.form`
   }
 `
 
-const VisualAbstract = props => (
-  <FilesUpload acceptMultiple={false} mimeTypesToAccept="image/*" {...props} />
-)
-
 const filterFileManuscript = files =>
   files.filter(file => file.tags.includes('manuscript'))
-
-/** Definitions for available field types */
-const elements = {
-  Title: TextInput,
-  Authors: AuthorsInput,
-  Abstract: RichTextEditor,
-  Keywords: TextInput,
-  TextField: TextInput,
-  AbstractEditor: RichTextEditor,
-  RadioGroup: SafeRadioGroup,
-  CheckboxGroup,
-  AuthorsInput,
-  Select,
-  LinksInput,
-  ThreadedDiscussion,
-  SupplementaryFiles: FilesUpload,
-  VisualAbstract,
-}
 
 /** Shallow clone props, leaving out all specified keys, and also stripping all keys with (string) value 'false'. */
 const rejectProps = (obj, keys) =>
@@ -93,8 +32,11 @@ const rejectProps = (obj, keys) =>
       {},
     )
 
-const createMarkup = encodedHtml => ({
-  __html: sanitize(unescape(encodedHtml)),
+const fieldIsRequired = el =>
+  Array.isArray(el.validate) && el.validate.some(v => v.value === 'required')
+
+const createMarkup = (encodedHtml, isRequired) => ({
+  __html: sanitize(unescape(`${encodedHtml}${isRequired ? ' *' : ''}`)),
 })
 
 /** Rename some props so the various formik components can understand them */
@@ -129,8 +71,6 @@ const FormTemplate = ({
   setShouldPublishField,
   shouldShowOptionToPublish = false,
 }) => {
-  const config = useContext(ConfigContext)
-
   const [submitButtonOverrideStatus, setSubmitButtonOverrideStatus] =
     useState(null)
 
@@ -148,11 +88,45 @@ const FormTemplate = ({
     )
   }
 
+  const getThreadedDiscussionPropsForField = (element, values) => {
+    if (element.component === 'ThreadedDiscussion') {
+      const setShouldPublishComment =
+        shouldShowOptionToPublish &&
+        element.permitPublishing === 'true' &&
+        ((id, val) => setShouldPublishField(`${element.name}:${id}`, val))
+
+      return {
+        ...tdProps,
+        threadedDiscussion: tdProps.threadedDiscussions.find(
+          d => d.id === values[element.name],
+        ),
+        threadedDiscussions: undefined,
+        commentsToPublish: fieldsToPublish
+          .filter(f => f.startsWith(`${element.name}:`))
+          .map(f => f.split(':')[1]),
+        setShouldPublishComment,
+        userCanAddThread: true,
+      }
+    }
+
+    return undefined
+  }
+
   const createBlankSubmissionBasedOnForm = value => {
     const allBlankedFields = {}
     const fieldNames = value.children.map(field => field.name)
     fieldNames.forEach(fieldName => set(allBlankedFields, fieldName, ''))
     return allBlankedFields
+  }
+
+  const onSubmitForm = async (values, actions) => {
+    await sumbitPendingThreadedDiscussionComments(values)
+
+    if (onSubmit) {
+      setSubmitButtonOverrideStatus(null)
+      const status = await onSubmit(values, actions)
+      if (status) setSubmitButtonOverrideStatus(status)
+    }
   }
 
   const initialValuesWithDummyValues = {
@@ -178,15 +152,7 @@ const FormTemplate = ({
     <Formik
       displayName={form.name}
       initialValues={initialValuesWithDummyValues}
-      onSubmit={async (values, actions) => {
-        await sumbitPendingThreadedDiscussionComments(values)
-
-        if (onSubmit) {
-          setSubmitButtonOverrideStatus(null)
-          const status = await onSubmit(values, actions)
-          if (status) setSubmitButtonOverrideStatus(status)
-        }
-      }}
+      onSubmit={onSubmitForm}
       validateOnBlur
       validateOnChange={false}
     >
@@ -212,15 +178,6 @@ const FormTemplate = ({
           debounceChange(value, fieldName)
         }
 
-        // this is whether or not to show a submit button
-        const showSubmitButton =
-          submissionButtonText &&
-          (isSubmission
-            ? !['submitted', 'revise'].includes(values.status) ||
-              (['preprint1', 'preprint2'].includes(config.instanceName) &&
-                values.status === 'submitted')
-            : true)
-
         const manuscriptFiles = filterFileManuscript(values.files || [])
 
         const submittedManuscriptFile =
@@ -236,145 +193,124 @@ const FormTemplate = ({
               )
               .map(prepareFieldProps)
               .map((element, i) => {
-                let threadedDiscussionProps
+                const threadedDiscussionProps =
+                  getThreadedDiscussionPropsForField(element, values)
 
-                if (element.component === 'ThreadedDiscussion') {
-                  const setShouldPublishComment =
-                    shouldShowOptionToPublish &&
-                    element.permitPublishing === 'true' &&
-                    ((id, val) =>
-                      setShouldPublishField(`${element.name}:${id}`, val))
+                const markup = createMarkup(
+                  element.title,
+                  fieldIsRequired(element),
+                )
 
-                  threadedDiscussionProps = {
-                    ...tdProps,
-                    threadedDiscussion: tdProps.threadedDiscussions.find(
-                      d => d.id === values[element.name],
-                    ),
-                    threadedDiscussions: undefined,
-                    commentsToPublish: fieldsToPublish
-                      .filter(f => f.startsWith(`${element.name}:`))
-                      .map(f => f.split(':')[1]),
-                    setShouldPublishComment,
-                    userCanAddThread: true,
-                  }
-                }
+                const publishingSelector =
+                  shouldShowOptionToPublish &&
+                  element.permitPublishing === 'true' &&
+                  element.component !== 'ThreadedDiscussion' ? (
+                    <FieldPublishingSelector
+                      onChange={val => setShouldPublishField(element.name, val)}
+                      value={fieldsToPublish.includes(element.name)}
+                    />
+                  ) : null
 
-                let markup = createMarkup(element.title)
+                let field = null
 
-                // add an '*' to the markup if it is marked required
-                if (Array.isArray(element.validate)) {
-                  // element.validate can specify multiple validation functions; we're looking for 'required'
-                  if (element.validate.some(v => v.value === 'required'))
-                    markup = createMarkup(`${element.title} *`)
-                }
-
-                return (
-                  <Section
-                    cssOverrides={JSON.parse(element.sectioncss || '{}')}
-                    key={`${element.id}`}
-                  >
-                    <FieldHead>
-                      <Legend dangerouslySetInnerHTML={markup} />
-                      {shouldShowOptionToPublish &&
-                        element.permitPublishing === 'true' &&
-                        element.component !== 'ThreadedDiscussion' && (
-                          <FieldPublishingSelector
-                            onChange={val =>
-                              setShouldPublishField(element.name, val)
-                            }
-                            value={fieldsToPublish.includes(element.name)}
-                          />
-                        )}
-                      <MessageWrapper>
-                        <ErrorMessage name={element.name} />
-                      </MessageWrapper>
-                    </FieldHead>
-                    {element.component === 'ManuscriptFile' &&
-                    submittedManuscriptFile ? (
+                if (element.component === 'ManuscriptFile') {
+                  if (submittedManuscriptFile)
+                    field = (
                       <Attachment
                         file={submittedManuscriptFile}
                         key={submittedManuscriptFile.storedObjects[0].url}
                         uploaded
                       />
-                    ) : null}
-                    {element.component !== 'ManuscriptFile' && (
-                      <ValidatedField
-                        {...rejectProps(element, [
-                          'component',
-                          'title',
-                          'sectioncss',
-                          'parse',
-                          'format',
-                          'validate',
-                          'validateValue',
-                          'description',
-                          'shortDescription',
-                          'labelColor',
-                        ])}
-                        aria-label={element.placeholder || element.title}
-                        component={elements[element.component]}
-                        createFile={createFile}
-                        data-testid={element.name} // TODO: Improve this
-                        deleteFile={deleteFile}
-                        fileType={tagForFiles}
-                        isClearable={
-                          element.component === 'Select' &&
-                          element.name === 'submission.$customStatus'
+                    )
+                } else {
+                  field = (
+                    <ValidatedField
+                      {...rejectProps(element, [
+                        'component',
+                        'title',
+                        'sectioncss',
+                        'parse',
+                        'format',
+                        'validate',
+                        'validateValue',
+                        'description',
+                        'shortDescription',
+                        'labelColor',
+                      ])}
+                      aria-label={element.placeholder || element.title}
+                      component={fieldComponents[element.component]}
+                      createFile={createFile}
+                      data-testid={element.name}
+                      deleteFile={deleteFile}
+                      fileType={tagForFiles}
+                      isClearable={
+                        element.component === 'Select' &&
+                        element.name === 'submission.$customStatus'
+                      }
+                      key={`validate-${element.id}`}
+                      name={element.name}
+                      objectId={objectId}
+                      onChange={value => {
+                        let val
+
+                        if (value?.target) {
+                          val = value.target.value
+                        } else if (value?.value) {
+                          val = value.value
+                        } else {
+                          val = value
                         }
-                        key={`validate-${element.id}`}
-                        name={element.name}
-                        objectId={objectId}
-                        onChange={value => {
-                          let val
 
-                          if (value?.target) {
-                            val = value.target.value
-                          } else if (value?.value) {
-                            val = value.value
-                          } else {
-                            val = value
-                          }
-
-                          if (
-                            !['SupplementaryFiles', 'VisualAbstract'].includes(
-                              element.component,
-                            )
+                        if (
+                          !['SupplementaryFiles', 'VisualAbstract'].includes(
+                            element.component,
                           )
-                            setFieldValue(element.name, val, false)
+                        )
+                          setFieldValue(element.name, val, false)
 
-                          innerOnChange(val, element.name)
-                        }}
-                        setTouched={setTouched}
-                        spellCheck
-                        threadedDiscussionProps={threadedDiscussionProps}
-                        validate={validateFormField(
-                          element.validate,
-                          element.validateValue,
-                          element.name,
-                          JSON.parse(element.doiValidation || false),
-                          JSON.parse(
-                            element.doiUniqueSuffixValidation || false,
-                          ),
-                          validateDoi,
-                          validateSuffix,
-                          element.component,
-                          threadedDiscussionProps,
-                        )}
-                        values={values}
-                      />
-                    )}
-                    {hasValue(element.description) && (
-                      <SubNote
-                        dangerouslySetInnerHTML={createMarkup(
-                          element.description,
-                        )}
-                      />
-                    )}
-                  </Section>
+                        innerOnChange(val, element.name)
+                      }}
+                      setTouched={setTouched}
+                      spellCheck
+                      threadedDiscussionProps={threadedDiscussionProps}
+                      validate={validateFormField(
+                        element.validate,
+                        element.validateValue,
+                        element.name,
+                        JSON.parse(element.doiValidation || false),
+                        JSON.parse(element.doiUniqueSuffixValidation || false),
+                        validateDoi,
+                        validateSuffix,
+                        element.component,
+                        threadedDiscussionProps,
+                      )}
+                      values={values}
+                    />
+                  )
+                }
+
+                const subNote = hasValue(element.description) ? (
+                  <div
+                    // eslint-disable-next-line react/no-danger
+                    dangerouslySetInnerHTML={createMarkup(element.description)}
+                  />
+                ) : null
+
+                return (
+                  <FieldLayout
+                    cssOverrides={JSON.parse(element.sectioncss || '{}')}
+                    errorMessage={<ErrorMessage name={element.name} />}
+                    field={field}
+                    key={`${element.id}`}
+                    // eslint-disable-next-line react/no-danger
+                    label={<div dangerouslySetInnerHTML={markup} />}
+                    publishingSelector={publishingSelector}
+                    subNote={subNote}
+                  />
                 )
               })}
 
-            {showSubmitButton && (
+            {submissionButtonText && (
               <FormSubmitButton
                 errors={errors}
                 form={form}

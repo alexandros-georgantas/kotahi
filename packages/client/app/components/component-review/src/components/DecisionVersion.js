@@ -203,7 +203,6 @@ const DecisionVersion = ({
                 form={form}
                 initialValues={versionValues}
                 isSubmission
-                match={{ url: 'decision' }}
                 objectId={version.id}
                 onChange={(value, path) => {
                   onChange(value, path, versionId)

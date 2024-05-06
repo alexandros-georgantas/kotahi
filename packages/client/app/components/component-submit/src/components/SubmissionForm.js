@@ -30,7 +30,7 @@ const SubmissionForm = ({
   const [publishErrorsModalIsOpen, setPublishErrorsModalIsOpen] =
     useState(false)
 
-  let submissionButtonText = t('manuscriptSubmit.Submit your research object')
+  let submissionButtonText = null
   let submitButtonShouldRepublish = false
 
   if (match.url.includes('/evaluation')) {
@@ -38,6 +38,8 @@ const SubmissionForm = ({
       submitButtonShouldRepublish = true
       submissionButtonText = 'Republish'
     } else submissionButtonText = 'Submit Evaluation'
+  } else if (!['submitted', 'revise'].includes(manuscript.status)) {
+    submissionButtonText = t('manuscriptSubmit.Submit your research object')
   }
 
   return (
