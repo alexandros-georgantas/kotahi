@@ -3405,10 +3405,10 @@ export const generateSchemas = (
                 config={config}
                 createFile={createFile}
                 deleteFile={deleteFile}
-                fieldName="logo"
                 fileType="brandLogo"
                 inputProps={props}
                 mimeTypesToAccept={'image/*'}
+                name="logo"
                 tempStoredFiles={tempStoredFiles}
               />
             )
@@ -3424,10 +3424,10 @@ export const generateSchemas = (
                 config={config}
                 createFile={createFile}
                 deleteFile={deleteFile}
-                fieldName="icon"
                 fileType="favicon"
                 inputProps={props}
                 mimeTypesToAccept="image/png,image/gif"
+                name="icon"
                 tempStoredFiles={tempStoredFiles}
               />
             )

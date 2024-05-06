@@ -18,7 +18,7 @@ import {
 import { Section, Legend, SubNote } from '../component-submit/src/style'
 import AuthorsInput from '../component-submit/src/components/AuthorsInput'
 import LinksInput from '../component-submit/src/components/LinksInput'
-import ValidatedFieldFormik from '../component-submit/src/components/ValidatedField'
+import ValidatedField from '../component-submit/src/components/ValidatedField'
 import { validateFormField } from '../../shared/formValidation'
 import ThreadedDiscussion from '../component-formbuilder/src/components/builderComponents/ThreadedDiscussion/ThreadedDiscussion'
 import { hasValue } from '../../shared/htmlUtils'
@@ -57,6 +57,10 @@ const Form = styled.form`
   }
 `
 
+const VisualAbstract = props => (
+  <FilesUpload acceptMultiple={false} mimeTypesToAccept="image/*" {...props} />
+)
+
 const filterFileManuscript = files =>
   files.filter(file => file.tags.includes('manuscript'))
 
@@ -74,6 +78,8 @@ const elements = {
   Select,
   LinksInput,
   ThreadedDiscussion,
+  SupplementaryFiles: FilesUpload,
+  VisualAbstract,
 }
 
 /** Shallow clone props, leaving out all specified keys, and also stripping all keys with (string) value 'false'. */
@@ -283,30 +289,6 @@ const FormTemplate = ({
                         <ErrorMessage name={element.name} />
                       </MessageWrapper>
                     </FieldHead>
-                    {element.component === 'SupplementaryFiles' && (
-                      <FilesUpload
-                        createFile={createFile}
-                        deleteFile={deleteFile}
-                        fieldName={element.name}
-                        fileType={tagForFiles}
-                        objectId={objectId}
-                        onChange={innerOnChange}
-                        values={values}
-                      />
-                    )}
-                    {element.component === 'VisualAbstract' && (
-                      <FilesUpload
-                        acceptMultiple={false}
-                        createFile={createFile}
-                        deleteFile={deleteFile}
-                        fieldName={element.name}
-                        fileType={tagForFiles}
-                        mimeTypesToAccept="image/*"
-                        objectId={objectId}
-                        onChange={innerOnChange}
-                        values={values}
-                      />
-                    )}
                     {element.component === 'ManuscriptFile' &&
                     submittedManuscriptFile ? (
                       <Attachment
@@ -315,12 +297,8 @@ const FormTemplate = ({
                         uploaded
                       />
                     ) : null}
-                    {![
-                      'SupplementaryFiles',
-                      'VisualAbstract',
-                      'ManuscriptFile',
-                    ].includes(element.component) && (
-                      <ValidatedFieldFormik
+                    {element.component !== 'ManuscriptFile' && (
+                      <ValidatedField
                         {...rejectProps(element, [
                           'component',
                           'title',
@@ -335,15 +313,18 @@ const FormTemplate = ({
                         ])}
                         aria-label={element.placeholder || element.title}
                         component={elements[element.component]}
+                        createFile={createFile}
                         data-testid={element.name} // TODO: Improve this
+                        deleteFile={deleteFile}
+                        fileType={tagForFiles}
                         isClearable={
                           element.component === 'Select' &&
                           element.name === 'submission.$customStatus'
                         }
                         key={`validate-${element.id}`}
                         name={element.name}
+                        objectId={objectId}
                         onChange={value => {
-                          // TODO: Perhaps split components remove conditions here
                           let val
 
                           if (value?.target) {
@@ -354,7 +335,13 @@ const FormTemplate = ({
                             val = value
                           }
 
-                          setFieldValue(element.name, val, false)
+                          if (
+                            !['SupplementaryFiles', 'VisualAbstract'].includes(
+                              element.component,
+                            )
+                          )
+                            setFieldValue(element.name, val, false)
+
                           innerOnChange(val, element.name)
                         }}
                         setTouched={setTouched}

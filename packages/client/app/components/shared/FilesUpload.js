@@ -161,7 +161,7 @@ DropzoneAndList.defaultProps = {
 
 const FilesUpload = ({
   fileType,
-  fieldName,
+  name,
   persistentFileLabel,
   objectId,
   acceptMultiple = true,
@@ -178,7 +178,7 @@ const FilesUpload = ({
   let existingFiles = []
 
   if (values) {
-    existingFiles = get(values, fieldName)
+    existingFiles = get(values, name)
     if (!existingFiles) existingFiles = []
   }
 
@@ -196,7 +196,7 @@ const FilesUpload = ({
     })
 
     if (onFileAdded) onFileAdded(data.createFile)
-    if (onChange) onChange([...existingFiles, data.createFile.id], fieldName)
+    if (onChange) onChange([...existingFiles, data.createFile.id], name)
 
     return data
   }
@@ -211,7 +211,7 @@ const FilesUpload = ({
       )
 
       // Update the new array with the file deleted
-      onChange(filteredFiles, fieldName)
+      onChange(filteredFiles, name)
     }
 
     if (onFileRemoved) onFileRemoved(file)
@@ -221,14 +221,14 @@ const FilesUpload = ({
 
   return (
     <FieldArray
-      name={fieldName}
+      name={name}
       render={formikProps => (
         <DropzoneAndList
           acceptMultiple={acceptMultiple}
           confirmBeforeDelete={confirmBeforeDelete}
           createFile={createFile}
           deleteFile={deleteFile}
-          fieldName={fieldName}
+          fieldName={name}
           fileType={fileType}
           mimeTypesToAccept={mimeTypesToAccept}
           persistentFileLabel={persistentFileLabel}
@@ -243,11 +243,11 @@ const FilesUpload = ({
 FilesUpload.propTypes = {
   /** The type of attachment, e.g. 'manuscript' (for embedded images), or 'supplementary', 'visualAbstract', 'review', 'confidential', 'decision' */
   fileType: PropTypes.string.isRequired,
-  fieldName: PropTypes.string.isRequired,
+  /** The field name in the form, for an attachment field in a form */
+  name: PropTypes.string.isRequired,
   /** All files belong to an object, such as a manuscript or review */
   objectId: PropTypes.string.isRequired,
-  /** only supply onChange if you want the field data to contain the list of file IDs.
-   * For submissions we don't store these in the form. */
+  /** Function for updating the list of file IDs. */
   onChange: PropTypes.func,
   /** Allow multiple drag/drop or multiple selection in file dialog */
   acceptMultiple: PropTypes.bool,

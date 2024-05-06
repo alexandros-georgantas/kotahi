@@ -75,47 +75,16 @@ const ReadonlyFieldData = ({
   }
 
   if (
-    // Shows supplementary, visualAbstract, manuscript tagged files in Metadata submission form
-    ['SupplementaryFiles', 'VisualAbstract', 'ManuscriptFile'].includes(
-      fieldDefinition?.component,
-    ) &&
+    fieldDefinition?.component === 'ManuscriptFile' &&
     Array.isArray(formData.files)
   ) {
-    const supplementaryFiles = formData.files.filter(file =>
-      file.tags.includes('supplementary'),
-    )
-
-    const visualAbstractFiles = formData.files.filter(file =>
-      file.tags.includes('visualAbstract'),
-    )
-
     const manuscriptFiles = formData.files.filter(file =>
       file.tags.includes('manuscript'),
     )
 
-    if (
-      fieldDefinition?.component === 'SupplementaryFiles' &&
-      supplementaryFiles.length > 0
-    )
-      return supplementaryFiles.map(file => (
-        <Attachment file={file} key={file.storedObjects[0].url} uploaded />
-      ))
-
-    if (
-      fieldDefinition?.component === 'VisualAbstract' &&
-      visualAbstractFiles.length > 0
-    )
-      return visualAbstractFiles.map(file => (
-        <Attachment file={file} key={file.storedObjects[0].url} uploaded />
-      ))
-
-    if (
-      fieldDefinition?.component === 'ManuscriptFile' &&
-      manuscriptFiles.length > 0
-    )
-      return manuscriptFiles.map(file => (
-        <Attachment file={file} key={file.storedObjects[0].url} uploaded />
-      ))
+    return manuscriptFiles.map(file => (
+      <Attachment file={file} key={file.storedObjects[0].url} uploaded />
+    ))
   }
 
   if (data && fieldDefinition?.component === 'AbstractEditor')

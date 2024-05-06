@@ -37,8 +37,8 @@ const FileInputComponent = ({ entityId, disabled, ...restProps }) => {
     <FilesUpload
       acceptMultiple
       disabled={disabled}
-      fieldName="files"
       fileType="authorFeedback"
+      name="files"
       objectId={entityId}
       {...restProps}
       onChange={() => {}}

@@ -13,9 +13,9 @@ const FileInputComponent = ({ entityId, ...restProps }) => {
   return (
     <FilesUpload
       acceptMultiple={false}
-      fieldName="logo"
       fileType="cms"
       mimeTypesToAccept="image/*"
+      name="logo"
       objectId={entityId}
       {...restProps}
     />
