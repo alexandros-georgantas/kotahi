@@ -56,7 +56,9 @@ const SubmissionForm = ({
         }
         form={form}
         initialValues={versionValues}
-        isSubmission
+        manuscriptFile={manuscript.files.find(f =>
+          f.tags.includes('manuscript'),
+        )}
         objectId={manuscript.id}
         onChange={(value, path) => {
           onChange(value, path, manuscript.id)

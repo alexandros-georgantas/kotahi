@@ -167,7 +167,6 @@ const DecisionVersion = ({
     Object.assign(submissionValues, version.submission)
 
     const versionValues = {
-      ...version,
       submission: submissionValues,
     }
 
@@ -202,7 +201,9 @@ const DecisionVersion = ({
                 }
                 form={form}
                 initialValues={versionValues}
-                isSubmission
+                manuscriptFile={version.files.find(f =>
+                  f.tags.includes('manuscript'),
+                )}
                 objectId={version.id}
                 onChange={(value, path) => {
                   onChange(value, path, versionId)

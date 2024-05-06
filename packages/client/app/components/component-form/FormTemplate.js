@@ -18,9 +18,6 @@ const Form = styled.form`
   }
 `
 
-const filterFileManuscript = files =>
-  files.filter(file => file.tags.includes('manuscript'))
-
 /** Shallow clone props, leaving out all specified keys, and also stripping all keys with (string) value 'false'. */
 const rejectProps = (obj, keys) =>
   Object.keys(obj)
@@ -64,12 +61,12 @@ const FormTemplate = ({
   validateSuffix,
   createFile,
   deleteFile,
-  isSubmission,
   tagForFiles,
   threadedDiscussionProps: tdProps,
   fieldsToPublish,
   setShouldPublishField,
   shouldShowOptionToPublish = false,
+  manuscriptFile, // TODO insert this into the submission data in the same way we do for attachments and visual abstracts (manuscriptCommsUtils.js)
 }) => {
   const [submitButtonOverrideStatus, setSubmitButtonOverrideStatus] =
     useState(null)
@@ -178,11 +175,6 @@ const FormTemplate = ({
           debounceChange(value, fieldName)
         }
 
-        const manuscriptFiles = filterFileManuscript(values.files || [])
-
-        const submittedManuscriptFile =
-          isSubmission && manuscriptFiles.length ? manuscriptFiles[0] : null
-
         return (
           <Form>
             {(form.children || [])
@@ -214,11 +206,11 @@ const FormTemplate = ({
                 let field = null
 
                 if (element.component === 'ManuscriptFile') {
-                  if (submittedManuscriptFile)
+                  if (manuscriptFile)
                     field = (
                       <Attachment
-                        file={submittedManuscriptFile}
-                        key={submittedManuscriptFile.storedObjects[0].url}
+                        file={manuscriptFile}
+                        key={manuscriptFile.storedObjects[0].url}
                         uploaded
                       />
                     )
@@ -357,17 +349,7 @@ FormTemplate.propTypes = {
   }).isRequired,
   /** The object the form data belongs to, e.g. a manuscript or review */
   objectId: PropTypes.string.isRequired,
-  initialValues: PropTypes.shape({
-    files: PropTypes.arrayOf(
-      PropTypes.shape({
-        name: PropTypes.string,
-        tags: PropTypes.arrayOf(PropTypes.string.isRequired),
-        // eslint-disable-next-line react/forbid-prop-types
-        storedObjects: PropTypes.arrayOf(PropTypes.object),
-      }).isRequired,
-    ),
-    status: PropTypes.string,
-  }),
+  initialValues: PropTypes.shape({}),
   onChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func,
   submissionButtonText: PropTypes.string,

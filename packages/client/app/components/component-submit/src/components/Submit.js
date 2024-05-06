@@ -121,7 +121,6 @@ const Submit = ({
       Object.assign(submissionValues, version.submission)
 
       const versionValues = {
-        ...version,
         submission: submissionValues,
       }
 
