@@ -9,7 +9,7 @@
       "title": "Title",
       "id": "47fd802f-ed30-460d-9617-c8a9b9025e95",
       "component": "TextField",
-      "name": "submission.$title",
+      "name": "$title",
       "description": "<p class=\"paragraph\">Please enter the title of your Research Object as you would like it to appear once published. PLEASE DO NOT USE ALL CAPS. Use the example below as a guide: \"An fMRI Study on Word Recognition\". Please do not use Subscript, Superscript, boldface and/or italics in your Title</p>",
       "placeholder": "Enter the manuscript's title",
       "permitPublishing": "always",
@@ -25,7 +25,7 @@
       "title": "Authors ",
       "id": "660e43f2-95b5-4666-8f1f-8cfdca04c761",
       "component": "AuthorsInput",
-      "name": "submission.$authors",
+      "name": "$authors",
       "description": "<p class=\"paragraph\">Please enter the author names, titles, contact information and affiliations in the order they appear in your manuscript.</p><p class=\"paragraph\">Please include the email address of at least your contributing or first author. The email addresses of the rest of the co-authors is not required. Any submitted email address will be made public with the work if published. &nbsp;</p><p class=\"paragraph\">Multiple affiliations can be seperated by a comma.</p><p class=\"paragraph\">Initials and Middle intials can be added in the First Name field.</p>",
       "permitPublishing": "always",
       "validate": [
@@ -40,7 +40,7 @@
       "title": "Cover letter",
       "id": "347dc171-f008-45ac-8433-ca0711bf213c",
       "component": "AbstractEditor",
-      "name": "submission.cover",
+      "name": "cover",
       "description": "<p class=\"paragraph\">Please upload a cover letter that summarizes the contributions of your Research Object and any other relevant or timely information to consider. Do not upload your abstract here. You may upload your cover letter as a PDF in the “Uploads” step. Please address your Cover Letter to the Editor-in-Chief, Dr. Tonya White.<br></p><p class=\"paragraph\"><br></p>",
       "permitPublishing": "false",
       "placeholder": "Enter your cover letter"
@@ -49,7 +49,7 @@
       "title": "Type of Research Object",
       "id": "fa0c39ca-0486-4e29-ba24-f86f7d375c3f",
       "component": "CheckboxGroup",
-      "name": "submission.objectType",
+      "name": "objectType",
       "description": "<p class=\"paragraph\">Please select the Research Object type(s) that best match your submission and include a link to the supporting elements if applicable. If you are linking to a preprint server or hosting site, we ask that you use reliable and accessible sites.</p>",
       "permitPublishing": "false",
       "options": [
@@ -95,7 +95,7 @@
       "shortDescription": "Abstract",
       "id": "d80b2c88-6144-4003-b671-63990b9b2793",
       "component": "AbstractEditor",
-      "name": "submission.$abstract",
+      "name": "$abstract",
       "description": "<p class=\"paragraph\">Please provide a short summary of your submission. </p>",
       "placeholder": "Input your abstract...",
       "permitPublishing": "always",
@@ -111,7 +111,7 @@
       "title": "Data Availability Statements",
       "id": "de3f6194-96c0-437e-aa4b-721b2ddbaccb",
       "component": "CheckboxGroup",
-      "name": "submission.dataCode",
+      "name": "dataCode",
       "description": "<p class=\"paragraph\">Please select from the following list to confirm that the data are or are not available, and the conditions and means in which your data will be available.</p><p class=\"paragraph\">If your data would fit under multiple accessibility statements, please explain in the following text field.&nbsp;</p><p class=\"paragraph\"></p>",
       "permitPublishing": "false",
       "options": [
@@ -153,7 +153,7 @@
       "title": "Code Availability Statements",
       "id": "7c5f4edc-2d04-41ba-8280-7eb543954ade",
       "component": "CheckboxGroup",
-      "name": "submission.codeAvailability",
+      "name": "codeAvailability",
       "description": "<p class=\"paragraph\"></p>",
       "permitPublishing": "false",
       "options": [
@@ -173,7 +173,7 @@
       "title": "Data availability statements Cont.",
       "id": "bf2f9b4a-377b-4303-8f51-70d836eb1456",
       "component": "AbstractEditor",
-      "name": "submission.dataCodeContinued",
+      "name": "dataCodeContinued",
       "description": "<p class=\"paragraph\">Please use this field to explain your selections above and include any other supporting information about your data.</p><p class=\"paragraph\">If the Research Object does not report on new empirical data nor create it directly, please state that “No new research data were acquired or generated for this Research Object.\"</p><p class=\"paragraph\">Reminder: The statement, “Data will be available on reasonable request” is not sufficient. Please confirm that the data are or are not available, and the conditions and means in which your data will be available.</p><p class=\"paragraph\">If your Research Object does not include data, please put NA.</p><p class=\"paragraph\">Please include any available DOI’s.</p><p class=\"paragraph\"></p>",
       "permitPublishing": "false",
       "placeholder": "Enter your data and code availability statement"
@@ -183,7 +183,7 @@
       "shortDescription": "Content",
       "id": "6deaacc6-759a-4a68-b494-c38c664bb665",
       "component": "CheckboxGroup",
-      "name": "submission.content",
+      "name": "content",
       "description": "<p class=\"paragraph\">Choose the following options that best fit your Research Object. IMPORTANT: These choices will be used to assign Handling Editors and Reviewers for the Research Object.</p><p class=\"paragraph\">&nbsp;<em>(Choose Up To 5)</em></p>",
       "permitPublishing": "false",
       "options": [
@@ -401,7 +401,7 @@
       "shortDescription": "Other methods",
       "id": "6bfdc237-814d-4af8-b0f0-064099d679ba",
       "component": "TextField",
-      "name": "submission.otherMethods",
+      "name": "otherMethods",
       "permitPublishing": "false",
       "placeholder": "Enter any additional methods used, if applicable"
     },
@@ -410,7 +410,7 @@
       "shortDescription": "Supplementary Files",
       "id": "b769b4d5-f9b3-48d3-a6d5-77bb6a9e95b0",
       "component": "SupplementaryFiles",
-      "name": "fileName",
+      "name": "attachments",
       "permitPublishing": "false",
       "description": "<p class=\"paragraph\">Use this space to upload any supplementary files including a PDF of your manuscript. You can also upload your cover letter as a PDF here.</p>"
     },
@@ -418,7 +418,7 @@
       "title": "Research Object Links",
       "id": "bf0c8b8f-7523-4c7d-a74c-7635838f1451",
       "component": "AbstractEditor",
-      "name": "submission.researchObjectLinks",
+      "name": "researchObjectLinks",
       "permitPublishing": "false",
       "description": "<p class=\"paragraph\">Please include the URL for any supplementary materials or supporting items if applicable.</p>"
     },
@@ -426,7 +426,7 @@
       "title": "Ethics statement",
       "id": "fa5e5b75-4b6f-4a2d-9113-c2b4db73ef8a",
       "component": "AbstractEditor",
-      "name": "submission.ethics",
+      "name": "ethics",
       "description": "<p class=\"paragraph\">Please enter your ethics statement here. If you have an ethics statement in your manuscript, please include it here.</p>",
       "permitPublishing": "false",
       "placeholder": "Enter your ethics statements"
@@ -436,7 +436,7 @@
       "shortDescription": "References",
       "id": "e8af0c63-e46f-46a8-bc90-5023fe50a541",
       "component": "AbstractEditor",
-      "name": "submission.references",
+      "name": "references",
       "permitPublishing": "false",
       "description": "<p class=\"paragraph\">References must be included in the manuscript and formatted as per the author's preference with the initial submission. </p><p class=\"paragraph\">If asked to submit revisions, authors will be asked to format their references in Vancouver Style and include these in the Submission Form Here.</p>"
     },
@@ -444,7 +444,7 @@
       "title": "Suggested reviewers",
       "id": "14b8da7d-5924-4098-8d1f-e528c7c440b9",
       "component": "TextField",
-      "name": "submission.suggested",
+      "name": "suggested",
       "description": "<p class=\"paragraph\">Aperture Neuro encourages authors to recommend potential Peer Reviewers for their Research Object provided there is no conflict of interest. A conflict of interest describes any situation that skews or interferes with Aperture’s objective and open peer review and publication processes. Personal, financial, and professional competing interests should be considered. We require all authors to declare any and all competing interests, and failure to do so could result in the rejection of your Research Object.</p><p class=\"paragraph\"><strong>Please list at least six reviewer suggestions </strong>and include name, affiliation, and contact information.</p>",
       "placeholder": "Add reviewer names...",
       "parse": "split",
@@ -470,7 +470,7 @@
       "title": "Conflict of Interest Statement",
       "id": "7b7e167c-beae-4762-8f84-bf6dbf0cd816",
       "component": "RadioGroup",
-      "name": "submission.conflictOfInterest",
+      "name": "conflictOfInterest",
       "description": "<p class=\"paragraph\">The authors of this (these) Research Object(s) certify that they have NO affiliations with or involvement in any organization or entity with any financial, personal or professional interest in the materials presented in this submission.</p>",
       "permitPublishing": "false",
       "options": [
@@ -498,7 +498,7 @@
       "shortDescription": "Similarity Report Score",
       "id": "e06411cd-7e75-42c5-8875-b71fbf2c2225",
       "component": "TextField",
-      "name": "submission.similarityReportScore",
+      "name": "similarityReportScore",
       "description": "<p class=\"paragraph\">Admin Only: Please note that any score over 15 percent should trigger a close inspection.</p>",
       "permitPublishing": "false",
       "hideFromAuthors": "true"
@@ -508,7 +508,7 @@
       "shortDescription": "Submission Label",
       "id": "b92ff5dc-d205-48ad-b112-8bfdce28a5c0",
       "component": "Select",
-      "name": "submission.$customStatus",
+      "name": "$customStatus",
       "description": "<p class=\"paragraph\">Use the following labels to indicate the status of the submission.</p>",
       "permitPublishing": "false",
       "options": [
@@ -574,7 +574,7 @@
       "title": "Volume (to be completed by Admin Only)",
       "id": "3b585a22-2eff-42a0-a38b-62bdf1e10e64",
       "component": "TextField",
-      "name": "submission.volumeNumber",
+      "name": "volumeNumber",
       "description": "<p class=\"paragraph\">Please input the year of publication. </p>",
       "placeholder": "Volume (to be completed by Admin Only)",
       "permitPublishing": "false",
@@ -584,7 +584,7 @@
       "title": "Issue (to be completed by Admin) ",
       "id": "acbbdc73-02e4-411a-a835-137f8f33e8ca",
       "component": "TextField",
-      "name": "submission.issueNumber",
+      "name": "issueNumber",
       "description": "<p class=\"paragraph\">Please put the issue # as the consectutive number of publishing. (For example Volume 2021 : Issue 1</p>",
       "permitPublishing": "false",
       "hideFromAuthors": "true"
@@ -593,7 +593,7 @@
       "title": "Date Received",
       "id": "7ea98340-ac78-4151-a6a5-65a32f2fdb70",
       "component": "TextField",
-      "name": "submission.DateReceived",
+      "name": "DateReceived",
       "description": "<p class=\"paragraph\">Admin Only </p>",
       "placeholder": "Date Received",
       "permitPublishing": "false",
@@ -603,7 +603,7 @@
       "title": "Date Accepted ",
       "id": "94a0ec89-68db-4143-b31e-624cdd435b58",
       "component": "TextField",
-      "name": "submission.DateAccepted",
+      "name": "DateAccepted",
       "description": "<p class=\"paragraph\">preferred format; DD.MM.YYYY e.g. 07.01.2021</p>",
       "permitPublishing": "false",
       "hideFromAuthors": "true"
@@ -612,7 +612,7 @@
       "title": "Author correspondence ",
       "id": "8236f27e-31dc-457f-989f-41f8cc8766a3",
       "component": "TextField",
-      "name": "submission.AuthorCorrespondence",
+      "name": "AuthorCorrespondence",
       "permitPublishing": "false",
       "hideFromAuthors": "true"
     }

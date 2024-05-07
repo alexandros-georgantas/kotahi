@@ -1053,8 +1053,6 @@ const fr = {
       'Field title': 'Titre du champ',
       'Field name': 'Nom (nom de champ interne)',
       'Field placeholder': 'Espace réservé du champ',
-      internalNameDescription:
-        'Entrez "submission." suivi d\'un nom contenant uniquement des lettres, des chiffres ou des traits de soulignement, par exemple "submission.votreNomDeChampIci".',
       'Field description': 'Description du champ',
       'Field options': 'Options du champ',
       'Field shortDescription':

@@ -38,7 +38,7 @@ const props = {
         title: 'Upload supplementary materials',
         id: 'b769b4d5-f9b3-48d3-a6d5-77bb6a9e95b0',
         component: 'SupplementaryFiles',
-        name: 'fileName',
+        name: 'attachments',
         description: '<p>Upload your files.</p>',
       },
       {
@@ -47,7 +47,7 @@ const props = {
         shortDescription: 'Abstract',
         id: 'd80b2c88-6144-4003-b671-63990b9b2793',
         component: 'AbstractEditor',
-        name: 'submission.$abstract',
+        name: '$abstract',
         description: '<p>Please provide a short summary of your submission</p>',
         placeholder: 'Input your abstract...',
       },
@@ -58,7 +58,7 @@ const props = {
         shortDescription: 'Patients/healthy subjects',
         id: 'ebe75cec-0ba8-4f00-9024-20e77ed94f1c',
         component: 'Select',
-        name: 'submission.subjects',
+        name: 'subjects',
         description: '<p></p>',
         options: [
           {
@@ -80,7 +80,7 @@ const props = {
         title: 'Cover letter',
         id: '347dc171-f008-45ac-8433-ca0711bf213c',
         component: 'AbstractEditor',
-        name: 'submission.cover',
+        name: 'cover',
         description:
           '<p>Cover letter describing submission, relevant implications, and timely information to consider</p>',
         placeholder: 'Enter your cover letter',
@@ -90,7 +90,7 @@ const props = {
         title: 'Title',
         id: '47fd802f-ed30-460d-9617-c8a9b9025e95',
         component: 'TextField',
-        name: 'submission.$title',
+        name: '$title',
         description: '<p></p>',
         placeholder: "Enter the manuscript's title",
       },
@@ -99,7 +99,7 @@ const props = {
         title: 'Affiliation',
         id: '1c2e9325-3fa8-41f3-8607-180eb8a25aa3',
         component: 'TextField',
-        name: 'submission.affiliation',
+        name: 'affiliation',
         placeholder: 'Enter your affiliation',
       },
       {
@@ -107,7 +107,7 @@ const props = {
         title: 'Name',
         id: '62ca72ad-04b0-41fc-85d1-415469d7e895',
         component: 'TextField',
-        name: 'submission.name',
+        name: 'name',
         placeholder: 'Enter your name',
         validate: [
           {
@@ -127,7 +127,7 @@ const props = {
         title: 'Ethics statement',
         id: 'fa5e5b75-4b6f-4a2d-9113-c2b4db73ef8a',
         component: 'AbstractEditor',
-        name: 'submission.ethics',
+        name: 'ethics',
         placeholder: 'Enter your ethics statements',
       },
       {
@@ -135,14 +135,14 @@ const props = {
         title: 'Research object links',
         id: 'bf0c8b8f-7523-4c7d-a74c-7635838f1451',
         component: 'LinksInput',
-        name: 'submission.links',
+        name: 'links',
       },
       {
         __typename: 'FormElement',
         title: 'Email and contact information',
         id: '7f5aa395-3486-4067-b636-ae204d472c16',
         component: 'TextField',
-        name: 'submission.contact',
+        name: 'contact',
         placeholder: 'Enter your contact information',
       },
       {
@@ -150,7 +150,7 @@ const props = {
         title: 'Type of Research Object',
         id: 'fa0c39ca-0486-4e29-ba24-f86f7d375c3f',
         component: 'Select',
-        name: 'submission.objectType',
+        name: 'objectType',
         options: [
           {
             __typename: 'FormElementOption',
@@ -183,7 +183,7 @@ const props = {
         title: 'Suggested reviewers',
         id: '14b8da7d-5924-4098-8d1f-e528c7c440b9',
         component: 'TextField',
-        name: 'submission.suggested',
+        name: 'suggested',
         placeholder: 'Add reviewer names...',
         parse: 'split',
         format: 'join',
@@ -193,7 +193,7 @@ const props = {
         title: 'Keywords',
         id: '6342cff7-c57a-4fd9-b91d-c4cf77b4c309',
         component: 'TextField',
-        name: 'submission.keywords',
+        name: 'keywords',
         placeholder: 'Enter keywords...',
         parse: 'split',
         format: 'join',
@@ -233,7 +233,7 @@ const props = {
         shortDescription: 'Ethics panel',
         id: '6871680a-2278-40b3-80c6-7de06f21aafb',
         component: 'Select',
-        name: 'submission.irb',
+        name: 'irb',
         description:
           '<p><i>NOTE: Any human subjects studies without IRB approval will be automatically rejected.</i></p>',
         options: [
@@ -265,7 +265,7 @@ const props = {
         shortDescription: 'Animal research panel',
         id: 'b127ecb1-4862-4662-a958-3266eb284353',
         component: 'Select',
-        name: 'submission.animal_research_approval',
+        name: 'animal_research_approval',
         description:
           '<p><i>NOTE: Any animal studies without IACUC approval will be automatically rejected.</i></p>',
         options: [
@@ -296,7 +296,7 @@ const props = {
         shortDescription: 'Methods',
         id: '6deaacc6-759a-4a68-b494-c38c664bb665',
         component: 'CheckboxGroup',
-        name: 'submission.methods',
+        name: 'methods',
         options: [
           {
             __typename: 'FormElementOption',
@@ -384,7 +384,7 @@ const props = {
         shortDescription: 'Other methods',
         id: '6bfdc237-814d-4af8-b0f0-064099d679ba',
         component: 'TextField',
-        name: 'submission.otherMethods',
+        name: 'otherMethods',
         placeholder: 'Enter any additional methods used, if applicable',
       },
       {
@@ -392,7 +392,7 @@ const props = {
         title: 'Data and Code availability statements',
         id: 'bf2f9b4a-377b-4303-8f51-70d836eb1456',
         component: 'AbstractEditor',
-        name: 'submission.datacode',
+        name: 'datacode',
         placeholder: 'Enter your data and code availability statement',
       },
       {
@@ -401,7 +401,7 @@ const props = {
         shortDescription: 'MRI strength',
         id: '38736c42-53bb-488d-a171-f6a102d7fa02',
         component: 'Select',
-        name: 'submission.humanMRI',
+        name: 'humanMRI',
         options: [
           {
             __typename: 'FormElementOption',
@@ -447,7 +447,7 @@ const props = {
         shortDescription: 'Other MRI strength',
         id: '88304f10-fbed-4597-9c25-0a4cdde7d7cf',
         component: 'TextField',
-        name: 'submission.humanMRIother',
+        name: 'humanMRIother',
         validate: [],
         validateValue: {
           __typename: 'FormElementValidation',
@@ -460,7 +460,7 @@ const props = {
         shortDescription: 'Processing packages',
         id: 'a2fc5de1-b173-42e6-839c-5082f62ba65d',
         component: 'CheckboxGroup',
-        name: 'submission.packages',
+        name: 'packages',
         options: [
           {
             __typename: 'FormElementOption',
@@ -513,7 +513,7 @@ const props = {
         shortDescription: 'Other processing packages',
         id: '92988a50-40f1-43a6-833c-31702c232728',
         component: 'TextField',
-        name: 'submission.otherPackages',
+        name: 'otherPackages',
       },
       {
         __typename: 'FormElement',
@@ -521,14 +521,14 @@ const props = {
         shortDescription: 'References',
         id: 'e8af0c63-e46f-46a8-bc90-5023fe50a541',
         component: 'AbstractEditor',
-        name: 'submission.references',
+        name: 'references',
       },
       {
         __typename: 'FormElement',
         title: 'Category',
         id: 'e2fede08-9c51-4e64-bf4e-666b409d341e',
         component: 'Select',
-        name: 'submission.test',
+        name: 'test',
         placeholder: 'select the category',
         options: [
           {
@@ -1025,63 +1025,63 @@ const props = {
               __typename: 'FormElement',
               id: 'bf0c8b8f-7523-4c7d-a74c-7635838f1451',
               component: 'LinksInput',
-              name: 'submission.links',
+              name: 'links',
               title: 'Research object links',
             },
             {
               __typename: 'FormElement',
               id: '47fd802f-ed30-460d-9617-c8a9b9025e95',
               component: 'TextField',
-              name: 'submission.$title',
+              name: '$title',
               title: 'Title',
             },
             {
               __typename: 'FormElement',
               id: '62ca72ad-04b0-41fc-85d1-415469d7e895',
               component: 'TextField',
-              name: 'submission.name',
+              name: 'name',
               title: 'Name',
             },
             {
               __typename: 'FormElement',
               id: '1c2e9325-3fa8-41f3-8607-180eb8a25aa3',
               component: 'TextField',
-              name: 'submission.affiliation',
+              name: 'affiliation',
               title: 'Affiliation',
             },
             {
               __typename: 'FormElement',
               id: '7f5aa395-3486-4067-b636-ae204d472c16',
               component: 'TextField',
-              name: 'submission.contact',
+              name: 'contact',
               title: 'Email and contact information',
             },
             {
               __typename: 'FormElement',
               id: '347dc171-f008-45ac-8433-ca0711bf213c',
               component: 'AbstractEditor',
-              name: 'submission.cover',
+              name: 'cover',
               title: 'Cover letter',
             },
             {
               __typename: 'FormElement',
               id: 'bf2f9b4a-377b-4303-8f51-70d836eb1456',
               component: 'AbstractEditor',
-              name: 'submission.datacode',
+              name: 'datacode',
               title: 'Data and Code availability statements',
             },
             {
               __typename: 'FormElement',
               id: 'fa5e5b75-4b6f-4a2d-9113-c2b4db73ef8a',
               component: 'AbstractEditor',
-              name: 'submission.ethics',
+              name: 'ethics',
               title: 'Ethics statement',
             },
             {
               __typename: 'FormElement',
               id: 'fa0c39ca-0486-4e29-ba24-f86f7d375c3f',
               component: 'Select',
-              name: 'submission.objectType',
+              name: 'objectType',
               title: 'Type of Research Object',
               options: [
                 {
@@ -1118,28 +1118,28 @@ const props = {
               __typename: 'FormElement',
               id: '14b8da7d-5924-4098-8d1f-e528c7c440b9',
               component: 'TextField',
-              name: 'submission.suggested',
+              name: 'suggested',
               title: 'Suggested reviewers',
             },
             {
               __typename: 'FormElement',
               id: 'b769b4d5-f9b3-48d3-a6d5-77bb6a9e95b0',
               component: 'SupplementaryFiles',
-              name: 'fileName',
+              name: 'attachments',
               title: 'Upload supplementary materials',
             },
             {
               __typename: 'FormElement',
               id: '6342cff7-c57a-4fd9-b91d-c4cf77b4c309',
               component: 'TextField',
-              name: 'submission.keywords',
+              name: 'keywords',
               title: 'Keywords',
             },
             {
               __typename: 'FormElement',
               id: 'ebe75cec-0ba8-4f00-9024-20e77ed94f1c',
               component: 'Select',
-              name: 'submission.subjects',
+              name: 'subjects',
               title:
                 'Did your study involve healthy subjects only or patients (note that patient studies may also involve healthy subjects)',
               shortDescription: 'Patients/healthy subjects',
@@ -1164,7 +1164,7 @@ const props = {
               __typename: 'FormElement',
               id: '6871680a-2278-40b3-80c6-7de06f21aafb',
               component: 'Select',
-              name: 'submission.irb',
+              name: 'irb',
               title:
                 'If your research involved human subjects, was the research approved by the relevant Institutional Review Board or ethics panel?',
               shortDescription: 'Ethics panel',
@@ -1197,7 +1197,7 @@ const props = {
               __typename: 'FormElement',
               id: 'b127ecb1-4862-4662-a958-3266eb284353',
               component: 'Select',
-              name: 'submission.animal_research_approval',
+              name: 'animal_research_approval',
               title:
                 'Was any animal research approved by the relevant IACUC or other animal research panel?',
               shortDescription: 'Animal research panel',
@@ -1230,7 +1230,7 @@ const props = {
               __typename: 'FormElement',
               id: '6deaacc6-759a-4a68-b494-c38c664bb665',
               component: 'CheckboxGroup',
-              name: 'submission.methods',
+              name: 'methods',
               title:
                 'Please indicate which methods were used in your research:',
               shortDescription: 'Methods',
@@ -1332,7 +1332,7 @@ const props = {
               __typename: 'FormElement',
               id: '6bfdc237-814d-4af8-b0f0-064099d679ba',
               component: 'TextField',
-              name: 'submission.otherMethods',
+              name: 'otherMethods',
               title: 'If you used other research methods, please specify:',
               shortDescription: 'Other methods',
             },
@@ -1340,7 +1340,7 @@ const props = {
               __typename: 'FormElement',
               id: '38736c42-53bb-488d-a171-f6a102d7fa02',
               component: 'Select',
-              name: 'submission.humanMRI',
+              name: 'humanMRI',
               title: 'For human MRI, what field strength scanner do you use?',
               shortDescription: 'MRI strength',
               options: [
@@ -1392,7 +1392,7 @@ const props = {
               __typename: 'FormElement',
               id: '88304f10-fbed-4597-9c25-0a4cdde7d7cf',
               component: 'TextField',
-              name: 'submission.humanMRIother',
+              name: 'humanMRIother',
               title: 'If other, please specify:',
               shortDescription: 'Other MRI strength',
             },
@@ -1400,7 +1400,7 @@ const props = {
               __typename: 'FormElement',
               id: 'a2fc5de1-b173-42e6-839c-5082f62ba65d',
               component: 'CheckboxGroup',
-              name: 'submission.packages',
+              name: 'packages',
               title: 'Which processing packages did you use for your study?',
               shortDescription: 'Processing packages',
               options: [
@@ -1459,7 +1459,7 @@ const props = {
               __typename: 'FormElement',
               id: '92988a50-40f1-43a6-833c-31702c232728',
               component: 'TextField',
-              name: 'submission.otherPackages',
+              name: 'otherPackages',
               title:
                 'If you used any other processing packages, please list them here:',
               shortDescription: 'Other processing packages',
@@ -1468,7 +1468,7 @@ const props = {
               __typename: 'FormElement',
               id: 'e8af0c63-e46f-46a8-bc90-5023fe50a541',
               component: 'AbstractEditor',
-              name: 'submission.references',
+              name: 'references',
               title: 'Provide references using author date format:',
               shortDescription: 'References',
             },
@@ -1483,7 +1483,7 @@ const props = {
               __typename: 'FormElement',
               id: 'd80b2c88-6144-4003-b671-63990b9b2793',
               component: 'AbstractEditor',
-              name: 'submission.$abstract',
+              name: '$abstract',
               title: 'Abstract',
               shortDescription: 'Abstract',
             },

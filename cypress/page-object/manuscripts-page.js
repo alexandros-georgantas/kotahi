@@ -24,13 +24,13 @@ const STATUS_FIELD = 'Badge__Status'
 const TABLE_HEADER = '[class*=Table__Header]'
 const MANUSCRIPTS_TABLE_HEAD = '[class*=style__ManuscriptsHeaderRow]'
 const ARTICLE_TITLE = '[class*=Table__Row]>td:nth-child(1)'
-const ARTICLE_ID = '[name="submission.articleId"]'
-const ARTICLE_LABEL = '[name="submission.$customStatus"]'
+const ARTICLE_ID = '[name="articleId"]'
+const ARTICLE_LABEL = '[name="$customStatus"]'
 const DROPDOWN_LABEL = '[class*=LabelDropdown__BaseDropdown]'
 const ARTICLE_TOPIC = '[class*=Table__Cell] > [title]'
 const TABLE_ROW = '[class*=style__ManuscriptsRow]'
 const TABLE_CELL = 'Table__Cell'
-const LABEL = '[name="submission.$customStatus"]'
+const LABEL = '[name="$customStatus"]'
 const BULKBUTTON = 'style__BulkActionModalButton'
 
 const ARTICLE_CHECKBOX =
@@ -169,9 +169,7 @@ export const ManuscriptsPage = {
     this.getTableHead(nth).click()
   },
   selectCustomStatus(statusLabel) {
-    cy.get(
-      '[class*="ManuscriptsHeaderRow"] [data-testid="submission.$customStatus"]',
-    )
+    cy.get('[class*="ManuscriptsHeaderRow"] [data-testid="$customStatus"]')
       .scrollIntoView()
       .click()
     cy.get('[class*="MenuList"]').contains(statusLabel).click()

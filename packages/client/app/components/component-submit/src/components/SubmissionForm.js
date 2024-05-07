@@ -8,7 +8,7 @@ import Modal from '../../../component-modal/src/Modal'
 import PublishingResponse from '../../../component-review/src/components/publishing/PublishingResponse'
 
 const SubmissionForm = ({
-  versionValues,
+  submissionValues,
   form,
   onSubmit,
   onChange,
@@ -55,13 +55,13 @@ const SubmissionForm = ({
           )?.fieldsToPublish ?? []
         }
         form={form}
-        initialValues={versionValues}
+        initialValues={submissionValues}
         manuscriptFile={manuscript.files.find(f =>
           f.tags.includes('manuscript'),
         )}
         objectId={manuscript.id}
         onChange={(value, path) => {
-          onChange(value, path, manuscript.id)
+          onChange(value, `submission.${path}`, manuscript.id)
         }}
         onSubmit={async (values, { validateForm, setSubmitting, ...other }) => {
           // TODO: Change this to a more Formik idiomatic form

@@ -237,7 +237,7 @@ const FormTemplate = ({
                       fileType={tagForFiles}
                       isClearable={
                         element.component === 'Select' &&
-                        element.name === 'submission.$customStatus'
+                        element.name === '$customStatus'
                       }
                       key={`validate-${element.id}`}
                       name={element.name}

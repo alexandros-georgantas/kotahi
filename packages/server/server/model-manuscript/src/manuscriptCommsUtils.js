@@ -136,7 +136,7 @@ const convertFilesToFullObjects = async (
     .filter(field =>
       ['SupplementaryFiles', 'VisualAbstract'].includes(field.component),
     )
-    .map(field => field.name.split('submission.')[1])
+    .map(field => field.name)
 
   for (const [key, value] of Object.entries(submission)) {
     if (fileFieldNames.includes(key)) {

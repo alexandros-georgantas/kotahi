@@ -1017,8 +1017,6 @@ const en = {
       'Field title': 'Field title',
       'Field name': 'Name (internal field name)',
       'Field placeholder': 'Field placeholder',
-      internalNameDescription:
-        'Enter "submission." followed by a name including only letters, numbers or underscores, e.g. "submission.yourFieldNameHere"',
       'Field description': 'Field description',
       'Field options': 'Field options',
       'Field shortDescription':

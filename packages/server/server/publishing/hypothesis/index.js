@@ -66,7 +66,7 @@ const publishToHypothesis = async manuscript => {
   const fields = await Promise.all(
     publishableFieldData.map(async d => {
       if (['create', 'update'].includes(d.action) && !uri)
-        throw new Error('Missing field submission.$sourceUri')
+        throw new Error('Missing field $sourceUri')
 
       if (
         d.action === 'update' &&
@@ -79,8 +79,7 @@ const publishToHypothesis = async manuscript => {
       )
         return { ...d, action: null }
 
-      if (d.action === null && !uri)
-        throw new Error('Missing field submission.$sourceUri')
+      if (d.action === null && !uri) throw new Error('Missing field $sourceUri')
 
       return d
     }),

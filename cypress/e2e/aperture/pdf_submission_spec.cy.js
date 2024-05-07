@@ -21,7 +21,7 @@ describe('Upload manuscript test', () => {
 
     cy.fixture('submission_form_data').then(data => {
       // Fill Submission Form
-      SubmissionFormPage.fillInField('submission.$title', data.title, true)
+      SubmissionFormPage.fillInField('$title', data.title, true)
       SubmissionFormPage.clickSubmitResearch()
       SubmissionFormPage.clickSubmitYourManuscript() // Submit your form
 

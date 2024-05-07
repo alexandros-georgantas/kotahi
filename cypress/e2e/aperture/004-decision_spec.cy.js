@@ -52,14 +52,10 @@ describe('Completing a review', () => {
       DashboardPage.getDecisionField(2).should('contain', 'Revise')
       DashboardPage.clickCreateNewVersionButton() // Create new manuscript version
 
-      cy.getByDataTestId('submission.objectType').click()
+      cy.getByDataTestId('objectType').click()
       cy.contains('Dataset').click({ force: true })
 
-      SubmissionFormPage.fillInField(
-        'submission.$abstract',
-        'New abstract...',
-        true,
-      )
+      SubmissionFormPage.fillInField('$abstract', 'New abstract...', true)
       SubmissionFormPage.clickSubmitResearch()
       SubmissionFormPage.clickSubmitYourManuscript()
       DashboardPage.getSubmittedManuscript()

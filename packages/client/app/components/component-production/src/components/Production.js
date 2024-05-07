@@ -259,8 +259,11 @@ const Production = ({
             copyHandleBarsCode
             displayShortIdAsIdentifier={displayShortIdAsIdentifier}
             form={form}
-            formData={manuscript}
+            formData={manuscript.submission}
             manuscript={manuscript}
+            manuscriptFile={manuscript.files.find(f =>
+              f.tags.includes('manuscript'),
+            )}
             // threadedDiscussionProps={threadedDiscussionExtendedProps}
             showEditorOnlyFields
           />

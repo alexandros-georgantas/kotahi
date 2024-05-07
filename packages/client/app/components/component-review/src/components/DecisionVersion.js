@@ -166,10 +166,6 @@ const DecisionVersion = ({
 
     Object.assign(submissionValues, version.submission)
 
-    const versionValues = {
-      submission: submissionValues,
-    }
-
     const versionId = version.id
 
     return {
@@ -179,8 +175,11 @@ const DecisionVersion = ({
             <ReadonlyFormTemplate
               displayShortIdAsIdentifier={displayShortIdAsIdentifier}
               form={form}
-              formData={version}
+              formData={version.submission}
               manuscript={version}
+              manuscriptFile={version.files.find(f =>
+                f.tags.includes('manuscript'),
+              )}
               showEditorOnlyFields
               threadedDiscussionProps={threadedDiscussionExtendedProps}
             />
@@ -200,13 +199,13 @@ const DecisionVersion = ({
                   )?.fieldsToPublish ?? []
                 }
                 form={form}
-                initialValues={versionValues}
+                initialValues={submissionValues}
                 manuscriptFile={version.files.find(f =>
                   f.tags.includes('manuscript'),
                 )}
                 objectId={version.id}
                 onChange={(value, path) => {
-                  onChange(value, path, versionId)
+                  onChange(value, `submission.${path}`, versionId)
                 }}
                 setShouldPublishField={async (fieldName, shouldPublish) =>
                   setShouldPublishField({

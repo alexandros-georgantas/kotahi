@@ -1039,8 +1039,6 @@ const ru = {
       'Field title': 'Название поля',
       'Field name': 'Название (Внутреннее название поля)',
       'Field placeholder': 'Замещающий текст',
-      internalNameDescription:
-        'Введитe "submission." перед именем, содержащим только буквы, цифры или подчеркивания, например "submission.вашеИмяПоляЗдесь".',
       'Field description': 'Описание поля',
       'Field options': 'Параметры поля',
       'Field shortDescription':

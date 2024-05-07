@@ -163,14 +163,14 @@ If a submission to Crossref fails basic schema validation (e.g. if required fiel
 Publishing to Crossref requires that you have certain fields configured via the form-builder. These are:
 | Field type | Internal field name | Purpose |
 | --------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Title | `submission.$title` | Article title |
-| Authors | `submission.$authors` | Ordered list of authors |
-| Abstract | `submission.$abstract` | Article abstract |
-| Rich text | `submission.references` | Citations in separate paragraphs |
-| Text | `submission.volumeNumber` | (Optional) Journal volume number |
-| Text | `submission.issueNumber` | (Optional) Journal issue number |
-| Text | `submission.issueYear` | The year of publication. If `submission.volumeNumber` is formatted as a year (e.g. 2021), then `submission.issueYear` is optional. |
-| DOI suffix | `submission.$doiSuffix` | (Optional) The custom DOI suffix for the article |
+| Title | `$title` | Article title |
+| Authors | `$authors` | Ordered list of authors |
+| Abstract | `$abstract` | Article abstract |
+| Rich text | `references` | Citations in separate paragraphs |
+| Text | `volumeNumber` | (Optional) Journal volume number |
+| Text | `issueNumber` | (Optional) Journal issue number |
+| Text | `issueYear` | The year of publication. If `submission.volumeNumber` is formatted as a year (e.g. 2021), then `submission.issueYear` is optional. |
+| DOI suffix | `$doiSuffix` | (Optional) The custom DOI suffix for the article |
 
 #### Registering article evaluations via Crossref
 
@@ -191,14 +191,14 @@ And the following form fields are required:
 
 | Field type | Field name                                                                                                                                                                                                       | Purpose                                                  |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| DOI        | `submission.$doi`                                                                                                                                                                                                | The DOI link to the article under review                 |
-| Rich text  | `submission.review1`                                                                                                                                                                                             | Review number 1                                          |
-| Text       | `submission.review1date`                                                                                                                                                                                         | Review 1 date, formatted as yyyy-mm-dd or mm/dd/yyyy     |
-| Text       | `submission.review1creator`                                                                                                                                                                                      | Review 1 author, formatted as Firstname Lastname         |
-| Text       | `submission.review1suffix`                                                                                                                                                                                       | (Optional) Review 1 custom DOI sufix                     |
-| (As above) | `submission.review2`, `submission.review2date`, `submission.review2creator`, `submission.review2suffix`, `submission.review3`, `submission.review3date`, `submission.review3creator`, `submission.review3suffix` | (Optional) Fields for second and third reviews.          |
-| (As above) | `submission.summary`, `submission.summarydate`, `submission.summarycreator`, `submission.summarysuffix`                                                                                                          | (Optional) Fields for a summary of the reviews.          |
-| Title      | `submission.$title`                                                                                                                                                                                              | Title of the article under review, possibly abbreviated. |
+| DOI        | `$doi`                                                                                                                                                                                                | The DOI link to the article under review                 |
+| Rich text  | `review1`                                                                                                                                                                                             | Review number 1                                          |
+| Text       | `review1date`                                                                                                                                                                                         | Review 1 date, formatted as yyyy-mm-dd or mm/dd/yyyy     |
+| Text       | `review1creator`                                                                                                                                                                                      | Review 1 author, formatted as Firstname Lastname         |
+| Text       | `review1suffix`                                                                                                                                                                                       | (Optional) Review 1 custom DOI sufix                     |
+| (As above) | `review2`, `review2date`, `review2creator`, `review2suffix`, `review3`, `review3date`, `review3creator`, `review3suffix` | (Optional) Fields for second and third reviews.          |
+| (As above) | `summary`, `summarydate`, `summarycreator`, `summarysuffix`                                                                                                          | (Optional) Fields for a summary of the reviews.          |
+| Title      | `$title`                                                                                                                                                                                              | Title of the article under review, possibly abbreviated. |
 
 ### Hypothesis
 
@@ -214,7 +214,7 @@ HYPOTHESIS_GROUP=<group key here>
 HYPOTHESIS_ALLOW_TAGGING=true
 ```
 
-Your submission form must also contain a 'Manuscript source URI' field (internal name `submission.$sourceUri`), which should contain the URL of the page to be annotated.
+Your submission form must also contain a 'Manuscript source URI' field (internal name `$sourceUri`), which should contain the URL of the page to be annotated.
 
 Once these preliminaries are in place, there are two approaches to publishing to Hypothesis. Both can be used at the same time:
 

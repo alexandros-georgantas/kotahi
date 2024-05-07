@@ -10,6 +10,7 @@ const ReadonlyFieldData = ({
   form,
   formData,
   threadedDiscussionProps,
+  manuscriptFile,
 }) => {
   const data = get(formData, fieldName)
   const fieldDefinition = form.children?.find(field => field.name === fieldName)
@@ -74,17 +75,14 @@ const ReadonlyFieldData = ({
     ))
   }
 
-  if (
-    fieldDefinition?.component === 'ManuscriptFile' &&
-    Array.isArray(formData.files)
-  ) {
-    const manuscriptFiles = formData.files.filter(file =>
-      file.tags.includes('manuscript'),
+  if (fieldDefinition?.component === 'ManuscriptFile' && manuscriptFile) {
+    return (
+      <Attachment
+        file={manuscriptFile}
+        key={manuscriptFile.storedObjects[0].url}
+        uploaded
+      />
     )
-
-    return manuscriptFiles.map(file => (
-      <Attachment file={file} key={file.storedObjects[0].url} uploaded />
-    ))
   }
 
   if (data && fieldDefinition?.component === 'AbstractEditor')

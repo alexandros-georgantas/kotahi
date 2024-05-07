@@ -63,8 +63,11 @@ const ReviewLayout = ({
       <div key={latestManuscript.id}>
         <ReadonlyFormTemplate
           form={submissionForm}
-          formData={latestManuscript}
+          formData={latestManuscript.submission}
           manuscript={latestManuscript}
+          manuscriptFile={latestManuscript.files.find(f =>
+            f.tags.includes('manuscript'),
+          )}
           showEditorOnlyFields={false}
           threadedDiscussionProps={threadedDiscussionProps}
         />

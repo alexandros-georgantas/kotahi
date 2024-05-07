@@ -83,7 +83,6 @@ const Review = ({
       form={reviewForm}
       formData={ensureJsonIsParsed(localizedData) ?? {}}
       hideSpecialInstructions
-      isReview={isReview}
       showEditorOnlyFields={
         showEditorOnlyFields || user.groupRoles.includes('groupManager')
       }
