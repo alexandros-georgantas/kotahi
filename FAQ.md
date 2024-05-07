@@ -189,16 +189,16 @@ DOI_PREFIX=12.34567
 
 And the following form fields are required:
 
-| Field type | Field name                                                                                                                                                                                                       | Purpose                                                  |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| DOI        | `$doi`                                                                                                                                                                                                | The DOI link to the article under review                 |
-| Rich text  | `review1`                                                                                                                                                                                             | Review number 1                                          |
-| Text       | `review1date`                                                                                                                                                                                         | Review 1 date, formatted as yyyy-mm-dd or mm/dd/yyyy     |
-| Text       | `review1creator`                                                                                                                                                                                      | Review 1 author, formatted as Firstname Lastname         |
-| Text       | `review1suffix`                                                                                                                                                                                       | (Optional) Review 1 custom DOI sufix                     |
+| Field type | Field name                                                                                                               | Purpose                                                  |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
+| DOI        | `$doi`                                                                                                                   | The DOI link to the article under review                 |
+| Rich text  | `review1`                                                                                                                | Review number 1                                          |
+| Text       | `review1date`                                                                                                            | Review 1 date, formatted as yyyy-mm-dd or mm/dd/yyyy     |
+| Text       | `review1creator`                                                                                                         | Review 1 author, formatted as Firstname Lastname         |
+| Text       | `review1suffix`                                                                                                          | (Optional) Review 1 custom DOI sufix                     |
 | (As above) | `review2`, `review2date`, `review2creator`, `review2suffix`, `review3`, `review3date`, `review3creator`, `review3suffix` | (Optional) Fields for second and third reviews.          |
-| (As above) | `summary`, `summarydate`, `summarycreator`, `summarysuffix`                                                                                                          | (Optional) Fields for a summary of the reviews.          |
-| Title      | `$title`                                                                                                                                                                                              | Title of the article under review, possibly abbreviated. |
+| (As above) | `summary`, `summarydate`, `summarycreator`, `summarysuffix`                                                              | (Optional) Fields for a summary of the reviews.          |
+| Title      | `$title`                                                                                                                 | Title of the article under review, possibly abbreviated. |
 
 ### Hypothesis
 
