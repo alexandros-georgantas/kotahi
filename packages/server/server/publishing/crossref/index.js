@@ -3,12 +3,18 @@ const fsPromised = require('fs').promises
 const fs = require('fs')
 const xml2js = require('xml2js')
 const axios = require('axios')
-const path = require('path')
+// const path = require('path')
 const config = require('config')
 const { v4: uuid } = require('uuid')
 const { upsertArtifact } = require('../publishingCommsUtils')
-const { parseDate } = require('../../utils/dateUtils')
-const checkIsAbstractValueEmpty = require('../../utils/checkIsAbstractValueEmpty')
+// const { parseDate } = require('../../utils/dateUtils')
+// const checkIsAbstractValueEmpty = require('../../utils/checkIsAbstractValueEmpty')
+
+// const {
+//   getReviewForm,
+//   getDecisionForm,
+//   getSubmissionForm,
+// } = require('../../model-review/src/reviewCommsUtils')
 
 const {
   htmlToJats,
@@ -22,7 +28,7 @@ const ABSTRACT_PLACEHOLDER = '‖ABSTRACT‖'
 const CITATIONS_PLACEHOLDER = '‖CITATIONS‖'
 
 const builder = new xml2js.Builder()
-const parser = new xml2js.Parser()
+// const parser = new xml2js.Parser()
 
 const requestToCrossref = async (xmlFiles, activeConfig) => {
   const publishPromises = xmlFiles.map(async file => {
@@ -230,7 +236,8 @@ const emailRegex =
 /** Send submission to register an article, with appropriate metadata */
 const publishArticleToCrossref = async manuscript => {
   const activeConfig = await Config.getCached(manuscript.groupId)
-
+  // console.log('manu.sub', manuscript.submission)
+  // console.log('manu', manuscript)
   if (!manuscript.submission)
     throw new Error('Manuscript has no submission object')
   if (!manuscript.submission.$title)
@@ -359,6 +366,7 @@ const publishArticleToCrossref = async manuscript => {
     .replace(ABSTRACT_PLACEHOLDER, htmlToJats(manuscript.submission.$abstract))
     .replace(CITATIONS_PLACEHOLDER, citations)
 
+  // console.log('hmmmmm', xml)
   const dirName = `${+new Date()}-${manuscript.id}`
   await fsPromised.mkdir(dirName)
   const fileName = `submission-${batchId}.xml`
@@ -371,243 +379,106 @@ const publishArticleToCrossref = async manuscript => {
 const publishReviewsToCrossref = async manuscript => {
   const activeConfig = await Config.getCached(manuscript.groupId)
 
+  // const reviewForm = await getReviewForm(manuscript.groupId)
+  // const decisionForm = await getDecisionForm(manuscript.groupId)
+
   if (!manuscript.submission.$doi)
     throw new Error('Field submission.$doi is not present')
 
-  const template = await fsPromised.readFile(
-    path.resolve(__dirname, 'crossref_publish_xml_template.xml'),
-  )
+  // console.log('manuscript', manuscript)
 
-  // Get array of numbers representing nonempty reviews, e.g. '1', '2' for review1, review2
-  const notEmptyReviews = Object.entries(manuscript.submission)
-    .filter(
-      ([key, value]) =>
-        key.length === 7 &&
-        key.includes('review') &&
-        !checkIsAbstractValueEmpty(value),
-    )
-    .map(([key]) => key.replace('review', ''))
+  const batchId = uuid()
+  const publishDate = new Date()
 
-  const jsonResult = await parser.parseStringPromise(template)
+  const reviewsToPublish = await Promise.all(
+    manuscript.reviews.map(async review => {
+      const reviewDOI = getDoi(review.id, activeConfig)
+      if (!(await doiIsAvailable(reviewDOI)))
+        throw Error('Custom DOI is not available.')
 
-  const summaryDoiSuffix = manuscript.submission.summarycreator
-    ? getReviewOrSubmissionField(manuscript, 'summarysuffix') ||
-      `${manuscript.id}/`
-    : null
+      const descriptionStart = review.isDecision
+        ? 'Summary of'
+        : 'Referee report of'
 
-  const summaryDoi = summaryDoiSuffix
-    ? getDoi(summaryDoiSuffix, activeConfig)
-    : null
+      const artifactId = await upsertArtifact({
+        title: `Review: ${manuscript.submission.$title}`,
+        content: review.jsonData.comment,
+        manuscriptId: manuscript.id,
+        platform: 'Crossref',
+        externalId: reviewDOI,
+        hostedInKotahi: true,
+        relatedDocumentUri: `https://doi.org/${manuscript.submission.$doi}`,
+        relatedDocumentType: 'preprint',
+      })
 
-  // only validate if a summary exists, i.e. there is a summary author/creator
-  if (summaryDoi && !(await doiIsAvailable(summaryDoi)))
-    throw Error(`Summary suffix is not available: ${summaryDoiSuffix}`)
-
-  const xmls = (
-    await Promise.all(
-      notEmptyReviews.map(async reviewNumber => {
-        if (!manuscript.submission[`review${reviewNumber}date`]) {
-          return null
-        }
-
-        const doiSuffix =
-          getReviewOrSubmissionField(
-            manuscript,
-            `review${reviewNumber}suffix`,
-          ) || `${manuscript.id}/${reviewNumber}`
-
-        const doi = getDoi(doiSuffix, activeConfig)
-        if (!(await doiIsAvailable(doi)))
-          throw Error(`Review suffix is not available: ${doiSuffix}`)
-
-        const artifactId = await upsertArtifact({
-          title: `Review: ${manuscript.submission.description}`,
-          content: manuscript.submission[`review${reviewNumber}`],
-          manuscriptId: manuscript.id,
-          platform: 'Crossref',
-          externalId: doi,
-          hostedInKotahi: true,
-          relatedDocumentUri: `https://doi.org/${manuscript.submission.$doi}`,
-          relatedDocumentType: 'preprint',
-        })
-
-        const [year, month, day] = parseDate(
-          manuscript.submission[`review${reviewNumber}date`],
-        )
-
-        const templateCopy = JSON.parse(JSON.stringify(jsonResult))
-        templateCopy.doi_batch.body[0].peer_review[0].review_date[0].day[0] =
-          day
-        templateCopy.doi_batch.body[0].peer_review[0].review_date[0].month[0] =
-          month
-        templateCopy.doi_batch.body[0].peer_review[0].review_date[0].year[0] =
-          year
-        templateCopy.doi_batch.head[0].depositor[0].depositor_name[0] =
-          activeConfig.formData.publishing.crossref.depositorName
-        templateCopy.doi_batch.head[0].depositor[0].email_address[0] =
-          activeConfig.formData.publishing.crossref.depositorEmail
-        templateCopy.doi_batch.head[0].registrant[0] =
-          activeConfig.formData.publishing.crossref.registrant
-        templateCopy.doi_batch.head[0].timestamp[0] = +new Date()
-        templateCopy.doi_batch.head[0].doi_batch_id[0] = String(
-          +new Date(),
-        ).slice(0, 8)
-
-        if (manuscript.submission[`review${reviewNumber}creator`]) {
-          const surname =
-            manuscript.submission[`review${reviewNumber}creator`].split(' ')[1]
-
-          templateCopy.doi_batch.body[0].peer_review[0].contributors[0].person_name[0] =
-            {
+      return {
+        $: {
+          stage: 'pre-publication',
+          type: review.isDecision ? 'aggregate' : 'referee-report',
+        },
+        titles: { title: `Review: ${manuscript.submission.$title}` },
+        review_date: {
+          month: review.created.getUTCMonth() + 1, // +1 because the month is zero-based
+          day: review.created.getUTCDate(),
+          year: review.created.getUTCFullYear(),
+        },
+        program: {
+          $: { xmlns: 'http://www.crossref.org/relations.xsd' },
+          related_item: {
+            description: `${descriptionStart} ${manuscript.submission.$title}`,
+            inter_work_relation: {
               $: {
-                contributor_role: 'reviewer',
-                sequence: 'first',
+                'relationship-type': 'isReviewOf',
+                'identifier-type': 'doi',
               },
-              given_name: [
-                manuscript.submission[`review${reviewNumber}creator`].split(
-                  ' ',
-                )[0],
-              ],
-              surname: [surname || ''],
-            }
-        }
-
-        templateCopy.doi_batch.body[0].peer_review[0] = {
-          ...templateCopy.doi_batch.body[0].peer_review[0],
-          $: {
-            type: 'referee-report',
-            stage: 'pre-publication',
-            'revision-round': '0',
-          },
-        }
-
-        templateCopy.doi_batch.body[0].peer_review[0].titles[0].title[0] = `Review: ${manuscript.submission.description}`
-        templateCopy.doi_batch.body[0].peer_review[0].doi_data[0].doi[0] = doi
-        templateCopy.doi_batch.body[0].peer_review[0].doi_data[0].resource[0] = `${config['pubsweet-client'].baseUrl}/versions/${manuscript.id}/artifacts/${artifactId}`
-        templateCopy.doi_batch.body[0].peer_review[0].program[0].related_item[0] =
-          {
-            inter_work_relation: [
-              {
-                _: manuscript.submission.$doi,
-                $: {
-                  'relationship-type': 'isReviewOf',
-                  'identifier-type': 'doi',
-                },
-              },
-            ],
-          }
-
-        if (summaryDoi) {
-          templateCopy.doi_batch.body[0].peer_review[0].program[0].related_item[1] =
-            {
-              inter_work_relation: [
-                {
-                  _: summaryDoi,
-                  $: {
-                    'relationship-type': 'isSupplementTo',
-                    'identifier-type': 'doi',
-                  },
-                },
-              ],
-            }
-        }
-
-        return { reviewNumber, xml: builder.buildObject(templateCopy) }
-      }),
-    )
-  ).filter(Boolean)
-
-  if (manuscript.submission.summary && manuscript.submission.summarydate) {
-    const artifactId = await upsertArtifact({
-      title: `Summary of: ${manuscript.submission.description}`,
-      content: manuscript.submission.summary,
-      manuscriptId: manuscript.id,
-      platform: 'Crossref',
-      externalId: summaryDoi,
-      hostedInKotahi: true,
-      relatedDocumentUri: `https://doi.org/${manuscript.submission.$doi}`,
-      relatedDocumentType: 'preprint',
-    })
-
-    const templateCopy = JSON.parse(JSON.stringify(jsonResult))
-    const [year, month, day] = parseDate(manuscript.submission.summarydate)
-    templateCopy.doi_batch.body[0].peer_review[0].review_date[0].day[0] = day
-    templateCopy.doi_batch.body[0].peer_review[0].review_date[0].month[0] =
-      month
-    templateCopy.doi_batch.body[0].peer_review[0].review_date[0].year[0] = year
-    templateCopy.doi_batch.head[0].depositor[0].depositor_name[0] =
-      'eLife Kotahi'
-    templateCopy.doi_batch.head[0].depositor[0].email_address[0] =
-      'elife-kotahi@kotahi.cloud'
-    templateCopy.doi_batch.head[0].registrant[0] = 'eLife'
-    templateCopy.doi_batch.head[0].timestamp[0] = +new Date()
-    templateCopy.doi_batch.head[0].doi_batch_id[0] = String(+new Date()).slice(
-      0,
-      8,
-    )
-
-    if (manuscript.submission.summarycreator) {
-      const surname = manuscript.submission.summarycreator.split(' ')[1]
-      templateCopy.doi_batch.body[0].peer_review[0].contributors[0].person_name[0] =
-        {
-          $: {
-            contributor_role: 'reviewer',
-            sequence: 'first',
-          },
-          given_name: [manuscript.submission.summarycreator.split(' ')[0]],
-          surname: [surname || ''],
-        }
-    }
-
-    templateCopy.doi_batch.body[0].peer_review[0] = {
-      ...templateCopy.doi_batch.body[0].peer_review[0],
-      $: {
-        type: 'aggregate',
-        stage: 'pre-publication',
-        'revision-round': '0',
-      },
-    }
-    templateCopy.doi_batch.body[0].peer_review[0].titles[0].title[0] = `Summary of: ${manuscript.submission.description}`
-
-    templateCopy.doi_batch.body[0].peer_review[0].doi_data[0].doi[0] =
-      summaryDoi
-
-    templateCopy.doi_batch.body[0].peer_review[0].doi_data[0].resource[0] = `${config['pubsweet-client'].baseUrl}/versions/${manuscript.id}/artifacts/${artifactId}`
-    templateCopy.doi_batch.body[0].peer_review[0].program[0].related_item[0] = {
-      inter_work_relation: [
-        {
-          _: manuscript.submission.$doi,
-          $: {
-            'relationship-type': 'isReviewOf',
-            'identifier-type': 'doi',
+              _: manuscript.submission.$doi,
+            },
           },
         },
-      ],
-    }
+        doi_data: {
+          doi: reviewDOI,
+          resource: `${config['pubsweet-client'].baseUrl}/versions/${manuscript.id}/artifacts/${artifactId}`,
+        },
+      }
+    }),
+  )
 
-    xmls.push({ summary: true, xml: builder.buildObject(templateCopy) })
+  const json = {
+    doi_batch: {
+      $: {
+        'xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+        'xsi:schemaLocation':
+          'http://www.crossref.org/schema/5.3.0 https://www.crossref.org/schemas/crossref5.3.0.xsd',
+        xmlns: 'http://www.crossref.org/schema/5.3.0',
+        version: '5.3.0',
+        'xmlns:ai': 'http://www.crossref.org/AccessIndicators.xsd',
+      },
+      head: {
+        doi_batch_id: batchId,
+        timestamp: getCurrentCrossrefTimestamp(publishDate),
+        depositor: {
+          depositor_name:
+            activeConfig.formData.publishing.crossref.depositorName,
+          email_address:
+            activeConfig.formData.publishing.crossref.depositorEmail,
+        },
+        registrant: activeConfig.formData.publishing.crossref.registrant,
+      },
+      body: {
+        peer_review: reviewsToPublish,
+      },
+    },
   }
 
-  const dirName = `${+new Date()}-${manuscript.id}`
+  const xml = builder.buildObject(json)
+
+  const dirName = `${+new Date()}-${manuscript.id}-peer_reviews`
   await fsPromised.mkdir(dirName)
-
-  const fileCreationPromises = xmls.map(async xml => {
-    const fileName = xml.reviewNumber
-      ? `review${xml.reviewNumber}.xml`
-      : 'summary.xml'
-
-    await fsPromised.appendFile(`${dirName}/${fileName}`, xml.xml)
-    return `${dirName}/${fileName}`
-  })
-
-  const xmlFiles = await Promise.all(fileCreationPromises)
-  await requestToCrossref(xmlFiles, activeConfig)
-  fs.rmdirSync(dirName, {
-    recursive: true,
-  })
-
-  // eslint-disable-next-line no-console
-  console.log(`Published ${xmlFiles.length} evaluation artifacts to Crossref`)
+  const fileName = `submission-${batchId}.xml`
+  await fsPromised.appendFile(`${dirName}/${fileName}`, xml)
+  const filePath = `${dirName}/${fileName}`
+  await requestToCrossref([filePath], activeConfig)
+  return fs.rmdirSync(dirName, { recursive: true })
 }
 
 module.exports = {
