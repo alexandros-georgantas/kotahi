@@ -6,7 +6,13 @@ const axios = require('axios')
 // const path = require('path')
 const config = require('config')
 const { v4: uuid } = require('uuid')
+const models = require('@pubsweet/models')
 const { upsertArtifact } = require('../publishingCommsUtils')
+
+const {
+  getEditorIdsForManuscript,
+} = require('../../model-manuscript/src/manuscriptCommsUtils')
+
 // const { parseDate } = require('../../utils/dateUtils')
 // const checkIsAbstractValueEmpty = require('../../utils/checkIsAbstractValueEmpty')
 
@@ -236,8 +242,6 @@ const emailRegex =
 /** Send submission to register an article, with appropriate metadata */
 const publishArticleToCrossref = async manuscript => {
   const activeConfig = await Config.getCached(manuscript.groupId)
-  // console.log('manu.sub', manuscript.submission)
-  // console.log('manu', manuscript)
   if (!manuscript.submission)
     throw new Error('Manuscript has no submission object')
   if (!manuscript.submission.$title)
@@ -366,7 +370,6 @@ const publishArticleToCrossref = async manuscript => {
     .replace(ABSTRACT_PLACEHOLDER, htmlToJats(manuscript.submission.$abstract))
     .replace(CITATIONS_PLACEHOLDER, citations)
 
-  // console.log('hmmmmm', xml)
   const dirName = `${+new Date()}-${manuscript.id}`
   await fsPromised.mkdir(dirName)
   const fileName = `submission-${batchId}.xml`
@@ -379,13 +382,8 @@ const publishArticleToCrossref = async manuscript => {
 const publishReviewsToCrossref = async manuscript => {
   const activeConfig = await Config.getCached(manuscript.groupId)
 
-  // const reviewForm = await getReviewForm(manuscript.groupId)
-  // const decisionForm = await getDecisionForm(manuscript.groupId)
-
   if (!manuscript.submission.$doi)
     throw new Error('Field submission.$doi is not present')
-
-  // console.log('manuscript', manuscript)
 
   const batchId = uuid()
   const publishDate = new Date()
@@ -411,11 +409,39 @@ const publishReviewsToCrossref = async manuscript => {
         relatedDocumentType: 'preprint',
       })
 
+      let editors
+      let users
+
+      if (review.isDecision) {
+        editors = await getEditorIdsForManuscript(manuscript.id)
+
+        users = await models.User.query()
+          .findByIds(editors)
+          .withGraphFetched('defaultIdentity')
+      } else if (!review.isHiddenReviewerName && review.userId) {
+        users = await models.User.query()
+          .findByIds([review.userId])
+          .withGraphFetched('defaultIdentity')
+      }
+
       return {
         $: {
           stage: 'pre-publication',
           type: review.isDecision ? 'aggregate' : 'referee-report',
         },
+        ...(users && {
+          contributors: users.map(user => {
+            return {
+              person_name: {
+                $: {
+                  contributor_role: review.isDecision ? 'editor' : 'reviewer',
+                },
+                given_name: user.defaultIdentity.name,
+                surname: user.defaultIdentity.name,
+              },
+            }
+          }),
+        }),
         titles: { title: `Review: ${manuscript.submission.$title}` },
         review_date: {
           month: review.created.getUTCMonth() + 1, // +1 because the month is zero-based
