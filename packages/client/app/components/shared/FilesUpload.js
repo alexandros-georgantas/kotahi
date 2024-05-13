@@ -161,11 +161,9 @@ DropzoneAndList.defaultProps = {
 
 const FilesUpload = ({
   fileType,
-  fieldName,
+  name,
   persistentFileLabel,
-  manuscriptId,
-  reviewId,
-  initializeReview,
+  objectId,
   acceptMultiple = true,
   mimeTypesToAccept,
   createFile: createF,
@@ -179,19 +177,16 @@ const FilesUpload = ({
 }) => {
   let existingFiles = []
 
-  if (values?.[fieldName]) {
-    existingFiles = values[fieldName]
+  if (values) {
+    existingFiles = get(values, name)
+    if (!existingFiles) existingFiles = []
   }
 
   const createFile = async file => {
     const meta = {
       fileType,
-      manuscriptId,
-      reviewId,
+      objectId,
     }
-
-    if (!meta.reviewId && initializeReview)
-      meta.reviewId = (await initializeReview()) || null
 
     const { data } = await createF({
       variables: {
@@ -201,7 +196,7 @@ const FilesUpload = ({
     })
 
     if (onFileAdded) onFileAdded(data.createFile)
-    if (onChange) onChange([...existingFiles, data.createFile.id], fieldName)
+    if (onChange) onChange([...existingFiles, data.createFile.id], name)
 
     return data
   }
@@ -216,7 +211,7 @@ const FilesUpload = ({
       )
 
       // Update the new array with the file deleted
-      onChange(filteredFiles, fieldName)
+      onChange(filteredFiles, name)
     }
 
     if (onFileRemoved) onFileRemoved(file)
@@ -226,14 +221,14 @@ const FilesUpload = ({
 
   return (
     <FieldArray
-      name={fieldName}
+      name={name}
       render={formikProps => (
         <DropzoneAndList
           acceptMultiple={acceptMultiple}
           confirmBeforeDelete={confirmBeforeDelete}
           createFile={createFile}
           deleteFile={deleteFile}
-          fieldName={fieldName}
+          fieldName={name}
           fileType={fileType}
           mimeTypesToAccept={mimeTypesToAccept}
           persistentFileLabel={persistentFileLabel}
@@ -248,19 +243,12 @@ const FilesUpload = ({
 FilesUpload.propTypes = {
   /** The type of attachment, e.g. 'manuscript' (for embedded images), or 'supplementary', 'visualAbstract', 'review', 'confidential', 'decision' */
   fileType: PropTypes.string.isRequired,
-  fieldName: PropTypes.string.isRequired,
-  /** All files belong to a manuscript */
-  manuscriptId: PropTypes.string.isRequired,
-  /** only supply onChange if you want the field data to contain the list of file IDs.
-   * For submissions we don't store these in the form. */
+  /** The field name in the form, for an attachment field in a form */
+  name: PropTypes.string.isRequired,
+  /** All files belong to an object, such as a manuscript or review */
+  objectId: PropTypes.string.isRequired,
+  /** Function for updating the list of file IDs. */
   onChange: PropTypes.func,
-  /** Some files may be attached to a review comment (or review decision).
-   * If the review hasn't been started yet there may not be an ID
-   * assigned for it yet, in which case initializeReview will be
-   * called to create a new record in the DB. */
-  reviewId: PropTypes.string,
-  /** Function to create a new record in DB in case there is no reviewId yet */
-  initializeReview: PropTypes.func,
   /** Allow multiple drag/drop or multiple selection in file dialog */
   acceptMultiple: PropTypes.bool,
   /** Keep showing the file label in case of single file selection */
@@ -273,8 +261,6 @@ FilesUpload.propTypes = {
 }
 
 FilesUpload.defaultProps = {
-  reviewId: null,
-  initializeReview: undefined,
   acceptMultiple: true,
   onChange: null,
   mimeTypesToAccept: undefined,

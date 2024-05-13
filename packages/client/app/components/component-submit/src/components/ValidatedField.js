@@ -12,7 +12,7 @@ const useFocusOnError = ({ fieldRef, name }) => {
   const nestedError = formik.errors[firstErrorKey]
 
   if (nestedError !== null && typeof nestedError === 'object') {
-    firstErrorKey = `${firstErrorKey}.${Object.keys(nestedError)[0]}` // e.g. submission.name
+    firstErrorKey = `${firstErrorKey}.${Object.keys(nestedError)[0]}`
   }
 
   React.useEffect(() => {

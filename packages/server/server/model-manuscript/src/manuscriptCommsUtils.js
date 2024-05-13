@@ -121,6 +121,34 @@ const getEditorIdsForManuscript = async (manuscriptId, options = {}) => {
   return [...new Set(teams.map(t => t.members.map(m => m.userId)).flat())]
 }
 
+/** For all fields containing files, convert files expressed as simple IDs into full object form
+ * with time-limited URL.
+ * This modifies the supplied submission IN PLACE. */
+/* eslint-disable no-restricted-syntax, no-await-in-loop, no-param-reassign */
+const convertFilesToFullObjects = async (
+  submission,
+  form,
+  /** Function to return full file objects from DB, for an array of file IDs */
+  getFilesByIds,
+  getFilesWithUrl,
+) => {
+  const fileFieldNames = form.structure.children
+    .filter(field =>
+      ['SupplementaryFiles', 'VisualAbstract'].includes(field.component),
+    )
+    .map(field => field.name)
+
+  for (const [key, value] of Object.entries(submission)) {
+    if (fileFieldNames.includes(key)) {
+      const fileRecords = Array.isArray(value) ? value : []
+      const fileIds = fileRecords.map(file => file.id || file) // Paranoia, in case some files are already in full object form
+      const files = await getFilesByIds(fileIds)
+      submission[key] = await getFilesWithUrl(files)
+    }
+  }
+}
+/* eslint-enable no-restricted-syntax, no-await-in-loop, no-param-reassign */
+
 module.exports = {
   getIdOfFirstVersionOfManuscript,
   getIdOfLatestVersionOfManuscript,
@@ -129,4 +157,5 @@ module.exports = {
   manuscriptIsActive,
   getEditorIdsForManuscript,
   isLatestVersionOfManuscript,
+  convertFilesToFullObjects,
 }

@@ -15,13 +15,17 @@ import Publish from './Publish'
 import { AdminSection } from './style'
 import {
   HiddenTabs,
+  PaddedSectionContent,
   SectionContent,
   SectionHeader,
   SectionRow,
   Title,
 } from '../../../shared'
 import DecisionAndReviews from '../../../component-submit/src/components/DecisionAndReviews'
-import FormTemplate from '../../../component-submit/src/components/FormTemplate'
+import FormTemplate, {
+  ManuscriptNumberLabel,
+  FormIntro,
+} from '../../../component-form'
 import TaskList from '../../../component-task-manager/src/TaskList'
 import KanbanBoard from './KanbanBoard'
 import InviteReviewer from './reviewers/InviteReviewer'
@@ -162,11 +166,6 @@ const DecisionVersion = ({
 
     Object.assign(submissionValues, version.submission)
 
-    const versionValues = {
-      ...version,
-      submission: submissionValues,
-    }
-
     const versionId = version.id
 
     return {
@@ -176,33 +175,38 @@ const DecisionVersion = ({
             <ReadonlyFormTemplate
               displayShortIdAsIdentifier={displayShortIdAsIdentifier}
               form={form}
-              formData={version}
+              formData={version.submission}
               manuscript={version}
+              manuscriptFile={version.files.find(f =>
+                f.tags.includes('manuscript'),
+              )}
               showEditorOnlyFields
               threadedDiscussionProps={threadedDiscussionExtendedProps}
             />
           ) : (
-            <SectionContent>
+            <PaddedSectionContent>
+              {displayShortIdAsIdentifier && (
+                <ManuscriptNumberLabel manuscriptShortId={version.shortId} />
+              )}
+              <FormIntro form={form} manuscriptId={version.id} />
+              <hr />
               <FormTemplate
                 createFile={createFile}
                 deleteFile={deleteFile}
-                displayShortIdAsIdentifier={displayShortIdAsIdentifier}
                 fieldsToPublish={
                   version.formFieldsToPublish.find(
                     ff => ff.objectId === version.id,
                   )?.fieldsToPublish ?? []
                 }
                 form={form}
-                initialValues={versionValues}
-                isSubmission
-                manuscriptId={version.id}
-                manuscriptShortId={version.shortId}
-                manuscriptStatus={version.status}
-                match={{ url: 'decision' }}
+                initialValues={submissionValues}
+                manuscriptFile={version.files.find(f =>
+                  f.tags.includes('manuscript'),
+                )}
+                objectId={version.id}
                 onChange={(value, path) => {
-                  onChange(value, path, versionId)
+                  onChange(value, `submission.${path}`, versionId)
                 }}
-                republish={() => null}
                 setShouldPublishField={async (fieldName, shouldPublish) =>
                   setShouldPublishField({
                     variables: {
@@ -215,12 +219,12 @@ const DecisionVersion = ({
                 }
                 shouldShowOptionToPublish
                 showEditorOnlyFields
+                tagForFiles="submission"
                 threadedDiscussionProps={threadedDiscussionExtendedProps}
-                urlFrag={urlFrag}
                 validateDoi={validateDoi}
                 validateSuffix={validateSuffix}
               />
-            </SectionContent>
+            </PaddedSectionContent>
           )}
         </>
       ),
@@ -399,7 +403,9 @@ const DecisionVersion = ({
           )}
           {isCurrentVersion && (
             <AdminSection key="decision-form">
-              <SectionContent>
+              <PaddedSectionContent>
+                <FormIntro form={decisionForm} manuscriptId={version.id} />
+                <hr />
                 <FormTemplate
                   createFile={createFile}
                   deleteFile={deleteFile}
@@ -416,8 +422,7 @@ const DecisionVersion = ({
                   }
                   isSubmission={false}
                   manuscriptId={version.id}
-                  manuscriptShortId={version.shortId}
-                  manuscriptStatus={version.status}
+                  objectId={currentDecisionData.id}
                   onChange={updateReviewJsonData}
                   onSubmit={async (values, actions) => {
                     await makeDecision({
@@ -428,7 +433,6 @@ const DecisionVersion = ({
                     })
                     actions.setSubmitting(false)
                   }}
-                  reviewId={currentDecisionData.id}
                   setShouldPublishField={async (fieldName, shouldPublish) =>
                     setShouldPublishField({
                       variables: {
@@ -440,16 +444,14 @@ const DecisionVersion = ({
                     })
                   }
                   shouldShowOptionToPublish
-                  shouldStoreFilesInForm
                   showEditorOnlyFields
                   submissionButtonText={t('decisionPage.decisionTab.Submit')}
                   tagForFiles="decision"
                   threadedDiscussionProps={threadedDiscussionExtendedProps}
-                  urlFrag={urlFrag}
                   validateDoi={validateDoi}
                   validateSuffix={validateSuffix}
                 />
-              </SectionContent>
+              </PaddedSectionContent>
             </AdminSection>
           )}
           {isCurrentVersion && (

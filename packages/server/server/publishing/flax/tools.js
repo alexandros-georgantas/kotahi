@@ -29,14 +29,7 @@ const getPublishableFieldsForFlax = (
   return fields
     .filter(f => ['always', 'true'].includes(f.permitPublishing))
     .map(field => {
-      let fieldName = field.name
-
-      if (formType === 'submission') {
-        fieldName = field.name.replace('submission.', '')
-        fieldName = fieldName.replace('meta.', '')
-      }
-
-      const value = get(data, fieldName)
+      const value = get(data, field.name)
 
       if (field.component === 'ThreadedDiscussion') {
         const discussion = threadedDiscussions.find(td => td.id === value)

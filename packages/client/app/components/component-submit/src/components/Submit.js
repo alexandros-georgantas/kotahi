@@ -120,13 +120,8 @@ const Submit = ({
     if (userCanEditManuscriptAndFormData) {
       Object.assign(submissionValues, version.submission)
 
-      const versionValues = {
-        ...version,
-        submission: submissionValues,
-      }
-
       const submissionProps = {
-        versionValues,
+        submissionValues,
         form: submissionForm,
         onSubmit,
         onChange,
@@ -160,8 +155,11 @@ const Submit = ({
             />
             <ReadonlyFormTemplate
               form={submissionForm}
-              formData={version}
+              formData={version.submission}
               manuscript={version}
+              manuscriptFile={version.files.find(f =>
+                f.tags.includes('manuscript'),
+              )}
               showEditorOnlyFields={false}
               threadedDiscussionProps={threadedDiscussionExtendedProps}
               title={t('manuscriptSubmit.Metadata')}

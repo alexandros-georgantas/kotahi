@@ -7,15 +7,15 @@ import { CompactSection } from '../../../component-cms-manager/src/style'
 const setInitialValues = (
   existingConfig,
   selectedFile,
-  fieldName,
+  name,
   tempStoredFiles,
 ) => {
   const initialData = { ...existingConfig, ...tempStoredFiles?.current }
 
   if (selectedFile?.length < 1) {
-    initialData[fieldName] = [initialData[fieldName]]
+    initialData[name] = [initialData[name]]
   } else {
-    initialData[fieldName] = selectedFile
+    initialData[name] = selectedFile
   }
 
   return initialData
@@ -34,7 +34,7 @@ const FilesUploadWithOnChange = ({ handleFileChange, ...otherProps }) => (
 const BrandIcon = ({
   config,
   createFile,
-  fieldName,
+  name,
   fileType,
   deleteFile,
   mimeTypesToAccept,
@@ -46,13 +46,13 @@ const BrandIcon = ({
   const handleFileChange = file => {
     setSelectedFile(file)
     // eslint-disable-next-line no-param-reassign
-    tempStoredFiles.current[fieldName] = file
+    tempStoredFiles.current[name] = file
   }
 
   const initialData = setInitialValues(
     config,
     selectedFile,
-    fieldName,
+    name,
     tempStoredFiles,
   )
 
@@ -68,11 +68,11 @@ const BrandIcon = ({
         confirmBeforeDelete
         createFile={createFile}
         deleteFile={deleteFile}
-        fieldName={fieldName}
         fileType={fileType}
         handleFileChange={handleFileChange}
-        manuscriptId={config?.id}
         mimeTypesToAccept={mimeTypesToAccept}
+        name={name}
+        objectId={config?.id}
         {...restProps}
       />
     </Formik>

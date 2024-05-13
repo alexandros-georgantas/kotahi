@@ -1046,8 +1046,6 @@ const esLa = {
       'Field title': 'Título del Campo',
       'Field name': 'Nombre (nombre interno del campo)',
       'Field placeholder': 'Marcador de posición del campo',
-      internalNameDescription:
-        'Ingrese "submission." seguido de un nombre que solo contenga letras, números o guiones bajos, por ejemplo "submission.suCampoAqui".',
       'Field description': 'Descripción del Campo',
       'Field options': 'Opciones del Campo',
       'Field shortDescription':

@@ -126,8 +126,6 @@ const hasElifeStyleEvaluations = manuscript => {
  * are key-value pairs as opposed to strings.
  */
 const getSafelyNamedJsonbFieldInfo = (fieldName, submissionForm) => {
-  if (!fieldName.startsWith('submission.')) return null
-
   const field =
     submissionForm &&
     submissionForm.structure.children.find(f => f.name === fieldName)
@@ -137,15 +135,13 @@ const getSafelyNamedJsonbFieldInfo = (fieldName, submissionForm) => {
     return null
   }
 
-  const name = fieldName.split('submission.')[1]
-
-  if (!/^\$?[a-zA-Z]\w*$/.test(name)) {
+  if (!/^\$?[a-zA-Z]\w*$/.test(fieldName)) {
     console.warn(`Ignoring unsupported field "${fieldName}"`)
     return null
   }
 
   return {
-    name,
+    fieldName,
     valuesAreKeyedObjects: !!field.options,
   }
 }

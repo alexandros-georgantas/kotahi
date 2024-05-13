@@ -233,12 +233,11 @@ const publishArticleToCrossref = async manuscript => {
 
   if (!manuscript.submission)
     throw new Error('Manuscript has no submission object')
-  if (!manuscript.submission.$title)
-    throw new Error('Manuscript has no submission.$title')
+  if (!manuscript.submission.$title) throw new Error('Manuscript has no $title')
   if (!manuscript.submission.$abstract)
-    throw new Error('Manuscript has no submission.$abstract')
+    throw new Error('Manuscript has no $abstract')
   if (!manuscript.submission.$authors)
-    throw new Error('Manuscript has no submission.$authors field')
+    throw new Error('Manuscript has no $authors field')
   if (!Array.isArray(manuscript.submission.$authors))
     throw new Error('Manuscript.submission.$authors is not an array')
   if (
@@ -371,8 +370,7 @@ const publishArticleToCrossref = async manuscript => {
 const publishReviewsToCrossref = async manuscript => {
   const activeConfig = await Config.getCached(manuscript.groupId)
 
-  if (!manuscript.submission.$doi)
-    throw new Error('Field submission.$doi is not present')
+  if (!manuscript.submission.$doi) throw new Error('Field $doi is not present')
 
   const template = await fsPromised.readFile(
     path.resolve(__dirname, 'crossref_publish_xml_template.xml'),

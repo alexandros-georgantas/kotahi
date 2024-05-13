@@ -12,15 +12,15 @@ import {
   Columns,
   Manuscript,
   Chat,
-  SectionContent,
   HiddenTabs,
   ErrorBoundary,
   VersionSwitcher,
+  PaddedSectionContent,
 } from '../../../../shared'
 import { ChatButton, CollapseButton } from '../style'
 import MessageContainer from '../../../../component-chat/src/MessageContainer'
 import SharedReviewerGroupReviews from './SharedReviewerGroupReviews'
-import FormTemplate from '../../../../component-submit/src/components/FormTemplate'
+import FormTemplate, { FormIntro } from '../../../../component-form'
 import { ConfigContext } from '../../../../config/src'
 
 const ReviewLayout = ({
@@ -63,8 +63,11 @@ const ReviewLayout = ({
       <div key={latestManuscript.id}>
         <ReadonlyFormTemplate
           form={submissionForm}
-          formData={latestManuscript}
+          formData={latestManuscript.submission}
           manuscript={latestManuscript}
+          manuscriptFile={latestManuscript.files.find(f =>
+            f.tags.includes('manuscript'),
+          )}
           showEditorOnlyFields={false}
           threadedDiscussionProps={threadedDiscussionProps}
         />
@@ -198,15 +201,15 @@ const ReviewLayout = ({
             threadedDiscussionProps={threadedDiscussionProps}
           />
         ) : (
-          <SectionContent>
+          <PaddedSectionContent>
+            <FormIntro form={reviewForm} manuscriptId={manuscript.id} />
+            <hr />
             <FormTemplate
               createFile={createFile}
               deleteFile={deleteFile}
               form={reviewForm}
               initialValues={reviewData}
-              manuscriptId={latestManuscript.id}
-              manuscriptShortId={latestManuscript.shortId}
-              manuscriptStatus={latestManuscript.status}
+              objectId={latestManuscript.id}
               onChange={(value, path) =>
                 updateReviewJsonData(
                   latestManuscript.id,
@@ -216,7 +219,6 @@ const ReviewLayout = ({
                 )
               }
               onSubmit={handleSubmit}
-              shouldStoreFilesInForm
               showEditorOnlyFields={false}
               submissionButtonText={t('reviewPage.Submit')}
               tagForFiles="review"
@@ -224,7 +226,7 @@ const ReviewLayout = ({
               validateDoi={validateDoi}
               validateSuffix={validateSuffix}
             />
-          </SectionContent>
+          </PaddedSectionContent>
         )}
       </div>
     )

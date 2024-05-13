@@ -30,6 +30,7 @@ const ReadonlyFormTemplate = ({
   threadedDiscussionProps,
   allowAuthorsSubmitNewVersion,
   copyHandleBarsCode,
+  manuscriptFile, // TODO inject this into the submission data in the query resolver
 }) => {
   const { t } = useTranslation()
 
@@ -87,6 +88,7 @@ const ReadonlyFormTemplate = ({
                 fieldName={element.name}
                 form={form}
                 formData={formData}
+                manuscriptFile={manuscriptFile}
                 threadedDiscussionProps={threadedDiscussionProps}
               />
             </Cell>

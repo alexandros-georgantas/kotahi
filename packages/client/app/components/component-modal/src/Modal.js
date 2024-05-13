@@ -112,6 +112,17 @@ const ModalContainer = styled.div`
   overflow-y: auto;
   padding: ${grid(2.5)} ${grid(3)};
   width: 100%;
+
+  & > hr {
+    margin-left: ${grid(-3)};
+    margin-right: ${grid(-3)};
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  & > hr::after {
+    background: ${color.gray90};
+  }
 `
 
 export const PrimaryButton = ({ onClick, children }) => {

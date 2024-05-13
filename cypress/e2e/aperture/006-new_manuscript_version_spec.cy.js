@@ -57,11 +57,7 @@ describe('checking manuscript version', () => {
       DashboardPage.getDecisionField(2).should('contain', 'Revise')
       /* Create new manuscript version */
       DashboardPage.clickCreateNewVersionButton()
-      SubmissionFormPage.fillInField(
-        'submission.$abstract',
-        'New abstract',
-        true,
-      )
+      SubmissionFormPage.fillInField('$abstract', 'New abstract', true)
       SubmissionFormPage.clickSubmitResearch()
       SubmissionFormPage.clickSubmitYourManuscript()
       /* Verify new submission got created */

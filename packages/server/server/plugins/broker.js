@@ -23,17 +23,17 @@ const getEmptySubmission = async groupId => {
   const submissionForm = await getSubmissionForm(groupId)
   if (!submissionForm) throw new Error('No submission form was found!')
 
-  const fields = submissionForm.structure.children.filter(field =>
-    field.name.startsWith('submission.'),
+  const fields = submissionForm.structure.children.filter(
+    field =>
+      !['SupplementaryFiles', 'VisualAbstract', 'ManuscriptFile'].includes(
+        field.componentname,
+      ) && field.name !== '$editDate',
   )
 
   const emptySubmission = fields.reduce((acc, curr) => {
-    const [, nameInSubmission] = curr.name.split('submission.')
-    acc[nameInSubmission] = [
-      'CheckboxGroup',
-      'LinksInput',
-      'AuthorsInput',
-    ].includes(curr.component)
+    acc[curr.name] = ['CheckboxGroup', 'LinksInput', 'AuthorsInput'].includes(
+      curr.component,
+    )
       ? []
       : ''
     return {

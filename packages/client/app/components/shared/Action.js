@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import styled, { css } from 'styled-components'
 import { grid, rotate360 } from '@pubsweet/ui-toolkit'
 import { Check, AlertCircle } from 'react-feather'
@@ -97,47 +97,57 @@ const Action = ({
 }) => {
   const [resultStatus, setResultStatus] = useState(null)
   const [isInProgress, setIsInProgress] = useState(false)
+  const isMountedRef = useRef(true)
+
+  useEffect(
+    () => () => {
+      isMountedRef.current = false
+    },
+    [],
+  )
 
   return (
-    <>
-      <ActionLink
-        className={className}
-        data-testid={dataTestId}
-        disabled={isInProgress || isDisabled || typeof onClick !== 'function'}
-        onClick={async e => {
-          setIsInProgress(true)
-          const result = await onClick(e)
-          if (onActionCompleted)
-            setResultStatus(await onActionCompleted(result))
-          setIsInProgress(false)
-        }}
-        title={title}
-        type="button"
-      >
-        {children}
-        {isInProgress && <Spinner />}
-        {!isInProgress && resultStatus === 'success' && (
-          <IconContainer>
-            <Check
-              color={color.brand1.base}
-              data-testid="check-svg"
-              size={16}
-              strokeWidth={2}
-            />
-          </IconContainer>
-        )}
-        {!isInProgress && resultStatus === 'failure' && (
-          <IconContainer>
-            <AlertCircle
-              color={color.warning.base}
-              data-testid="alert-circle-svg"
-              size={16}
-              strokeWidth={2}
-            />
-          </IconContainer>
-        )}
-      </ActionLink>
-    </>
+    <ActionLink
+      className={className}
+      data-testid={dataTestId}
+      disabled={isInProgress || isDisabled || typeof onClick !== 'function'}
+      onClick={async e => {
+        setIsInProgress(true)
+        const result = await onClick(e)
+
+        if (onActionCompleted) {
+          const completedStatus = await onActionCompleted(result)
+          if (isMountedRef.current) setResultStatus(completedStatus)
+        }
+
+        if (isMountedRef.current) setIsInProgress(false)
+      }}
+      title={title}
+      type="button"
+    >
+      {children}
+      {isInProgress && <Spinner />}
+      {!isInProgress && resultStatus === 'success' && (
+        <IconContainer>
+          <Check
+            color={color.brand1.base}
+            data-testid="check-svg"
+            size={16}
+            strokeWidth={2}
+          />
+        </IconContainer>
+      )}
+      {!isInProgress && resultStatus === 'failure' && (
+        <IconContainer>
+          <AlertCircle
+            color={color.warning.base}
+            data-testid="alert-circle-svg"
+            size={16}
+            strokeWidth={2}
+          />
+        </IconContainer>
+      )}
+    </ActionLink>
   )
 }
 

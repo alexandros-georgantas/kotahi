@@ -35,8 +35,7 @@ const typeDefs = `
 
   input FileMetaInput {
     fileType: String!
-    manuscriptId: ID!
-    reviewId: ID
+    objectId: ID!
   }
 
   input UpdateFileInput {

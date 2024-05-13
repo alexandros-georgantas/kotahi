@@ -5,7 +5,7 @@
       "title": "Title",
       "id": "8afe555d-30e5-4bc8-9826-6a9dc5d34760",
       "component": "TextField",
-      "name": "submission.$title",
+      "name": "$title",
       "placeholder": "Enter the manuscript's title",
       "description": "<p></p>",
       "permitPublishing": "always",
@@ -21,7 +21,7 @@
       "title": "DOI",
       "id": "29512053-bad0-43cd-ad4f-1ec689c72a63",
       "component": "TextField",
-      "name": "submission.$doi",
+      "name": "$doi",
       "description": "<p></p>",
       "doiValidation": "false",
       "permitPublishing": "always",
@@ -31,7 +31,7 @@
       "title": "Abstract",
       "id": "e93b5e84-a049-4a0f-9a7a-b573aea4f905",
       "component": "AbstractEditor",
-      "name": "submission.$abstract",
+      "name": "$abstract",
       "description": "<p></p>",
       "doiValidation": "false",
       "permitPublishing": "always",
@@ -47,7 +47,7 @@
       "title": "First Author",
       "id": "49a42019-748a-4fd1-a0e3-210a43ce8225",
       "component": "TextField",
-      "name": "submission.firstAuthor",
+      "name": "firstAuthor",
       "permitPublishing": "false",
       "validate": [
         {
@@ -61,7 +61,7 @@
       "title": "Date Published",
       "id": "43fcd173-40fd-411c-a89c-6bdd958bed70",
       "component": "TextField",
-      "name": "submission.datePublished",
+      "name": "datePublished",
       "permitPublishing": "false",
       "validate": [
         {
@@ -75,7 +75,7 @@
       "title": "Link",
       "id": "f3228a30-e87c-11eb-9a03-0242ac130003",
       "component": "TextField",
-      "name": "submission.$sourceUri",
+      "name": "$sourceUri",
       "description": "<p></p>",
       "doiValidation": "false",
       "permitPublishing": "false",
@@ -133,7 +133,7 @@
       "title": "Topics",
       "id": "fef9af15-9d7b-4164-bb5b-9277b6f96704",
       "component": "CheckboxGroup",
-      "name": "submission.topics",
+      "name": "topics",
       "permitPublishing": "false",
       "validate": []
     },
@@ -141,7 +141,7 @@
       "title": "Our take",
       "id": "13e673b4-0a25-4a02-92e6-e2a3a8b59daf",
       "component": "AbstractEditor",
-      "name": "submission.ourTake",
+      "name": "ourTake",
       "permitPublishing": "false",
       "validate": [
         {
@@ -155,7 +155,7 @@
       "title": "Main findings",
       "id": "421aab67-569f-4539-8bc6-97376c64538f",
       "component": "AbstractEditor",
-      "name": "submission.mainFindings",
+      "name": "mainFindings",
       "permitPublishing": "false",
       "validate": [
         {
@@ -169,7 +169,7 @@
       "title": "Study strengths",
       "id": "4209cfa4-95de-48d4-ae3f-c98b29a9a847",
       "component": "AbstractEditor",
-      "name": "submission.studyStrengths",
+      "name": "studyStrengths",
       "permitPublishing": "false",
       "validate": [
         {
@@ -183,7 +183,7 @@
       "title": "Limitations",
       "id": "6531975d-1e8e-4bf1-831e-61e7b52a912e",
       "component": "AbstractEditor",
-      "name": "submission.limitations",
+      "name": "limitations",
       "permitPublishing": "false",
       "validate": [
         {
@@ -197,7 +197,7 @@
       "title": "Keywords",
       "id": "2c4fb5cd-1e88-434c-b28a-7837c57c89ab",
       "component": "TextField",
-      "name": "submission.keywords",
+      "name": "keywords",
       "permitPublishing": "false",
       "validate": [
         {
@@ -211,7 +211,7 @@
       "title": "Journal",
       "id": "150d401e-0e1c-4122-a661-26516a8e6838",
       "component": "TextField",
-      "name": "submission.journal",
+      "name": "journal",
       "permitPublishing": "false",
       "validate": []
     },
@@ -220,7 +220,7 @@
       "id": "f60c6272-bd21-466b-9943-2837f7b2fcf5",
       "component": "TextField",
       "permitPublishing": "false",
-      "name": "submission.$editDate"
+      "name": "$editDate"
     },
     {
       "options": [
@@ -243,7 +243,7 @@
       "title": "Labels",
       "id": "a94dd0b8-99a0-4555-9e59-0895fafa464e",
       "component": "Select",
-      "name": "submission.$customStatus",
+      "name": "$customStatus",
       "permitPublishing": "false",
       "validate": []
     },
@@ -251,7 +251,7 @@
       "title": "Review creator",
       "id": "12a0d30b-e91a-434d-9985-01820f48fdc4",
       "component": "TextField",
-      "name": "submission.reviewCreator",
+      "name": "reviewCreator",
       "permitPublishing": "false",
       "validate": [
         {

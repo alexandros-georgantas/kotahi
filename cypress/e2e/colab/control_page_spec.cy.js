@@ -287,7 +287,7 @@ describe('control page tests', () => {
           ReviewPage.clickConfirmSubmitButton()
           // eslint-disable-next-line cypress/no-unnecessary-waiting
           cy.wait(2000)
-          cy.get('[name="submission.$title"]').contains('New submission')
+          cy.get('[name="$title"]').contains('New submission')
         })
         cy.login(name.role.admin, manuscripts)
         cy.awaitDisappearSpinner()
@@ -299,7 +299,7 @@ describe('control page tests', () => {
       })
       cy.fixture('role_names').then(name => {
         cy.login(name.role.reviewers[1], dashboard)
-        cy.get('[name="submission.$title"]:last').click()
+        cy.get('[name="$title"]:last').click()
         cy.get('[class*=TabsContainer]').contains('Review').click()
         ControlPage.getReviewerName().should('contain', name.role.reviewers[1])
       })
@@ -317,7 +317,7 @@ describe('control page tests', () => {
       ControlPage.clickHideReviewerNameToAuthor()
       cy.fixture('role_names').then(name => {
         cy.login(name.role.reviewers[1], dashboard)
-        cy.get('[name="submission.$title"]:last').click()
+        cy.get('[name="$title"]:last').click()
         cy.get('[class*=TabsContainer]').contains('Review').click()
         ControlPage.getReviewerName().should(
           'not.contain',

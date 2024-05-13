@@ -39,6 +39,11 @@ const ReviewPreview = ({
 }) => {
   const history = useHistory()
   const { t } = useTranslation()
+
+  const manuscriptFile = manuscript.files.find(f =>
+    f.tags.includes('manuscript'),
+  )
+
   return (
     <Page>
       <WidthLimiter>
@@ -48,9 +53,10 @@ const ReviewPreview = ({
         </Title>
         <ReadonlyFormTemplate
           form={submissionForm}
-          formData={manuscript}
+          formData={manuscript.submission}
           hideSpecialInstructions
           manuscript={manuscript}
+          manuscriptFile={manuscriptFile}
           showEditorOnlyFields={false}
           threadedDiscussionProps={threadedDiscussionProps}
         />

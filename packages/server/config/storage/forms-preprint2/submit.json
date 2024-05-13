@@ -4,7 +4,7 @@
       "title": "Article URL",
       "id": "29512053-bad0-43cd-ad4f-1ec689c72a63",
       "component": "TextField",
-      "name": "submission.$sourceUri",
+      "name": "$sourceUri",
       "doiValidation": "false",
       "permitPublishing": "always",
       "validate": [
@@ -19,7 +19,7 @@
       "title": "Article Description",
       "id": "dd48def7-9f7b-4062-b0c0-716537876934",
       "component": "TextField",
-      "name": "submission.$title",
+      "name": "$title",
       "doiValidation": "false",
       "permitPublishing": "always",
       "validate": [
@@ -34,7 +34,7 @@
       "title": "Our take",
       "id": "13e673b4-0a25-4a02-92e6-e2a3a8b59daf",
       "component": "AbstractEditor",
-      "name": "submission.ourTake",
+      "name": "ourTake",
       "permitPublishing": "false",
       "validate": [
         {
@@ -100,7 +100,7 @@
       "title": "Study design",
       "id": "5f00b2cc-3adb-4671-bfdf-67b2679e58a9",
       "component": "Select",
-      "name": "submission.studyDesign",
+      "name": "studyDesign",
       "permitPublishing": "false",
       "validate": [
         {
@@ -114,7 +114,7 @@
       "title": "Summary of main findings",
       "id": "421aab67-569f-4539-8bc6-97376c64538f",
       "component": "AbstractEditor",
-      "name": "submission.summaryOfMainFindings",
+      "name": "summaryOfMainFindings",
       "permitPublishing": "false",
       "validate": [
         {
@@ -128,7 +128,7 @@
       "title": "Study strengths",
       "id": "4209cfa4-95de-48d4-ae3f-c98b29a9a847",
       "component": "AbstractEditor",
-      "name": "submission.studyStrengths",
+      "name": "studyStrengths",
       "permitPublishing": "false",
       "validate": [
         {
@@ -142,7 +142,7 @@
       "title": "Limitations",
       "id": "6531975d-1e8e-4bf1-831e-61e7b52a912e",
       "component": "AbstractEditor",
-      "name": "submission.limitations",
+      "name": "limitations",
       "permitPublishing": "false",
       "validate": [
         {
@@ -156,7 +156,7 @@
       "title": "Value added",
       "id": "dd57894d-ef5e-4c36-aa17-d9daed83a116",
       "component": "AbstractEditor",
-      "name": "submission.valueAdded",
+      "name": "valueAdded",
       "permitPublishing": "false",
       "validate": [
         {
@@ -187,7 +187,7 @@
       "title": "Label",
       "id": "a94dd0b8-99a0-4555-9e59-0895fafa464e",
       "component": "Select",
-      "name": "submission.$customStatus",
+      "name": "$customStatus",
       "permitPublishing": "false",
       "validate": [
         {
@@ -368,7 +368,7 @@
       "title": "Sub Topics",
       "id": "73ca76d0-eae3-11eb-9a03-0242ac130003",
       "component": "CheckboxGroup",
-      "name": "submission.subTopics",
+      "name": "subTopics",
       "permitPublishing": "false",
       "validate": []
     },
@@ -418,7 +418,7 @@
       "title": "Topics",
       "id": "fef9af15-9d7b-4164-bb5b-9277b6f96704",
       "component": "CheckboxGroup",
-      "name": "submission.topics",
+      "name": "topics",
       "permitPublishing": "false",
       "validate": [
         {
@@ -432,7 +432,7 @@
       "title": "Abstract",
       "id": "e93b5e84-a049-4a0f-9a7a-b573aea4f905",
       "component": "AbstractEditor",
-      "name": "submission.$abstract",
+      "name": "$abstract",
       "doiValidation": "false",
       "permitPublishing": "always",
       "validate": []
@@ -441,7 +441,7 @@
       "title": "First Author",
       "id": "49a42019-748a-4fd1-a0e3-210a43ce8225",
       "component": "TextField",
-      "name": "submission.firstAuthor",
+      "name": "firstAuthor",
       "permitPublishing": "false",
       "validate": [
         {
@@ -455,7 +455,7 @@
       "title": "Date Published",
       "id": "43fcd173-40fd-411c-a89c-6bdd958bed70",
       "component": "TextField",
-      "name": "submission.datePublished",
+      "name": "datePublished",
       "permitPublishing": "false",
       "validate": [
         {
@@ -470,13 +470,13 @@
       "id": "8e502920-62bd-4841-8e00-927171908766",
       "component": "AbstractEditor",
       "permitPublishing": "false",
-      "name": "submission.studyPopulationSetting"
+      "name": "studyPopulationSetting"
     },
     {
       "title": "Journal",
       "id": "150d401e-0e1c-4122-a661-26516a8e6838",
       "component": "TextField",
-      "name": "submission.journal",
+      "name": "journal",
       "permitPublishing": "false",
       "validate": [
         {
@@ -490,7 +490,7 @@
       "title": "Reviewer",
       "id": "2552df53-765b-489a-9626-01a4f8ccdd5c",
       "component": "TextField",
-      "name": "submission.reviewer",
+      "name": "reviewer",
       "permitPublishing": "false",
       "validate": [
         {
@@ -504,7 +504,7 @@
       "title": "Edit date",
       "id": "f60c6272-bd21-466b-9943-2837f7b2fcf5",
       "component": "TextField",
-      "name": "submission.$editDate",
+      "name": "$editDate",
       "permitPublishing": "false",
       "readonly": true
     },
@@ -512,7 +512,7 @@
       "title": "Compendium feature",
       "id": "3d21cd7c-5264-48a5-b19a-792f9191bb99",
       "component": "Select",
-      "name": "submission.compendiumFeature",
+      "name": "compendiumFeature",
       "permitPublishing": "false",
       "options": [
         {
@@ -531,7 +531,7 @@
       "title": "Review creator",
       "id": "12a0d30b-e91a-434d-9985-01820f48fdc4",
       "component": "TextField",
-      "name": "submission.reviewCreator",
+      "name": "reviewCreator",
       "permitPublishing": "false",
       "validate": [
         {

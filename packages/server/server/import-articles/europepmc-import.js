@@ -120,7 +120,7 @@ const getData = async (groupId, ctx) => {
   const manuscripts = await models.Manuscript.query()
 
   const currentDOIs = manuscripts.map(({ submission }) => {
-    return submission.doi
+    return submission.$doi
   })
 
   const withoutDuplicates = articlesDetailedInfo.filter(

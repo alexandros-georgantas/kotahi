@@ -49,6 +49,26 @@ export const SectionContent = styled(Section)`
     border-top-left-radius: 0;
     margin: 0;
   }
+
+  & > hr {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  & > hr::after {
+    background: ${color.gray90};
+  }
+`
+
+export const PaddedSectionContent = styled(SectionContent)`
+  padding: ${grid(2)} ${grid(3)};
+
+  & > hr {
+    margin-left: ${grid(-3)};
+    margin-right: ${grid(-3)};
+    padding-left: 0;
+    padding-right: 0;
+  }
 `
 
 export const PaddedContent = styled(Content)`

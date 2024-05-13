@@ -1,4 +1,3 @@
-import i18next from 'i18next'
 import { required } from '../../../../xpub-validators/src'
 
 const hiddenfield = {
@@ -56,18 +55,6 @@ const nameField = {
   props: {
     label: 'Name (internal field name)',
     validate: val => (nameFieldRegex.test(val) ? null : 'Invalid name'),
-  },
-}
-
-const submissionNameFieldRegex = /^submission\.[a-zA-Z]\w*$/
-
-const submissionNameField = {
-  component: 'TextField',
-  props: {
-    label: 'Name (internal field name)',
-    description: i18next.t('formBuilder.internalNameDescription'),
-    validate: val =>
-      submissionNameFieldRegex.test(val) ? null : 'Invalid name',
   },
 }
 
@@ -294,10 +281,10 @@ const doiValidationField = {
 
 /** Most fields have at least these properties.
  * Components and fields can override these */
-const prototypeComponent = category => ({
+const prototypeComponent = {
   id: hiddenfield,
   title: requiredTextField,
-  name: category === 'submission' ? submissionNameField : nameField,
+  name: nameField,
   shortDescription: shortDescriptionField,
   description: editorfield,
   validate: validateOther,
@@ -305,7 +292,7 @@ const prototypeComponent = category => ({
   hideFromReviewers: hideFromReviewersField,
   permitPublishing: permitPublishingField,
   publishingTag: publishingTagField,
-})
+}
 
 /** All properties from all components must appear in this list,
  * which is used to establish correct order of display, and for
@@ -447,6 +434,12 @@ const genericFieldOptions = [
     fieldType: 'links',
     component: 'LinksInput',
   },
+  {
+    label: 'Attachments',
+    isCustom: true,
+    fieldType: 'attachments',
+    component: 'SupplementaryFiles',
+  },
 ]
 
 /** Field options for use in the submission form. Some are specialised, imposing
@@ -461,7 +454,7 @@ const submissionFieldOptions = [
     label: 'Title',
     component: ['TextField', 'AbstractEditor'],
     title: requiredTextFieldWithDefault('Title'),
-    name: presetTextField('submission.$title'),
+    name: presetTextField('$title'),
     doiValidation: null,
     doiUniqueSuffixValidation: null,
     parse: null,
@@ -473,7 +466,7 @@ const submissionFieldOptions = [
     label: 'Authors',
     component: 'AuthorsInput',
     title: requiredTextFieldWithDefault('Authors'),
-    name: presetTextField('submission.$authors'),
+    name: presetTextField('$authors'),
     permitPublishing: { ...permitPublishingField, defaultValue: 'always' },
   },
   {
@@ -481,40 +474,26 @@ const submissionFieldOptions = [
     label: 'Abstract',
     component: ['AbstractEditor', 'TextField'],
     title: requiredTextFieldWithDefault('Abstract'),
-    name: presetTextField('submission.$abstract'),
+    name: presetTextField('$abstract'),
     doiValidation: null,
     doiUniqueSuffixValidation: null,
     parse: null,
     format: null,
     permitPublishing: { ...permitPublishingField, defaultValue: 'always' },
   },
-  {
-    fieldType: 'visualAbstract',
-    label: 'Visual abstract',
-    component: 'VisualAbstract',
-    title: requiredTextFieldWithDefault('Visual abstract'),
-    name: presetTextField('visualAbstract'),
-  },
   /* {
     fieldType: 'keywords',
     label: 'Keywords',
     component: 'TextField',
     title: requiredTextFieldWithDefault('Keywords'),
-    name: presetTextField('submission.keywords'),
+    name: presetTextField('keywords'),
   }, */
-  {
-    fieldType: 'attachments',
-    label: 'Attachments',
-    component: 'SupplementaryFiles',
-    title: requiredTextFieldWithDefault('Attachments'),
-    name: presetTextField('fileName'),
-  },
   {
     fieldType: 'doi',
     label: 'DOI',
     component: 'TextField',
     title: requiredTextFieldWithDefault('DOI'),
-    name: presetTextField('submission.$doi'),
+    name: presetTextField('$doi'),
     doiValidation: { ...doiValidationField, defaultValue: 'true' },
     doiUniqueSuffixValidation: null,
     parse: null,
@@ -527,7 +506,7 @@ const submissionFieldOptions = [
     label: 'DOI suffix',
     component: 'TextField',
     title: requiredTextFieldWithDefault('DOI suffix'),
-    name: presetTextField('submission.$doiSuffix'),
+    name: presetTextField('$doiSuffix'),
     doiValidation: null,
     doiUniqueSuffixValidation: {
       ...doiUniqueSuffixValidationField,
@@ -541,7 +520,7 @@ const submissionFieldOptions = [
     label: 'Manuscript source URI',
     component: 'TextField',
     title: requiredTextFieldWithDefault('Manuscript source URI'),
-    name: presetTextField('submission.$sourceUri'),
+    name: presetTextField('$sourceUri'),
     doiValidation: null,
     doiUniqueSuffixValidation: null,
     parse: null,
@@ -552,7 +531,7 @@ const submissionFieldOptions = [
     label: 'Custom status',
     component: ['Select', 'RadioGroup'],
     title: requiredTextFieldWithDefault('Label'),
-    name: presetTextField('submission.$customStatus'),
+    name: presetTextField('$customStatus'),
     options: {
       ...optionfield,
       defaultValue: [
@@ -581,7 +560,7 @@ const submissionFieldOptions = [
     label: 'Last edit date — read-only',
     component: 'TextField',
     title: requiredTextFieldWithDefault('Last edit date'),
-    name: presetTextField('submission.$editDate'),
+    name: presetTextField('$editDate'),
     readonly: true,
     placeholder: null,
     doiValidation: null,
@@ -595,10 +574,16 @@ const submissionFieldOptions = [
     label: 'Attached manuscript — read-only',
     component: 'ManuscriptFile',
     title: requiredTextFieldWithDefault('Attached manuscript'),
-    name: presetTextField('manuscriptFile'),
+    name: presetTextField('$manuscriptFile'),
     validate: null,
   },
   ...genericFieldOptions,
+  {
+    isCustom: true,
+    fieldType: 'visualAbstract',
+    label: 'Visual abstract',
+    component: 'VisualAbstract',
+  },
 ]
 
 /** Field options for use in the decision form, including specialised and
@@ -619,12 +604,6 @@ const decisionFieldOptions = [
     component: 'ThreadedDiscussion',
   },
   ...genericFieldOptions,
-  {
-    isCustom: true,
-    fieldType: 'attachments',
-    label: 'Attachments',
-    component: 'SupplementaryFiles',
-  },
   {
     fieldType: 'doiSuffix',
     label: 'DOI suffix',
@@ -654,12 +633,6 @@ const reviewFieldOptions = [
   },
   ...genericFieldOptions,
   {
-    isCustom: true,
-    fieldType: 'attachments',
-    label: 'Attachments',
-    component: 'SupplementaryFiles',
-  },
-  {
     fieldType: 'doiSuffix',
     label: 'DOI suffix',
     component: 'TextField',
@@ -688,8 +661,6 @@ const getFieldOptions = formCategory => {
 
   const result = []
 
-  const prototypeProps = prototypeComponent(formCategory)
-
   opts.forEach(opt => {
     const permittedComponents = Array.isArray(opt.component)
       ? opt.component
@@ -703,7 +674,7 @@ const getFieldOptions = formCategory => {
         if (opt[propName] === null) return // to skip the property
 
         const prop =
-          opt[propName] || baseProps[propName] || prototypeProps[propName]
+          opt[propName] || baseProps[propName] || prototypeComponent[propName]
 
         if (prop) props[propName] = prop
       })
