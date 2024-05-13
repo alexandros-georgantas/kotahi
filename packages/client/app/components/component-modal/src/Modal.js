@@ -168,6 +168,7 @@ const Modal = ({
   children,
   overlayStyles,
   contentStyles,
+  hideCloseButton,
   ...props
 }) => {
   const themeContext = useContext(ThemeContext)
@@ -213,9 +214,11 @@ const Modal = ({
             <Title>{title}</Title>
             {subtitle && <Subtitle>{subtitle}</Subtitle>}
           </MediumColumn>
-          <CloseButton alignSelf="flex-end" onClick={onClose}>
-            <Icon>x</Icon>
-          </CloseButton>
+          {!hideCloseButton && (
+            <CloseButton alignSelf="flex-end" onClick={onClose}>
+              <Icon>x</Icon>
+            </CloseButton>
+          )}
         </MainHeader>
       )}
 

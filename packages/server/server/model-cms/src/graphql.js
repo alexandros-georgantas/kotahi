@@ -1,3 +1,4 @@
+const fnv = require('fnv-plus')
 const axios = require('axios')
 const { Readable } = require('stream')
 
@@ -22,6 +23,8 @@ const setInitialLayout = async groupId => {
     primaryColor,
     secondaryColor,
     groupId,
+    language: 'en',
+    languagePriority: 0,
   }).save()
 
   return layout
@@ -65,10 +68,45 @@ const addSlashes = inputString => {
 }
 
 const cleanCMSPageInput = inputData => {
-  if (!inputData.url) return inputData
-  const attrs = { ...inputData }
-  attrs.url = addSlashes(inputData.url)
-  return inputData
+  const result = { language: 'en', ...inputData } // TODO don't use this placeholder language once language support is properly built
+  if (inputData.url) result.url = addSlashes(inputData.url)
+  return result
+}
+
+/** Simulate a data structure where certain fields of the different language layouts are common,
+ * stored in a parent "CmsLayoutSet" object. In fact these values are set individually in each
+ * CMSLayout object, but program logic causes them to be shared.
+ * TODO: This is hacky and we should modify the DB schema to follow this structure, rather than faking it.
+ */
+const mungeGroupLayoutsIntoSingleObject = layouts => {
+  const first = layouts[0]
+  if (!first) return null
+
+  return {
+    id: first.groupId,
+    created: first.created,
+    updated: first.updated,
+    edited: first.edited,
+    published: first.published,
+    active: first.active,
+    hexCode: first.isPrivate ? fnv.hash(first.groupId).str() : null,
+    isPrivate: first.isPrivate,
+    languageLayouts: layouts.map(x => ({
+      id: x.id,
+      article: x.article ?? '',
+      css: x.css ?? '',
+      footerText: x.footerText,
+      language: x.language,
+      logoId: x.logoId,
+      logo: x.logo,
+      favicon: x.favicon,
+      partnerFiles: x.partnerFiles,
+      partners: x.partners ?? [],
+      primaryColor: x.primaryColor,
+      secondaryColor: x.secondaryColor,
+      publishConfig: x.publishConfig,
+    })),
+  }
 }
 
 const cmsFileTree = async (groupId, folderId) => {
@@ -134,17 +172,15 @@ const resolvers = {
       return cmsPage
     },
 
-    async cmsLayout(_, _vars, ctx) {
+    async cmsLayoutSet(_, _vars, ctx) {
       const groupId = ctx.req.headers['group-id']
-      let layout = await models.CMSLayout.query()
-        .where('groupId', groupId)
-        .first()
+      let layouts = await models.CMSLayout.query()
+        .where({ groupId })
+        .orderBy('languagePriority')
 
-      if (!layout) {
-        layout = await setInitialLayout(groupId) // TODO move this to seedArticleTemplate.js or similar
-      }
+      if (!layouts.length) layouts = [await setInitialLayout(groupId)] // TODO move this to seedArticleTemplate.js or similar
 
-      return layout
+      return mungeGroupLayoutsIntoSingleObject(layouts)
     },
 
     async getCmsFilesTree(_, { folderId }, ctx) {
@@ -276,30 +312,120 @@ const resolvers = {
         }
       }
     },
-
-    async updateCMSLayout(_, { _id, input }, ctx) {
+    async updateCmsLayout(_, { input }, ctx) {
       const groupId = ctx.req.headers['group-id']
 
-      const layout = await models.CMSLayout.query()
-        .where('groupId', groupId)
-        .first()
+      // TODO delete old logo if a new one replaces it
 
-      if (!layout) {
-        const savedCmsLayout = await new models.CMSLayout(input).save()
+      if (input.languageLayouts) {
+        await Promise.all(
+          input.languageLayouts.map(langLayout => {
+            const { id, flaxHeaderConfig, flaxFooterConfig, ...newLayout } =
+              langLayout
 
-        const cmsLayout = await models.CMSLayout.query().findById(
-          savedCmsLayout.id,
+            // TODO save flaxHeaderConfig/flaxFooterConfig if present
+
+            if (Object.keys(newLayout).length) {
+              return models.CMSLayout.query().patch(newLayout).where({ id })
+            }
+
+            return null
+          }),
         )
-
-        return cmsLayout
       }
 
-      const cmsLayout = await models.CMSLayout.query().updateAndFetchById(
-        layout.id,
-        input,
+      // Update the common fields of layouts for all languages for this group.
+      // TODO Change DB schema to reflect graphql schema: Separate these common fields into a separate table
+      const updatedLayouts = await models.CMSLayout.query()
+        .patch({
+          active: input.active,
+          isPrivate: input.isPrivate,
+          published: input.published,
+          edited: new Date(),
+        })
+        .where({ groupId })
+        .returning('*')
+        .orderBy('languagePriority')
+
+      const result = mungeGroupLayoutsIntoSingleObject(
+        updatedLayouts.sort((a, b) => a.languagePriority - b.languagePriority),
       )
 
-      return cmsLayout
+      return result
+    },
+
+    async updateCmsLanguages(_, { languages }, ctx) {
+      // eslint-disable-next-line no-console
+      console.log('updateCmsLanguages', languages)
+      if (!languages.length)
+        throw new Error(
+          "Deleting the last language-layout for the group's CMS is not permitted!",
+        )
+
+      const groupId = ctx.req.headers['group-id']
+
+      const existingLayouts = await models.CMSLayout.query()
+        .where({ groupId })
+        .orderBy('languagePriority')
+
+      const defaultLangLayout = existingLayouts[0]
+
+      const promises = []
+
+      existingLayouts.forEach(layout => {
+        const position = languages.findIndex(lang => layout.language === lang)
+
+        if (position < 0) {
+          // eslint-disable-next-line no-console
+          console.log(
+            `Deleting CMS layout for language ${layout.language} in group ${groupId}`,
+          )
+          promises.push(
+            models.CMSLayout.query().delete().where({ id: layout.id }),
+          )
+        } else if (layout.languagePriority !== position) {
+          promises.push(
+            models.CMSLayout.query()
+              .patch({ languagePriority: position })
+              .where({ id: layout.id }),
+          )
+        }
+      })
+
+      const newLanguages = languages.filter(
+        lang => !existingLayouts.some(layout => layout.language === lang),
+      )
+
+      newLanguages.forEach(lang => {
+        // eslint-disable-next-line no-console
+        console.log(`Adding language ${lang}`)
+        // TODO duplicate file records and anything else that lives outside cms_layouts table
+        promises.push(
+          models.CMSLayout.query().upsertGraphAndFetch({
+            active: true,
+            isPrivate: true,
+            hexCode: defaultLangLayout.hexCode,
+            primaryColor: defaultLangLayout.primaryColor,
+            secondaryColor: defaultLangLayout.secondaryColor,
+            logoId: defaultLangLayout.logoId, // TODO
+            partners: defaultLangLayout.partners, // TODO
+            footerText: defaultLangLayout.footerText,
+            published: null,
+            edited: new Date(),
+            groupId,
+            language: lang,
+            languagePriority: languages.findIndex(x => x === lang),
+          }),
+        )
+      })
+
+      await Promise.all(promises)
+
+      return mungeGroupLayoutsIntoSingleObject(
+        await models.CMSLayout.query()
+          .where({ groupId })
+          .orderBy('languagePriority'),
+      )
     },
 
     async addResourceToFolder(_, { id, type }, ctx) {
@@ -429,7 +555,7 @@ const resolvers = {
           ...parent.meta,
           title: parent.submission.$title,
           abstract: parent.submission.$abstract,
-        }) // TODO update flax so we can remove these bogus title and abstract fields
+        }) // TODO modify flax so we can remove these bogus title and abstract fields
       }
 
       return null
@@ -554,13 +680,32 @@ const resolvers = {
       }
     },
   },
+  CmsLanguageLayout: {
+    async flaxHeaderConfig(parent, _, ctx) {
+      const groupId = ctx.req.headers['group-id']
+      return getFlaxPageConfig('flaxHeaderConfig', groupId)
+    },
+
+    async flaxFooterConfig(parent, _, ctx) {
+      const groupId = ctx.req.headers['group-id']
+      return getFlaxPageConfig('flaxFooterConfig', groupId)
+    },
+
+    async logo(parent) {
+      if (!parent.logoId) return null
+      const file = await File.find(parent.logoId)
+      const updatedStoredObjects = await setFileUrls(file.storedObjects)
+      file.storedObjects = updatedStoredObjects
+      return file
+    },
+  },
 }
 
 const typeDefs = `
   extend type Query {
     cmsPage(id: ID!): CMSPage!
     cmsPages: [CMSPage!]!
-    cmsLayout: CMSLayout!
+    cmsLayoutSet: CmsLayoutSet!
     getCmsFilesTree(folderId: ID): CmsFileTree!
     getCmsFileContent(id: ID!): FileContent!
     getFoldersList: [FolderView!]
@@ -571,7 +716,8 @@ const typeDefs = `
     createCMSPage(input: CMSPageInput!): CreatePageResponse!
     updateCMSPage(id: ID!, input: CMSPageInput!): CMSPage!
     deleteCMSPage(id: ID!): DeletePageResponse!
-    updateCMSLayout(input: CMSLayoutInput!): CMSLayout!
+    updateCmsLayout(input: CmsLayoutInput!): CmsLayoutSet!
+    updateCmsLanguages(languages: [String!]!): CmsLayoutSet!
     addResourceToFolder(id: ID!, type: Boolean!): CmsFileTree!
     deleteResource(id: ID!): CmsFileTree!
     renameResource(id: ID!, name: String!): CmsFileTree!
@@ -601,7 +747,6 @@ const typeDefs = `
     errorMessage: String
   }
 
-
   type DeletePageResponse {
     success: Boolean!
     error: String
@@ -621,7 +766,7 @@ const typeDefs = `
     secondaryColor: String!
     logo: File
     favicon: File
-    partners: [StoredPartner!]
+    partners: [StoredPartner!]!
     footerText: String
     isPrivate:Boolean
     hexCode: String
@@ -629,12 +774,64 @@ const typeDefs = `
     edited: DateTime!
     created: DateTime!
     updated: DateTime
-    flaxHeaderConfig: [FlaxPageHeaderConfig!]
-    flaxFooterConfig: [FlaxPageFooterConfig!]
+    flaxHeaderConfig: [FlaxPageHeaderConfig!]!
+    flaxFooterConfig: [FlaxPageFooterConfig!]!
     publishConfig: String!
     article: String!
     css: String!
+    language: String!
     publishingCollection: PublishCollection! 
+  }
+
+  type CmsLayoutSet {
+    id: ID!
+    active: Boolean!
+    languageLayouts: [CmsLanguageLayout!]!
+    isPrivate: Boolean
+    hexCode: String
+    published: DateTime
+    edited: DateTime!
+    created: DateTime!
+    updated: DateTime
+  }
+
+  type CmsLanguageLayout {
+    id: ID!
+    language: String!
+    article: String!
+    css: String!
+    primaryColor: String!
+    secondaryColor: String!
+    logoId: ID
+    logo: File
+    favicon: File
+    partners: [StoredPartner!]!
+    footerText: String
+    flaxHeaderConfig: [FlaxPageHeaderConfig!]!
+    flaxFooterConfig: [FlaxPageFooterConfig!]!
+    publishConfig: String!
+  }
+
+  input CmsLayoutInput {
+    active: Boolean
+    languageLayouts: [CmsLanguageLayoutInput!]
+    isPrivate: Boolean
+    published: DateTime
+  }
+
+  input CmsLanguageLayoutInput {
+    id: ID!
+    language: String
+    article: String
+    css: String
+    primaryColor: String
+    secondaryColor: String
+    logoId: ID
+    partners: [StoredPartnerInput!]
+    footerText: String
+    publishConfig: String
+    flaxHeaderConfig: [FlaxConfigInput!]
+    flaxFooterConfig: [FlaxConfigInput!]
   }
 
   type CmsFileTree {
@@ -701,6 +898,7 @@ const typeDefs = `
     footerText: String
     published: DateTime
     edited: DateTime
+    language: String!
   }
 
   input FlaxConfigInput {

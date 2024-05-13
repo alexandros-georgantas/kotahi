@@ -34,6 +34,7 @@ const en = {
       Save: 'Save',
       Update: 'Update',
       Confirm: 'Confirm',
+      Add: 'Add',
       Delete: 'Delete',
       View: 'View',
       'Enter search terms...': 'Enter search terms...',
@@ -344,6 +345,11 @@ const en = {
         Published: 'Published',
         'Brand logo': 'Brand logo',
         'Brand Color': 'Brand Color',
+        'Choose languages': 'Choose languages',
+        LanguagesDesc:
+          'Choose one or more languages for your website, with the default language at the top:',
+        'Add language': 'Add language',
+        'Remove language': 'Remove language',
         fields: {
           primaryColor: 'Primary color',
           secondaryColor: 'Secondary color',
@@ -353,6 +359,7 @@ const en = {
           'Use checkbox to show and hide the page in the menu. Click and Drag to order them.',
         Footer: 'Footer',
         Status: 'Status',
+        publishingTo: 'This site will publish to:',
         MakeFlaxSitePrivate:
           'Your publishing website will only be visible to those who have access to the Draft link',
         DraftCheckbox: 'Draft',

@@ -40,31 +40,37 @@ const cmsLayoutFields = `
     id
     created
     updated
-    primaryColor
-    secondaryColor
-    footerText
+    languageLayouts {
+      id
+      primaryColor
+      secondaryColor
+      footerText
+      flaxHeaderConfig {
+        ${flaxPageConfigFields}
+      }
+      flaxFooterConfig {
+        ${flaxPageConfigFields}
+      }
+      partners {
+        id
+        url
+        sequenceIndex
+        file {
+         ${fileFields}
+        }
+      }
+      logoId
+      logo {
+        ${fileFields}
+      }
+      article
+      css
+      language
+    }
     published
     edited
     isPrivate
     hexCode
-    flaxHeaderConfig {
-      ${flaxPageConfigFields}
-    }
-    flaxFooterConfig {
-      ${flaxPageConfigFields}
-    }
-    partners {
-      id
-      url
-      sequenceIndex
-      file {
-       ${fileFields}
-      }
-    }
-    logo {
-      ${fileFields}
-    }
-    css
 `
 
 const createCmsPageFields = `
@@ -132,9 +138,17 @@ export const rebuildFlaxSiteMutation = gql`
   }
 `
 
-export const getCMSLayout = gql`
-  query cmsLayout {
-    cmsLayout {
+export const getCmsLayoutSet = gql`
+query cmsLayoutSet {
+  cmsLayoutSet {
+    ${cmsLayoutFields}
+  }
+}
+`
+
+export const updateCmsLayoutMutation = gql`
+  mutation updateCmsLayout($input: CmsLayoutInput!) {
+    updateCmsLayout(input: $input) {
       ${cmsLayoutFields}
     }
   }
@@ -259,6 +273,14 @@ export const createFileMutation = gql`
 export const deleteFileMutation = gql`
   mutation ($id: ID!) {
     deleteFile(id: $id)
+  }
+`
+
+export const updateCmsLanguagesMutation = gql`
+  mutation ($languages: [String!]!) {
+    updateCmsLanguages(languages: $languages) {
+      ${cmsLayoutFields}
+    }
   }
 `
 

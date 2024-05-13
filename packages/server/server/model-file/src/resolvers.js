@@ -169,7 +169,7 @@ const resolvers = {
         null,
         null,
         [meta.fileType],
-        meta.reviewId || meta.manuscriptId,
+        meta.reviewId || meta.manuscriptId, // TODO We should just use meta.objectId, and not receive manuscriptId or reviewId.
       )
 
       const data = await getFileWithUrl(createdFile)

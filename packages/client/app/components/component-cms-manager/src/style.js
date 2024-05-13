@@ -4,6 +4,7 @@ import { ChevronRight } from 'react-feather'
 import { TextInput, Heading, ActionButton } from '../../shared'
 
 import { SecondaryButton } from '../../component-modal/src/Modal'
+import { color } from '../../../theme'
 
 export const Section = styled.div`
   margin: 8px 8px 0px 0px;
@@ -184,6 +185,14 @@ export const LayoutHeaderListItem = styled.div`
   margin-bottom: ${grid(2)};
   padding: ${grid(1 / 2)};
   user-select: 'none';
+
+  & svg {
+    stroke: transparent;
+  }
+
+  &:hover svg {
+    stroke: ${color.gray40};
+  }
 `
 
 export const LayoutMainHeading = styled(Heading)`

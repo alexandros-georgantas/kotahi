@@ -55,6 +55,18 @@ export const PaddedContent = styled(Content)`
   margin-bottom: ${grid(3)};
   margin-top: ${grid(3)};
   padding: ${grid(2)} ${grid(3)};
+
+  & > hr {
+    border-bottom: 1px solid ${color.gray97};
+    border-top: 1px solid ${color.gray95};
+    margin: ${grid(3)} ${grid(-3)};
+    padding: 0;
+
+    &:after {
+      background-color: transparent;
+      height: 2px;
+    }
+  }
 `
 
 export const Container = styled.div`

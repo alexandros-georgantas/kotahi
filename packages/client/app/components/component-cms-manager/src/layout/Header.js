@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { LayoutMainHeading, LayoutSecondaryHeading } from '../style'
 import PageOrder from './PageOrder'
 
-const Header = ({ cmsLayout, onPageOrderUpdated }) => {
+const Header = ({ cmsLayout, updateCmsLayout }) => {
   const { t } = useTranslation()
   return (
     <div>
@@ -15,7 +15,14 @@ const Header = ({ cmsLayout, onPageOrderUpdated }) => {
       </LayoutMainHeading>
       <PageOrder
         initialItems={cmsLayout.flaxHeaderConfig}
-        onPageOrderUpdated={onPageOrderUpdated}
+        onPageOrderUpdated={newOrder =>
+          updateCmsLayout({
+            flaxHeaderConfig: newOrder.map(x => ({
+              sequenceIndex: x.sequenceIndex,
+              shownInMenu: x.shownInMenu,
+            })),
+          })
+        }
       />
     </div>
   )

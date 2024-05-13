@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { ValidatedFieldFormik } from '@pubsweet/ui'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import ValidatedField from '../../../component-submit/src/components/ValidatedField'
 import PageOrder from './PageOrder'
 import {
   CompactSection,
@@ -21,11 +21,11 @@ const CompactSectionWithFullWidth = styled(CompactSection)`
   }
 `
 
-const PartnerInputComponent = ({ entityId, ...restProps }) => {
+const PartnerInputComponent = ({ entityId, language, ...restProps }) => {
   return (
     <FilesUpload
       acceptMultiple
-      fieldName="partnerFiles"
+      fieldName={`${language}.partnerFiles`}
       fileType="cms"
       manuscriptId={entityId}
       mimeTypesToAccept="image/*"
@@ -54,19 +54,20 @@ const Footer = ({
   cmsLayout,
   createFile,
   deleteFile,
-  triggerAutoSave,
+  updateCmsLayout,
   onPageOrderUpdated,
 }) => {
+  const { language } = cmsLayout
+
   const [selectedFiles, setSelectedFiles] = useState(
-    formikProps.values.partners,
+    formikProps.values[language].partners ?? [],
   )
 
-  useEffect(() => onDataChanged('partners', selectedFiles), [selectedFiles])
   const { t } = useTranslation()
 
   const onDataChanged = (name, value) => {
-    formikProps.setFieldValue(name, value)
-    triggerAutoSave({ [name]: value })
+    formikProps.setFieldValue(`${language}.${name}`, value)
+    updateCmsLayout({ [name]: value })
   }
 
   const onFileAdded = file => {
@@ -77,13 +78,16 @@ const Footer = ({
         url: '',
         sequenceIndex: currentFiles.length,
       })
+      onDataChanged('partners', currentFiles)
       return currentFiles
     })
   }
 
   const onFileRemoved = file => {
     setSelectedFiles(current => {
-      return current.filter(currFile => currFile.id !== file.id)
+      const newFiles = current.filter(currFile => currFile.id !== file.id)
+      onDataChanged('partners', newFiles)
+      return newFiles
     })
   }
 
@@ -94,21 +98,23 @@ const Footer = ({
         <LayoutSecondaryHeading>
           {t('cmsPage.layout.Partners')}
         </LayoutSecondaryHeading>
-        <ValidatedFieldFormik
+        <ValidatedField
           component={partnersInput.component}
           createFile={createFile}
           deleteFile={deleteFile}
           entityId={cmsLayout.id}
           key={selectedFiles.length}
-          name={partnersInput.name}
+          language={language}
+          name={`${language}.${partnersInput.name}`}
           onFileAdded={onFileAdded}
           onFileRemoved={onFileRemoved}
           renderFileList={(files, props) => (
             <PartnerListing
+              cmsLayout={cmsLayout}
               files={files}
               formikProps={formikProps}
               key={files?.length}
-              triggerAutoSave={triggerAutoSave}
+              updateCmsLayout={updateCmsLayout}
               {...props}
             />
           )}
@@ -126,9 +132,9 @@ const Footer = ({
         <LayoutSecondaryHeading>
           {t('cmsPage.layout.Footer Text')}
         </LayoutSecondaryHeading>
-        <ValidatedFieldFormik
+        <ValidatedField
           component={footerTextInput.component}
-          name={footerTextInput.name}
+          name={`${language}.${footerTextInput.name}`}
           onChange={value => onDataChanged(footerTextInput.name, value)}
           setFieldValue={formikProps.setFieldValue}
           setTouched={formikProps.setTouched}
@@ -143,7 +149,14 @@ const Footer = ({
         </LayoutSecondaryHeading>
         <PageOrder
           initialItems={cmsLayout.flaxFooterConfig}
-          onPageOrderUpdated={onPageOrderUpdated}
+          onPageOrderUpdated={newOrder =>
+            updateCmsLayout({
+              flaxFooterConfig: newOrder.map(x => ({
+                sequenceIndex: x.sequenceIndex,
+                shownInMenu: x.shownInMenu,
+              })),
+            })
+          }
         />
       </CompactSectionWithFullWidth>
     </FullWidthAndHeightContainer>
