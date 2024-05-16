@@ -7,20 +7,11 @@ const axios = require('axios')
 const config = require('config')
 const { v4: uuid } = require('uuid')
 const models = require('@pubsweet/models')
-const { upsertArtifact } = require('../publishingCommsUtils')
+const fetchUserDetails = require('../../auth-orcid/fetchUserDetails')
 
 const {
   getEditorIdsForManuscript,
 } = require('../../model-manuscript/src/manuscriptCommsUtils')
-
-// const { parseDate } = require('../../utils/dateUtils')
-// const checkIsAbstractValueEmpty = require('../../utils/checkIsAbstractValueEmpty')
-
-// const {
-//   getReviewForm,
-//   getDecisionForm,
-//   getSubmissionForm,
-// } = require('../../model-review/src/reviewCommsUtils')
 
 const {
   htmlToJats,
@@ -34,7 +25,6 @@ const ABSTRACT_PLACEHOLDER = '‖ABSTRACT‖'
 const CITATIONS_PLACEHOLDER = '‖CITATIONS‖'
 
 const builder = new xml2js.Builder()
-// const parser = new xml2js.Parser()
 
 const requestToCrossref = async (xmlFiles, activeConfig) => {
   const publishPromises = xmlFiles.map(async file => {
@@ -76,7 +66,6 @@ const publishToCrossref = async manuscript => {
     await publishArticleToCrossref(manuscript).catch(err => {
       throw err
     })
-  // else if (activeConfig.formData.publishing.crossref.publicationType === 'peer review')
   else
     await publishReviewsToCrossref(manuscript).catch(err => {
       throw err
@@ -379,11 +368,20 @@ const publishArticleToCrossref = async manuscript => {
   await fs.rmdirSync(dirName, { recursive: true })
 }
 
+const populateUserInfo = async userIds => {
+  const systemUsers = await models.User.query().findByIds(userIds)
+  return Promise.all(systemUsers?.map(async user => fetchUserDetails(user)))
+}
+
 const publishReviewsToCrossref = async manuscript => {
   const activeConfig = await Config.getCached(manuscript.groupId)
 
   if (!manuscript.submission.$doi)
     throw new Error('Field submission.$doi is not present')
+
+  if (!config['flax-site'].clientFlaxSiteUrl) {
+    throw new Error('Flax should be configured and running')
+  }
 
   const batchId = uuid()
   const publishDate = new Date()
@@ -398,30 +396,13 @@ const publishReviewsToCrossref = async manuscript => {
         ? 'Summary of'
         : 'Referee report of'
 
-      const artifactId = await upsertArtifact({
-        title: `Review: ${manuscript.submission.$title}`,
-        content: review.jsonData.comment,
-        manuscriptId: manuscript.id,
-        platform: 'Crossref',
-        externalId: reviewDOI,
-        hostedInKotahi: true,
-        relatedDocumentUri: `https://doi.org/${manuscript.submission.$doi}`,
-        relatedDocumentType: 'preprint',
-      })
-
-      let editors
       let users
 
       if (review.isDecision) {
-        editors = await getEditorIdsForManuscript(manuscript.id)
-
-        users = await models.User.query()
-          .findByIds(editors)
-          .withGraphFetched('defaultIdentity')
+        const editors = await getEditorIdsForManuscript(manuscript.id)
+        users = await populateUserInfo(editors)
       } else if (!review.isHiddenReviewerName && review.userId) {
-        users = await models.User.query()
-          .findByIds([review.userId])
-          .withGraphFetched('defaultIdentity')
+        users = await populateUserInfo([review.userId])
       }
 
       return {
@@ -436,8 +417,8 @@ const publishReviewsToCrossref = async manuscript => {
                 $: {
                   contributor_role: review.isDecision ? 'editor' : 'reviewer',
                 },
-                given_name: user.defaultIdentity.name,
-                surname: user.defaultIdentity.name,
+                given_name: user.firstName,
+                surname: user.lastName,
               },
             }
           }),
@@ -463,7 +444,7 @@ const publishReviewsToCrossref = async manuscript => {
         },
         doi_data: {
           doi: reviewDOI,
-          resource: `${config['pubsweet-client'].baseUrl}/versions/${manuscript.id}/artifacts/${artifactId}`,
+          resource: `${config['flax-site'].clientFlaxSiteUrl}/${activeConfig.formData.instanceName}/articles/${manuscript.shortId}`,
         },
       }
     }),
@@ -497,6 +478,8 @@ const publishReviewsToCrossref = async manuscript => {
   }
 
   const xml = builder.buildObject(json)
+
+  // console.log('xml', xml)
 
   const dirName = `${+new Date()}-${manuscript.id}-peer_reviews`
   await fsPromised.mkdir(dirName)
