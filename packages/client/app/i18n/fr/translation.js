@@ -511,6 +511,11 @@ const fr = {
         'Appliquer des tags Hypothèse dans le formulaire de soumission',
       reverseFieldOrder:
         "Inverser l'ordre des champs du formulaire de soumission/décision publiés à Hypothèse",
+      Datacite: 'Datacite',
+      dataciteLogin: "Nom d'utilisateur Datacite",
+      datacitePassword: 'Mot de passe Datacite',
+      dataciteUseSandbox: 'Publier dans le bac à sable Datacite',
+      dataciteDoiPrefix: 'Préfixe DOI Datacite',
       Crossref: 'Crossref',
       journalName: 'Nom du journal/groupe',
       journalAbbreviatedName: 'Nom abrégé',

@@ -54,6 +54,16 @@ module.exports = {
       publishedArticleLocationPrefix: 'test',
       useSandbox: false,
     },
+    datacite: {
+      login: 'test',
+      password: 'test',
+      doiPrefix: '10.12345',
+      useSandbox: false,
+      licenseUrl: 'test',
+      journalName: 'test',
+      journalAbbreviatedName: 'test',
+      publishedArticleLocationPrefix: 'test',
+    },
   },
   taskManager: {
     teamTimezone: 'Etc/UTC',

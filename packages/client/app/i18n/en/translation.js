@@ -492,6 +492,11 @@ const en = {
       shouldAllowTagging: 'Apply Hypothesis tags in the submission form',
       reverseFieldOrder:
         'Reverse the order of Submission/Decision form fields published to Hypothesis',
+      Datacite: 'Datacite',
+      dataciteLogin: 'Datacite username',
+      datacitePassword: 'Datacite password',
+      dataciteUseSandbox: 'Publish to Datacite sandbox',
+      dataciteDoiPrefix: 'Datacite DOI prefix',
       Crossref: 'Crossref',
       journalName: 'Journal/Group name',
       journalAbbreviatedName: 'Abbreviated name',

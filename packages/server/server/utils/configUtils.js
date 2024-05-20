@@ -8,6 +8,12 @@ const redact = str => {
 const hideSensitiveInformation = async configData => {
   const config = configData
 
+  // Publishing - Datacite password
+  if (config.formData.publishing.datacite?.password)
+    config.formData.publishing.datacite.password = redact(
+      config.formData.publishing.datacite.password,
+    )
+
   // Publishing - Crossref password
   if (config.formData.publishing.crossref.password)
     config.formData.publishing.crossref.password = redact(
@@ -28,6 +34,17 @@ const revertHiddenSensitiveInformation = async (
   inputFormData,
 ) => {
   const formData = inputFormData
+
+  // Publishing - Datacite password
+  if (formData.publishing.datacite.password) {
+    const passwordIsHidden =
+      redact(existingConfig.formData.publishing.datacite?.password) ===
+      formData.publishing.datacite.password
+
+    if (passwordIsHidden)
+      formData.publishing.datacite.password =
+        existingConfig.formData.publishing.datacite?.password
+  }
 
   // Publishing - Crossref password
   if (formData.publishing.crossref.password) {
@@ -61,6 +78,8 @@ const stripSensitiveInformation = async configData => {
   delete config.formData.kotahiApis
 
   // publishing - credentials
+  delete config.formData.publishing.datacite?.login
+  delete config.formData.publishing.datacite?.password
   delete config.formData.publishing.crossref.login
   delete config.formData.publishing.crossref.password
   delete config.formData.publishing.crossref.depositorName

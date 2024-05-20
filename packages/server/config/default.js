@@ -146,6 +146,7 @@ module.exports = {
     'teams',
     'client-features',
     'crossref',
+    'datacite',
     'hypothesis',
     'review',
     'notification-email',
@@ -158,6 +159,11 @@ module.exports = {
     registrant: '',
     depositorName: '',
     depositorEmail: '',
+    doiPrefix: '',
+  },
+  datacite: {
+    login: '',
+    password: '',
     doiPrefix: '',
   },
   hypothesis: {

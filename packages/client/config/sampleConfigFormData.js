@@ -38,6 +38,16 @@ module.exports = {
       url: 'test',
       token: 'test',
     },
+    datacite: {
+      login: 'test',
+      password: 'test',
+      doiPrefix: '10.12345',
+      useSandbox: false,
+      publicationType: 'article',
+      journalAbbreviatedName: 'test',
+      publishedArticleLocationPrefix: 'test',
+      licenseUrl: 'test',
+    },
     crossref: {
       login: 'test',
       password: 'test',

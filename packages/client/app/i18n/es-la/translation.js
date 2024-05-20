@@ -503,6 +503,11 @@ const esLa = {
         'Aplicar etiquetas de Hipótesis en el formulario de envío',
       reverseFieldOrder:
         'Invertir el orden de campos del formulario de Envío/Decisión publicados en Hipótesis',
+      Datacite: 'Datacite',
+      dataciteLogin: 'Nombre de Usuario de Datacite',
+      datacitePassword: 'Contraseña de  Datacite',
+      dataciteUseSandbox: 'Publicar en el entorno de prueba de Datacite',
+      dataciteDoiPrefix: 'Prefijo DOI de Datacite',
       Crossref: 'Crossref',
       journalName: 'Nombre de la Revista/Grupo',
       journalAbbreviatedName: 'Nombre Abreviado de la Revista',

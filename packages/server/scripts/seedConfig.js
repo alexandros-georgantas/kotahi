@@ -23,6 +23,18 @@ const seedConfig = async (group, instanceName, index, options) => {
             url: process.env.PUBLISHING_WEBHOOK_URL || null,
             token: process.env.PUBLISHING_WEBHOOK_TOKEN || null,
           },
+          datacite: {
+            login: process.env.DATACITE_LOGIN || null,
+            password: process.env.DATACITE_PASSWORD || null,
+            doiPrefix: process.env.DOI_PREFIX || null,
+            useSandbox: process.env.DATACITE_USE_SANDBOX === 'true',
+            licenseUrl: process.env.PUBLICATION_LICENSE_URL || null,
+            journalName: process.env.JOURNAL_NAME || null,
+            journalAbbreviatedName:
+              process.env.JOURNAL_ABBREVIATED_NAME || null,
+            publishedArticleLocationPrefix:
+              process.env.PUBLISHED_ARTICLE_LOCATION_PREFIX || null,
+          },
           crossref: {
             login: process.env.CROSSREF_LOGIN || null,
             password: process.env.CROSSREF_PASSWORD || null,
@@ -55,6 +67,16 @@ const seedConfig = async (group, instanceName, index, options) => {
             ref: null,
             url: null,
             token: null,
+          },
+          datacite: {
+            login: null,
+            password: null,
+            doiPrefix: null,
+            useSandbox: false,
+            journalName: null,
+            licenseUrl: null,
+            journalAbbreviatedName: null,
+            publishedArticleLocationPrefix: null,
           },
           crossref: {
             login: null,
