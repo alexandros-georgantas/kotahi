@@ -60,6 +60,7 @@ module.exports = {
       doiPrefix: '10.12345',
       useSandbox: false,
       licenseUrl: 'test',
+      publisher: 'test',
       journalName: 'test',
       journalAbbreviatedName: 'test',
       publishedArticleLocationPrefix: 'test',

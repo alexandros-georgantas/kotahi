@@ -46,6 +46,11 @@ const publishToDatacite = async manuscript => {
       'Could not publish to Datacite, as no DOI prefix is configured.',
     )
 
+  if (!activeConfig.formData.publishing.datacite.publisher)
+    throw new Error(
+      'Could not publish to Datacite, as no publisher is configured.',
+    )
+
   await publishArticleToDatacite(manuscript).catch(err => {
     throw err
   })
@@ -85,20 +90,20 @@ const getContributor = author => {
 /** Gets issueYear from submission.issueYear or failing that, from submission.volumeNumber.
  * Checks that the year looks sensible (in range 2000-2099)
  */
-const getIssueYear = manuscript => {
-  let yearString =
-    manuscript.submission.issueYear || manuscript.submission.volumeNumber
-  if (typeof yearString !== 'string')
-    throw new Error('Could not determine issue year')
-  yearString = yearString.trim()
+// const getIssueYear = manuscript => {
+//   let yearString =
+//     manuscript.submission.$issueYear || manuscript.submission.$volumeNumber
+//   if (typeof yearString !== 'string')
+//     throw new Error('Could not determine issue year')
+//   yearString = yearString.trim()
 
-  // Only works for years 2000-2099
-  if (!/^20\d\d$/.test(yearString))
-    throw new Error(
-      `Issue year '${yearString}' does not appear to be a valid year.`,
-    )
-  return yearString
-}
+//   // Only works for years 2000-2099
+//   if (!/^20\d\d$/.test(yearString))
+//     throw new Error(
+//       `Issue year '${yearString}' does not appear to be a valid year.`,
+//     )
+//   return yearString
+// }
 
 /** Returns true if a DOI is not already in use.
  * It will also return true if the Datacite server is faulty or down, so that form submission is not prevented.
@@ -139,29 +144,76 @@ const publishArticleToDatacite = async manuscript => {
   if (!Array.isArray(manuscript.submission.$authors))
     throw new Error('Manuscript.submission.$authors is not an array')
 
-  const issueYear = getIssueYear(manuscript)
+  const issueYear = '2020' // getIssueYear(manuscript)
   const publishDate = new Date()
 
   const doiSuffix = manuscript.id
 
   const doi = getDoi(doiSuffix, activeConfig)
-  if (!(await doiIsAvailable(doi, activeConfig)))
-    throw Error('Custom DOI is not available.')
 
   const publishedLocation = `${activeConfig.formData.publishing.datacite.publishedArticleLocationPrefix}${manuscript.shortId}`
 
   const creators = manuscript.submission.$authors.map(getContributor)
+
+  const relatedItems = []
+
+  if (
+    manuscript.submission.$volumeNumber ||
+    manuscript.submission.$issueNumber
+  ) {
+    relatedItems.push({
+      relatedItemType: 'Collection',
+      relationType: 'IsPublishedIn',
+      volume: manuscript.submission.$volumeNumber,
+      issue: manuscript.submission.$issueNumber,
+    })
+  }
+
+  const {
+    journalName,
+    journalAbbreviatedName,
+    publisher,
+    licenseUrl,
+    doiPrefix,
+  } = activeConfig.formData.publishing.datacite
+
+  if (journalName || journalAbbreviatedName) {
+    const titles = []
+
+    if (journalName) {
+      titles.push({
+        title: journalName,
+        titleType: 'TranslatedTitle',
+      })
+    }
+
+    if (journalAbbreviatedName) {
+      titles.push({
+        title: journalAbbreviatedName,
+        titleType: 'Subtitle',
+      })
+    }
+
+    relatedItems.push({
+      relatedItemType: 'Journal',
+      relationType: 'IsPublishedIn',
+      titles,
+    })
+  }
 
   const payload = {
     type: 'dois',
     attributes: {
       doi,
       event: 'publish',
-      prefix: activeConfig.formData.publishing.datacite.doiPrefix,
+      prefix: doiPrefix,
       suffix: doiSuffix,
       url: publishedLocation,
       types: { resourceTypeGeneral: 'JournalArticle' },
       creators,
+      publisher: {
+        name: publisher,
+      },
       titles: [
         {
           title: manuscript.submission.$title,
@@ -179,37 +231,16 @@ const publishArticleToDatacite = async manuscript => {
         { dateType: 'Accepted', date: publishDate.toISOString() },
       ],
       publicationYear: publishDate.getUTCFullYear(),
-      relatedItems: [
-        {
-          relatedItemType: 'Collection',
-          relationType: 'IsPublishedIn',
-          volume: manuscript.submission.volumeNumber,
-          issue: manuscript.submission.issueNumber,
-        },
-        {
-          relatedItemType: 'Journal',
-          relationType: 'IsPublishedIn',
-          titles: [
-            {
-              title: activeConfig.formData.publishing.datacite.journalName,
-              titleType: 'TranslatedTitle',
-            },
-            {
-              title:
-                activeConfig.formData.publishing.datacite
-                  .journalAbbreviatedName,
-              titleType: 'Subtitle',
-            },
-          ],
-        },
-      ],
-      rightsList: [
-        { rights: activeConfig.formData.publishing.datacite.licenseUrl },
-      ],
+      relatedItems,
+      rightsList: [{ rights: licenseUrl }],
     },
   }
 
-  await requestToDatacite('post', 'dois', payload, activeConfig)
+  if (!(await doiIsAvailable(doi, activeConfig))) {
+    await requestToDatacite('put', `dois/${doi}`, payload, activeConfig)
+  } else {
+    await requestToDatacite('post', 'dois', payload, activeConfig)
+  }
 }
 
 module.exports = {

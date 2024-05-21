@@ -509,6 +509,7 @@ const esLa = {
       dataciteUseSandbox: 'Publicar en el entorno de prueba de Datacite',
       dataciteDoiPrefix: 'Prefijo DOI de Datacite',
       Crossref: 'Crossref',
+      publisher: 'Editor',
       journalName: 'Nombre de la Revista/Grupo',
       journalAbbreviatedName: 'Nombre Abreviado de la Revista',
       journalHomepage: 'Página de Inicio de la Revista',
@@ -519,6 +520,8 @@ const esLa = {
       crossrefDepositorEmail: 'Dirección de Correo Electrónico del Depositante',
       publicationType: 'Seleccionar tipo de publicación',
       doiPrefix: 'Prefijo DOI de Crossref',
+      publishedArticleLocationPrefixDatacite:
+        'Prefijo de Ubicación de Artículos Publicados de Datacite',
       publishedArticleLocationPrefix:
         'Prefijo de Ubicación de Artículos Publicados de Crossref',
       licenseUrl: 'URL de la Licencia de Publicación',

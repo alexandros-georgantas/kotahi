@@ -666,6 +666,10 @@ export const generateSchemas = (
                   type: ['string', 'null'],
                   description: t('configPage.licenseUrl'),
                 },
+                publisher: {
+                  type: ['string', 'null'],
+                  description: t('configPage.publisher'),
+                },
                 journalName: {
                   type: ['string', 'null'],
                   description: t('configPage.journalName'),
@@ -1529,6 +1533,10 @@ export const generateSchemas = (
                 licenseUrl: {
                   type: ['string', 'null'],
                   description: t('configPage.licenseUrl'),
+                },
+                publisher: {
+                  type: ['string', 'null'],
+                  description: t('configPage.publisher'),
                 },
                 journalName: {
                   type: ['string', 'null'],
@@ -2399,6 +2407,10 @@ export const generateSchemas = (
                   type: ['string', 'null'],
                   description: t('configPage.licenseUrl'),
                 },
+                publisher: {
+                  type: ['string', 'null'],
+                  description: t('configPage.publisher'),
+                },
                 journalName: {
                   type: ['string', 'null'],
                   description: t('configPage.journalName'),
@@ -3262,11 +3274,17 @@ export const generateSchemas = (
                 },
                 publishedArticleLocationPrefix: {
                   type: ['string', 'null'],
-                  description: t('configPage.publishedArticleLocationPrefix'),
+                  description: t(
+                    'configPage.publishedArticleLocationPrefixDatacite',
+                  ),
                 },
                 licenseUrl: {
                   type: ['string', 'null'],
                   description: t('configPage.licenseUrl'),
+                },
+                publisher: {
+                  type: ['string', 'null'],
+                  description: t('configPage.publisher'),
                 },
                 journalName: {
                   type: ['string', 'null'],

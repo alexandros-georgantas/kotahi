@@ -517,6 +517,7 @@ const fr = {
       dataciteUseSandbox: 'Publier dans le bac à sable Datacite',
       dataciteDoiPrefix: 'Préfixe DOI Datacite',
       Crossref: 'Crossref',
+      publisher: 'Éditeur',
       journalName: 'Nom du journal/groupe',
       journalAbbreviatedName: 'Nom abrégé',
       journalHomepage: "Page d'accueil",
@@ -527,6 +528,8 @@ const fr = {
       crossrefDepositorEmail: 'Adresse e-mail du déposant',
       publicationType: 'Sélectionner le type de publication',
       doiPrefix: 'Préfixe DOI Crossref',
+      publishedArticleLocationPrefixDatacite:
+        "Emplacement de l'article publié Datacite",
       publishedArticleLocationPrefix:
         "Emplacement de l'article publié Crossref",
       licenseUrl: 'URL de la licence de publication',

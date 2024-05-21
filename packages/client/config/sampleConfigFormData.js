@@ -47,6 +47,7 @@ module.exports = {
       journalAbbreviatedName: 'test',
       publishedArticleLocationPrefix: 'test',
       licenseUrl: 'test',
+      publisher: 'test',
     },
     crossref: {
       login: 'test',

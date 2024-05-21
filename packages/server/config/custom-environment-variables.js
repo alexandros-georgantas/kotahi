@@ -60,6 +60,7 @@ module.exports = {
     doiPrefix: 'DOI_PREFIX',
     useSandbox: 'DATACITE_USE_SANDBOX',
     licenseUrl: 'PUBLICATION_LICENSE_URL',
+    publisher: 'PUBLISHER',
     journalName: 'JOURNAL_NAME',
     journalAbbreviatedName: 'JOURNAL_ABBREVIATED_NAME',
     publishedArticleLocationPrefix: 'PUBLISHED_ARTICLE_LOCATION_PREFIX',

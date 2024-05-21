@@ -29,6 +29,7 @@ const seedConfig = async (group, instanceName, index, options) => {
             doiPrefix: process.env.DOI_PREFIX || null,
             useSandbox: process.env.DATACITE_USE_SANDBOX === 'true',
             licenseUrl: process.env.PUBLICATION_LICENSE_URL || null,
+            publisher: process.env.PUBLISHER || null,
             journalName: process.env.JOURNAL_NAME || null,
             journalAbbreviatedName:
               process.env.JOURNAL_ABBREVIATED_NAME || null,
@@ -74,6 +75,7 @@ const seedConfig = async (group, instanceName, index, options) => {
             doiPrefix: null,
             useSandbox: false,
             journalName: null,
+            publisher: null,
             licenseUrl: null,
             journalAbbreviatedName: null,
             publishedArticleLocationPrefix: null,
