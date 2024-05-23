@@ -165,8 +165,7 @@ const getContributor = (author, isAdditional) => {
  * Checks that the year looks sensible (in range 2000-2099)
  */
 const getIssueYear = manuscript => {
-  let yearString =
-    manuscript.submission.issueYear || manuscript.submission.volumeNumber
+  let yearString = manuscript.submission.$issueYear
   if (typeof yearString !== 'string')
     throw new Error('Could not determine issue year')
   yearString = yearString.trim()
@@ -231,34 +230,62 @@ const emailRegex =
 /** Send submission to register an article, with appropriate metadata */
 const publishArticleToCrossref = async manuscript => {
   const activeConfig = await Config.getCached(manuscript.groupId)
-  if (!manuscript.submission)
-    throw new Error('Manuscript has no submission object')
-  if (!manuscript.submission.$title)
-    throw new Error('Manuscript has no submission.$title')
-  if (!manuscript.submission.$abstract)
-    throw new Error('Manuscript has no submission.$abstract')
-  if (!manuscript.submission.$authors)
-    throw new Error('Manuscript has no submission.$authors field')
-  if (!Array.isArray(manuscript.submission.$authors))
+
+  const {
+    formData: {
+      publishing: { crossref },
+    },
+  } = activeConfig
+
+  const {
+    depositorEmail,
+    journalName,
+    journalAbbreviatedName,
+    journalHomepage,
+    publishedArticleLocationPrefix,
+    licenseUrl,
+    depositorName,
+    registrant,
+  } = crossref
+
+  const { submission, shortId, id } = manuscript
+
+  const {
+    $title,
+    $abstract,
+    $authors,
+    $issueYear,
+    $issueNumber,
+    $volumeNumber,
+  } = submission
+
+  if (!submission) throw new Error('Manuscript has no submission object')
+  if (!$title) throw new Error('Manuscript has no submission.$title')
+  if (!$abstract) throw new Error('Manuscript has no submission.$abstract')
+  if (!$authors) throw new Error('Manuscript has no submission.$authors field')
+  if (!$issueYear)
+    throw new Error('Manuscript has no submission.$issueYear field')
+  if (!Array.isArray($authors))
     throw new Error('Manuscript.submission.$authors is not an array')
-  if (
-    !emailRegex.test(activeConfig.formData.publishing.crossref.depositorEmail)
-  )
+  if (!emailRegex.test(depositorEmail))
     throw new Error(
-      `Depositor email address "${activeConfig.formData.publishing.crossref.depositorEmail}" is misconfigured`,
+      `Depositor email address "${depositorEmail}" is misconfigured`,
     )
+
+  if (!journalName) {
+    throw new Error(`Journal Name should be defined`)
+  }
 
   const issueYear = getIssueYear(manuscript)
   const publishDate = new Date()
   const journalDoi = getDoi(0, activeConfig)
 
-  const doiSuffix =
-    getReviewOrSubmissionField(manuscript, '$doiSuffix') || manuscript.id
+  const doiSuffix = getReviewOrSubmissionField(manuscript, '$doiSuffix') || id
 
   const doi = getDoi(doiSuffix, activeConfig)
   if (!(await doiIsAvailable(doi))) throw Error('Custom DOI is not available.')
 
-  const publishedLocation = `${activeConfig.formData.publishing.crossref.publishedArticleLocationPrefix}${manuscript.shortId}`
+  const publishedLocation = `${publishedArticleLocationPrefix}${shortId}`
   const batchId = uuid()
   const citations = getCitations(manuscript)
 
@@ -266,22 +293,21 @@ const publishArticleToCrossref = async manuscript => {
 
   const journal = {
     journal_metadata: {
-      full_title: activeConfig.formData.publishing.crossref.journalName,
-      abbrev_title:
-        activeConfig.formData.publishing.crossref.journalAbbreviatedName,
+      full_title: journalName,
+      abbrev_title: journalAbbreviatedName,
       doi_data: {
         doi: journalDoi,
-        resource: activeConfig.formData.publishing.crossref.journalHomepage,
+        resource: journalHomepage,
       },
     },
     journal_issue: {
       publication_date: { year: issueYear },
     },
     journal_article: {
-      titles: { title: manuscript.submission.$title },
+      titles: { title: $title },
       contributors: {
         // This seems really counterintuitive but it's how xml2js requires it
-        person_name: manuscript.submission.$authors.map(
+        person_name: $authors.map(
           (author, i) => getContributor(author, i).person_name,
         ),
       },
@@ -297,27 +323,27 @@ const publishArticleToCrossref = async manuscript => {
       publisher_item: {
         item_number: {
           $: { item_number_type: 'institution' },
-          _: manuscript.shortId,
+          _: shortId,
         },
       },
     },
   }
 
-  if (manuscript.submission.issueNumber) {
-    if (manuscript.submission.volumeNumber)
+  if ($issueNumber) {
+    if ($volumeNumber)
       journal.journal_issue.journal_volume = {
-        volume: manuscript.submission.volumeNumber,
+        volume: $volumeNumber,
       }
-    journal.journal_issue.issue = manuscript.submission.issueNumber
+    journal.journal_issue.issue = $issueNumber
   }
 
-  if (activeConfig.formData.publishing.crossref.licenseUrl)
+  if (licenseUrl)
     journal.journal_article.program = {
       $: {
         name: 'AccessIndicators',
         xmlns: 'http://www.crossref.org/AccessIndicators.xsd',
       },
-      license_ref: activeConfig.formData.publishing.crossref.licenseUrl,
+      license_ref: licenseUrl,
     }
 
   journal.journal_article.doi_data = {
@@ -341,12 +367,10 @@ const publishArticleToCrossref = async manuscript => {
         doi_batch_id: batchId,
         timestamp: getCurrentCrossrefTimestamp(publishDate),
         depositor: {
-          depositor_name:
-            activeConfig.formData.publishing.crossref.depositorName,
-          email_address:
-            activeConfig.formData.publishing.crossref.depositorEmail,
+          depositor_name: depositorName,
+          email_address: depositorEmail,
         },
-        registrant: activeConfig.formData.publishing.crossref.registrant,
+        registrant,
       },
       body: {
         journal,
@@ -356,10 +380,10 @@ const publishArticleToCrossref = async manuscript => {
 
   const xml = builder
     .buildObject(json)
-    .replace(ABSTRACT_PLACEHOLDER, htmlToJats(manuscript.submission.$abstract))
+    .replace(ABSTRACT_PLACEHOLDER, htmlToJats($abstract))
     .replace(CITATIONS_PLACEHOLDER, citations)
 
-  const dirName = `${+new Date()}-${manuscript.id}`
+  const dirName = `${+new Date()}-${id}`
   await fsPromised.mkdir(dirName)
   const fileName = `submission-${batchId}.xml`
   await fsPromised.appendFile(`${dirName}/${fileName}`, xml)
@@ -376,8 +400,20 @@ const populateUserInfo = async userIds => {
 const publishReviewsToCrossref = async manuscript => {
   const activeConfig = await Config.getCached(manuscript.groupId)
 
-  if (!manuscript.submission.$doi)
-    throw new Error('Field submission.$doi is not present')
+  const {
+    formData: {
+      publishing: { crossref },
+      instanceName,
+    },
+  } = activeConfig
+
+  const { depositorEmail, depositorName, registrant } = crossref
+
+  const { submission, shortId, id: manuscriptId } = manuscript
+
+  const { $title, $doi } = submission
+
+  if (!$doi) throw new Error('Field submission.$doi is not present')
 
   if (!config['flax-site'].clientFlaxSiteUrl) {
     throw new Error('Flax should be configured and running')
@@ -399,7 +435,7 @@ const publishReviewsToCrossref = async manuscript => {
       let users
 
       if (review.isDecision) {
-        const editors = await getEditorIdsForManuscript(manuscript.id)
+        const editors = await getEditorIdsForManuscript(manuscriptId)
         users = await populateUserInfo(editors)
       } else if (!review.isHiddenReviewerName && review.userId) {
         users = await populateUserInfo([review.userId])
@@ -423,7 +459,7 @@ const publishReviewsToCrossref = async manuscript => {
             }
           }),
         }),
-        titles: { title: `Review: ${manuscript.submission.$title}` },
+        titles: { title: `Review: ${$title}` },
         review_date: {
           month: review.created.getUTCMonth() + 1, // +1 because the month is zero-based
           day: review.created.getUTCDate(),
@@ -432,19 +468,19 @@ const publishReviewsToCrossref = async manuscript => {
         program: {
           $: { xmlns: 'http://www.crossref.org/relations.xsd' },
           related_item: {
-            description: `${descriptionStart} ${manuscript.submission.$title}`,
+            description: `${descriptionStart} ${$title}`,
             inter_work_relation: {
               $: {
                 'relationship-type': 'isReviewOf',
                 'identifier-type': 'doi',
               },
-              _: manuscript.submission.$doi,
+              _: $doi,
             },
           },
         },
         doi_data: {
           doi: reviewDOI,
-          resource: `${config['flax-site'].clientFlaxSiteUrl}/${activeConfig.formData.instanceName}/articles/${manuscript.shortId}`,
+          resource: `${config['flax-site'].clientFlaxSiteUrl}/${instanceName}/articles/${shortId}`,
         },
       }
     }),
@@ -464,12 +500,10 @@ const publishReviewsToCrossref = async manuscript => {
         doi_batch_id: batchId,
         timestamp: getCurrentCrossrefTimestamp(publishDate),
         depositor: {
-          depositor_name:
-            activeConfig.formData.publishing.crossref.depositorName,
-          email_address:
-            activeConfig.formData.publishing.crossref.depositorEmail,
+          depositor_name: depositorName,
+          email_address: depositorEmail,
         },
-        registrant: activeConfig.formData.publishing.crossref.registrant,
+        registrant,
       },
       body: {
         peer_review: reviewsToPublish,
@@ -478,8 +512,6 @@ const publishReviewsToCrossref = async manuscript => {
   }
 
   const xml = builder.buildObject(json)
-
-  // console.log('xml', xml)
 
   const dirName = `${+new Date()}-${manuscript.id}-peer_reviews`
   await fsPromised.mkdir(dirName)
