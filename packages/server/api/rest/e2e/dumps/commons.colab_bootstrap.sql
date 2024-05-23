@@ -6,6 +6,11 @@ DECLARE
   user_team_id UUID;
   channel_id UUID;
 BEGIN
+
+INSERT INTO teams (id, object_id, object_type, name, role, global, type)
+  values (gen_random_uuid(), null, null, 'Admin', 'admin', true, 'team');
+
+
 SELECT id INTO g_id FROM groups WHERE name='prc' LIMIT 1;
 SELECT id INTO admin_team_id FROM teams
   WHERE global IS TRUE AND role='admin' LIMIT 1;
@@ -19,15 +24,15 @@ UPDATE configs SET form_data = '{"user": {"isAdmin": false, "kotahiApiTokens": "
 WHERE group_id = g_id;
 
 -- Add users to the tests
-INSERT INTO "public"."users" ("id", "created", "updated", "admin", "email", "username", "password_hash", "teams", "password_reset_token", "password_reset_timestamp", "type", "profile_picture", "online", "last_online", "recent_tab", "menu_pinned", "chat_expanded") VALUES
-('5b861dfb-02df-4be1-bc67-41a21611f5e7', '2022-05-14 10:31:35.715+00', '2022-08-23 14:55:02.854+00', NULL, 'joanep@example.com' , 'Joane Pilger' , NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', FALSE, FALSE),
-('85e1300e-003c-4e96-987b-23812f902477', '2020-07-21 14:35:38.381+00', '2022-08-23 14:55:16.435+00', 't', 'elaineb@example.com', 'Elaine Barnes', NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', FALSE, FALSE),
-('ba84de0d-d3d5-49e9-ae1b-e8a265789fbe', '2022-05-13 10:55:50.523+00', '2022-08-23 14:54:54.91+00' , NULL, 'emilyc@example.com' , 'Emily Clay' , NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', FALSE, FALSE),
-('f9b1ed7f-f288-4c3f-898c-59e84b1c8e69', '2022-05-13 10:54:12.651+00', '2022-08-23 14:55:09.39+00' , 't' , 'sineads@example.com', 'Sinead Sullivan', NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', FALSE, FALSE),
-('41d52254-a2b8-4ea4-9ded-bfbfe9671578', '2022-09-14 02:51:58.817+00', '2022-09-14 02:53:20.544+00', NULL, 'sherry@example.com' , 'Sherry Crofoot', NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', FALSE, FALSE),
-('7f2fb549-51c0-49d5-844d-8a2fbbbbc0ad', '2022-09-14 02:50:09.737+00', '2022-09-14 02:50:25.118+00', NULL, 'gale@example.com'   , 'Gale Davis'  , NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', FALSE, FALSE),
-('dcabc94f-eb6e-49bb-97d3-fc1a38f9408c', '2022-09-14 02:51:21.741+00', '2022-09-14 02:51:29.283+00', NULL, 'david@example.com'  , 'David Miller' , NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', FALSE, FALSE),
-('231717dd-ba09-43d4-ac98-9d5542b27a0c', '2020-07-22 14:18:36.597+02', '2020-07-24 16:43:54.939+02', true, NULL, 'Test Account', NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'profile', FALSE, FALSE);
+INSERT INTO "public"."users" ("id", "created", "updated", "admin", "email", "username", "password_hash", "teams", "password_reset_token", "password_reset_timestamp", "type", "profile_picture", "online", "last_online", "recent_tab", "event_notifications_opt_in", "preferred_language", "chat_expanded", "menu_pinned") VALUES
+('5b861dfb-02df-4be1-bc67-41a21611f5e7', '2022-05-14 10:31:35.715+00', '2022-08-23 14:55:02.854+00', NULL, 'joanep@example.com' , 'Joane Pilger' , NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', true, 'en-US', FALSE, true),
+('85e1300e-003c-4e96-987b-23812f902477', '2020-07-21 14:35:38.381+00', '2022-08-23 14:55:16.435+00', 't', 'elaineb@example.com', 'Elaine Barnes', NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', true, 'en-US', FALSE, true),
+('ba84de0d-d3d5-49e9-ae1b-e8a265789fbe', '2022-05-13 10:55:50.523+00', '2022-08-23 14:54:54.91+00' , NULL, 'emilyc@example.com' , 'Emily Clay' , NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', true, 'en-US', FALSE, true),
+('f9b1ed7f-f288-4c3f-898c-59e84b1c8e69', '2022-05-13 10:54:12.651+00', '2022-08-23 14:55:09.39+00' , 't' , 'sineads@example.com', 'Sinead Sullivan', NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', true, 'en-US', FALSE, true),
+('41d52254-a2b8-4ea4-9ded-bfbfe9671578', '2022-09-14 02:51:58.817+00', '2022-09-14 02:53:20.544+00', NULL, 'sherry@example.com' , 'Sherry Crofoot', NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', true, 'en-US', FALSE, true),
+('7f2fb549-51c0-49d5-844d-8a2fbbbbc0ad', '2022-09-14 02:50:09.737+00', '2022-09-14 02:50:25.118+00', NULL, 'gale@example.com'   , 'Gale Davis'  , NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', true, 'en-US', FALSE, true),
+('dcabc94f-eb6e-49bb-97d3-fc1a38f9408c', '2022-09-14 02:51:21.741+00', '2022-09-14 02:51:29.283+00', NULL, 'david@example.com'  , 'David Miller' , NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'submissions', true, 'en-US', FALSE, true),
+('231717dd-ba09-43d4-ac98-9d5542b27a0c', '2020-07-22 14:18:36.597+02', '2020-07-24 16:43:54.939+02', true, NULL, 'Test Account', NULL, NULL, NULL, NULL, 'user', NULL, NULL, NULL, 'profile', true, 'en-US', FALSE, true);
 
 INSERT INTO "public"."identities" ("id", "user_id", "created", "updated", "type", "identifier", "name", "aff", "oauth", "is_default") VALUES
 (gen_random_uuid(), '5b861dfb-02df-4be1-bc67-41a21611f5e7', '2022-07-29 05:15:21.654+00', '2022-07-29 05:15:21.624+00', 'orcid', '0000-0003-1838-2441', 'Joane Pilger'   , '', '{"accesstoken": "26fbc6b6-4421-40c5-ba07-d8c665f6704b", "refreshtoken": "4211bbf5-85ae-4980-833a-3f3deabcec6a"}', 't'),
@@ -53,14 +58,14 @@ INSERT INTO "public"."team_members" ("id", "created", "updated", "status", "team
 (gen_random_uuid(), '2023-01-17 19:09:08.683+00', '2023-01-17 19:09:08.683+00', NULL, gm_team_id, '231717dd-ba09-43d4-ac98-9d5542b27a0c', NULL, NULL),
 (gen_random_uuid(), '2022-08-10 02:15:29.071+00', '2022-08-10 02:15:29.071+00', NULL, admin_team_id, 'f9b1ed7f-f288-4c3f-898c-59e84b1c8e69', NULL, NULL);
 
-INSERT INTO "public"."channel_members" ("id", "created", "updated", "user_id", "channel_id", "last_viewed", "last_alert_triggered_time") VALUES 
-(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '5b861dfb-02df-4be1-bc67-41a21611f5e7', channel_id, '2023-07-27 06:58:53.829+00', NULL),
-(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '85e1300e-003c-4e96-987b-23812f902477', channel_id, '2023-07-27 06:58:53.829+00', NULL),
-(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', 'ba84de0d-d3d5-49e9-ae1b-e8a265789fbe', channel_id, '2023-07-27 06:58:53.829+00', NULL),
-(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', 'f9b1ed7f-f288-4c3f-898c-59e84b1c8e69', channel_id, '2023-07-27 06:58:53.829+00', NULL),
-(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '41d52254-a2b8-4ea4-9ded-bfbfe9671578', channel_id, '2023-07-27 06:58:53.829+00', NULL),
-(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '7f2fb549-51c0-49d5-844d-8a2fbbbbc0ad', channel_id, '2023-07-27 06:58:53.829+00', NULL),
-(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', 'dcabc94f-eb6e-49bb-97d3-fc1a38f9408c', channel_id, '2023-07-27 06:58:53.829+00', NULL),
-(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '231717dd-ba09-43d4-ac98-9d5542b27a0c', channel_id, '2023-07-27 06:58:53.829+00', NULL);
+-- INSERT INTO "public"."channel_members" ("id", "created", "updated", "user_id", "channel_id", "last_viewed", "last_alert_triggered_time") VALUES 
+-- (gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '5b861dfb-02df-4be1-bc67-41a21611f5e7', channel_id, '2023-07-27 06:58:53.829+00', NULL),
+-- (gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '85e1300e-003c-4e96-987b-23812f902477', channel_id, '2023-07-27 06:58:53.829+00', NULL),
+-- (gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', 'ba84de0d-d3d5-49e9-ae1b-e8a265789fbe', channel_id, '2023-07-27 06:58:53.829+00', NULL),
+-- (gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', 'f9b1ed7f-f288-4c3f-898c-59e84b1c8e69', channel_id, '2023-07-27 06:58:53.829+00', NULL),
+-- (gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '41d52254-a2b8-4ea4-9ded-bfbfe9671578', channel_id, '2023-07-27 06:58:53.829+00', NULL),
+-- (gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '7f2fb549-51c0-49d5-844d-8a2fbbbbc0ad', channel_id, '2023-07-27 06:58:53.829+00', NULL),
+-- (gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', 'dcabc94f-eb6e-49bb-97d3-fc1a38f9408c', channel_id, '2023-07-27 06:58:53.829+00', NULL),
+-- (gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '231717dd-ba09-43d4-ac98-9d5542b27a0c', channel_id, '2023-07-27 06:58:53.829+00', NULL);
 
 END $$

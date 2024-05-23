@@ -104,6 +104,8 @@ function doReview(name, reviewData) {
       cy.wait(2000)
       cy.get('nav').contains('Dashboard').click()
       DashboardPage.getDoReviewButton().should('contain', 'View')
+      cy.get('[type="user"]:nth(1)').click()
+      cy.contains('Logout').click()
     }
   }
 

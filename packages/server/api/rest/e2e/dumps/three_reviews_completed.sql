@@ -6,6 +6,7 @@ SELECT object_id INTO g_id from teams where id =
 (SELECT team_id FROM team_members WHERE team_members.team_id  <> (SELECT id FROM teams
   WHERE global IS TRUE AND role='admin' LIMIT 1)  LIMIT 1);
 
+
 -- -------------------------------------------------------------
 -- Senior Editor Assigned 
 -- -------------------------------------------------------------
@@ -23,6 +24,16 @@ INSERT INTO "public"."teams" ("id", "created", "updated", "name", "role", "membe
 ('84b65fa6-0ca9-42ee-92dc-e8c98307456b', '2022-09-15 06:53:16.324+00', '2022-09-15 06:53:16.324+00', 'Senior Editor', 'seniorEditor', NULL, NULL, NULL, 'team', '908587ed-c5f8-4532-aa56-bc94f805d336', 'manuscript');
 INSERT INTO "public"."team_members" ("id", "created", "updated", "status", "team_id", "user_id", "alias_id", "is_shared") VALUES
 ('e150f9c6-903a-4753-9934-26c4a74be188', '2022-09-13 14:07:25.582+00', '2022-09-13 14:07:25.582+00', NULL, '62469169-e185-43e3-965c-3e4ecf3dcbcb', 'ba84de0d-d3d5-49e9-ae1b-e8a265789fbe', NULL, NULL);
+
+
+INSERT INTO "public"."channel_members" ("id", "created", "updated", "user_id", "channel_id", "last_viewed", "last_alert_triggered_time") VALUES 
+(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '5b861dfb-02df-4be1-bc67-41a21611f5e7', 'f1bdad7f-de4c-4833-87d5-27aa2838197f', '2023-07-27 06:58:53.829+00', NULL),
+(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '85e1300e-003c-4e96-987b-23812f902477', 'f1bdad7f-de4c-4833-87d5-27aa2838197f', '2023-07-27 06:58:53.829+00', NULL),
+(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', 'ba84de0d-d3d5-49e9-ae1b-e8a265789fbe', '90c5f618-ccc4-4be2-8a79-f396ca5582c7', '2023-07-27 06:58:53.829+00', NULL),
+(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', 'f9b1ed7f-f288-4c3f-898c-59e84b1c8e69', 'f1bdad7f-de4c-4833-87d5-27aa2838197f', '2023-07-27 06:58:53.829+00', NULL),
+(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '41d52254-a2b8-4ea4-9ded-bfbfe9671578', 'f1bdad7f-de4c-4833-87d5-27aa2838197f', '2023-07-27 06:58:53.829+00', NULL),
+(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', '7f2fb549-51c0-49d5-844d-8a2fbbbbc0ad', 'f1bdad7f-de4c-4833-87d5-27aa2838197f', '2023-07-27 06:58:53.829+00', NULL),
+(gen_random_uuid(), '2023-07-27 06:58:30.249+00', '2023-07-27 06:58:53.829+00', 'dcabc94f-eb6e-49bb-97d3-fc1a38f9408c', 'f1bdad7f-de4c-4833-87d5-27aa2838197f', '2023-07-27 06:58:53.829+00', NULL);
 
 -- -------------------------------------------------------------
 -- Reviewers Invited 
