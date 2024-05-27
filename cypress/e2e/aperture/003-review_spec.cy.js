@@ -64,7 +64,7 @@ describe('Completing a review', () => {
 })
 
 // login as reviewer, accept and do review, leave comments and submit
-function doReview(name, reviewData) {
+const doReview = (name, reviewData) => {
   cy.login(name, dashboard)
   cy.get('nav').contains('Dashboard').click()
   cy.visit(dashboard)
@@ -93,11 +93,16 @@ function doReview(name, reviewData) {
       if (reviewData.radioButton === 'revise')
         ReviewPage.clickReviseRadioButton()
 
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(1000)
+
       // Submit the review
       ReviewPage.clickSubmitButton()
       // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(500)
       ReviewPage.clickConfirmSubmitButton()
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(500)
 
       // Verify the review got completed
       // eslint-disable-next-line cypress/no-unnecessary-waiting
