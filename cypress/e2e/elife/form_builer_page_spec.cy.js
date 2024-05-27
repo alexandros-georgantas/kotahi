@@ -1,6 +1,6 @@
 /* eslint-disable jest/expect-expect, cypress/unsafe-to-chain-command */
 import { FormsPage } from '../../page-object/forms-page'
-import { Menu } from '../../page-object/page-component/menu'
+// import { Menu } from '../../page-object/page-component/menu'
 import { submissionForm } from '../../support/routes2'
 
 describe('Form builder', () => {
@@ -134,7 +134,6 @@ describe('Form builder', () => {
       cy.contains('Save').click()
 
       // for review field
-      Menu.clickSettings()
       cy.contains('Review').click()
       FormsPage.getFormTitleTab(0).should('contain', 'Review')
       FormsPage.clickFormOption(1)
@@ -153,7 +152,6 @@ describe('Form builder', () => {
       cy.contains('Save').click()
 
       // for decision field
-      Menu.clickSettings()
       cy.contains('Decision').click()
       FormsPage.getFormTitleTab(0).should('contain', 'Decision')
       FormsPage.clickFormOption(1)
