@@ -21,8 +21,7 @@ const EditModal = ({
 }) => {
   // console.log('Coming in: ', citationData, formattedCitation)
   const config = useContext(ConfigContext)
-  /* eslint-disable-next-line no-unsafe-optional-chaining */
-  const { styleName } = config?.production
+  const styleName = config?.production?.styleName || 'apa'
   const { t } = useTranslation()
   const [currentText, setCurrentText] = useState(formattedCitation)
   const [reRender, setReRender] = useState(-1)
