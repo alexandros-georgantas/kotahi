@@ -14,6 +14,11 @@ const {
 } = require('../../model-manuscript/src/manuscriptCommsUtils')
 
 const {
+  getReviewForm,
+  getDecisionForm,
+} = require('../../model-review/src/reviewCommsUtils')
+
+const {
   htmlToJats,
   getCrossrefCitationsFromList,
 } = require('../../utils/jatsUtils')
@@ -234,6 +239,7 @@ const publishArticleToCrossref = async manuscript => {
   const {
     formData: {
       publishing: { crossref },
+      instanceName,
     },
   } = activeConfig
 
@@ -242,7 +248,6 @@ const publishArticleToCrossref = async manuscript => {
     journalName,
     journalAbbreviatedName,
     journalHomepage,
-    publishedArticleLocationPrefix,
     licenseUrl,
     depositorName,
     registrant,
@@ -285,7 +290,6 @@ const publishArticleToCrossref = async manuscript => {
   const doi = getDoi(doiSuffix, activeConfig)
   if (!(await doiIsAvailable(doi))) throw Error('Custom DOI is not available.')
 
-  const publishedLocation = `${publishedArticleLocationPrefix}${shortId}`
   const batchId = uuid()
   const citations = getCitations(manuscript)
 
@@ -348,7 +352,7 @@ const publishArticleToCrossref = async manuscript => {
 
   journal.journal_article.doi_data = {
     doi,
-    resource: publishedLocation,
+    resource: `${config['flax-site'].clientFlaxSiteUrl}/${instanceName}/articles/${shortId}/index.html`,
   }
 
   if (citations) journal.journal_article.citation_list = CITATIONS_PLACEHOLDER
@@ -400,6 +404,28 @@ const populateUserInfo = async userIds => {
 const publishReviewsToCrossref = async manuscript => {
   const activeConfig = await Config.getCached(manuscript.groupId)
 
+  const decisionForm = await getDecisionForm(manuscript.groupId)
+  const reviewForm = await getReviewForm(manuscript.groupId)
+
+  const reviewFormComment = reviewForm?.structure?.children.find(
+    item => item.name === 'comment',
+  )
+
+  const decisionFormComment = decisionForm?.structure?.children.find(
+    item => item.name === 'comment',
+  )
+
+  const shouldPublishReview = reviewFormComment?.permitPublishing === 'always'
+
+  const shouldPublishDecision =
+    decisionFormComment?.permitPublishing === 'always'
+
+  if (!shouldPublishDecision && !shouldPublishReview) {
+    throw new Error(
+      'Your form configuration for Review and Decision does not allow publishing to external providers',
+    )
+  }
+
   const {
     formData: {
       publishing: { crossref },
@@ -422,8 +448,20 @@ const publishReviewsToCrossref = async manuscript => {
   const batchId = uuid()
   const publishDate = new Date()
 
+  const filteredReviews = manuscript.reviews.filter(review => {
+    if (!review.isDecision && shouldPublishReview) {
+      return true
+    }
+
+    if (review.isDecision && shouldPublishDecision) {
+      return true
+    }
+
+    return false
+  })
+
   const reviewsToPublish = await Promise.all(
-    manuscript.reviews.map(async review => {
+    filteredReviews.map(async review => {
       const reviewDOI = getDoi(review.id, activeConfig)
       if (!(await doiIsAvailable(reviewDOI)))
         throw Error('Custom DOI is not available.')
@@ -480,11 +518,17 @@ const publishReviewsToCrossref = async manuscript => {
         },
         doi_data: {
           doi: reviewDOI,
-          resource: `${config['flax-site'].clientFlaxSiteUrl}/${instanceName}/articles/${shortId}`,
+          resource: `${config['flax-site'].clientFlaxSiteUrl}/${instanceName}/articles/${shortId}/index.html`,
         },
       }
     }),
   )
+
+  if (reviewsToPublish.length === 0) {
+    throw new Error(
+      'Your form configuration for Review and Decision does not allow publishing to external providers',
+    )
+  }
 
   const json = {
     doi_batch: {
