@@ -76,9 +76,10 @@ const CitationComponent = ({ node, getPos }) => {
     possibleStructures,
     valid,
     refId,
+    citationNumber,
   } = node.attrs
 
-  // console.log(originalText, needsReview, needsValidation, valid)
+  // console.log(originalText, needsReview, needsValidation, valid, citationNumber)
 
   const makeHtmlFrom = content => {
     const serialize = serializer(activeView.state.schema)
@@ -118,6 +119,10 @@ const CitationComponent = ({ node, getPos }) => {
 
   const [potentialText, setPotentialText] = useState(
     `<p class="ref">${makeHtmlFrom(node.content)}</p>`,
+  )
+
+  const [potentialCitationNumber, setPotentialCitationNumber] = useState(
+    citationNumber || '',
   )
 
   const getNodeWithId = id => {
@@ -162,6 +167,7 @@ const CitationComponent = ({ node, getPos }) => {
         structure,
         possibleStructures: structures,
         valid,
+        citationNumber: potentialCitationNumber,
       })
 
       newNode.content = onlyAttrs ? thisNode.content : fragment
@@ -229,11 +235,42 @@ const CitationComponent = ({ node, getPos }) => {
         await sendToAnystyle(formattedOriginalText),
         await sendToCrossRef(formattedOriginalText),
       ]).then(data => {
-        const newStructures = {
-          ...structures,
-          ...data[0],
-          ...data[1],
+        // use citation-number from anystyle if it exists
+        const anystyleCitationNumber =
+          data[0]?.anyStyle?.['citation-number'] || ''
+
+        const anyStyle = {
+          anyStyle: {
+            ...data[0]?.anyStyle,
+            'citation-number': !potentialCitationNumber
+              ? anystyleCitationNumber
+              : potentialCitationNumber,
+          },
         }
+
+        const crossRef = {
+          crossRef: data[1]?.crossRef.map(c => {
+            return {
+              ...c,
+              'citation-number': !potentialCitationNumber
+                ? anystyleCitationNumber
+                : potentialCitationNumber,
+            }
+          }),
+        }
+
+        // console.log('anystyleCitationNumber:', anystyleCitationNumber)
+
+        const newStructures = {
+          original: structures.original,
+          ...anyStyle, // anystyle data
+          ...crossRef, // crossRef data
+          custom: structures.custom,
+        }
+
+        // console.log('anystyle', data[0])
+        // console.log('crossref', data[1])
+        // console.log('newStructures', newStructures)
 
         setStructures(newStructures)
         // console.log("Versions found. Setting status to 'needs review'")
@@ -246,9 +283,17 @@ const CitationComponent = ({ node, getPos }) => {
             valid: false,
             originalText: formattedOriginalText,
             possibleStructures: newStructures,
+            citationNumber: !potentialCitationNumber
+              ? anystyleCitationNumber
+              : potentialCitationNumber,
           },
           null,
           true,
+        )
+        setPotentialCitationNumber(
+          !potentialCitationNumber
+            ? anystyleCitationNumber
+            : potentialCitationNumber,
         )
         setLoading(false)
       })
@@ -265,25 +310,35 @@ const CitationComponent = ({ node, getPos }) => {
     }
   }, [formattedOriginalText, internalNeedsValidation])
 
-  useEffect(() => {
-    if (
-      JSON.stringify(structures) !== JSON.stringify(possibleStructures) &&
-      !loading
-    ) {
-      setContent(
-        {
-          needsValidation: true,
-          needsReview: false,
-          valid: false,
-          possibleStructures: structures,
-        },
-        null,
-        true,
-      )
-      setInternalNeedsValidation(true)
-      setInternalNeedsReview(false)
-    }
-  }, [structures])
+  // The below code is causing some updates which resets the valid flag unecessary update!
+  // useEffect(() => {
+  //   console.log(
+  //     'json structure',
+  //     JSON.stringify(structures) !== JSON.stringify(possibleStructures),
+  //     'loading:',
+  //     !loading,
+  //   )
+
+  //   if (
+  //     JSON.stringify(structures) !== JSON.stringify(possibleStructures) &&
+  //     !loading
+  //   ) {
+  //     console.log('structures', structures)
+  //     console.log('possibleStructures', possibleStructures)
+  //     setContent(
+  //       {
+  //         needsValidation: true,
+  //         needsReview: false,
+  //         valid: false,
+  //         possibleStructures: { ...structures },
+  //       },
+  //       null,
+  //       true,
+  //     )
+  //     setInternalNeedsValidation(true)
+  //     setInternalNeedsReview(false)
+  //   }
+  // }, [structures])
 
   useEffect(() => {
     // This is firing whenever we change currentText.
@@ -292,6 +347,7 @@ const CitationComponent = ({ node, getPos }) => {
     // If currentText has changed in some way, we need to save it to the node.
     if (JSON.stringify(newFragment) !== JSON.stringify(node.content)) {
       // console.log('something is changed: ', newFragment, node.content)
+      // console.log('potentialCsl', potentialCsl)
       // This should probably not be happening all the time. If you then click CLOSE, it's already been set.
       setContent(
         {
@@ -299,6 +355,7 @@ const CitationComponent = ({ node, getPos }) => {
           needsValidation: false,
           needsReview: false,
           valid: true,
+          citationNumber: potentialCitationNumber,
         },
         newFragment,
       )
@@ -354,9 +411,45 @@ const CitationComponent = ({ node, getPos }) => {
             formattedCitation={potentialText}
             formattedOriginalText={formattedOriginalText}
             setCitationData={currentCitation => {
-              const newStructures = { ...structures, custom: currentCitation }
-              setStructures(newStructures)
+              // console.log('currentCitation', currentCitation)
+              const currentCitationNumber = currentCitation['citation-number']
+              const { original, anyStyle } = structures
 
+              anyStyle['citation-number'] = currentCitationNumber
+
+              const crossRefData = structures.crossRef.map(c => {
+                return {
+                  ...c,
+                  'citation-number': currentCitationNumber,
+                }
+              })
+
+              let newStructures
+
+              if (
+                currentCitation.formattedCitation ===
+                  anyStyle.formattedCitation ||
+                crossRefData.some(
+                  c =>
+                    c.formattedCitation === currentCitation.formattedCitation,
+                )
+              ) {
+                newStructures = {
+                  original,
+                  anyStyle,
+                  crossRef: crossRefData,
+                  custom: '',
+                }
+              } else {
+                newStructures = {
+                  original,
+                  anyStyle,
+                  crossRef: crossRefData,
+                  custom: currentCitation,
+                }
+              }
+
+              setStructures(newStructures)
               // Question: is it possible someone clicks "close" before formattedCitation has been generated?
 
               const newFragment = makeFragmentFrom(
@@ -366,10 +459,11 @@ const CitationComponent = ({ node, getPos }) => {
               setContent(
                 {
                   structure: currentCitation,
-                  possibleStructures: newStructures, // This seems like it's not working.
+                  possibleStructures: { ...newStructures }, // This seems like it's not working.
                   needsValidation: false,
                   needsReview: false,
                   valid: true,
+                  citationNumber: currentCitationNumber,
                 },
                 newFragment,
                 false,
@@ -377,6 +471,7 @@ const CitationComponent = ({ node, getPos }) => {
 
               setInternalNeedsValidation(false)
               setInternalNeedsReview(false)
+              setPotentialCitationNumber(currentCitationNumber)
               setPotentialText(currentCitation.formattedCitation) // seeing if this fixes the problem.
               setPotentialCsl(currentCitation)
               setCurrentText(currentCitation.formattedCitation) // is this going to do a double-save?
@@ -407,6 +502,9 @@ const CitationComponent = ({ node, getPos }) => {
                 select={() => {
                   setPotentialCsl(structures.anyStyle)
                   setPotentialText(structures.anyStyle.formattedCitation)
+                  setPotentialCitationNumber(
+                    structures.anyStyle['citation-number'],
+                  )
                 }}
                 selected={
                   decodeEntities(structures.anyStyle.formattedCitation) ===
@@ -428,6 +526,9 @@ const CitationComponent = ({ node, getPos }) => {
                         select={() => {
                           setPotentialCsl(crossRefVersion)
                           setPotentialText(crossRefVersion.formattedCitation)
+                          setPotentialCitationNumber(
+                            crossRefVersion['citation-number'],
+                          )
                         }}
                         selected={
                           decodeEntities(crossRefVersion.formattedCitation) ===
@@ -449,6 +550,9 @@ const CitationComponent = ({ node, getPos }) => {
                 select={() => {
                   setPotentialCsl(structures.custom)
                   setPotentialText(structures.custom.formattedCitation)
+                  setPotentialCitationNumber(
+                    structures.custom['citation-number'],
+                  )
                 }}
                 selected={
                   decodeEntities(structures.custom.formattedCitation) ===
@@ -486,6 +590,9 @@ const CitationComponent = ({ node, getPos }) => {
                       valid: true,
                       needsValidation: false,
                       needsReview: false,
+                      citationNumber:
+                        potentialCsl['citation-number'] ||
+                        potentialCitationNumber,
                     },
                     newFragment,
                     true,
@@ -523,7 +630,12 @@ const CitationComponent = ({ node, getPos }) => {
         <CitationWrapper>
           {currentText.length > 19 ? (
             <div // eslint-disable-next-line
-              dangerouslySetInnerHTML={{ __html: sanitize(currentText) }}
+              dangerouslySetInnerHTML={{
+                __html: sanitize(currentText),
+              }}
+              data-citation-number={
+                !potentialCitationNumber ? null : potentialCitationNumber
+              }
             />
           ) : (
             // This is a fallback in case we're getting an empty value for citation. Shouldn't happen.

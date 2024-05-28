@@ -41,8 +41,29 @@ export const CitationOuterWrapper = styled.div`
 `
 
 export const CitationWrapper = styled.div`
-  display: inline-block;
+  display: inline;
+  margin-left: 2.5em;
   margin-right: 12px;
+  text-indent: -3.5em;
+
+  & [data-citation-number]::before {
+    content: attr(data-citation-number) '.';
+    display: inline-block;
+    min-width: 3em;
+    text-align: right;
+  }
+
+  & div::before {
+    content: ' ';
+    display: inline-block;
+    min-width: 3em;
+    text-align: right;
+  }
+
+  & p.ref {
+    display: inline;
+    margin-left: 0.5em;
+  }
 `
 
 export const PopUpWrapper = styled.div`
