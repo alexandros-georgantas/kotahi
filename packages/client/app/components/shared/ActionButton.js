@@ -125,6 +125,7 @@ const ActionButton = ({
 
   let statusIndicator = null
   if (status === 'pending') statusIndicator = <Spinner fgColor={fgColor} />
+
   if (status === 'success')
     statusIndicator = (
       <IconContainer>
@@ -136,6 +137,7 @@ const ActionButton = ({
         />
       </IconContainer>
     )
+
   if (status === 'failure')
     statusIndicator = (
       <IconContainer>

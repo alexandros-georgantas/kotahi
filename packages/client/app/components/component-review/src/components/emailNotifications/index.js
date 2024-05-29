@@ -90,6 +90,53 @@ const EmailNotifications = ({
     .filter(user => user.email)
     .map(user => editorOption(user))
 
+  const onClickActionButton = async () => {
+    setNotificationStatus('pending')
+
+    if (isReviewerInvitation(selectedTemplate, emailTemplates)) {
+      const user = allUsers.find(u => u.email === selectedEmail)
+      if (user)
+        await addReviewer({
+          variables: {
+            userId: user.id,
+            manuscriptId: manuscript.id,
+          },
+        })
+    }
+
+    const output = await sendEmail(
+      manuscript,
+      isNewUser,
+      currentUser,
+      sendNotifyEmail,
+      selectedTemplate,
+      selectedEmail,
+      externalEmail,
+      externalName,
+      selectedEmailIsBlacklisted,
+      config.groupId,
+    )
+
+    if (!output?.emailStatus) {
+      setNotificationStatus('failure')
+      return
+    }
+
+    const { invitation, input } = output
+
+    setNotificationStatus(invitation ? 'success' : 'failure')
+
+    if (input) {
+      sendEmailChannelMessage(
+        sendChannelMessage,
+        currentUser,
+        input,
+        options,
+        emailTemplates,
+      )
+    }
+  }
+
   return (
     <SectionContent>
       <SectionHeader>
@@ -113,52 +160,7 @@ const EmailNotifications = ({
           selectedEmailTemplate={selectedTemplate}
         />
         <ActionButton
-          onClick={async () => {
-            setNotificationStatus('pending')
-
-            if (isReviewerInvitation(selectedTemplate, emailTemplates)) {
-              const user = allUsers.find(u => u.email === selectedEmail)
-              if (user)
-                await addReviewer({
-                  variables: {
-                    userId: user.id,
-                    manuscriptId: manuscript.id,
-                  },
-                })
-            }
-
-            const output = await sendEmail(
-              manuscript,
-              isNewUser,
-              currentUser,
-              sendNotifyEmail,
-              selectedTemplate,
-              selectedEmail,
-              externalEmail,
-              externalName,
-              selectedEmailIsBlacklisted,
-              config.groupId,
-            )
-
-            if (!output?.emailStatus) {
-              setNotificationStatus('failure')
-              return
-            }
-
-            const { invitation, input } = output
-
-            setNotificationStatus(invitation ? 'success' : 'failure')
-
-            if (input) {
-              sendEmailChannelMessage(
-                sendChannelMessage,
-                currentUser,
-                input,
-                options,
-                emailTemplates,
-              )
-            }
-          }}
+          onClick={onClickActionButton}
           primary
           status={notificationStatus}
         >

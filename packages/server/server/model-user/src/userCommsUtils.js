@@ -183,7 +183,7 @@ const sendEmailWithPreparedData = async (
   if (!ctx) {
     invitationSender = emailSender
   } else {
-    invitationSender = await User.find(ctx.user) // no trx!!
+    invitationSender = await User.findById(ctx.user) // no trx!!
   }
 
   const toEmail = receiverEmail
