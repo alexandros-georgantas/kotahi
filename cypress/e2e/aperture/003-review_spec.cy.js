@@ -118,5 +118,7 @@ const doReview = (name, reviewData) => {
   if (reviewData.verdict === 'reject') {
     DashboardPage.clickRejectReviewButton()
     DashboardPage.getDoReviewButton().should('not.exist')
+    cy.get('[type="user"]:nth(1)').click()
+    cy.contains('Logout').click()
   }
 }
