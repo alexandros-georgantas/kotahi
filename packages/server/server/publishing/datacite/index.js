@@ -183,7 +183,6 @@ const publishArticleToDatacite = async manuscript => {
     if (journalName) {
       titles.push({
         title: journalName,
-        titleType: 'TranslatedTitle',
       })
     }
 
@@ -217,7 +216,6 @@ const publishArticleToDatacite = async manuscript => {
       titles: [
         {
           title: manuscript.submission.$title,
-          titleType: 'TranslatedTitle',
         },
       ],
       descriptions: [
