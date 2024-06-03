@@ -121,10 +121,8 @@ services:
       - INSTANCE_GROUPS=${INSTANCE_GROUPS:-kotahi:journal}
       - USE_COLAB_BIOPHYSICS_IMPORT=${USE_COLAB_BIOPHYSICS_IMPORT:-false}
       - E2E_TESTING_API=${E2E_TESTING_API}
-    # volumes:
-    # - ./uploads:/home/node/app/uploads
-    # - ./packages/server/config:/home/node/app/config
-    # - ./packages/client/config/translation:/home/node/app/config/translation
+    volumes:
+      - ./packages/client/config/translation:/home/node/app/config/translation
 
   pagedjs:
     depends_on:
