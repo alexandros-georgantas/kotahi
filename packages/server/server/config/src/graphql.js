@@ -90,6 +90,7 @@ const typeDefs = `
     logo: File
     icon: File
     groupId: ID!
+    flaxSiteUrl: String
   }
 
   input ConfigInput {

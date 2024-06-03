@@ -7,8 +7,6 @@ services:
     build:
       context: ./packages/client
       dockerfile: ./Dockerfile-production
-      args:
-        - flax_site_url=${FLAX_SITE_URL:-http://localhost:8081}
     depends_on:
       - server
     ports:

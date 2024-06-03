@@ -80,7 +80,6 @@ ARG client_protocol
 ARG client_host
 ARG client_port
 ARG use_colab_email
-ARG flax_site_url
 
 ENV NODE_ENV "development"
 ENV SERVER_PROTOCOL "http"
@@ -91,7 +90,6 @@ ENV CLIENT_HOST "0.0.0.0"
 ENV CLIENT_PORT "4000"
 ENV HOME "/home/node/app"
 ENV USE_COLAB_EMAIL $use_colab_email
-ENV FLAX_SITE_URL $flax_site_url
 
 RUN mkdir -p ${HOME}
 WORKDIR ${HOME}

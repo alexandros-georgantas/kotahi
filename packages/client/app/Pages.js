@@ -101,6 +101,7 @@ const Pages = () => {
     urlFrag: `/${currentGroup?.name}`,
     logo: activeConfig?.logo,
     icon: activeConfig?.icon,
+    flaxSiteUrl: activeConfig?.flaxSiteUrl,
     ...oldConfig,
     ...JSON.parse(activeConfig?.formData || '{}'),
   }

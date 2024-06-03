@@ -176,7 +176,7 @@ const Browser = ({
   const config = useContext(ConfigContext)
   const { groupName } = config
 
-  const flaxSiteUrlForGroup = `${process.env.FLAX_SITE_URL}/${groupName}/`
+  const flaxSiteUrlForGroup = `${config.flaxSiteUrl}/${groupName}/`
 
   const { t } = useTranslation()
 
