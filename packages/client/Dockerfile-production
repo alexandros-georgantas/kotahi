@@ -9,6 +9,7 @@ ARG flax_site_url
 ENV NODE_ENV='production'
 ENV SERVER_URL=$server_url
 ENV CLIENT_STATIC_FOLDER_PATH=../public
+ENV CLIENT_PAGE_TITLE=Kotahi - Open Journals
 ENV FLAX_SITE_URL=$flax_site_url
 
 WORKDIR /home/node/app

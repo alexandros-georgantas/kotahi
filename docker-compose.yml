@@ -25,6 +25,7 @@ services:
       - CLIENT_PORT=${CLIENT_PORT:-4000}
       - CLIENT_STATIC_FOLDER_PATH=../public
       - CLIENT_FAST_REFRESH=1
+      - CLIENT_PAGE_TITLE=Kotahi - Open Journals
       - FLAX_SITE_URL=${FLAX_SITE_URL:-http://localhost:8081}
     volumes:
       - ./packages/client/app:/home/node/app/app
