@@ -90,6 +90,15 @@ const cacheConfig = {
         },
       },
     },
+    Team: {
+      fields: {
+        members: {
+          merge(existing, incoming) {
+            return incoming
+          },
+        },
+      },
+    },
   },
 }
 

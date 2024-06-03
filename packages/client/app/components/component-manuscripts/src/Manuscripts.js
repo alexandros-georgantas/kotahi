@@ -18,7 +18,7 @@ import {
 import MessageContainer from '../../component-chat/src/MessageContainer'
 import ManuscriptsTable from '../../component-manuscripts-table/src/ManuscriptsTable'
 import buildColumnDefinitions from '../../component-manuscripts-table/src/util/buildColumnDefinitions'
-import Modal from '../../component-modal/src/ConfirmationModal'
+import { ConfirmationModal } from '../../component-modal/src/ConfirmationModal'
 import {
   ActionButton,
   Columns,
@@ -31,12 +31,12 @@ import {
   ScrollableContent,
   Spinner,
 } from '../../shared'
-import BulkArchiveModal from './BulkArchiveModal'
 import SearchControl from './SearchControl'
 import {
   ControlsContainer,
   SelectAllField,
   SelectedManuscriptsNumber,
+  ViewArchivedAction,
 } from './style'
 import { ConfigContext } from '../../config/src'
 
@@ -90,7 +90,7 @@ const DropdownContainer = styled.div`
 
   svg {
     height: calc(3 * 6px);
-    margin-top: -3px;
+    margin-top: -5px;
     stroke: ${props => (props.disabled ? color.gray60 : color.white)};
     width: calc(3 * 6px);
   }
@@ -115,8 +115,9 @@ const Manuscripts = ({ history, ...props }) => {
     chatRoomId,
     configuredColumnNames,
     shouldAllowBulkImport,
-    archiveManuscriptMutations,
-    confirmBulkArchive,
+    archived,
+    archiveManuscripts,
+    unarchiveManuscripts,
     uriQueryParams,
     currentUser,
     chatProps,
@@ -136,6 +137,9 @@ const Manuscripts = ({ history, ...props }) => {
   )
 
   const [isOpenBulkArchiveModal, setIsOpenBulkArchiveModal] = useState(false)
+
+  const [isOpenBulkUnarchiveModal, setIsOpenBulkUnarchiveModal] =
+    useState(false)
 
   const [selectedNewManuscripts, setSelectedNewManuscripts] = useState([])
 
@@ -185,8 +189,6 @@ const Manuscripts = ({ history, ...props }) => {
   const { loading, error, data } = queryObject
 
   const deleteManuscript = id => deleteManuscriptMutations(id)
-
-  const archiveManuscript = id => archiveManuscriptMutations(id)
 
   const tryPublishManuscript = async manuscript => {
     let result = null
@@ -251,19 +253,14 @@ const Manuscripts = ({ history, ...props }) => {
       })
   }
 
-  const openModalBulkArchiveConfirmation = () => {
-    setIsOpenBulkArchiveModal(true)
-  }
-
-  const closeModalBulkArchiveConfirmation = () => {
-    setIsOpenBulkArchiveModal(false)
-  }
-
-  const doConfirmBulkArchive = () => {
-    confirmBulkArchive(selectedNewManuscripts)
-
+  const doBulkArchive = () => {
+    archiveManuscripts(selectedNewManuscripts)
     setSelectedNewManuscripts([])
-    closeModalBulkArchiveConfirmation()
+  }
+
+  const doBulkUnarchive = () => {
+    unarchiveManuscripts(selectedNewManuscripts)
+    setSelectedNewManuscripts([])
   }
 
   const currentSearchQuery = uriQueryParams.get(URI_SEARCH_PARAM)
@@ -271,7 +268,6 @@ const Manuscripts = ({ history, ...props }) => {
   // Props for instantiating special components
   const specialComponentValues = {
     deleteManuscript,
-    archiveManuscript,
     tryPublishManuscript,
     selectedNewManuscripts,
     toggleNewManuscriptCheck,
@@ -290,6 +286,11 @@ const Manuscripts = ({ history, ...props }) => {
 
   const adjustedColumnNames = [...configuredColumnNames]
   adjustedColumnNames.push('actions')
+
+  if (['lab'].includes(config.instanceName)) {
+    adjustedColumnNames.push('publishArticle')
+  }
+
   adjustedColumnNames.splice(0, 0, 'rowItemCheckbox')
 
   // Source of truth for columns
@@ -300,6 +301,7 @@ const Manuscripts = ({ history, ...props }) => {
     specialComponentValues,
     displayProps,
     doUpdateManuscript,
+    archived,
   )
 
   const hideChat = async () => {
@@ -321,15 +323,19 @@ const Manuscripts = ({ history, ...props }) => {
 
   const topRightControls = (
     <ControlsContainer>
-      {config?.manuscript?.newSubmission && (
+      {config?.manuscript?.newSubmission && !archived && (
         <ActionButton
           onClick={() => history.push(`${urlFrag}/newSubmission`)}
           primary
         >
-          {t('dashboardPage.New submission')}
+          {t(
+            `dashboardPage.New ${
+              ['lab'].includes(config.instanceName) ? 'Article' : 'submission'
+            }`,
+          )}
         </ActionButton>
       )}
-      {shouldAllowBulkImport && (
+      {shouldAllowBulkImport && !archived && (
         <ActionButton
           onClick={importManuscripts}
           status={isImporting ? t('manuscriptsPage.importPending') : ''}
@@ -363,14 +369,22 @@ const Manuscripts = ({ history, ...props }) => {
     </ControlsContainer>
   )
 
+  const toggleArchived = () => {
+    applyQueryParams({ archived: !archived })
+  }
+
   const actionDropDownOptions = [
-    {
-      id: 1,
-      onClick: () => {
-        openModalBulkArchiveConfirmation()
-      },
-      title: t('manuscriptsPage.Archive'),
-    },
+    archived
+      ? {
+          id: 1,
+          onClick: () => setIsOpenBulkUnarchiveModal(true),
+          title: t('manuscriptsPage.Unarchive'),
+        }
+      : {
+          id: 1,
+          onClick: () => setIsOpenBulkArchiveModal(true),
+          title: t('manuscriptsPage.Archive'),
+        },
     {
       id: 2,
       onClick: () => {
@@ -396,7 +410,13 @@ const Manuscripts = ({ history, ...props }) => {
       <Columns>
         <ManuscriptsPane>
           <FlexRow>
-            <Heading>{t('manuscriptsPage.Manuscripts')}</Heading>
+            <Heading $warning={archived}>
+              {t(
+                archived
+                  ? 'manuscriptsPage.archivedManuscripts'
+                  : 'manuscriptsPage.Manuscripts',
+              )}
+            </Heading>
             {topRightControls}
           </FlexRow>
 
@@ -409,25 +429,38 @@ const Manuscripts = ({ history, ...props }) => {
                 label={t('manuscriptsPage.Select All')}
                 onChange={toggleAllNewManuscriptsCheck}
               />
-              <SelectedManuscriptsNumber>
+              <SelectedManuscriptsNumber
+                disabled={!selectedNewManuscripts.length}
+              >
                 <Trans
                   count={selectedNewManuscripts.length}
                   i18nKey="manuscriptsPage.selectedArticles"
                   values={{ count: selectedNewManuscripts.length }}
                 />
               </SelectedManuscriptsNumber>
-              <DropdownContainer disabled={selectedNewManuscripts.length === 0}>
+              <DropdownContainer
+                disabled={!selectedNewManuscripts.length}
+                key={!!selectedNewManuscripts.length}
+              >
                 <Dropdown itemsList={actionDropDownOptions} primary>
                   {t('manuscriptsPage.takeAction')}
                 </Dropdown>
               </DropdownContainer>
             </SelectAllField>
+            <ViewArchivedAction onClick={toggleArchived}>
+              {t(
+                archived
+                  ? 'manuscriptsPage.viewUnarchived'
+                  : 'manuscriptsPage.viewArchived',
+              )}
+            </ViewArchivedAction>
           </FlexRowWithSmallGapAbove>
 
           <div>
             <ScrollableContent>
               <ManuscriptsTable
                 applyQueryParams={applyQueryParams}
+                archived={archived}
                 columnsProps={columnsProps}
                 manuscripts={manuscripts}
                 sortDirection={sortDirection}
@@ -458,15 +491,18 @@ const Manuscripts = ({ history, ...props }) => {
           />
         )}
       </Columns>
-      <Modal
+      <ConfirmationModal
+        closeModal={() => setIsOpenBulkArchiveModal(false)}
+        confirmationAction={doBulkArchive}
         isOpen={isOpenBulkArchiveModal}
-        onRequestClose={closeModalBulkArchiveConfirmation}
-      >
-        <BulkArchiveModal
-          closeModal={closeModalBulkArchiveConfirmation}
-          confirmBulkArchive={doConfirmBulkArchive}
-        />
-      </Modal>
+        message={t('manuscriptsPage.confirmArchive')}
+      />
+      <ConfirmationModal
+        closeModal={() => setIsOpenBulkUnarchiveModal(false)}
+        confirmationAction={doBulkUnarchive}
+        isOpen={isOpenBulkUnarchiveModal}
+        message={t('manuscriptsPage.confirmUnarchive')}
+      />
     </OuterContainer>
   )
 }

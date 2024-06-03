@@ -18,8 +18,15 @@ const shouldRunDefaultImportsForColab = [true, 'true'].includes(
 )
 
 const importManuscripts = async (groupId, ctx) => {
+  // eslint-disable-next-line no-console
+  console.log(`Importing manuscripts. Triggered by ${ctx.userId ?? 'system'}`)
   const key = `${groupId}-imports`
-  if (importsInProgress.has(key)) return false
+
+  if (importsInProgress.has(key)) {
+    // eslint-disable-next-line no-console
+    console.log('Import already in progress. Aborting new import')
+    return false
+  }
 
   try {
     importsInProgress.add(key)
@@ -29,7 +36,7 @@ const importManuscripts = async (groupId, ctx) => {
       active: true,
     })
 
-    const evaluatedStatusString = ['preprint2', 'preprint1'].includes(
+    const evaluatedStatusString = ['preprint2', 'preprint1', 'lab'].includes(
       activeConfig.formData.instanceName,
     )
       ? 'evaluated'

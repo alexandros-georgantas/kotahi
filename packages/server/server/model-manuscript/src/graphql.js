@@ -431,6 +431,9 @@ const resolvers = {
     async createManuscript(_, vars, ctx) {
       const { meta, files, groupId } = vars.input
       const group = await Group.query().findById(groupId)
+      if (!group)
+        throw new Error(`Cannot create manuscript for unknown group ${groupId}`)
+      const activeConfig = await Config.getCached(groupId)
       const submissionForm = await getSubmissionForm(group.id)
 
       const parsedFormStructure = submissionForm.structure.children
@@ -524,6 +527,17 @@ const resolvers = {
         manuscriptId: updatedManuscript.id,
         userId: ctx.user,
       })
+
+      if (['lab'].includes(activeConfig.formData.instanceName)) {
+        await Team.query().insert({
+          role: 'collaborator',
+          name: 'Collaborator',
+          objectId: updatedManuscript.id,
+          objectType: 'manuscript',
+          global: false,
+        })
+      }
+
       return updatedManuscript
     },
 
@@ -554,6 +568,24 @@ const resolvers = {
         .orWhereIn('parentId', firstVersionIds)
 
       return archivedManuscripts.map(m => m.id)
+    },
+
+    async unarchiveManuscripts(_, { ids }, ctx) {
+      // finding the ids of the first versions of all manuscripts:
+      const selectedManuscripts = await Manuscript.query()
+        .select('parentId', 'id')
+        .whereIn('id', ids)
+
+      const firstVersionIds = selectedManuscripts.map(m => m.parentId || m.id)
+
+      // unarchiving manuscripts with either firstVersionID or parentID
+      const unarchivedManuscripts = await Manuscript.query()
+        .returning('id')
+        .update({ isHidden: false })
+        .whereIn('id', firstVersionIds)
+        .orWhereIn('parentId', firstVersionIds)
+
+      return unarchivedManuscripts.map(m => m.id)
     },
 
     async archiveManuscript(_, { id }, ctx) {
@@ -1111,7 +1143,7 @@ const resolvers = {
             manuscript.decision = 'accepted'
             manuscript.status = 'accepted'
           } else if (
-            ['preprint1', 'preprint2'].includes(
+            ['preprint1', 'preprint2', 'lab'].includes(
               activeConfig.formData.instanceName,
             )
           ) {
@@ -1581,6 +1613,7 @@ const resolvers = {
         offset,
         limit,
         filters,
+        false,
         submissionForm,
         timezoneOffsetMinutes || 0,
         Object.keys(userManuscriptsWithInfo),
@@ -1635,7 +1668,15 @@ const resolvers = {
 
     async paginatedManuscripts(
       _,
-      { sort, offset, limit, filters, timezoneOffsetMinutes, groupId },
+      {
+        sort,
+        offset,
+        limit,
+        filters,
+        timezoneOffsetMinutes,
+        archived,
+        groupId,
+      },
       ctx,
     ) {
       const groupIdFromHeader = ctx.req.headers['group-id']
@@ -1648,6 +1689,7 @@ const resolvers = {
         offset,
         limit,
         filters,
+        archived,
         submissionForm,
         timezoneOffsetMinutes || 0,
         null,
@@ -2125,7 +2167,7 @@ const typeDefs = `
     globalTeams: [Team]
     manuscript(id: ID!): Manuscript!
     manuscripts: [Manuscript]!
-    paginatedManuscripts(offset: Int, limit: Int, sort: ManuscriptsSort, filters: [ManuscriptsFilter!]!, timezoneOffsetMinutes: Int, groupId: ID!): PaginatedManuscripts
+    paginatedManuscripts(offset: Int, limit: Int, sort: ManuscriptsSort, filters: [ManuscriptsFilter!]!, timezoneOffsetMinutes: Int, archived: Boolean!, groupId: ID!): PaginatedManuscripts
     manuscriptsUserHasCurrentRoleIn(reviewerStatus: String, wantedRoles: [String]!, offset: Int, limit: Int, sort: ManuscriptsSort, filters: [ManuscriptsFilter!]!, timezoneOffsetMinutes: Int, groupId: ID!, searchInAllVersions: Boolean!): PaginatedManuscripts
     publishedManuscripts(sort:String, offset: Int, limit: Int, groupId: ID!): PaginatedManuscripts
     validateDOI(doiOrUrl: String): validateDOIResponse
@@ -2182,6 +2224,7 @@ const typeDefs = `
     setShouldPublishField(manuscriptId: ID!, objectId: ID!, fieldName: String!, shouldPublish: Boolean!): Manuscript!
     archiveManuscript(id: ID!): ID!
     archiveManuscripts(ids: [ID]!): [ID!]!
+    unarchiveManuscripts(ids: [ID]!): [ID!]!
     assignAuthoForProofingManuscript(id: ID!): Manuscript!
   }
 

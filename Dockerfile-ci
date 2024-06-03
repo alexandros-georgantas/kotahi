@@ -88,11 +88,9 @@ ENV SERVER_PORT "3000"
 ENV CLIENT_PROTOCOL "http"
 ENV CLIENT_HOST "0.0.0.0"
 ENV CLIENT_PORT "4000"
-ENV HOME "/home/node/app"
 ENV USE_COLAB_EMAIL $use_colab_email
 
-RUN mkdir -p ${HOME}
-WORKDIR ${HOME}
+WORKDIR /home/node/app
 
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile

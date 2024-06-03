@@ -1,5 +1,4 @@
 const { isEnvVariableTrue } = require('@coko/server/src/utils/env')
-
 const modelComponents = require('../models/modelComponents')
 
 const components = [

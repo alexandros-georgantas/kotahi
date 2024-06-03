@@ -203,7 +203,7 @@ services:
   xsweet:
     depends_on:
       - db-xsweet
-    image: cokoapps/xsweet:2.3.0
+    image: cokoapps/xsweet:2.3.1
     ports:
       - ${SERVICE_XSWEET_PORT:-3004}:${SERVICE_XSWEET_PORT:-3004}
     environment:
@@ -344,8 +344,9 @@ services:
       - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
 
   kotahi-flax-site:
-    image: cokoapps/kotahi-flax:0.2.41
+    image: cokoapps/kotahi-flax:0.2.45
     depends_on:
+      - server
       - client
     ports:
       - ${FLAX_EXPRESS_PORT:-8082}:${FLAX_EXPRESS_PORT:-3000}

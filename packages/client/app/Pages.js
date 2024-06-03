@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Route, Switch, useLocation, Redirect } from 'react-router-dom'
 import styled from 'styled-components'
 import { useQuery } from '@apollo/client'
@@ -26,6 +26,7 @@ import { JournalProvider } from './components/xpub-journal/src'
 import * as journal from '../config/journal'
 import ModalProvider from './components/asset-manager/src/ui/Modal/ModalProvider'
 import { XpubProvider } from './components/xpub-with-context/src'
+import { reloadTranslationsForGroup } from './i18n'
 
 const Container = styled.div`
   display: grid;
@@ -57,8 +58,6 @@ const Pages = () => {
 
   const { loading, error, data } = useQuery(GET_GROUPS)
 
-  if (loading && !data) return <Spinner />
-
   const groups = data?.groups ? data.groups : []
 
   const hasMultipleGroups = groups && groups.length > 1
@@ -74,6 +73,12 @@ const Pages = () => {
   if (name) {
     currentGroup = groups.find(group => group.name === name)
   }
+
+  useEffect(() => {
+    reloadTranslationsForGroup(currentGroup?.name)
+  }, [currentGroup?.id])
+
+  if (loading && !data) return <Spinner />
 
   if (error)
     return (

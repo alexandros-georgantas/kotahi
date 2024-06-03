@@ -15,6 +15,7 @@ import {
   OverdueTooltip,
   LastReviewerUpdated,
   ReviewerStatusBadge,
+  PublishArticleButton,
 } from '../cell-components'
 import reviewFilterOptions from '../../../../../config/journal/review-status'
 import AuthorProofingLink from '../cell-components/AuthorProofingLink'
@@ -31,6 +32,7 @@ const buildSpecialColumnProps = (
   config,
   fieldDefinitions,
   doUpdateManuscript,
+  archived,
 ) => {
   const {
     deleteManuscript,
@@ -40,7 +42,6 @@ const buildSpecialColumnProps = (
     toggleNewManuscriptCheck,
     setReadyToEvaluateLabel,
     unsetCustomStatus,
-    archiveManuscript,
     reviewerRespond,
     getMainActionLink,
     currentUser,
@@ -148,11 +149,11 @@ const buildSpecialColumnProps = (
       flex: '0 1 8em',
       component: Actions,
       extraProps: {
+        archived,
         config,
         deleteManuscript,
         tryPublishManuscript,
         urlFrag,
-        archiveManuscript,
       },
     },
     submitChevron: {
@@ -223,20 +224,30 @@ const buildSpecialColumnProps = (
     'submission.$customStatus': {
       flex: '0.25 1 15em',
       extraProps: { setReadyToEvaluateLabel, unsetCustomStatus },
-      component: config?.manuscript?.labelColumn
-        ? props =>
-            LabelsOrSelectButton({
-              ...props,
-              options: fieldDefinitions['submission.$customStatus']?.options,
-              doUpdateManuscript,
-            })
-        : DefaultField,
+      component:
+        config?.manuscript?.labelColumn && !archived
+          ? props =>
+              LabelsOrSelectButton({
+                ...props,
+                options: fieldDefinitions['submission.$customStatus']?.options,
+                doUpdateManuscript,
+              })
+          : DefaultField,
     },
     'submission.label': { flex: '0.2 1 10em' },
     'submission.journal': { flex: '0.2 1 12em' },
     titleAndAbstract: {
       component: TitleWithAbstractAsTooltip,
       title: i18next.t('manuscriptsTable.Title'),
+    },
+    publishArticle: {
+      flex: '0 1 8em',
+      extraProps: {
+        config,
+        tryPublishManuscript,
+        urlFrag,
+      },
+      component: PublishArticleButton,
     },
   }
 

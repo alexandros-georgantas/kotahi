@@ -24,7 +24,7 @@ import { BigProfileImage } from './ProfileImage'
 import ChangeEmail from './ChangeEmail'
 import EnterEmail from './EnterEmail'
 import ChangeLanguage from './ChangeLanguage'
-import { languagesLabels } from '../../../i18n/index'
+import { getLanguages } from '../../../i18n'
 
 const VersionText = styled.div`
   color: #757575;
@@ -120,6 +120,8 @@ const Profile = ({
   user,
   notificationUserOption,
 }) => {
+  const languages = getLanguages()
+
   const [hasGlobalChatNotificationOptIn, setHasGlobalChatNotificationOptIn] =
     useState(notificationUserOption)
 
@@ -227,9 +229,8 @@ const Profile = ({
               ) : (
                 <div>
                   {
-                    languagesLabels.find(
-                      elem => elem.value === i18next.language,
-                    ).label
+                    languages.find(elem => elem.value === i18next.language)
+                      .label
                   }
                 </div>
               )}

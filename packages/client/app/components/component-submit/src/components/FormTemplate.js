@@ -39,7 +39,7 @@ const FormContainer = styled(Container)`
 
   header {
     border-bottom: 1px solid #e8e8e8;
-    display: flex;
+    display: ${({ noHeader }) => (noHeader ? 'none' : 'flex')};
     flex-direction: column;
     justify-content: center;
     /* account for <NoteRight> */
@@ -53,7 +53,7 @@ const FormContainer = styled(Container)`
   }
 
   form {
-    padding: 30px;
+    padding: ${({ noPadding }) => (noPadding ? 0 : '30px')};
 
     section {
       margin: 0 0 44px;
@@ -186,6 +186,8 @@ const FormTemplate = ({
   shouldStoreFilesInForm,
   initializeReview,
   tagForFiles,
+  noPadding,
+  noHeader,
   threadedDiscussionProps: tdProps,
   fieldsToPublish,
   setShouldPublishField,
@@ -351,9 +353,10 @@ const FormTemplate = ({
         const showSubmitButton =
           submissionButtonText &&
           (isSubmission
-            ? !['submitted', 'revise'].includes(values.status) ||
-              (['preprint1', 'preprint2'].includes(config.instanceName) &&
-                values.status === 'submitted')
+            ? (!['submitted', 'revise'].includes(values.status) ||
+                (['preprint1', 'preprint2'].includes(config.instanceName) &&
+                  values.status === 'submitted')) &&
+              !['lab'].includes(config.instanceName)
             : true)
 
         const manuscriptFiles = filterFileManuscript(values.files || [])
@@ -362,7 +365,7 @@ const FormTemplate = ({
           isSubmission && manuscriptFiles.length ? manuscriptFiles[0] : null
 
         return (
-          <FormContainer>
+          <FormContainer noHeader={noHeader} noPadding={noPadding}>
             {displayShortIdAsIdentifier && (
               <NoteRight>
                 {t('decisionPage.metadataTab.Manuscript Number')}{' '}

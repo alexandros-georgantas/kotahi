@@ -14,7 +14,6 @@ import {
   ChatInputContainer,
   ChatInputWrapper,
   InputWrapper,
-  PhotoSizeError,
   PreviewWrapper,
   RemovePreviewButton,
 } from './style'
@@ -53,7 +52,6 @@ const SuperChatInput = props => {
   const [text, changeText] = React.useState('')
   // key to clear ChatWaxEditor input on submit
   const [messageSentCount, setMessageSentCount] = React.useState(0)
-  const [photoSizeError, setPhotoSizeError] = React.useState('')
   const [chatInputFocus, setChatInputFocus] = React.useState(false)
   const { scrollToBottom } = useAppScroller()
   const editorRef = React.useRef()
@@ -176,17 +174,6 @@ const SuperChatInput = props => {
 
   return (
     <ChatInputContainer>
-      {photoSizeError && ( // TODO Dead code?
-        <PhotoSizeError>
-          <p>{photoSizeError}</p>
-          <Icon
-            color="warn.default"
-            glyph="view-close"
-            onClick={() => setPhotoSizeError('')}
-            size={16}
-          />
-        </PhotoSizeError>
-      )}
       <ChatInputWrapper>
         {/* {props.currentUser && (
             <MediaUploader

@@ -384,6 +384,8 @@ const ReviewData = ({
           formData={reviewFormData}
           initialValues={reviewFormData}
           manuscriptId={manuscriptId}
+          noHeader
+          noPadding
           onChange={(value, path) => {
             updateReview(
               review.id,
