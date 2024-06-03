@@ -16,6 +16,7 @@ const {
 const {
   getReviewForm,
   getDecisionForm,
+  getSubmissionForm,
 } = require('../../model-review/src/reviewCommsUtils')
 
 const {
@@ -183,6 +184,21 @@ const getIssueYear = manuscript => {
   return yearString
 }
 
+const checkIfRequiredFieldsArePublishable = (submissionForm, fields) => {
+  const fieldConfigurations = fields.map(fieldName =>
+    submissionForm?.structure?.children.find(item => item.name === fieldName),
+  )
+
+  let shouldAllowPublish = true
+
+  fieldConfigurations.forEach(field => {
+    if (field?.permitPublishing !== 'always') {
+      shouldAllowPublish = false
+    }
+  })
+  return shouldAllowPublish
+}
+
 /** Returns true if a DOI is not already in use.
  * It will also return true if the Crossref server is faulty or down, so that form submission is not prevented.
  */
@@ -262,6 +278,7 @@ const publishArticleToCrossref = async manuscript => {
     $issueYear,
     $issueNumber,
     $volumeNumber,
+    $doi,
   } = submission
 
   if (!submission) throw new Error('Manuscript has no submission object')
@@ -270,6 +287,10 @@ const publishArticleToCrossref = async manuscript => {
   if (!$authors) throw new Error('Manuscript has no submission.$authors field')
   if (!$issueYear)
     throw new Error('Manuscript has no submission.$issueYear field')
+  if (!$issueNumber)
+    throw new Error('Manuscript has no submission.$issueNumber field')
+  if (!$volumeNumber)
+    throw new Error('Manuscript has no submission.$volumeNumber field')
   if (!Array.isArray($authors))
     throw new Error('Manuscript.submission.$authors is not an array')
   if (!emailRegex.test(depositorEmail))
@@ -281,13 +302,34 @@ const publishArticleToCrossref = async manuscript => {
     throw new Error(`Journal Name should be defined`)
   }
 
+  const submissionForm = await getSubmissionForm(manuscript.groupId)
+
+  if (
+    !checkIfRequiredFieldsArePublishable(submissionForm, [
+      'submission.$title',
+      'submission.$abstract',
+      'submission.$issueNumber',
+      'submission.$issueYear',
+      'submission.$volumeNumber',
+    ])
+  ) {
+    throw new Error(
+      `Check your submission form configuration as some required fields are not publishable`,
+    )
+  }
+
   const issueYear = getIssueYear(manuscript)
   const publishDate = new Date()
   const journalDoi = getDoi(0, activeConfig)
 
-  const doiSuffix = getReviewOrSubmissionField(manuscript, '$doiSuffix') || id
+  let doiSuffix
+  let doi = $doi
 
-  const doi = getDoi(doiSuffix, activeConfig)
+  if (!$doi) {
+    doiSuffix = getReviewOrSubmissionField(manuscript, '$doiSuffix') || id
+    doi = getDoi(doiSuffix, activeConfig)
+  }
+
   if (!(await doiIsAvailable(doi))) throw Error('Custom DOI is not available.')
 
   const batchId = uuid()
@@ -449,11 +491,13 @@ const publishReviewsToCrossref = async manuscript => {
   const publishDate = new Date()
 
   const filteredReviews = manuscript.reviews.filter(review => {
-    if (!review.isDecision && shouldPublishReview) {
+    const { isDecision, isHiddenFromAuthor } = review
+
+    if (!isDecision && shouldPublishReview && !isHiddenFromAuthor) {
       return true
     }
 
-    if (review.isDecision && shouldPublishDecision) {
+    if (isDecision && shouldPublishDecision && !isHiddenFromAuthor) {
       return true
     }
 
