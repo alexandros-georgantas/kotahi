@@ -15,6 +15,9 @@ const Info = styled.span`
 `
 
 const Columns = styled.div`
+  display: grid;
+  grid-template-areas: 'manuscript chat';
+  grid-template-columns: ${({ chatProps }) => (chatProps ? '3fr 2fr' : '3fr')};
   height: 100%;
   overflow: hidden;
   width: 100%;
@@ -22,13 +25,16 @@ const Columns = styled.div`
 
 const ManuscriptContainer = styled.div`
   grid-area: manuscript;
-  height: 100%;
   overflow-y: scroll;
   padding: 2em;
 
-  #wax-container > div {
+  #wax-container {
     max-width: 1200px;
     min-height: 0;
+
+    & > div > div {
+      display: block;
+    }
   }
 `
 
