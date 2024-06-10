@@ -15,7 +15,6 @@ import {
   OverdueTooltip,
   LastReviewerUpdated,
   ReviewerStatusBadge,
-  PublishArticleButton,
 } from '../cell-components'
 import reviewFilterOptions from '../../../../../config/journal/review-status'
 import AuthorProofingLink from '../cell-components/AuthorProofingLink'
@@ -239,15 +238,6 @@ const buildSpecialColumnProps = (
     titleAndAbstract: {
       component: TitleWithAbstractAsTooltip,
       title: i18next.t('manuscriptsTable.Title'),
-    },
-    publishArticle: {
-      flex: '0 1 8em',
-      extraProps: {
-        config,
-        tryPublishManuscript,
-        urlFrag,
-      },
-      component: PublishArticleButton,
     },
   }
 

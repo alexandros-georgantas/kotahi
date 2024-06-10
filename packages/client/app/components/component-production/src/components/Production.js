@@ -1,6 +1,6 @@
 /* stylelint-disable string-quotes */
 
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { grid, th } from '@pubsweet/ui-toolkit'
 import { withRouter } from 'react-router-dom'
@@ -31,7 +31,6 @@ import gatherManuscriptVersions from '../../../../shared/manuscript_versions'
 import PreviousFeedbackSubmissions from './PreviousFeedbackSubmissions'
 import { CssAssistantProvider } from '../../../component-ai-assistant/hooks/CssAssistantContext'
 import AiPDFDesigner from '../../../component-ai-assistant/AiPDFDesigner'
-import { ConfigContext } from '../../../config/src'
 
 const PreviousFeedBackSection = styled.div`
   margin-bottom: calc(${th('gridUnit')} * 3);
@@ -145,16 +144,13 @@ const Production = ({
 
   const { t } = useTranslation()
 
-  const config = useContext(ConfigContext)
-
   const editorSection = {
     content: (
       // eslint-disable-next-line react/jsx-no-useless-fragment
       <>
-        {(file &&
-          file.storedObjects[0].mimetype ===
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document') ||
-        ['lab'].includes(config?.instanceName) ? (
+        {file &&
+        file.storedObjects[0].mimetype ===
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ? (
           <SectionContent>
             {manuscript ? (
               <ProductionWaxEditor
