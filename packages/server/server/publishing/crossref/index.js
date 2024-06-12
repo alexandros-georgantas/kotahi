@@ -492,17 +492,25 @@ const publishReviewsToCrossref = async manuscript => {
 
   const filteredReviews = manuscript.reviews.filter(review => {
     const { isDecision, isHiddenFromAuthor } = review
+    const isHidden = isHiddenFromAuthor === null || isHiddenFromAuthor === true
 
-    if (!isDecision && shouldPublishReview && !isHiddenFromAuthor) {
+    if (!isDecision && shouldPublishReview && !isHidden) {
       return true
     }
 
-    if (isDecision && shouldPublishDecision && !isHiddenFromAuthor) {
+    // if (isDecision && shouldPublishDecision && !isHiddenFromAuthor) {
+    if (isDecision && shouldPublishDecision) {
       return true
     }
 
     return false
   })
+
+  if (filteredReviews.length === 0) {
+    throw new Error(
+      'No reviews available to publish! If you can see reviews/decision please check Review and Decision forms to verify that there are publishable fields ',
+    )
+  }
 
   const reviewsToPublish = await Promise.all(
     filteredReviews.map(async review => {
