@@ -109,4 +109,4 @@ const getUrlByDoi = async (doi, contactEmail) => {
   }
 }
 
-module.exports = { getUrlByDoi }
+module.exports = { getUrlByDoi, updateRateLimit }
