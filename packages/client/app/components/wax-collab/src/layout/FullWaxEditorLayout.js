@@ -79,17 +79,19 @@ const FullWaxEditorLayout =
         <Grid fullHeight readonly={readOnly}>
           {readOnly ? (
             <FullWaxEditorGrid useComments={false}>
-              <ReadOnlyEditorDiv className="wax-surface-scroll panelWrapper">
-                {editor}
-              </ReadOnlyEditorDiv>
-              {notes.length > 0 && (
-                <ReadOnlyNotesAreaContainer className="panelWrapper">
-                  <NotesContainer id="notes-container">
-                    <NotesHeading>Notes</NotesHeading>
-                    <NotesArea view={main} />
-                  </NotesContainer>
-                </ReadOnlyNotesAreaContainer>
-              )}
+              <EditorArea className="editorArea">
+                <ReadOnlyEditorDiv className="wax-surface-scroll panelWrapper">
+                  {editor}
+                </ReadOnlyEditorDiv>
+                {notes.length > 0 && (
+                  <ReadOnlyNotesAreaContainer className="panelWrapper">
+                    <NotesContainer id="notes-container">
+                      <NotesHeading>Notes</NotesHeading>
+                      <NotesArea view={main} />
+                    </NotesContainer>
+                  </ReadOnlyNotesAreaContainer>
+                )}
+              </EditorArea>
             </FullWaxEditorGrid>
           ) : (
             <>
