@@ -1,15 +1,6 @@
 const { default: axios } = require('axios')
-const rateLimit = require('axios-rate-limit')
-const { updateRateLimit } = require('../../utils/crossrefCommsUtils')
+const { pluckAuthors, pluckTitle, pluckJournalTitle } = require('./helpers')
 
-const http = rateLimit(axios.create(), {
-  maxRequests: 10,
-  perMilliseconds: 1000,
-})
-
-const defaultMailTo = 'unknown@unknown.com'
-
-const { formatCitation } = require('./formatting')
 // const { logger } = require('@coko/server') // turning off logger until I can get it to work in tests
 
 axios.interceptors.request.use(req => {
@@ -21,16 +12,6 @@ axios.interceptors.response.use(resp => {
   // logger.debug('Response:', JSON.stringify(resp.data, null, 2))
   return resp
 })
-
-const pluckAuthors = authors => {
-  if (!authors) return authors
-  return authors.map(({ given, family, sequence }) => {
-    return { given, family, sequence }
-  })
-}
-
-const pluckTitle = title => title && title[0]
-const pluckJournalTitle = journalTitle => journalTitle && journalTitle[0]
 
 const createReference = data => {
   const {
@@ -52,45 +33,6 @@ const createReference = data => {
     title: pluckTitle(title),
     journalTitle: pluckJournalTitle(journalTitle),
   }
-}
-
-const createFormattedReference = async (data, groupId) => {
-  const {
-    DOI: doi,
-    author,
-    page,
-    title,
-    issue,
-    volume,
-    'container-title': journalTitle,
-  } = data
-
-  // console.log('issued data:', data.issued)
-
-  const rawDate = data.issued?.raw ? data.issued.raw : false
-
-  const yearFromDateParts = data.issued['date-parts']?.length
-    ? String(data.issued['date-parts'][0][0] || '')
-    : ''
-
-  const year = rawDate || yearFromDateParts
-
-  const outputData = {
-    doi,
-    DOI: doi,
-    author: pluckAuthors(author),
-    page,
-    issue,
-    volume,
-    issued: { raw: String(year) },
-    title: pluckTitle(title),
-    journalTitle: pluckJournalTitle(journalTitle),
-  }
-
-  const formattedCitation = await formatCitation(outputData, groupId)
-
-  outputData.formattedCitation = formattedCitation.result
-  return outputData
 }
 
 // const refValConfig = config.get('referenceValidator')
@@ -137,59 +79,6 @@ const getMatchingReferencesFromCrossRef = async (
     })
 }
 
-const getFormattedReferencesFromCrossRef = async (
-  reference,
-  count,
-  crossrefRetrievalEmail,
-  groupId,
-) => {
-  try {
-    const response = await http.get('https://api.crossref.org/v1/works', {
-      params: {
-        'query.bibliographic': reference,
-        rows: count,
-        select: 'DOI,author,issue,page,title,volume,container-title,issued',
-        mailto: crossrefRetrievalEmail || defaultMailTo,
-        order: 'desc',
-        sort: 'score',
-      },
-      timeout: 15000,
-      headers: {
-        'User-Agent': `Kotahi (Axios 0.21; mailto:${
-          crossrefRetrievalEmail || defaultMailTo
-        })`,
-      },
-    })
-
-    updateRateLimit(response)
-
-    if (response.status === 200)
-      return response.data.message.items.reduce(
-        (accumulator, current, index) => {
-          accumulator.push(createFormattedReference(current, groupId))
-          return accumulator
-        },
-        [],
-      )
-
-    console.error('Crossref failure!', response)
-    return []
-  } catch (error) {
-    if (error.response?.status === 404) {
-      console.error('Crossref 404 error!')
-    }
-
-    if (error.response?.status === 429) {
-      // TODO Consider implementing a backoff
-      // return getUrlByDoiFromDataCite(doi) // Get from alternative service that's generally slower, but shouldn't give 429 error
-      console.error('Crossref rate limit error!!!')
-    }
-
-    console.error('Crossref failure!', error.message)
-    return []
-  }
-}
-
 const getReferenceWithDoi = async (doi, crossrefRetrievalEmail) => {
   // eslint-disable-next-line no-return-await
   return await axios
@@ -209,6 +98,5 @@ const getReferenceWithDoi = async (doi, crossrefRetrievalEmail) => {
 
 module.exports = {
   getMatchingReferencesFromCrossRef,
-  getFormattedReferencesFromCrossRef,
   getReferenceWithDoi,
 }
