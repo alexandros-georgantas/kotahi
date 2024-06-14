@@ -74,6 +74,8 @@ const Footer = styled.div`
   }
 `
 
+const EmptyDiv = styled.div``
+
 // TODO Improve on this hardcoded hack to hide the "Publishing" heading.
 const StyledWrapper = styled.div`
   /* stylelint-disable-next-line selector-id-pattern */
@@ -258,7 +260,9 @@ const ConfigManagerForm = ({
               onSubmit={handlers.form.onSubmit}
               schema={schemas.data[key]}
               uiSchema={schemas.ui[key]}
-            />
+            >
+              <EmptyDiv />
+            </StyledForm>
           </StyledSectionContent>
         ),
       })),
