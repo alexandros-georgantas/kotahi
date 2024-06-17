@@ -186,7 +186,7 @@ const sendEmailWithPreparedData = async (
   if (!ctx) {
     invitationSender = emailSender
   } else {
-    invitationSender = await User.find(ctx.user) // no trx!!
+    invitationSender = await User.findById(ctx.user) // no trx!!
   }
 
   const toEmail = receiverEmail
@@ -224,7 +224,7 @@ const sendEmailWithPreparedData = async (
         ? 'AUTHOR'
         : 'REVIEWER'
 
-    const newInvitation = await new Invitation({
+    const newInvitation = await Invitation.query().insert({
       manuscriptId,
       toEmail,
       purpose,
@@ -233,7 +233,7 @@ const sendEmailWithPreparedData = async (
       invitedPersonType,
       invitedPersonName,
       userId,
-    }).saveGraph() // no trx!!
+    }) // no trx!!
 
     invitationId = newInvitation.id
   }

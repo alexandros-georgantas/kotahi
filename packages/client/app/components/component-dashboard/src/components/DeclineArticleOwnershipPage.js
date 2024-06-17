@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react'
-import { Checkbox, TextArea } from '@pubsweet/ui/dist/atoms'
-import { Button } from '@pubsweet/ui'
 import { useMutation, useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
+
+import { Button, Checkbox, TextArea } from '../../../pubsweet'
 import { ADD_EMAIL_TO_BLACKLIST } from '../../../../queries/index'
 import {
   UPDATE_INVITATION_RESPONSE,

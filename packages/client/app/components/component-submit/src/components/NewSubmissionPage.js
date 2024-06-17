@@ -1,13 +1,24 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import { ApolloConsumer } from '@apollo/client'
-import config from 'config'
 import { useTranslation } from 'react-i18next'
 import { Container, Content, UploadContainer, Heading } from '../style'
 import UploadManuscript from './UploadManuscript'
 import { ConfigContext } from '../../../config/src'
 
-const { acceptUploadFiles } = config['pubsweet-component-xpub-dashboard'] || {}
+const acceptUploadFiles = [
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/x-latex',
+  'text/vnd.latex-z',
+  'text/plain',
+  'text/x-tex',
+  'application/x-tex',
+  'application/x-dvi',
+  'application/pdf',
+  'application/epub+zip',
+  'application/zip',
+  '.tex',
+]
 
 const acceptFiles =
   acceptUploadFiles.length > 0

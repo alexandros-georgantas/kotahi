@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
-import { grid } from '@pubsweet/ui-toolkit'
+import { grid } from '@coko/client'
 import CollaboratorRow from './CollaboratorRow'
 import { Spinner } from '../../../shared'
 

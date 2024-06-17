@@ -1,13 +1,13 @@
 /* eslint-disable jest/expect-expect, cypress/unsafe-to-chain-command */
 import { FormsPage } from '../../page-object/forms-page'
-import { Menu } from '../../page-object/page-component/menu'
+// import { Menu } from '../../page-object/page-component/menu'
 import { submissionForm } from '../../support/routes2'
 
 describe('Form builder', () => {
   context('check Form builder elements visibility', () => {
     beforeEach(() => {
-      // eslint-disable-next-line jest/valid-expect-in-promise
-      cy.task('restore', 'commons/elife_bootstrap')
+      const restoreUrl = Cypress.config('restoreUrl')
+      cy.request('POST', `${restoreUrl}/commons.elife_bootstrap`)
 
       // login as admin
       // eslint-disable-next-line jest/valid-expect-in-promise
@@ -50,8 +50,9 @@ describe('Form builder', () => {
 
     // check the type of the field and if is required
     it('check form fields type and if are required', () => {
-      // eslint-disable-next-line jest/valid-expect-in-promise
-      cy.task('restore', 'commons/elife_bootstrap')
+      const restoreUrl = Cypress.config('restoreUrl')
+      cy.request('POST', `${restoreUrl}/commons.elife_bootstrap`)
+
       // login as admin
       // eslint-disable-next-line jest/valid-expect-in-promise
       cy.fixture('role_names').then(name => {
@@ -112,8 +113,8 @@ describe('Form builder', () => {
 
   context('add field to submission, review and decision forms', () => {
     it('views a form field', () => {
-      // task to restore the database as per the  dumps/commons/elife_bootstrap.sql
-      cy.task('restore', 'commons/elife_bootstrap')
+      const restoreUrl = Cypress.config('restoreUrl')
+      cy.request('POST', `${restoreUrl}/commons.elife_bootstrap`)
 
       // login as admin
       // eslint-disable-next-line jest/valid-expect-in-promise
@@ -133,7 +134,6 @@ describe('Form builder', () => {
       cy.contains('Save').click()
 
       // for review field
-      Menu.clickSettings()
       cy.contains('Review').click()
       FormsPage.getFormTitleTab(0).should('contain', 'Review')
       FormsPage.clickFormOption(1)
@@ -152,7 +152,6 @@ describe('Form builder', () => {
       cy.contains('Save').click()
 
       // for decision field
-      Menu.clickSettings()
       cy.contains('Decision').click()
       FormsPage.getFormTitleTab(0).should('contain', 'Decision')
       FormsPage.clickFormOption(1)

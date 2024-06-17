@@ -13,8 +13,8 @@ import { Menu } from '../../page-object/page-component/menu'
 describe.skip('Manuscripts page tests', () => {
   context('Elements visibility', () => {
     beforeEach(() => {
-      // task to restore the database as per the  dumps/commons/elife_bootstrap.sql
-      cy.task('restore', 'commons/elife_bootstrap')
+      const restoreUrl = Cypress.config('restoreUrl')
+      cy.request('POST', `${restoreUrl}/commons.elife_bootstrap`)
 
       // login as admin
       // eslint-disable-next-line jest/valid-expect-in-promise
@@ -49,8 +49,8 @@ describe.skip('Manuscripts page tests', () => {
 
   context('unsubmitted article tests', () => {
     beforeEach(() => {
-      // task to restore the database as per the  dumps/commons/elife_bootstrap.sql
-      cy.task('restore', 'commons/elife_bootstrap')
+      const restoreUrl = Cypress.config('restoreUrl')
+      cy.request('POST', `${restoreUrl}/commons.elife_bootstrap`)
 
       // login as admin
       // eslint-disable-next-line jest/valid-expect-in-promise
@@ -158,8 +158,8 @@ describe.skip('Manuscripts page tests', () => {
 
   context('Submitted and evaluated article tests', () => {
     beforeEach(() => {
-      // task to restore the database as per the  dumps/commons/elife_bootstrap.sql
-      cy.task('restore', 'commons/elife_bootstrap')
+      const restoreUrl = Cypress.config('restoreUrl')
+      cy.request('POST', `${restoreUrl}/commons.elife_bootstrap`)
 
       // login as admin
       // eslint-disable-next-line jest/valid-expect-in-promise

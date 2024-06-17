@@ -1,30 +1,63 @@
 const path = require('path')
-const logger = require('winston')
 const { deferConfig } = require('config/defer')
 
 const permissions = require('./permissions')
 const components = require('./components')
 const journal = require('./journal')
 
+// console.log('helloooooooo')
+
+// Object.keys(process.env)
+//   .filter(k =>
+//     [
+//       'POSTGRES_PORT',
+//       'POSTGRES_HOST',
+//       'POSTGRES_DB',
+//       'POSTGRES_USER',
+//       'POSTGRES_PASSWORD',
+//     ].includes(k),
+//   )
+//   .map(i => {
+//     console.log(`${k}: ${process.env[k]}`)
+//   })
+
 module.exports = {
   teams: {
-    seniorEditor: {
-      name: 'Senior Editor',
+    global: {
+      admin: {
+        displayName: 'Admin',
+        role: 'admin',
+      },
+      groupManager: {
+        displayName: 'Group Manager',
+        role: 'groupManager',
+      },
     },
-    handlingEditor: {
-      name: 'Handling Editor',
-    },
-    editor: {
-      name: 'Editor',
-    },
-    managingEditor: {
-      name: 'Managing Editor',
-    },
-    reviewer: {
-      name: 'Reviewer',
-    },
-    author: {
-      name: 'Author',
+    nonGlobal: {
+      seniorEditor: {
+        displayName: 'Senior Editor',
+        role: 'seniorEditor',
+      },
+      handlingEditor: {
+        displayName: 'Handling Editor',
+        role: 'handlingEditor',
+      },
+      editor: {
+        displayName: 'Editor',
+        role: 'editor',
+      },
+      managingEditor: {
+        displayName: 'Managing Editor',
+        role: 'managingEditor',
+      },
+      reviewer: {
+        displayName: 'Reviewer',
+        role: 'reviewer',
+      },
+      author: {
+        displayName: 'Author',
+        role: 'author',
+      },
     },
   },
   authsome: {
@@ -78,7 +111,6 @@ module.exports = {
       createRetryIntervalMillis: 100,
       propagateCreateError: false,
     },
-    logger,
     uploads: 'uploads',
     baseUrl: deferConfig(cfg => {
       const { protocol, host, port } = cfg['pubsweet-server']
@@ -101,21 +133,6 @@ module.exports = {
       }`
     }),
   },
-  // 'pubsweet-component-xpub-dashboard': {
-  //   acceptUploadFiles: [
-  //     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  //     'application/x-latex',
-  //     'text/vnd.latex-z',
-  //     'text/plain',
-  //     'text/x-tex',
-  //     'application/x-tex',
-  //     'application/x-dvi',
-  //     'application/pdf',
-  //     'application/epub+zip',
-  //     'application/zip',
-  //     '.tex',
-  //   ],
-  // },
   pagedjs: {
     clientId: '',
     clientSecret: '',
@@ -138,7 +155,6 @@ module.exports = {
   /** These named configuration sections will be available to webpack */
   publicKeys: [
     'pubsweet-client',
-    'pubsweet-component-xpub-dashboard',
     'pubsweet-component-xpub-formbuilder',
     'pubsweet',
     'detectionMethodCorrelations',

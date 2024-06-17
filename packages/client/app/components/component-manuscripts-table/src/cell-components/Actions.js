@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { Link } from '@pubsweet/ui'
+import { Link } from '../../../pubsweet'
 import { Action, LinkAction } from '../../../shared'
 import { articleStatuses } from '../../../../globals'
 import Modal from '../../../component-modal/src/Modal'

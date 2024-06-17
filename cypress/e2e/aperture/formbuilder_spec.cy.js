@@ -6,8 +6,8 @@ import { dashboard } from '../../support/routes'
 
 describe('Form builder', () => {
   it('views a form field', () => {
-    // task to restore the database as per the  dumps/commons/bootstrap.sql
-    cy.task('restore', 'commons/bootstrap')
+    const restoreUrl = Cypress.config('restoreUrl')
+    cy.request('POST', `${restoreUrl}/commons.bootstrap`)
 
     // login as admin
     // eslint-disable-next-line jest/valid-expect-in-promise
@@ -36,7 +36,7 @@ describe('Form builder', () => {
     cy.contains('Save').click()
 
     // for review field
-    Menu.clickSettings()
+    // Menu.clickSettings()
     cy.contains('Review').click()
     FormsPage.getFormTitleTab(0).should('contain', 'Review')
     FormsPage.clickFormOption(1)
@@ -55,7 +55,7 @@ describe('Form builder', () => {
     cy.contains('Save').click()
 
     // for decision field
-    Menu.clickSettings()
+    // Menu.clickSettings()
     cy.contains('Decision').click()
     FormsPage.getFormTitleTab(0).should('contain', 'Decision')
     FormsPage.clickFormOption(1)

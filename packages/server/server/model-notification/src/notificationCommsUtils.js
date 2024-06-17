@@ -200,7 +200,7 @@ const notify = async (
       const maxNotificationTime = new Date(time)
       maxNotificationTime.setMinutes(maxNotificationTime.getMinutes() + 30)
 
-      return new NotificationDigest({
+      return NotificationDigest.query().insert({
         time,
         maxNotificationTime,
         pathString: path.join('/'),
@@ -208,7 +208,7 @@ const notify = async (
         context,
         userId,
         groupId,
-      }).save()
+      })
     }
   })
 

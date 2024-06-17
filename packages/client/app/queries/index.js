@@ -524,6 +524,7 @@ export const GET_GROUPS = gql`
         icon {
           ${fileFields}
         }
+        flaxSiteUrl
       }
     }
   }

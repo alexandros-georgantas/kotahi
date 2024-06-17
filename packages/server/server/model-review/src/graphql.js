@@ -102,9 +102,10 @@ const resolvers = {
         .where('userId', ctx.user)
         .first()
 
-      member.status = status
-      member.updated = new Date().toISOString()
-      return member.save()
+      return member.$query().patchAndFetch({
+        status,
+        updated: new Date().toISOString(),
+      })
     },
   },
   Review: {

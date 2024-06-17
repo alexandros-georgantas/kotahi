@@ -6,8 +6,8 @@ import { DashboardPage } from '../../page-object/dashboard-page'
 
 describe('manuscripts page tests', () => {
   beforeEach(() => {
-    // task to restore the database as per the dumps/initial_state_other.sql
-    cy.task('restore', 'commons/colab_bootstrap')
+    const restoreUrl = Cypress.config('restoreUrl')
+    cy.request('POST', `${restoreUrl}/commons.colab_bootstrap`)
 
     // login as admin
     cy.fixture('role_names').then(name => {

@@ -1,3 +1,5 @@
+# This file is meant for running a development environment locally
+
 version: '3'
 
 services:
@@ -7,30 +9,21 @@ services:
       dockerfile: ./Dockerfile-development
     depends_on:
       - server
-    command:
-      [
-        'node_modules/.bin/webpack-dev-server',
-        '--config',
-        './webpack/webpack.development.config.js',
-      ]
+    command: ['node_modules/.bin/coko-client-dev']
     ports:
       - ${CLIENT_PORT:-4000}:${CLIENT_PORT:-4000}
     environment:
       - NODE_ENV=development
-      - CLIENT_PROTOCOL=${CLIENT_PROTOCOL:-http}
-      - CLIENT_HOST=0.0.0.0
+      - SERVER_URL=http://localhost:3000
       - CLIENT_PORT=${CLIENT_PORT:-4000}
-      - SERVER_PROTOCOL=http
-      - SERVER_HOST=server
-      - SERVER_PORT=3000
-      - PUBLIC_CLIENT_HOST=${PUBLIC_CLIENT_HOST:-0.0.0.0}
-      - USE_COLAB_EMAIL=${USE_COLAB_EMAIL:-false}
-      - USE_COLAB_BIOPHYSICS_IMPORT=${USE_COLAB_BIOPHYSICS_IMPORT:-false}
-      - FLAX_SITE_URL=${FLAX_SITE_URL:-http://localhost:8081}
+      - CLIENT_STATIC_FOLDER_PATH=../public
+      - CLIENT_FAST_REFRESH=1
+      - CLIENT_PAGE_TITLE=Kotahi - Open Journals
     volumes:
       - ./packages/client/app:/home/node/app/app
-      - ./packages/client/certs:/home/node/app/certs
-      - ./packages/client/config/translation:/home/node/app/config/translation
+      - ./packages/client/config:/home/node/app/config
+      - ./packages/client/public:/home/node/app/public
+    tty: true
 
   server:
     build:
@@ -78,6 +71,8 @@ services:
       - CLIENT_PROTOCOL=${CLIENT_PROTOCOL:-http}
       - CLIENT_HOST=${CLIENT_HOST:-127.0.0.1}
       - CLIENT_PORT=${CLIENT_PORT:-4000}
+      - CLIENT_URL=http://localhost:4000
+      - SERVER_URL=http://127.0.0.1:3000
       - PUBLIC_CLIENT_PROTOCOL=${PUBLIC_CLIENT_PROTOCOL:-}
       - PUBLIC_CLIENT_HOST=${PUBLIC_CLIENT_HOST:-}
       - PUBLIC_CLIENT_PORT=${PUBLIC_CLIENT_PORT:-}
@@ -155,11 +150,13 @@ services:
       - FLAX_CLIENT_ID=${FLAX_CLIENT_ID:-}
       - FLAX_CLIENT_SECRET=${FLAX_CLIENT_SECRET:-}
       - FLAX_CLIENT_API_URL=${FLAX_CLIENT_API_URL:-http://client:4000}
-      - FLAX_SITE_URL=${FLAX_SITE_URL:-false}
+      - FLAX_SITE_URL=${FLAX_SITE_URL:-http://localhost:8081}
       - USE_APERTURE_EMAIL=${USE_APERTURE_EMAIL:-false}
       - INSTANCE_GROUPS=${INSTANCE_GROUPS:-kotahi:journal}
       - USE_COLAB_BIOPHYSICS_IMPORT=${USE_COLAB_BIOPHYSICS_IMPORT:-false}
+      - E2E_TESTING_API=${E2E_TESTING_API}
     volumes:
+      - ./packages/server/api:/home/node/app/api
       - ./packages/server/config:/home/node/app/config
       - ./packages/server/models:/home/node/app/models
       - ./packages/server/scripts:/home/node/app/scripts

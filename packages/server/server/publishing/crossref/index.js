@@ -5,7 +5,9 @@ const xml2js = require('xml2js')
 const axios = require('axios')
 const path = require('path')
 const config = require('config')
-const { v4: uuid } = require('uuid')
+
+const { uuid } = require('@coko/server')
+
 const { upsertArtifact } = require('../publishingCommsUtils')
 const { parseDate } = require('../../utils/dateUtils')
 const checkIsAbstractValueEmpty = require('../../utils/checkIsAbstractValueEmpty')

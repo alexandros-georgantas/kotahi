@@ -3,7 +3,10 @@ import gql from 'graphql-tag'
 import { useQuery, useMutation } from '@apollo/client'
 import Profile from './Profile'
 import { Spinner, CommsErrorBanner } from '../../shared'
-import { version as kotahiVersion } from '../../../../package.json'
+
+import packageJson from '../../../../package.json'
+
+const { version: kotahiVersion } = packageJson
 
 const GET_USER = gql`
   query user($id: ID, $username: String) {
