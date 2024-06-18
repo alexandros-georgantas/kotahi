@@ -221,9 +221,9 @@ const GET_MANUSCRIPT_TEAMS = gql`
   }
 `
 
-const SEARCH_USERS_BY_EMAIL = gql`
-  mutation SearchUsersByEmail($search: String, $exclude: [ID]!) {
-    searchUsersByEmail(search: $search, exclude: $exclude) {
+const SEARCH_USERS_BY_NAME_OR_EMAIL = gql`
+  mutation SearchUsersByNameOrEmail($search: String, $exclude: [ID]!) {
+    searchUsersByNameOrEmail(search: $search, exclude: $exclude) {
       id
       profilePicture
       username
@@ -236,5 +236,5 @@ export {
   GET_MANUSCRIPT_AND_FORMS,
   GET_MANUSCRIPT_TEAMS,
   reviewFields,
-  SEARCH_USERS_BY_EMAIL,
+  SEARCH_USERS_BY_NAME_OR_EMAIL,
 }

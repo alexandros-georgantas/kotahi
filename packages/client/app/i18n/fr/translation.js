@@ -881,7 +881,7 @@ const fr = {
       submitForPublishing: 'Soumettre pour publication',
     },
     inviteCollaborator: {
-      selectPlaceholder: 'E-mail',
+      selectPlaceholder: 'Nom ou email',
       addUser: 'Ajouter',
     },
     chat: {

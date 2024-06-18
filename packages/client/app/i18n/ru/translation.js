@@ -874,7 +874,7 @@ const ru = {
       submitForPublishing: 'Отправить для публикации',
     },
     inviteCollaborator: {
-      selectPlaceholder: 'Электронная почта',
+      selectPlaceholder: 'Имя или адрес электронной почты',
       addUser: 'Добавить пользователя',
     },
     chat: {
