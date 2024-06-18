@@ -81,6 +81,11 @@ const KanbanBoard = ({
             invitation.invitedPersonType === 'REVIEWER' &&
             invitation.user?.id === reviewer.user.id,
         ),
+        suggestedReviewers: invitations.find(
+          invitation =>
+            invitation.invitedPersonType === 'REVIEWER' &&
+            invitation.user?.id === reviewer.user.id,
+        )?.suggestedReviewers,
       }
     }),
     ...invitations

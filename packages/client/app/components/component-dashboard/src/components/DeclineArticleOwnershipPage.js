@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react'
 import { Checkbox, TextArea } from '@pubsweet/ui/dist/atoms'
 import { Button } from '@pubsweet/ui'
 import { useMutation, useQuery } from '@apollo/client'
+import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { ADD_EMAIL_TO_BLACKLIST } from '../../../../queries/index'
 import AuthorsInput from '../../../component-submit/src/components/AuthorsInput'
@@ -23,6 +24,31 @@ import {
   ThankYouString,
 } from '../style'
 import InvitationLinkExpired from './InvitationLinkExpired'
+
+const SuggestedReviewersContainer = styled.div`
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  margin: 7px auto;
+  width: 100%;
+
+  > div > div {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+  }
+`
+
+const SuggestedReviewersScrollable = styled.div`
+  max-height: 200px;
+  overflow-y: scroll;
+  width: 100%;
+`
+
+const SuggestedReviewersSectionLabel = styled.h4`
+  font-weight: bold;
+  margin-bottom: 5px;
+`
 
 const DeclineArticleOwnershipPage = ({ match }) => {
   const config = useContext(ConfigContext)
@@ -146,10 +172,18 @@ const DeclineArticleOwnershipPage = ({ match }) => {
                   rows="4"
                   value={feedbackComment}
                 />
-                <AuthorsInput
-                  onChange={setSuggestedReviewers}
-                  value={suggestedReviewers}
-                />
+                <SuggestedReviewersContainer>
+                  <SuggestedReviewersSectionLabel>
+                    Suggested Reviewers
+                  </SuggestedReviewersSectionLabel>
+                  <SuggestedReviewersScrollable>
+                    <AuthorsInput
+                      onChange={setSuggestedReviewers}
+                      overrideButtonLabel="Add Suggested Reviewer"
+                      value={suggestedReviewers}
+                    />
+                  </SuggestedReviewersScrollable>
+                </SuggestedReviewersContainer>
                 <Checkbox
                   checked={checked}
                   label={t('declineReviewPage.dontWantContact')}

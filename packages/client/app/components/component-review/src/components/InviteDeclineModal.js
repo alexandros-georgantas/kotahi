@@ -19,6 +19,25 @@ const ResponseCommentRow = styled.div`
   gap: 10px;
 `
 
+const SuggestedReviewerRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`
+
+const SuggestedReviewerContainer = styled.div`
+  display: flex;
+`
+
+const SuggestedReviewerFieldLabel = styled.span`
+  font-weight: bold;
+  margin-right: 5px;
+`
+
+const SuggestedReviewerFieldValue = styled.span`
+  margin-right: 8px;
+`
+
 const ModalBodyRow = styled.div`
   align-items: center;
   display: flex;
@@ -85,13 +104,24 @@ const InviteDeclineModal = ({ invitation, isOpen, onClose }) => {
               t('modals.inviteDeclined.No reason provided')}
           </TextChange>
         </ResponseCommentRow>
-        <ResponseCommentRow>
+        <SuggestedReviewerRow>
           <StyledH4>Suggested Reviewers</StyledH4>
-          <TextChange gray={!invitation.responseComment}>
-            {invitation.suggestedReviewers ||
-              t('modals.inviteDeclined.No reason provided')}
-          </TextChange>
-        </ResponseCommentRow>
+          {invitation.suggestedReviewers.map((reviewer, i) => (
+            /* eslint-disable react/no-array-index-key */
+            <SuggestedReviewerContainer key={`suggestedReviewer-${i}`}>
+              <SuggestedReviewerFieldLabel>
+                Full Name:
+              </SuggestedReviewerFieldLabel>
+              <SuggestedReviewerFieldValue>
+                {`${reviewer.firstName} ${reviewer.lastName}`}
+              </SuggestedReviewerFieldValue>
+              <SuggestedReviewerFieldLabel>Email:</SuggestedReviewerFieldLabel>
+              <SuggestedReviewerFieldValue>
+                {reviewer.email}
+              </SuggestedReviewerFieldValue>
+            </SuggestedReviewerContainer>
+          ))}
+        </SuggestedReviewerRow>
       </ModalBody>
     </Modal>
   )
