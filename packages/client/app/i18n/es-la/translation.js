@@ -871,7 +871,7 @@ const esLa = {
       submitForPublishing: 'Enviar para publicación',
     },
     inviteCollaborator: {
-      selectPlaceholder: 'Correo electrónico',
+      selectPlaceholder: 'Nombre o correo electrónico',
       addUser: 'Agregar usuario',
     },
     chat: {

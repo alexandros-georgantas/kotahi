@@ -7,7 +7,10 @@ import { grid, th } from '@pubsweet/ui-toolkit'
 import { useQuery, useMutation } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { ActionButton, SelectAsync, Select } from '../../../shared'
-import { GET_MANUSCRIPT_TEAMS, SEARCH_USERS_BY_EMAIL } from '../graphql/queries'
+import {
+  GET_MANUSCRIPT_TEAMS,
+  SEARCH_USERS_BY_NAME_OR_EMAIL,
+} from '../graphql/queries'
 import { isAdmin, isAuthor } from '../../../../shared/userPermissions'
 import {
   ADD_TEAM_MEMBERS,
@@ -162,7 +165,7 @@ const InviteCollaborators = ({ channelId, currentUser, manuscript }) => {
     },
   })
 
-  const [searchForUsers] = useMutation(SEARCH_USERS_BY_EMAIL)
+  const [searchForUsers] = useMutation(SEARCH_USERS_BY_NAME_OR_EMAIL)
 
   const [addTeamMembers] = useMutation(ADD_TEAM_MEMBERS, refetchChatUserOptions)
 
@@ -195,8 +198,8 @@ const InviteCollaborators = ({ channelId, currentUser, manuscript }) => {
     }
 
     return searchForUsers({ variables }).then(({ data }) => {
-      const { searchUsersByEmail } = data
-      return searchUsersByEmail
+      const { searchUsersByNameOrEmail } = data
+      return searchUsersByNameOrEmail
     })
   }
 

@@ -848,7 +848,7 @@ const en = {
       submitForPublishing: 'Submit for publishing',
     },
     inviteCollaborator: {
-      selectPlaceholder: 'Email',
+      selectPlaceholder: 'Name or Email',
       addUser: 'Add user',
     },
     chat: {

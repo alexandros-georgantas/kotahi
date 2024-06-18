@@ -454,13 +454,19 @@ const resolvers = {
 
       return user
     },
-    searchUsersByEmail(_, { search, exclude }, ctx) {
+    searchUsersByNameOrEmail(_, { search, exclude }, ctx) {
       if (!search) {
         return []
       }
 
+      const searchLowerCase = search.toLowerCase()
+
       return User.query()
-        .where({ email: search.toLowerCase() })
+        .where(builder =>
+          builder
+            .where({ email: searchLowerCase })
+            .orWhere('username', 'ilike', `%${searchLowerCase}%`),
+        )
         .whereNotIn('id', exclude || [])
     },
   },
@@ -562,7 +568,7 @@ const typeDefs = `
     setGlobalRole(userId: ID!, role: String!, shouldEnable: Boolean!): User!
     setGroupRole(userId: ID!, role: String!, shouldEnable: Boolean!): User!
     expandChat(state: Boolean!): User!
-	searchUsersByEmail(search: String, exclude: [ID]!): [User]
+	searchUsersByNameOrEmail(search: String, exclude: [ID]!): [User]
   }
 
   type UpdateEmailResponse {
