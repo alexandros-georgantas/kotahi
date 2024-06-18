@@ -99,6 +99,7 @@ const ru = {
       Manuscript: 'Рукопись',
       Dashboard: 'Панель управления',
       Manuscripts: 'Статьи',
+      Articles: 'Статьи',
       Reports: 'Аналитика',
       Settings: 'Параметры',
       Forms: 'Формы',
@@ -214,9 +215,13 @@ const ru = {
     },
     manuscriptsPage: {
       Manuscripts: 'Статьи',
+      Articles: 'Статьи',
       archivedManuscripts: 'Архивированные статьи',
-      viewArchived: 'Просмотреть архивированные статьи',
-      viewUnarchived: 'Вернуться к неархивированным статьям',
+      archivedArticles: 'Архивные статьи',
+      viewArchivedManuscripts: 'Просмотреть архивированные статьи',
+      viewArchivedArticles: 'Просмотреть архивированные статьи',
+      viewUnarchivedManuscripts: 'Вернуться к неархивированным статьям',
+      viewUnarchivedArticles: 'Вернуться к неархивированным статьям',
       manuscriptInvalid:
         'Эта рукопись содержит неполные или недопустимые поля. Исправьте их и повторите попытку.',
       importPending: 'импорт',
