@@ -260,6 +260,7 @@ const Submit = ({
       <Manuscript>
         <ErrorBoundary>
           <VersionSwitcher
+            channelId={channelId}
             Confirm={Confirm}
             currentUser={currentUser}
             InviteCollaborators={InviteCollaborators}
