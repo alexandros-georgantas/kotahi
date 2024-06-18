@@ -97,6 +97,7 @@ const en = {
       Manuscript: 'Manuscript',
       Dashboard: 'Dashboard',
       Manuscripts: 'Manuscripts',
+      Articles: 'Articles',
       Reports: 'Reports',
       Settings: 'Settings',
       Forms: 'Forms',
@@ -213,9 +214,13 @@ const en = {
     },
     manuscriptsPage: {
       Manuscripts: 'Manuscripts',
+      Articles: 'Articles',
       archivedManuscripts: 'Archived manuscripts',
-      viewArchived: 'View archived manuscripts',
-      viewUnarchived: 'Return to unarchived manuscripts',
+      archivedArticles: 'Archived articles',
+      viewArchivedManuscripts: 'View archived manuscripts',
+      viewArchivedArticles: 'View archived articles',
+      viewUnarchivedManuscripts: 'Return to unarchived manuscripts',
+      viewUnarchivedArticles: 'Return to unarchived articles',
       manuscriptInvalid:
         'This manuscript has incomplete or invalid fields. Please correct these and try again.',
       importPending: 'pending',

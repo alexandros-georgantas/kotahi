@@ -207,6 +207,8 @@ const AdminPage = () => {
   const isGroupManager = currentUser?.groupRoles?.includes('groupManager')
   const isAdmin = currentUser?.globalRoles?.includes('admin')
 
+  const isLabInstance = ['lab'].includes(instanceName)
+
   if (
     currentUser &&
     (isUser || isGroupManager || isAdmin) &&
@@ -223,7 +225,7 @@ const AdminPage = () => {
   if (isGroupManager) {
     links.push({
       link: manuscriptsLink,
-      name: t('leftMenu.Manuscripts'),
+      name: t(`leftMenu.${isLabInstance ? 'Articles' : 'Manuscripts'}`),
       icon: 'file-text',
     })
     if (config?.report?.showInMenu)
@@ -247,22 +249,20 @@ const AdminPage = () => {
           links: [
             {
               link: submissionFormBuilderLink,
-              name: t(
-                `leftMenu.${
-                  ['lab'].includes(config.instanceName)
-                    ? 'Metadata'
-                    : 'Submission'
-                }`,
-              ),
+              name: t(`leftMenu.${isLabInstance ? 'Metadata' : 'Submission'}`),
             },
-            {
-              link: reviewFormBuilderLink,
-              name: t('leftMenu.Review'),
-            },
-            {
-              link: decisionFormBuilderLink,
-              name: t('leftMenu.Decision'),
-            },
+            ...(isLabInstance
+              ? []
+              : [
+                  {
+                    link: reviewFormBuilderLink,
+                    name: t('leftMenu.Review'),
+                  },
+                  {
+                    link: decisionFormBuilderLink,
+                    name: t('leftMenu.Decision'),
+                  },
+                ]),
           ],
         },
         {

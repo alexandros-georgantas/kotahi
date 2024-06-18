@@ -97,6 +97,7 @@ const fr = {
       Manuscript: 'Manuscrit',
       Dashboard: 'Tableau de bord',
       Manuscripts: 'Manuscrits',
+      Articles: 'Des Articles',
       Reports: 'Rapports',
       Settings: 'Paramètres',
       Forms: 'Formulaires',
@@ -217,9 +218,13 @@ const fr = {
     },
     manuscriptsPage: {
       Manuscripts: 'Manuscrits',
+      Articles: 'Des Articles',
       archivedManuscripts: 'Manuscrits archivés',
-      viewArchived: 'Voir les manuscrits archivés',
-      viewUnarchived: 'Retourner aux manuscrits non archivés',
+      archivedArticles: 'Articles archivés',
+      viewArchivedManuscripts: 'Voir les manuscrits archivés',
+      viewArchivedArticles: 'Voir les articles archivés',
+      viewUnarchivedManuscripts: 'Retourner aux manuscrits non archivés',
+      viewUnarchivedArticles: 'Retourner aux articles non archivés',
       manuscriptInvalid:
         'Ce manuscrit a des champs incomplets ou invalides. Veuillez les corriger et réessayer.',
       importPending: 'en attente',

@@ -98,6 +98,7 @@ const esLa = {
       Manuscript: 'Manuscrito',
       Dashboard: 'Tablero',
       Manuscripts: 'Manuscritos',
+      Articles: 'Artículos',
       Reports: 'Informes',
       Settings: 'Configuración',
       Forms: 'Formularios',
@@ -215,9 +216,13 @@ const esLa = {
     },
     manuscriptsPage: {
       Manuscripts: 'Manuscritos',
+      Articles: 'Artículos',
       archivedManuscripts: 'Manuscritos archivados',
-      viewArchived: 'Ver manuscritos archivados',
-      viewUnarchived: 'Volver a los manuscritos no archivados',
+      archivedArticles: 'Artículos archivados',
+      viewArchivedManuscripts: 'Ver manuscritos archivados',
+      viewArchivedArticles: 'Ver artículos archivados',
+      viewUnarchivedManuscripts: 'Volver a los manuscritos no archivados',
+      viewUnarchivedArticles: 'Ver artículos no archivados',
       manuscriptInvalid:
         'Este manuscrito tiene campos incompletos o inválidos. Por favor, corrígelos e inténtalo de nuevo.',
       importPending: 'pendiente',
