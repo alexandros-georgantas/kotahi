@@ -15,6 +15,7 @@ import {
   UPDATE_TEAM_MEMBER,
 } from '../graphql/mutations'
 import CollaboratorList from './CollaboratorList'
+import { CHANNEL_USERS_FOR_MENTION } from '../../../component-chat/src/Messages/queries'
 
 const Wrapper = styled.div`
   display: flex;
@@ -131,7 +132,7 @@ AccessRightsInput.propTypes = {
     .isRequired,
 }
 
-const InviteCollaborators = ({ currentUser, manuscript }) => {
+const InviteCollaborators = ({ channelId, currentUser, manuscript }) => {
   const [noAvailableUsers, setNoAvailableUsers] = useState(true)
   const [manuscriptTeams, setManuscriptTeams] = useState([])
   const [addingUsers, setAddingUsers] = useState(false)
@@ -142,6 +143,12 @@ const InviteCollaborators = ({ currentUser, manuscript }) => {
       objectId: manuscript.id,
       objectType: 'manuscript',
     },
+  }
+
+  const refetchChatUserOptions = {
+    refetchQueries: [
+      { query: CHANNEL_USERS_FOR_MENTION, variables: { channelId } },
+    ],
   }
 
   const {
@@ -157,11 +164,14 @@ const InviteCollaborators = ({ currentUser, manuscript }) => {
 
   const [searchForUsers] = useMutation(SEARCH_USERS_BY_EMAIL)
 
-  const [addTeamMembers] = useMutation(ADD_TEAM_MEMBERS)
+  const [addTeamMembers] = useMutation(ADD_TEAM_MEMBERS, refetchChatUserOptions)
 
   const [updateTeamMemberStatus] = useMutation(UPDATE_TEAM_MEMBER)
 
-  const [removeTeamMember] = useMutation(REMOVE_TEAM_MEMBER)
+  const [removeTeamMember] = useMutation(
+    REMOVE_TEAM_MEMBER,
+    refetchChatUserOptions,
+  )
 
   const accessOptions = [
     {
@@ -237,9 +247,16 @@ const InviteCollaborators = ({ currentUser, manuscript }) => {
   const handleRemoveTeamMember = variables => {
     return removeTeamMember({
       variables,
-    }).then(async removeTeamData => {
+    }).then(async ({ data: removeTeamData }) => {
       const { data } = await refetchManuscriptTeams()
-      setManuscriptTeams(data.teams)
+
+      const authorTeam = data.teams.find(team => team.role === 'author')
+      const collabTeam = data.teams.find(team => team.role === 'collaborator')
+      collabTeam.members = collabTeam.members.filter(
+        collaborator => collaborator.id !== removeTeamData.removeTeamMember.id,
+      )
+
+      setManuscriptTeams([collabTeam, authorTeam])
       return removeTeamData
     })
   }
