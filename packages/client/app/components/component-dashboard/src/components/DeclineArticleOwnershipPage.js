@@ -4,6 +4,7 @@ import { Button } from '@pubsweet/ui'
 import { useMutation, useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
 import { ADD_EMAIL_TO_BLACKLIST } from '../../../../queries/index'
+import AuthorsInput from '../../../component-submit/src/components/AuthorsInput'
 import {
   UPDATE_INVITATION_RESPONSE,
   UPDATE_INVITATION_STATUS,
@@ -26,6 +27,10 @@ import InvitationLinkExpired from './InvitationLinkExpired'
 const DeclineArticleOwnershipPage = ({ match }) => {
   const config = useContext(ConfigContext)
   const { invitationId } = match.params
+
+  const [checked, setChecked] = useState(false)
+  const [feedbackComment, setFeedbackComment] = useState('')
+  const [suggestedReviewers, setSuggestedReviewers] = useState([])
 
   const { data } = useQuery(GET_INVITATION_STATUS, {
     variables: { id: invitationId },
@@ -66,9 +71,6 @@ const DeclineArticleOwnershipPage = ({ match }) => {
     },
   })
 
-  const [checked, setChecked] = useState(false)
-  const [feedbackComment, setFeedbackComment] = useState('')
-
   const handleChange = () => {
     setChecked(!checked)
   }
@@ -89,6 +91,12 @@ const DeclineArticleOwnershipPage = ({ match }) => {
         id: invitationId,
         responseComment: feedbackComment,
         declinedReason: checked ? 'DO_NOT_CONTACT' : null,
+        suggestedReviewers: suggestedReviewers.map(reviewer => ({
+          firstName: reviewer.firstName,
+          lastName: reviewer.lastName,
+          email: reviewer.email,
+          affiliation: reviewer.affiliation,
+        })),
       },
     })
   }
@@ -137,6 +145,10 @@ const DeclineArticleOwnershipPage = ({ match }) => {
                   placeholder={t('declineReviewPage.messageHere')}
                   rows="4"
                   value={feedbackComment}
+                />
+                <AuthorsInput
+                  onChange={setSuggestedReviewers}
+                  value={suggestedReviewers}
                 />
                 <Checkbox
                   checked={checked}

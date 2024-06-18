@@ -85,6 +85,13 @@ const InviteDeclineModal = ({ invitation, isOpen, onClose }) => {
               t('modals.inviteDeclined.No reason provided')}
           </TextChange>
         </ResponseCommentRow>
+        <ResponseCommentRow>
+          <StyledH4>Suggested Reviewers</StyledH4>
+          <TextChange gray={!invitation.responseComment}>
+            {invitation.suggestedReviewers ||
+              t('modals.inviteDeclined.No reason provided')}
+          </TextChange>
+        </ResponseCommentRow>
       </ModalBody>
     </Modal>
   )
