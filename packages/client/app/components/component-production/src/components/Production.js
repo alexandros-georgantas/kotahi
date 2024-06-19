@@ -146,6 +146,7 @@ const Production = ({
   const { t } = useTranslation()
 
   const config = useContext(ConfigContext)
+  const getDataFromDatacite = config?.production?.getDataFromDatacite
 
   const editorSection = {
     content: (
@@ -162,6 +163,7 @@ const Production = ({
                 //   updateManuscript(manuscript.id, { meta: { source } })
                 // }}
                 client={client}
+                getDataFromDatacite={getDataFromDatacite}
                 isAuthorProofingVersion={isAuthorProofingVersion}
                 manuscriptId={manuscript.id}
                 onAssetManager={onAssetManager}

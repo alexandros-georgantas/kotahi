@@ -66,6 +66,7 @@ const CitationComponent = ({ node, getPos }) => {
     CrossRefTransformation,
     CiteProcTransformation,
     readOnly,
+    getDataFromDatacite,
   } = citationConfig
 
   const {
@@ -87,6 +88,12 @@ const CitationComponent = ({ node, getPos }) => {
 
   const formattedOriginalText =
     originalText || `<p class="ref">${makeHtmlFrom(node.content)}</p>`
+
+  if (getDataFromDatacite) {
+    if (originalText.indexOf('doi') > -1) {
+      // console.log('DOI found in originalText')
+    }
+  }
 
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)

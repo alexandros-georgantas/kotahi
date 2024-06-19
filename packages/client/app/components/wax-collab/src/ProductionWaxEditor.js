@@ -84,6 +84,7 @@ const ProductionWaxEditor = ({
   manuscriptId,
   onAssetManager,
   isAuthorProofingVersion,
+  getDataFromDatacite,
   ...rest
 }) => {
   const handleAssetManager = () => onAssetManager(manuscriptId)
@@ -231,6 +232,7 @@ const ProductionWaxEditor = ({
                   updateCrossRef,
                   updateCiteProc,
                   readonly,
+                  getDataFromDatacite || false,
                 )
           }
           fileUpload={file => renderImage(file)}
