@@ -603,6 +603,8 @@ const fr = {
         cse: 'Conseil des éditeurs scientifiques (CSE)',
         'Select locale for citations':
           'Sélectionnez la langue pour les citations',
+        getDataFromDatacite:
+          'Obtenez des données de citation à partir de Datacite',
       },
       allowedIPs: 'Liste des adresses IP du référentiel autorisées à accéder',
       api: 'API Kotahi',

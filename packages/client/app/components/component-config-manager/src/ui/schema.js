@@ -606,6 +606,11 @@ export const generateSchemas = (
               enum: ['en-US', 'en-GB'],
               default: 'en-US',
             },
+            getDataFromDatacite: {
+              type: 'boolean',
+              title: t('configPage.production.getDataFromDatacite'),
+              default: false,
+            },
           },
         },
 
@@ -1431,6 +1436,11 @@ export const generateSchemas = (
               ),
               enum: ['en-US', 'en-GB'],
               default: 'en-US',
+            },
+            getDataFromDatacite: {
+              type: 'boolean',
+              title: t('configPage.production.getDataFromDatacite'),
+              default: false,
             },
           },
         },
@@ -2262,6 +2272,11 @@ export const generateSchemas = (
               enum: ['en-US', 'en-GB'],
               default: 'en-US',
             },
+            getDataFromDatacite: {
+              type: 'boolean',
+              title: t('configPage.production.getDataFromDatacite'),
+              default: false,
+            },
           },
         },
         publishing: {
@@ -3092,6 +3107,11 @@ export const generateSchemas = (
               enum: ['en-US', 'en-GB'],
               default: 'en-US',
             },
+            getDataFromDatacite: {
+              type: 'boolean',
+              title: t('configPage.production.getDataFromDatacite'),
+              default: false,
+            },
           },
         },
         publishing: {
@@ -3599,6 +3619,11 @@ export const generateSchemas = (
               ),
               enum: ['en-US', 'en-GB'],
               default: 'en-US',
+            },
+            getDataFromDatacite: {
+              type: 'boolean',
+              title: t('configPage.production.getDataFromDatacite'),
+              default: false,
             },
           },
         },
