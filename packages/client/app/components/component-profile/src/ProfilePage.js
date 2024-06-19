@@ -1,6 +1,9 @@
 import React from 'react'
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from '@apollo/client'
+
+import { serverUrl } from '@coko/client'
+
 import Profile from './Profile'
 import { Spinner, CommsErrorBanner } from '../../shared'
 
@@ -90,7 +93,7 @@ const ProfilePage = ({ currentUser, match }) => {
     const body = new FormData()
     body.append('file', acceptedFiles[0])
 
-    await fetch('/api/uploadProfile', {
+    await fetch(`${serverUrl}/api/uploadProfile`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
