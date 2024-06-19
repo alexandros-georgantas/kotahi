@@ -12544,10 +12544,10 @@ prosemirror-schema-list@1.3.0:
     prosemirror-state "^1.0.0"
     prosemirror-transform "^1.7.3"
 
-prosemirror-state@1.4.2, prosemirror-state@^1.0.0, prosemirror-state@^1.2.2, prosemirror-state@^1.4.1:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/prosemirror-state/-/prosemirror-state-1.4.2.tgz#f93bd8a33a4454efab917ba9b738259d828db7e5"
-  integrity sha512-puuzLD2mz/oTdfgd8msFbe0A42j5eNudKAAPDB0+QJRw8cO1ygjLmhLrg9RvDpf87Dkd6D4t93qdef00KKNacQ==
+prosemirror-state@1.4.3, prosemirror-state@^1.0.0, prosemirror-state@^1.2.2, prosemirror-state@^1.4.1:
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/prosemirror-state/-/prosemirror-state-1.4.3.tgz#94aecf3ffd54ec37e87aa7179d13508da181a080"
+  integrity sha512-goFKORVbvPuAQaXhpbemJFRKJ2aixr+AZMGiquiqKxaucC6hlpHNZHWgz5R7dS4roHiwq9vDctE//CZ++o0W1Q==
   dependencies:
     prosemirror-model "^1.0.0"
     prosemirror-transform "^1.0.0"
@@ -15953,10 +15953,10 @@ watchpack@^2.2.0, watchpack@^2.4.1:
     glob-to-regexp "^0.4.1"
     graceful-fs "^4.1.2"
 
-wax-prosemirror-core@0.9.4, wax-prosemirror-core@^0.9.4:
-  version "0.9.4"
-  resolved "https://registry.yarnpkg.com/wax-prosemirror-core/-/wax-prosemirror-core-0.9.4.tgz#94b24aaed8883f5607f94b886cb718b694ddb6f2"
-  integrity sha512-A8OQ1GQQyIka3J3vs/Y64AYn0YfFW+Jy4DcQUYuJZJ+ad/OKCtc5IJfpPkTw5hHjrd5/jlvDaAEqXpBJHl4+ig==
+wax-prosemirror-core@0.9.39, wax-prosemirror-core@^0.9.39:
+  version "0.9.39"
+  resolved "https://registry.yarnpkg.com/wax-prosemirror-core/-/wax-prosemirror-core-0.9.39.tgz#e24770df5893c2a7808c8fe69a1325b8a0b1acf7"
+  integrity sha512-kFD1FOr6/qBKCaWPjJOPODUo9Efg0/1JhuuwIc5YeyKnxeNYG9xOnxpF0ENCbSvwmbD0O4ZGTMo3KOG3gtPmTQ==
   dependencies:
     "@pubsweet/ui-toolkit" "^2.3.1"
     deepmerge "^4.2.2"
@@ -15973,17 +15973,17 @@ wax-prosemirror-core@0.9.4, wax-prosemirror-core@^0.9.4:
     prosemirror-keymap "1.2.1"
     prosemirror-model "1.19.0"
     prosemirror-schema-list "1.3.0"
-    prosemirror-state "1.4.2"
+    prosemirror-state "1.4.3"
     prosemirror-transform "1.7.1"
     prosemirror-view "1.30.2"
     react-i18next "^13.3.1"
     reflect-metadata "^0.1.13"
     uuid "^7.0.3"
 
-wax-prosemirror-services@0.9.4:
-  version "0.9.4"
-  resolved "https://registry.yarnpkg.com/wax-prosemirror-services/-/wax-prosemirror-services-0.9.4.tgz#1d2ab1e03f95031bceb2af5ad2eb267d8356d10c"
-  integrity sha512-3PiqrOLuQY7u1Fyy1SYOZjn9e0o4XptQ7dBOCKqyFc+RSrF3XEO2dTvrd3PcSraHhDuk87Bq0E1BTPHx0gr4Gg==
+wax-prosemirror-services@0.9.39:
+  version "0.9.39"
+  resolved "https://registry.yarnpkg.com/wax-prosemirror-services/-/wax-prosemirror-services-0.9.39.tgz#49ca85459ba6d2a10d157d1533a08f727271c9cf"
+  integrity sha512-vWlLPjGkN1tFFK4jpVC6R9p0zb2M9Ua/Bz5uCSZyb4jX4AppzBKbIsDecFwMOTqPaiyjRh8pLSzHVxVMJtgnGQ==
   dependencies:
     "@pubsweet/ui-toolkit" "^2.3.1"
     highlight.js "^10.1.1"
@@ -15999,7 +15999,7 @@ wax-prosemirror-services@0.9.4:
     prosemirror-keymap "1.2.1"
     prosemirror-model "1.19.0"
     prosemirror-schema-list "1.3.0"
-    prosemirror-state "1.4.2"
+    prosemirror-state "1.4.3"
     prosemirror-transform "1.7.1"
     prosemirror-view "1.30.2"
     rc-switch "^3.2.2"
@@ -16007,28 +16007,28 @@ wax-prosemirror-services@0.9.4:
     react-i18next "^13.3.1"
     use-deep-compare-effect "^1.3.1"
     uuid "^7.0.3"
-    wax-prosemirror-core "^0.9.4"
+    wax-prosemirror-core "^0.9.39"
     y-prosemirror "1.2.0"
     y-protocols "1.0.5"
     y-webrtc "10.2.0"
     y-websocket "1.4.5"
     yjs "13.5.38"
 
-wax-table-service@0.9.4:
-  version "0.9.4"
-  resolved "https://registry.yarnpkg.com/wax-table-service/-/wax-table-service-0.9.4.tgz#48627542c90c00353ff8e222a44ae159138c53ac"
-  integrity sha512-zWk5fta6WqZoNkriplcrz3HkbR1PKb+nLd3EVIjm1LSMrqWLmfuNgDyssrJyfheDMUGAC0uIgIUOYFUa6aE6Nw==
+wax-table-service@0.9.39:
+  version "0.9.39"
+  resolved "https://registry.yarnpkg.com/wax-table-service/-/wax-table-service-0.9.39.tgz#03227bad2b60227ba449fb02312a1895f15ca0a2"
+  integrity sha512-SZLLftyBHPR5OWpA0J+islP0WZ6NffuThzvfZBSk2YWlhuZmHdlDRv2btezPaC100PcEvhg8/ZZQqrzv4FEdoQ==
   dependencies:
     "@pubsweet/ui-toolkit" "^2.3.1"
     inversify "^5.0.1"
     lodash "^4.17.4"
     prosemirror-keymap "1.2.1"
-    prosemirror-state "1.4.2"
+    prosemirror-state "1.4.3"
     prosemirror-transform "1.7.1"
     prosemirror-view "1.30.2"
     react-i18next "^13.3.1"
     uuid "^7.0.3"
-    wax-prosemirror-core "^0.9.4"
+    wax-prosemirror-core "^0.9.39"
 
 wbuf@^1.1.0, wbuf@^1.7.3:
   version "1.7.3"
