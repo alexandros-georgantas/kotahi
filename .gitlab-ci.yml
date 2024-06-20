@@ -19,7 +19,7 @@ stages:
   - Tear down test
   # - Publish
 
-.build development:
+build development:
   stage: Build development
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:26-dind
   services:
@@ -27,16 +27,12 @@ stages:
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   script:
-    # - docker pull $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest || true
-    # --cache-from $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest
-    # --tag $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest
     - docker build
       --tag $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
       -f Dockerfile .
     - docker push $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
-    # - docker push $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.latest
 
-.lint:
+lint:
   stage: Lint & Unit test
   image: $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
   script:
@@ -88,8 +84,6 @@ deploy test:
     name: review/$CI_COMMIT_REF_NAME
     url: https://$CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_COMMIT_REF_NAME.coko.app
     on_stop: teardown test
-  # rules:
-  #   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   variables:
     ANSCOMPOSE_POSTGRES_ALLOW_SELF_SIGNED_CERTIFICATES: true
     ANSCOMPOSE_ORCID_CLIENT_ID: $ORCID_CLIENT_ID_2
