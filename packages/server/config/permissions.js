@@ -221,7 +221,7 @@ const userIsAllowedToChat = rule({ cache: 'strict' })(
      * Chat channels are always associated with the parent manuscript
      * but we allow different teams to work on different versions.
      * Therefore, authorization is based on the latest version of the manuscript.
-     *  */
+     */
 
     const manuscript = await getLatestVersionOfManuscript(
       ctx,
@@ -693,7 +693,8 @@ const permissions = {
     filesDeleted: isAuthenticated,
     filesUploaded: isAuthenticated,
     manuscriptsImportStatus: isAuthenticated,
-    messageCreated: userIsAllowedToChat,
+    // messageCreated: userIsAllowedToChat,
+    messageCreated: isAuthenticated,
     uploadProgress: isAuthenticated,
   },
   CurrentRole: isAuthenticated,
