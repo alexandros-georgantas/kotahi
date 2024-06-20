@@ -16,7 +16,7 @@ const Info = styled.span`
 
 const Columns = styled.div`
   display: grid;
-  grid-template-areas: 'manuscript chat';
+  grid-template-areas: "manuscript chat";
   grid-template-columns: ${({ chatProps }) => (chatProps ? '3fr 2fr' : '3fr')};
   height: 100%;
   overflow: hidden;
