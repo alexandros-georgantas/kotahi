@@ -36,6 +36,8 @@ const decodeEntities = s => {
   return str
 }
 
+const matchDoi = /(10.(\d)+\/([^(\s>"<)])+)/i
+
 const serializer = schema => {
   const WaxSerializer = DOMSerializer.fromSchema(schema)
 
@@ -88,12 +90,6 @@ const CitationComponent = ({ node, getPos }) => {
 
   const formattedOriginalText =
     originalText || `<p class="ref">${makeHtmlFrom(node.content)}</p>`
-
-  if (getDataFromDatacite) {
-    if (originalText.indexOf('doi') > -1) {
-      // console.log('DOI found in originalText')
-    }
-  }
 
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -220,8 +216,14 @@ const CitationComponent = ({ node, getPos }) => {
     return { anyStyle: thisResponse }
   }
 
-  const sendToCrossRef = async text => {
-    const response = await CrossRefTransformation(text)
+  const sendToCrossRef = async (text, useDatacite) => {
+    if (useDatacite) {
+      console.log('datacite being used!')
+      const response = await CrossRefTransformation(text, true)
+      return { crossRef: response || [] }
+    }
+
+    const response = await CrossRefTransformation(text, false)
     // Note: if this is failing, the function should return an empty array
     return { crossRef: response || [] }
   }
@@ -234,7 +236,7 @@ const CitationComponent = ({ node, getPos }) => {
 
       await Promise.all([
         await sendToAnystyle(formattedOriginalText),
-        await sendToCrossRef(formattedOriginalText),
+        await sendToCrossRef(formattedOriginalText, false),
       ]).then(data => {
         const newStructures = {
           ...structures,
@@ -261,14 +263,33 @@ const CitationComponent = ({ node, getPos }) => {
       })
     }
 
-    if (
-      needsValidation &&
-      !loading &&
-      !structures.crossRef.length &&
-      !(JSON.stringify(structures.anyStyle).length > 2)
-    ) {
-      // we shouldn't do this if we already have crossref/anystyle versions
-      getVersions()
+    const getDataciteData = async doi => {
+      setLoading(true)
+      await sendToCrossRef(doi, true).then(data => {
+        console.log('returned: ', data)
+      })
+    }
+
+    if (needsValidation) {
+      if (getDataFromDatacite) {
+        // If we're doing this, try to get the DOI from the text.
+        if (formattedOriginalText.match(matchDoi)) {
+          const thisDoi = formattedOriginalText.match(matchDoi)[0]
+          console.log('DOI found in originalText', thisDoi)
+          getDataciteData(thisDoi)
+        } else {
+          console.log('No DOI in this citation:', formattedOriginalText)
+        }
+      }
+
+      if (
+        !loading &&
+        !structures.crossRef.length &&
+        !(JSON.stringify(structures.anyStyle).length > 2)
+      ) {
+        // we shouldn't do this if we already have crossref/anystyle versions
+        getVersions()
+      }
     }
   }, [formattedOriginalText, internalNeedsValidation])
 

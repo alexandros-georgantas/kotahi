@@ -323,7 +323,7 @@ const en = {
       },
       metadata: {
         title: 'Title',
-        description: 'Decription',
+        description: 'Description',
         publicationDate: 'Date of publication',
         image: 'Image',
         deleteImage: 'Delete Image',
@@ -447,7 +447,7 @@ const en = {
       'Group Identity': 'Group Identity',
       'Brand name': 'Brand name',
       title: 'Title',
-      description: 'Decription',
+      description: 'Description',
       issn: 'ISSN',
       contact: 'Contact',
       'Brand primary colour': 'Brand primary colour',
