@@ -8,7 +8,7 @@ ARG server_url
 ENV NODE_ENV='production'
 ENV SERVER_URL=$server_url
 ENV CLIENT_STATIC_FOLDER_PATH=../public
-ENV CLIENT_PAGE_TITLE=Kotahi - Open Journals
+ENV CLIENT_PAGE_TITLE='Kotahi - Open Journals'
 
 WORKDIR /home/node/app
 

@@ -15,14 +15,15 @@ stages:
   - Lint & Unit test
   - Build production
   - Deploy test
+  - End to end testing
   - Tear down test
   # - Publish
 
 .build development:
   stage: Build development
-  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:23-dind
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:26-dind
   services:
-    - docker:23-dind
+    - docker:26-dind
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   script:
@@ -44,9 +45,9 @@ stages:
 
 build production client:
   stage: Build production
-  image: docker:23
+  image: docker:26
   services:
-    - docker:23-dind
+    - docker:26-dind
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   script:
@@ -62,9 +63,9 @@ build production client:
 
 build production server:
   stage: Build production
-  image: docker:23
+  image: docker:26
   services:
-    - docker:23-dind
+    - docker:26-dind
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   script:
@@ -82,7 +83,7 @@ deploy test:
   stage: Deploy test
   image: $CI_REGISTRY/cokoinfra/ansible-deployer
   services:
-    - docker:23-dind
+    - docker:26-dind
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: https://$CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_COMMIT_REF_NAME.coko.app
@@ -111,11 +112,17 @@ deploy test:
     - cd /ansible
     - ANSIBLE_FORCE_COLOR=true ansible-playbook bootstrap.yml -e "compose_file=$DEPLOY_COMPOSE_FILE"
 
+run end to end tests:
+  stage: End to end testing
+  image: $CI_REGISTRY/$IMAGE_NAME_DEVELOPMENT:$CI_COMMIT_REF_NAME.$CI_COMMIT_SHA
+  script:
+    - yarn dlx cypress run --browser chrome --spec 'cypress/e2e/**/**.js --config $CI_PROJECT_NAMESPACE.$CI_PROJECT_NAME.$CI_COMMIT_REF_NAME.coko.app
+
 teardown test:
   stage: Tear down test
   image: $CI_REGISTRY/cokoinfra/ansible-deployer
   services:
-    - docker:23-dind
+    - docker:26-dind
   environment:
     name: review/$CI_COMMIT_REF_NAME
     action: stop

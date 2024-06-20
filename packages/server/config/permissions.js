@@ -693,6 +693,11 @@ const permissions = {
     filesDeleted: isAuthenticated,
     filesUploaded: isAuthenticated,
     manuscriptsImportStatus: isAuthenticated,
+    /**
+     * This was not being triggered at all before the v3 upgrade.
+     * It doesn't work because userIsAllowedToChat dependends on req, and req
+     * is not in the context for subscriptions.
+     */
     // messageCreated: userIsAllowedToChat,
     messageCreated: isAuthenticated,
     uploadProgress: isAuthenticated,
