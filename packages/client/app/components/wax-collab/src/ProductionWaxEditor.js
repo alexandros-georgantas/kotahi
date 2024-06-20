@@ -86,7 +86,7 @@ const ProductionWaxEditor = ({
   manuscriptId,
   onAssetManager,
   isAuthorProofingVersion,
-  yjsProvider,
+  wsProvider,
   ydoc,
   name,
   ...rest
@@ -232,7 +232,7 @@ const ProductionWaxEditor = ({
         readonly,
       )
 
-  config = yjsConfig(config, { yjsProvider, ydoc, yjsType: name })
+  config = yjsConfig(config, { wsProvider, ydoc, yjsType: name })
 
   return (
     <ThemeProvider theme={{ textStyles: journal.textStyles, ...waxTheme }}>
