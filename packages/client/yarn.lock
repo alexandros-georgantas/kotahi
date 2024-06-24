@@ -12922,6 +12922,11 @@ y-protocols@^1.0.5:
   dependencies:
     lib0 "^0.2.85"
 
+y-textarea@^1.0.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/y-textarea/-/y-textarea-1.0.1.tgz#2e47b40dc11a31894d75b76b2f418c5bf3c8e16d"
+  integrity sha512-gvU/BzKq+4ivm2Fbl7u4vno39xGyet/CK4KdQ/Kf1c5GQ+Obq80UgAuUDR9knx4U3SH5aiyobT0xrSHeoBDCAw==
+
 y-webrtc@10.2.0:
   version "10.2.0"
   resolved "https://registry.yarnpkg.com/y-webrtc/-/y-webrtc-10.2.0.tgz#dae1460a9f3ae677c072fedff783864452fac1be"

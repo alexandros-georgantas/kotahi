@@ -65,6 +65,8 @@ const EditorSection = ({
   onBlur,
   readonly,
   currentUser,
+  ydoc = null,
+  yjsProvider = null,
 }) => {
   const manuscriptFile = manuscript?.files?.find(file =>
     file.tags.includes('manuscript'),
@@ -153,6 +155,8 @@ const EditorSection = ({
             }
             user={currentUser}
             value={manuscript.meta.source}
+            ydoc={ydoc}
+            yjsProvider={yjsProvider}
           />
         </div>
       )}
