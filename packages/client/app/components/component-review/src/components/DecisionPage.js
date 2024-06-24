@@ -44,6 +44,7 @@ import {
   UPDATE_PENDING_COMMENT,
 } from '../../../component-formbuilder/src/components/builderComponents/ThreadedDiscussion/queries'
 import useChat from '../../../../hooks/useChat'
+import YjsContext from '../../../provider-yjs/yjsProvider'
 
 export const updateManuscriptMutation = gql`
   mutation($id: ID!, $input: String) {
@@ -86,12 +87,15 @@ const DecisionPage = ({ currentUser, match }) => {
   // start of code from submit page to handle possible form changes
   const client = useApolloClient()
   const config = useContext(ConfigContext)
+  const { createYjsProvider, destroyYjsProvider } = useContext(YjsContext)
   const { urlFrag } = config
 
   useEffect(() => {
     return () => {
       Object.values(debouncers).forEach(d => d.flush())
       debouncers = {}
+
+      destroyYjsProvider({ identifier: match.params.version })
     }
   }, [])
 
@@ -127,6 +131,14 @@ const DecisionPage = ({ currentUser, match }) => {
       c => c.type === 'editorial',
     )
     allChannel = data?.manuscript.channels.find(c => c.type === 'all')
+  }
+
+  if (['lab'].includes(config?.instanceName)) {
+    createYjsProvider({
+      currentUser,
+      identifier: match.params.version,
+      object: {},
+    })
   }
 
   const channels = [

@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { useQuery, useMutation, gql, useApolloClient } from '@apollo/client'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { adopt } from 'react-adopt'
@@ -10,6 +10,7 @@ import { getSpecificFilesQuery } from '../../../asset-manager/src/queries'
 import withModal from '../../../asset-manager/src/ui/Modal/withModal'
 import DownloadPdfComponent from './DownloadPdf'
 import DownloadJatsComponent from './DownloadJats'
+import YjsContext from '../../../provider-yjs/yjsProvider'
 
 const mapper = {
   getSpecificFilesQuery,
@@ -244,7 +245,8 @@ export const updateTemplateMutation = gql`
 `
 
 const ProductionPage = ({ currentUser, match, ...props }) => {
-  const { groupId, controlPanel } = useContext(ConfigContext)
+  const { groupId, controlPanel, instanceName } = useContext(ConfigContext)
+  const { createYjsProvider, destroyYjsProvider } = useContext(YjsContext)
   const client = useApolloClient()
   const [makingPdf, setMakingPdf] = React.useState(false)
   const [makingJats, setMakingJats] = React.useState(false)
@@ -255,6 +257,12 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
   //   xml: '',
   //   error: false,
   // })
+
+  useEffect(() => {
+    return () => {
+      destroyYjsProvider({ identifier: match.params.version })
+    }
+  }, [])
 
   const [update] = useMutation(updateMutation)
 
@@ -288,6 +296,14 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
 
   if (loading) return <Spinner />
   if (error) return <CommsErrorBanner error={error} />
+
+  if (['lab'].includes(instanceName)) {
+    createYjsProvider({
+      currentUser,
+      identifier: match.params.version,
+      object: {},
+    })
+  }
 
   const manuscript = {
     ...data.manuscript,
