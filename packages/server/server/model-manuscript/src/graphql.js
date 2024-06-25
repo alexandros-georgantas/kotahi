@@ -144,15 +144,17 @@ const extractCommonData = item => ({
  * all files attached to reviews, and stringify JSON data in preparation for serving to client.
  * Note: 'reviews' include the decision object.
  */
-const getRelatedReviews = async (manuscript, ctx) => {
+const getRelatedReviews = async (
+  manuscript,
+  ctx,
+  shouldGetPublicReviewsOnly = false,
+) => {
   const reviewForm = await getReviewForm(manuscript.groupId)
   const decisionForm = await getDecisionForm(manuscript.groupId)
 
   let reviews =
     manuscript.reviews ||
-    (await (
-      await Manuscript.query().findById(manuscript.id)
-    ).$relatedQuery('reviews')) ||
+    (await Manuscript.relatedQuery('reviews').for(manuscript.id)) ||
     []
 
   // eslint-disable-next-line no-restricted-syntax
@@ -166,7 +168,9 @@ const getRelatedReviews = async (manuscript, ctx) => {
     )
   }
 
-  const userRoles = await getUserRolesInManuscript(ctx.user, manuscript.id)
+  const userRoles = shouldGetPublicReviewsOnly
+    ? {}
+    : await getUserRolesInManuscript(ctx.user, manuscript.id)
 
   const sharedReviewersIds = await getSharedReviewersIds(
     manuscript.id,
@@ -1986,10 +1990,7 @@ const resolvers = {
     async printReadyPdfUrl(parent) {
       // TODO reduce shared code with files resolver
       const files = (
-        parent.files ||
-        (await (
-          await Manuscript.query().findById(parent.id)
-        ).$relatedQuery('files'))
+        parent.files || (await Manuscript.relatedQuery('files').for(parent.id))
       ).map(f => ({
         ...f,
         tags: f.tags || [],
@@ -2002,10 +2003,7 @@ const resolvers = {
     async styledHtml(parent) {
       // TODO reduce shared code with files resolver
       let files = (
-        parent.files ||
-        (await (
-          await Manuscript.query().findById(parent.id)
-        ).$relatedQuery('files'))
+        parent.files || (await Manuscript.relatedQuery('files').for(parent.id))
       ).map(f => ({
         ...f,
         tags: f.tags || [],
@@ -2031,7 +2029,7 @@ const resolvers = {
       return parent.published
     },
     async reviews(parent, { _ }, ctx) {
-      let reviews = await getRelatedReviews(parent, ctx)
+      let reviews = await getRelatedReviews(parent, ctx, true)
 
       if (!Array.isArray(reviews)) {
         return []

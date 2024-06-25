@@ -1,23 +1,12 @@
-const getForm = async (categoryAndPurpose, options = {}) => {
-  /* eslint-disable-next-line global-require */
-  const Form = require('../../../models/form/form.model')
-  const { trx } = options
+const { cachedGet } = require('../../querycache')
 
-  const form = await Form.query(trx).where(categoryAndPurpose)
+const getReviewForm = async groupId =>
+  cachedGet(`form:review:review:${groupId}`)
 
-  if (!form || !form.length)
-    throw new Error(`No form found for "${categoryAndPurpose.purpose}"`)
+const getDecisionForm = async groupId =>
+  cachedGet(`form:decision:decision:${groupId}`)
 
-  return form[0]
-}
-
-const getReviewForm = async (groupId, options = {}) =>
-  getForm({ category: 'review', purpose: 'review', groupId }, options)
-
-const getDecisionForm = async (groupId, options = {}) =>
-  getForm({ category: 'decision', purpose: 'decision', groupId }, options)
-
-const getSubmissionForm = async (groupId, options = {}) =>
-  getForm({ category: 'submission', purpose: 'submit', groupId }, options)
+const getSubmissionForm = async groupId =>
+  cachedGet(`form:submission:submit:${groupId}`)
 
 module.exports = { getReviewForm, getDecisionForm, getSubmissionForm }
