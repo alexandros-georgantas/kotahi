@@ -163,7 +163,7 @@ const KanbanBoard = ({
       .filter((reviewer, index) => {
         const hasTheRightStatus =
           reviewer.status === normalizeStatus(status.value) ||
-          (reviewer.status === 'çlosed' && status.value === 'completed')
+          (reviewer.status === 'closed' && status.value === 'completed')
 
         const isDuplicate =
           !!reviewer.user &&
@@ -223,7 +223,7 @@ const KanbanBoard = ({
                         status.value === 'completed' ||
                         (status.value === 'inProgress' &&
                           reviewer.isCollaborative === true)
-                          ? findReviewFromReviewer(reviewer, allReviews)
+                          ? findReviewFromReviewer(allReviews, reviewer)
                           : null
                       }
                       reviewer={reviewer}
