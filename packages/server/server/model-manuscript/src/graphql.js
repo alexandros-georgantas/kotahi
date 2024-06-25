@@ -2331,6 +2331,18 @@ const typeDefs = `
     affiliation: String
   }
 
+  type PreviousVersionUser {
+    userName: String!
+    id: ID!
+  }
+
+  type PreviousVersion {
+    source: String!
+    title: String
+    user: PreviousVersionUser!
+    created: DateTime!
+  }
+
   type ManuscriptMeta {
     title: String
     source: String
@@ -2338,6 +2350,7 @@ const typeDefs = `
     subjects: [String]
     history: [MetaDate]
     manuscriptId: ID
+    previousVersions: [PreviousVersion]
   }
 
   type ManuscriptAuthorFeeback {
@@ -2409,9 +2422,9 @@ const typeDefs = `
     supplementaryFiles: String
     publishedArtifacts: [PublishedArtifact!]!
     publishedDate: DateTime
-		printReadyPdfUrl: String
-		styledHtml: String
-		css: String
+    printReadyPdfUrl: String
+    styledHtml: String
+    css: String
     decision: String
     totalCount: Int
     editors: [Editor!]

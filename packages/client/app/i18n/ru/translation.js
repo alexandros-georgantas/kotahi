@@ -177,6 +177,9 @@ const ru = {
         'Publishing error': 'Ошибка публикации',
         'Some targets failed to publish':
           'Не удалось опубликовать некоторые рукописи.',
+        continueSubmission: 'Продолжить подачу',
+        revise: 'Редактировать',
+        continueRevision: 'Продолжить редактирование',
       },
     },
     dashboardPage: {
@@ -579,6 +582,7 @@ const ru = {
         cmos: 'Руководство стиля Чикаго (CMOS)',
         cse: 'Совет редакторов науки (CSE)',
         'Select locale for citations': 'Выберите локаль для цитирования',
+        historyIntervalInMinutes: 'Интервал истории в минутах',
       },
       allowedIPs: 'Список IP-адресов репозитория, которым разрешен доступ',
       api: 'Один API',
