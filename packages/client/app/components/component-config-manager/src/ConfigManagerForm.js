@@ -259,7 +259,9 @@ const ConfigManagerForm = ({
               schema={schemas.data[key]}
               uiSchema={schemas.ui[key]}
             >
-              {/* The blank fragment that follows is needed to suppress the submit button. See https://github.com/rjsf-team/react-jsonschema-form/issues/1602 */}
+              {/* The blank fragment that follows is to suppress the submit button.
+              See https://github.com/rjsf-team/react-jsonschema-form/issues/1602 */}
+              {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
               <></>
             </StyledForm>
           </StyledSectionContent>
