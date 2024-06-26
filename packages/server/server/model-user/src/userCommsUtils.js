@@ -27,9 +27,12 @@ const getUserRolesInManuscript = async (userId, manuscriptId, options = {}) => {
   const manuscript = await Manuscript.query(trx).findById(manuscriptId)
   const { groupId } = manuscript
 
+  const userIsAdmin = userId && (await cachedGet(`userIsAdmin:${userId}`))
+  const userIsGM = userId && (await cachedGet(`userIsGM:${userId}:${groupId}`))
+
   const result = {
-    admin: await cachedGet(`userIsAdmin:${userId}`),
-    groupManager: await cachedGet(`userIsGM:${userId}:${groupId}`),
+    admin: userIsAdmin,
+    groupManager: userIsGM,
     author: false,
     reviewer: false,
     editor: false,

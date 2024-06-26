@@ -1736,7 +1736,6 @@ const resolvers = {
         .whereNotNull('m.published')
         .where('m.group_id', group.id)
         .orderBy('m.published', 'desc')
-        .withGraphJoined('reviews')
 
       if (startDate) query.where('m.published', '>=', new Date(startDate))
       if (limit) query.limit(limit)
