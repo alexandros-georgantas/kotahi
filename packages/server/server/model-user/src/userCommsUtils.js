@@ -12,6 +12,8 @@ const {
   getEditorIdsForManuscript,
 } = require('../../model-manuscript/src/manuscriptCommsUtils')
 
+const { cachedGet } = require('../../querycache')
+
 const getUsersById = async userIds => User.query().findByIds(userIds)
 
 /** Returns an object of boolean values corresponding to roles the user could hold:
@@ -25,15 +27,9 @@ const getUserRolesInManuscript = async (userId, manuscriptId, options = {}) => {
   const manuscript = await Manuscript.query(trx).findById(manuscriptId)
   const { groupId } = manuscript
 
-  const { groupRoles, globalRoles } = await getGroupAndGlobalRoles(
-    userId,
-    groupId,
-    { trx },
-  )
-
   const result = {
-    admin: globalRoles.includes('admin'),
-    groupManager: groupRoles.includes('groupManager'),
+    admin: await cachedGet(`userIsAdmin:${userId}`),
+    groupManager: await cachedGet(`userIsGM:${userId}:${groupId}`),
     author: false,
     reviewer: false,
     editor: false,

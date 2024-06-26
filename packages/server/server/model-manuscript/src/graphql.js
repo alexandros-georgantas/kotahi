@@ -161,6 +161,7 @@ const getRelatedReviews = async (
   for (const review of reviews) {
     // eslint-disable-next-line no-await-in-loop
     await convertFilesToFullObjects(
+      // TODO this may already be done? The reviews resolver and the decisions resolver might both be providing a manuscript with reviews populated.
       review,
       review.isDecision ? decisionForm : reviewForm,
       async ids => File.query().findByIds(ids),
@@ -387,9 +388,9 @@ const tryPublishingWebhook = async manuscriptId => {
   }
 }
 
-const getSupplementaryFiles = async parentId => {
+const getSupplementaryFiles = async manuscriptId => {
   return Manuscript.relatedQuery('files')
-    .for(Manuscript.query().where({ id: parentId }))
+    .for(manuscriptId)
     .where('tags', '@>', JSON.stringify(['supplementary']))
 }
 
@@ -1735,6 +1736,7 @@ const resolvers = {
         .whereNotNull('m.published')
         .where('m.group_id', group.id)
         .orderBy('m.published', 'desc')
+        .withGraphJoined('reviews')
 
       if (startDate) query.where('m.published', '>=', new Date(startDate))
       if (limit) query.limit(limit)
