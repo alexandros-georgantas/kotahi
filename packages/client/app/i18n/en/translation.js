@@ -239,6 +239,7 @@ const en = {
       'Current version': 'Current version',
       Team: 'Team',
       Decision: 'Decision',
+      Article: 'Article',
       'Manuscript text': 'Manuscript text',
       'read-only': ' (read-only)',
       Metadata: 'Metadata',
@@ -889,6 +890,7 @@ const en = {
           Reviewer: 'Reviewer',
           Editor: 'Editor',
           Author: 'Author',
+          Collaborator: 'Collaborator',
         },
       },
       task: {

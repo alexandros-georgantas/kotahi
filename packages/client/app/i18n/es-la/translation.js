@@ -242,6 +242,7 @@ const esLa = {
       Team: 'Equipo',
       Decision: 'Decisión',
       'Manuscript text': 'Texto del Manuscrito',
+      Article: 'Artículo',
       Metadata: 'Metadatos',
       'Tasks & Notifications': 'Tareas y Notificaciones',
       'Assign Editors': 'Asignar Editores',
@@ -912,6 +913,7 @@ const esLa = {
           Reviewer: 'Revisor',
           Editor: 'Editor',
           Author: 'Autor',
+          Collaborator: 'Colaborador',
         },
       },
       task: {

@@ -140,9 +140,9 @@ const DecisionVersion = ({
         />
       ),
       key: `editor`,
-      label: `${t('decisionPage.Manuscript text')} ${
-        isReadOnly ? t('decisionPage.read-only') : ''
-      }`,
+      label: `${t(
+        isLabInstance ? 'decisionPage.Article' : 'decisionPage.Manuscript text',
+      )} ${isReadOnly ? t('decisionPage.read-only') : ''}`,
     }
   }
 
@@ -241,7 +241,7 @@ const DecisionVersion = ({
       content: (
         <>
           {isCurrentVersion &&
-            ['journal', 'prc'].includes(config.instanceName) && (
+            ['journal', 'prc', 'lab'].includes(config.instanceName) && (
               <EmailNotifications
                 addReviewer={addReviewer}
                 allUsers={allUsers}

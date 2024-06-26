@@ -244,6 +244,7 @@ const fr = {
       Team: 'Équipe',
       Decision: 'Décision',
       'Manuscript text': 'Texte du manuscrit',
+      Article: 'Article',
       Metadata: 'Métadonnées',
       'Tasks & Notifications': 'Tâches et notifications',
       'Assign Editors': 'Attribuer des éditeurs',
@@ -919,6 +920,7 @@ const fr = {
           Reviewer: 'Évaluateur',
           Editor: 'Éditeur',
           Author: 'Auteur',
+          Collaborator: 'Collaborateur',
         },
       },
       task: {
