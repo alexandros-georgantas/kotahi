@@ -3529,18 +3529,10 @@ export const generateSchemas = (
               type: 'array',
               description: t('configPage.Control pages visible to editors'),
               minItems: 1,
-              default: ['Metadata'],
+              default: ['Manuscript text'],
               items: {
                 type: 'string',
                 oneOf: [
-                  {
-                    const: 'Team',
-                    title: t('configPage.showTabs.Team'),
-                  },
-                  {
-                    const: 'Decision',
-                    title: t('configPage.showTabs.Decision'),
-                  },
                   {
                     const: 'Manuscript text',
                     title: t('configPage.showTabs.Manuscript text'),
@@ -3556,28 +3548,6 @@ export const generateSchemas = (
                 ],
               },
               uniqueItems: true,
-            },
-          },
-        },
-        submission: {
-          type: 'object',
-          title: t('configPage.Submission'),
-          properties: {
-            allowAuthorsSubmitNewVersion: {
-              type: 'boolean',
-              title: t('configPage.allowToSubmitNewVersion'),
-              default: false,
-            },
-          },
-        },
-        review: {
-          type: 'object',
-          title: t('configPage.Review page'),
-          properties: {
-            showSummary: {
-              type: 'boolean',
-              title: t('configPage.showSummary'),
-              default: false,
             },
           },
         },

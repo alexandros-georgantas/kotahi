@@ -249,6 +249,7 @@ const ru = {
       Team: 'Исполнители',
       Decision: 'Решение',
       'Manuscript text': 'Текст статьи',
+      Article: 'Статья',
       Metadata: 'Основные данные',
       'Tasks & Notifications': 'Задачи и уведомления',
       'Assign Editors': 'Назначить редактора',
@@ -915,6 +916,7 @@ const ru = {
           Reviewer: 'Рецензент',
           Editor: 'Редактор',
           Author: 'Автор',
+          Collaborator: 'Соавтор',
         },
       },
       task: {

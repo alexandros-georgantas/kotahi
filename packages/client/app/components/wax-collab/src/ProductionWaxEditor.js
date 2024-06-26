@@ -231,7 +231,7 @@ const ProductionWaxEditor = ({
           updateCiteProc,
           readonly,
         ),
-    { yjsProvider, ydoc, yjsType: name },
+    { yjsProvider, ydoc, yjsType: 'manuscript' },
   )
 
   return (

@@ -7,7 +7,7 @@ import { ConfigContext } from '../../../config/src'
 import { fragmentFields } from '../../../component-submit/src/graphql/queries'
 import { CommsErrorBanner, Spinner } from '../../../shared'
 import DecisionVersions from './DecisionVersions'
-import { roles } from '../../../../globals'
+import { roles, labRoles } from '../../../../globals'
 
 import {
   addReviewerMutation,
@@ -133,7 +133,9 @@ const DecisionPage = ({ currentUser, match }) => {
     allChannel = data?.manuscript.channels.find(c => c.type === 'all')
   }
 
-  if (['lab'].includes(config?.instanceName)) {
+  const isLabInstance = ['lab'].includes(config?.instanceName)
+
+  if (isLabInstance) {
     createYjsProvider({
       currentUser,
       identifier: match.params.version,
@@ -476,7 +478,7 @@ const DecisionPage = ({ currentUser, match }) => {
       removeReviewer={removeReviewer}
       reviewers={data?.manuscript?.reviews}
       reviewForm={reviewForm}
-      roles={roles}
+      roles={isLabInstance ? labRoles : roles}
       selectedEmail={selectedEmail}
       selectedEmailIsBlacklisted={selectedEmailIsBlacklisted}
       sendChannelMessage={sendChannelMessage}

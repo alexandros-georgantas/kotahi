@@ -98,3 +98,8 @@ export const roles = [
   { slug: 'editor', name: 'Editor' },
   { slug: 'author', name: 'Author' },
 ]
+
+export const labRoles = [
+  { slug: 'author', name: 'Author' },
+  { slug: 'collaborator', name: 'Collaborator' },
+]

@@ -140,6 +140,7 @@ const EditorSection = ({
           <FullWaxEditor
             authorComments={isAuthorMode}
             manuscriptId={manuscript.id}
+            name="manuscript"
             // onChange={readonly && !isAuthorMode ? null : onBlur}
             // onChange={readonly && !isAuthorMode ? null : onChange}
             onAssetManager={onAssetManager}
