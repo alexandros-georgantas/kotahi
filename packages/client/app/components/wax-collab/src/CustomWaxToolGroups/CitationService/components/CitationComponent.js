@@ -220,7 +220,18 @@ const CitationComponent = ({ node, getPos }) => {
     if (useDatacite) {
       console.log('datacite being used!')
       const response = await CrossRefTransformation(text, true)
-      return { crossRef: response || [] }
+      console.log('response from datacite: ', response)
+
+      if (response.length) {
+        console.log('setting!')
+        setPotentialCsl(response[0])
+        setPotentialText(response[0].formattedCitation)
+        setCurrentText(response[0].formattedCitation)
+        setInternalNeedsValidation(false)
+        setInternalNeedsReview(false)
+      }
+
+      return { custom: response[0] || [] }
     }
 
     const response = await CrossRefTransformation(text, false)
@@ -265,7 +276,9 @@ const CitationComponent = ({ node, getPos }) => {
 
     const getDataciteData = async doi => {
       setLoading(true)
+      console.log('in getdatacitedata')
       await sendToCrossRef(doi, true).then(data => {
+        // we're not getting here?
         console.log('returned: ', data)
       })
     }
@@ -535,6 +548,8 @@ const CitationComponent = ({ node, getPos }) => {
       </PopUpWrapper>
     )
   }
+
+  console.log('currentText: ', currentText)
 
   return (
     <CitationOuterWrapper>

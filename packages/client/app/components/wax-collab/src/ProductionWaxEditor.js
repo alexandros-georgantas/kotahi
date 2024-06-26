@@ -199,9 +199,17 @@ const ProductionWaxEditor = ({
               return result.data.getFormattedReferences.matches
             }
 
+            if (
+              result?.data?.getDatasiteCslFromDOI?.success &&
+              result.data.getDatasiteCslFromDOI.matches &&
+              result.data.getDatasiteCslFromDOI.matches.length
+            ) {
+              return result.data.getDatasiteCslFromDOI.matches
+            }
+
             console.error(
               'Server-side error: ',
-              result.data.getFormattedReferences.message,
+              result.data.getFormattedReferences?.message || result.data,
             )
             return []
           })
