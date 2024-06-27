@@ -161,7 +161,6 @@ const getRelatedReviews = async (
   for (const review of reviews) {
     // eslint-disable-next-line no-await-in-loop
     await convertFilesToFullObjects(
-      // TODO this may already be done? The reviews resolver and the decisions resolver might both be providing a manuscript with reviews populated.
       review,
       review.isDecision ? decisionForm : reviewForm,
       async ids => File.query().findByIds(ids),
