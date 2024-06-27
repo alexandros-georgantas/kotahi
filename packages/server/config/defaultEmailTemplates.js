@@ -169,4 +169,18 @@ module.exports = [
           </p>
       </p>`,
   },
+  {
+    emailTemplateKey: 'reviewSubmittedEmailTemplate',
+    description: 'Review submitted for article',
+    subject: 'Kotahi | Review submitted',
+    ccEditors: false,
+    type: 'reviewSubmitted',
+    body: `
+      <p>Dear {{ recipientName }},</p>
+      <p></p>
+      <p>{{ reviewerName }} has submitted a review for the manuscript titled "{{ manuscriptTitle }}". Click here to view: {{{ manuscriptLink }}}</p>
+      <p></p>
+      <p>Regards,<br/>Kotahi team</p>
+    `,
+  },
 ]

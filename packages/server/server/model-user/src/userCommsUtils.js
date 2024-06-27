@@ -110,7 +110,7 @@ const sendEmailWithPreparedData = async (
 
   // TODO:
   // Maybe a better way to make this function less ambigious is by having a simpler object of the structure:
-  // { senderName, senderEmail, recieverName, recieverEmail }
+  // { senderName, senderEmail, receiverName, receiverEmail }
   // ANd send this as `input` from the Frontend
   const {
     manuscript,
@@ -121,6 +121,7 @@ const sendEmailWithPreparedData = async (
     currentUser, // Name of the currentUser or senderName
     groupId,
     teamMemberStatus = '', // updated team member status
+    reviewerName,
   } = inputParsed
 
   const selectedEmailTemplateData = await EmailTemplate.query(trx).findById(
@@ -284,6 +285,7 @@ const sendEmailWithPreparedData = async (
         manuscriptTitle: manuscript.submission.$title,
         manuscriptTitleLink: manuscript.submission.$sourceUri,
         manuscriptProductionLink: manuscriptProductionPageUrl,
+        reviewerName,
       },
       manuscriptObject.groupId,
     )
