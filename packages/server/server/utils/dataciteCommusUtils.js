@@ -4,12 +4,19 @@ const { createFormattedReference } = require('../reference/src/formatting')
 const getFormattedReferencesFromDatacite = async (doi, groupId) => {
   try {
     const response = await axios.get(
-      `https://data.crosscite.org/application/vnd.citationstyles.csl+json/${doi}`,
+      `https://api.datacite.org/application/vnd.citationstyles.csl+json/${doi}`,
+      // `https://data.crosscite.org/application/vnd.citationstyles.csl+json/${doi}`,
     )
 
     if (response.status === 200) {
       // console.log('Response: ', response.data)
-      const formatted = await createFormattedReference(response.data, groupId)
+
+      const formatted = await createFormattedReference(
+        response.data,
+        groupId,
+        true,
+      )
+
       // console.log('Formatted: ', formatted)
       return [formatted]
     }
@@ -23,7 +30,6 @@ const getFormattedReferencesFromDatacite = async (doi, groupId) => {
 
     if (error.response?.status === 429) {
       // TODO Consider implementing a backoff
-      // return getUrlByDoiFromDataCite(doi) // Get from alternative service that's generally slower, but shouldn't give 429 error
       console.error('Datacite rate limit error!')
     }
 

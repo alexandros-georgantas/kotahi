@@ -218,12 +218,12 @@ const CitationComponent = ({ node, getPos }) => {
 
   const sendToCrossRef = async (text, useDatacite) => {
     if (useDatacite) {
-      console.log('datacite being used!')
+      // console.log('datacite being used!')
       const response = await CrossRefTransformation(text, true)
-      console.log('response from datacite: ', response)
+      // console.log('response from datacite: ', response)
 
       if (response.length) {
-        console.log('setting!')
+        // console.log('setting!')
         setPotentialCsl(response[0])
         setPotentialText(response[0].formattedCitation)
         setCurrentText(response[0].formattedCitation)
@@ -261,6 +261,7 @@ const CitationComponent = ({ node, getPos }) => {
         setInternalNeedsReview(true)
         setContent(
           {
+            // TODO: turn this off if we have successfully completed the datacite call
             needsValidation: false,
             needsReview: true,
             valid: false,
@@ -276,11 +277,10 @@ const CitationComponent = ({ node, getPos }) => {
 
     const getDataciteData = async doi => {
       setLoading(true)
-      console.log('in getdatacitedata')
-      await sendToCrossRef(doi, true).then(data => {
-        // we're not getting here?
-        console.log('returned: ', data)
-      })
+      // console.log('in getdatacitedata')
+      await sendToCrossRef(doi, true) // .then(data => {
+      //   console.log('returned: ', data)
+      // })
     }
 
     if (needsValidation) {
@@ -288,10 +288,10 @@ const CitationComponent = ({ node, getPos }) => {
         // If we're doing this, try to get the DOI from the text.
         if (formattedOriginalText.match(matchDoi)) {
           const thisDoi = formattedOriginalText.match(matchDoi)[0]
-          console.log('DOI found in originalText', thisDoi)
+          // console.log('DOI found in originalText', thisDoi)
           getDataciteData(thisDoi)
         } else {
-          console.log('No DOI in this citation:', formattedOriginalText)
+          console.error('No DOI in this citation:', formattedOriginalText)
         }
       }
 
@@ -549,7 +549,7 @@ const CitationComponent = ({ node, getPos }) => {
     )
   }
 
-  console.log('currentText: ', currentText)
+  // console.log('currentText: ', currentText)
 
   return (
     <CitationOuterWrapper>

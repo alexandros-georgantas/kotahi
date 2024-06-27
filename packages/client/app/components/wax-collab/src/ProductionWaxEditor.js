@@ -172,8 +172,8 @@ const ProductionWaxEditor = ({
 
   const updateCrossRef = async (text, useDatacite = false) => {
     // eslint-disable-next-line no-console
-    console.log('Coming in for CrossRef: ', text)
-    console.log('use DataCite: ', useDatacite)
+    // console.log('Coming in for CrossRef: ', text)
+    // console.log('use DataCite: ', useDatacite)
     return text
       ? client
           .query({
@@ -207,8 +207,13 @@ const ProductionWaxEditor = ({
               return result.data.getDatasiteCslFromDOI.matches
             }
 
+            if (result?.data?.getDatasiteCslFromDOI?.message) {
+              console.error('DOI not found at Datacite!')
+              return []
+            }
+
             console.error(
-              'Server-side error: ',
+              'Crossref error: ',
               result.data.getFormattedReferences?.message || result.data,
             )
             return []
