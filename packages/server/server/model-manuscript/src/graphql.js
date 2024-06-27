@@ -215,9 +215,7 @@ const getRelatedReviews = async (
 const getRelatedPublishedArtifacts = async (manuscript, ctx) => {
   const templatedArtifacts =
     manuscript.publishedArtifacts ||
-    (await (
-      await Manuscript.query().findById(manuscript.id)
-    ).$relatedQuery('publishedArtifacts'))
+    (await Manuscript.relatedQuery('publishedArtifacts').for(manuscript.id))
 
   const reviews =
     manuscript.reviews || (await getRelatedReviews(manuscript, ctx))
@@ -366,7 +364,10 @@ const commonUpdateManuscript = async (id, input, ctx) => {
 
 /** Send the manuscriptId OR a configured ref; and send token if one is configured */
 const tryPublishingWebhook = async manuscriptId => {
-  const manuscript = await Manuscript.query().findById(manuscriptId)
+  const manuscript = await Manuscript.query()
+    .findById(manuscriptId)
+    .select('groupId')
+
   const activeConfig = await Config.getCached(manuscript.groupId)
 
   const publishingWebhookUrl = activeConfig.formData.publishing.webhook.url
@@ -1218,7 +1219,6 @@ const resolvers = {
       return Manuscript.query().updateAndFetchById(id, manuscript)
     },
     async addReviewer(_, { manuscriptId, userId, invitationId }, ctx) {
-      const manuscript = await Manuscript.query().findById(manuscriptId)
       const status = invitationId ? 'accepted' : 'invited'
 
       let invitationData
@@ -1227,8 +1227,8 @@ const resolvers = {
         invitationData = await Invitation.query().findById(invitationId)
       }
 
-      const existingTeam = await manuscript
-        .$relatedQuery('teams')
+      const existingTeam = await Manuscript.relatedQuery('teams')
+        .for(manuscriptId)
         .where('role', 'reviewer')
         .first()
 
@@ -1265,10 +1265,8 @@ const resolvers = {
       return newTeam
     },
     async removeReviewer(_, { manuscriptId, userId }, ctx) {
-      const manuscript = await Manuscript.query().findById(manuscriptId)
-
-      const reviewerTeam = await manuscript
-        .$relatedQuery('teams')
+      const reviewerTeam = await Manuscript.relatedQuery('teams')
+        .for(manuscriptId)
         .where('role', 'reviewer')
         .first()
 
@@ -2127,9 +2125,7 @@ const resolvers = {
 
       let files =
         parent.manuscriptFiles ||
-        (await (
-          await Manuscript.query().findById(parent.manuscriptId)
-        ).$relatedQuery('files'))
+        (await Manuscript.relatedQuery('files').for(parent.manuscriptId))
 
       files = await getFilesWithUrl(files)
       // TODO Any reason not to use replaceImageSrcResponsive here?
