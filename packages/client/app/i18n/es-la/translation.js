@@ -547,7 +547,8 @@ const esLa = {
       reviewRejectedEmailTemplate:
         'El revisor rechaza una invitación a revisar',
       reviewerInvitationPrimaryEmailTemplate: 'Invitación al revisor',
-      evaluationCompleteEmailTemplate: 'Revisión enviada',
+      evaluationCompleteEmailTemplate: 'Decisión enviada',
+      reviewSubmittedEmailTemplate: 'Revisión enviada',
       submissionConfirmationEmailTemplate: 'Manuscrito enviado',
       alertUnreadMessageDigestTemplate: 'Mensaje de discusión no leído',
       authorProofingInvitationEmailTemplate:

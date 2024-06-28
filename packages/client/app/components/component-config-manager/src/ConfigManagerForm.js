@@ -187,6 +187,15 @@ const ConfigManagerForm = ({
       title: defaultAuthorProofingSubmittedEmail.emailContent.description,
     }
 
+    const defaultReviewSubmittedEmail = emailTemplates.find(
+      emailTemplate => emailTemplate.emailTemplateType === 'reviewSubmitted',
+    )
+
+    const defaultReviewSubmittedTemplate = {
+      const: defaultReviewSubmittedEmail.id,
+      title: defaultReviewSubmittedEmail.emailContent.description,
+    }
+
     return generateSchemas(
       emailNotificationOptions,
       deleteFile,
@@ -195,6 +204,7 @@ const ConfigManagerForm = ({
       defaultReviewerInvitationTemplate,
       defaultAuthorProofingInvitationTemplate,
       defaultAuthorProofingSubmittedTemplate,
+      defaultReviewSubmittedTemplate,
       t,
       logoAndFavicon,
     )

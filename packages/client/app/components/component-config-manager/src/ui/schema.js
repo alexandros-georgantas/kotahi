@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 // NOTE: If you're modifying the schema here, ensure updating those changes to the files 'packages/client/config/sampleConfigFormData.js' and 'packages/server/scripts/seedConfig.js' as well.
 import React from 'react'
 import { Select } from '@pubsweet/ui/dist/molecules'
@@ -47,6 +46,7 @@ export const generateSchemas = (
   defaultReviewerInvitationTemplate,
   defaultAuthorProofingInvitationTemplate,
   defaultAuthorProofingSubmittedTemplate,
+  defaultReviewSubmittedTemplate,
   t,
   tempStoredFiles,
 ) => {
@@ -615,7 +615,6 @@ export const generateSchemas = (
             },
           },
         },
-
         publishing: {
           type: 'object',
           title: t('configPage.Publishing'),
@@ -780,6 +779,13 @@ export const generateSchemas = (
               oneOf: emailNotificationOptions,
               uniqueItems: true,
               default: defaultReviewerInvitationTemplate.const,
+            },
+            reviewSubmitted: {
+              description: t('configPage.reviewSubmittedEmailTemplate'),
+              type: ['string', 'null'],
+              oneOf: emailNotificationOptions,
+              uniqueItems: true,
+              default: defaultReviewSubmittedTemplate.const,
             },
             authorProofingInvitationEmailTemplate: {
               description: t(
@@ -1611,6 +1617,13 @@ export const generateSchemas = (
               oneOf: emailNotificationOptions,
               uniqueItems: true,
               default: defaultReviewerInvitationTemplate.const,
+            },
+            reviewSubmitted: {
+              description: t('configPage.reviewSubmittedEmailTemplate'),
+              type: ['string', 'null'],
+              oneOf: emailNotificationOptions,
+              uniqueItems: true,
+              default: defaultReviewSubmittedTemplate.const,
             },
             authorProofingInvitationEmailTemplate: {
               description: t(
@@ -2448,6 +2461,13 @@ export const generateSchemas = (
               oneOf: emailNotificationOptions,
               uniqueItems: true,
               default: defaultReviewerInvitationTemplate.const,
+            },
+            reviewSubmitted: {
+              description: t('configPage.reviewSubmittedEmailTemplate'),
+              type: ['string', 'null'],
+              oneOf: emailNotificationOptions,
+              uniqueItems: true,
+              default: defaultReviewSubmittedTemplate.const,
             },
             authorProofingInvitationEmailTemplate: {
               description: t(
@@ -3299,6 +3319,13 @@ export const generateSchemas = (
               oneOf: emailNotificationOptions,
               uniqueItems: true,
             },
+            reviewSubmitted: {
+              description: t('configPage.reviewSubmittedEmailTemplate'),
+              type: ['string', 'null'],
+              oneOf: emailNotificationOptions,
+              uniqueItems: true,
+              default: defaultReviewSubmittedTemplate.const,
+            },
             submissionConfirmationEmailTemplate: {
               description: t('configPage.submissionConfirmationEmailTemplate'),
               type: ['string', 'null'],
@@ -3793,6 +3820,13 @@ export const generateSchemas = (
               oneOf: emailNotificationOptions,
               uniqueItems: true,
               default: defaultReviewerInvitationTemplate.const,
+            },
+            reviewSubmitted: {
+              description: t('configPage.reviewSubmittedEmailTemplate'),
+              type: ['string', 'null'],
+              oneOf: emailNotificationOptions,
+              uniqueItems: true,
+              default: defaultReviewSubmittedTemplate.const,
             },
             authorProofingInvitationEmailTemplate: {
               description: t(

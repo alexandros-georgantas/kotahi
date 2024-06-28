@@ -171,7 +171,7 @@ module.exports = [
   },
   {
     emailTemplateKey: 'reviewSubmittedEmailTemplate',
-    description: 'Review submitted for article',
+    description: 'Review submitted',
     subject: 'Kotahi | Review submitted',
     ccEditors: false,
     type: 'reviewSubmitted',
