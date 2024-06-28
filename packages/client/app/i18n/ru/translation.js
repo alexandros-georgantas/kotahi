@@ -546,7 +546,8 @@ const ru = {
       eventNotification: 'Уведомления',
       reviewRejectedEmailTemplate: 'Рецензент отклонил приглашение',
       reviewerInvitationPrimaryEmailTemplate: 'Приглашение рецензента',
-      evaluationCompleteEmailTemplate: 'Рецензия отправлена',
+      evaluationCompleteEmailTemplate: 'Поданное решение',
+      reviewSubmittedEmailTemplate: 'Рецензия отправлена',
       submissionConfirmationEmailTemplate: 'Рукопись подана',
       alertUnreadMessageDigestTemplate: 'Непрочитанные сообщения в обсуждении',
       authorProofingInvitationEmailTemplate:

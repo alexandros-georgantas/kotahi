@@ -6,10 +6,15 @@ const Review = require('../../../models/review/review.model')
 const Manuscript = require('../../../models/manuscript/manuscript.model')
 const User = require('../../../models/user/user.model')
 const Team = require('../../../models/team/team.model')
+const EmailTemplate = require('../../../models/emailTemplate/emailTemplate.model')
 
 const { getFilesWithUrl } = require('../../utils/fileStorageUtils')
 const { deepMergeObjectsReplacingArrays } = require('../../utils/objectUtils')
 const { getReviewForm, getDecisionForm } = require('./reviewCommsUtils')
+
+const {
+  sendEmailWithPreparedData,
+} = require('../../model-user/src/userCommsUtils')
 
 const {
   convertFilesToIdsOnly,
@@ -104,7 +109,37 @@ const resolvers = {
 
       member.status = status
       member.updated = new Date().toISOString()
-      return member.save()
+      await member.save()
+
+      // #region review-submitted-email
+      if (status === 'completed') {
+        const editor = await manuscript.getManuscriptEditor()
+
+        if (editor) {
+          const sender = await User.query().findById(ctx.user)
+          const reviewer = await User.query().findById(member.userId)
+
+          const emailTemplate = await EmailTemplate.query().findOne({
+            groupId: manuscript.groupId,
+            emailTemplateType: 'reviewSubmitted',
+          })
+
+          sendEmailWithPreparedData(
+            {
+              groupId: manuscript.groupId,
+              manuscript,
+              reviewerName: reviewer.username,
+              selectedEmail: editor.email,
+              selectedTemplate: emailTemplate.id,
+            },
+            ctx,
+            sender,
+          )
+        }
+      }
+      // #endregion review-submitted-email
+
+      return member
     },
   },
   Review: {
