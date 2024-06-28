@@ -107,6 +107,7 @@ const CitationComponent = ({ node, getPos }) => {
     original: possibleStructures?.original || formattedOriginalText,
     anyStyle: possibleStructures?.anyStyle || '',
     crossRef: possibleStructures?.crossRef || [],
+    datacite: possibleStructures?.datacite || '',
     custom: possibleStructures?.custom || '',
   })
 
@@ -231,7 +232,7 @@ const CitationComponent = ({ node, getPos }) => {
         setInternalNeedsReview(false)
       }
 
-      return { custom: response[0] || [] }
+      return { datacite: response[0] || [] }
     }
 
     const response = await CrossRefTransformation(text, false)
@@ -241,7 +242,10 @@ const CitationComponent = ({ node, getPos }) => {
 
   useEffect(() => {
     // This is where we send things off to Anystyle/Crossref if it needs to be validated
-    const getVersions = async () => {
+    const getVersions = async (
+      currentStructures,
+      dataciteHasBeenRun = false,
+    ) => {
       // console.log('Getting versions from CrossRef and AnyStyle')
       setLoading(true)
 
@@ -250,21 +254,21 @@ const CitationComponent = ({ node, getPos }) => {
         await sendToCrossRef(formattedOriginalText, false),
       ]).then(data => {
         const newStructures = {
-          ...structures,
+          ...currentStructures,
           ...data[0],
           ...data[1],
         }
 
         setStructures(newStructures)
         // console.log("Versions found. Setting status to 'needs review'")
-        setInternalNeedsValidation(false)
-        setInternalNeedsReview(true)
+        setInternalNeedsValidation(!!dataciteHasBeenRun)
+        setInternalNeedsReview(dataciteHasBeenRun)
         setContent(
           {
             // TODO: turn this off if we have successfully completed the datacite call
-            needsValidation: false,
-            needsReview: true,
-            valid: false,
+            needsValidation: !!dataciteHasBeenRun,
+            needsReview: !!dataciteHasBeenRun,
+            valid: dataciteHasBeenRun,
             originalText: formattedOriginalText,
             possibleStructures: newStructures,
           },
@@ -278,9 +282,24 @@ const CitationComponent = ({ node, getPos }) => {
     const getDataciteData = async doi => {
       setLoading(true)
       // console.log('in getdatacitedata')
-      await sendToCrossRef(doi, true) // .then(data => {
-      //   console.log('returned: ', data)
-      // })
+      const result = await sendToCrossRef(doi, true) // .then(data => {
+
+      if (result.datacite) {
+        const newStructures = {
+          ...structures,
+          ...result,
+        }
+
+        setStructures(newStructures)
+
+        if (
+          !loading &&
+          !structures.crossRef.length &&
+          !(JSON.stringify(structures.anyStyle).length > 2)
+        ) {
+          getVersions(newStructures, true)
+        }
+      }
     }
 
     if (needsValidation) {
@@ -293,15 +312,13 @@ const CitationComponent = ({ node, getPos }) => {
         } else {
           console.error('No DOI in this citation:', formattedOriginalText)
         }
-      }
-
-      if (
+      } else if (
         !loading &&
         !structures.crossRef.length &&
         !(JSON.stringify(structures.anyStyle).length > 2)
       ) {
         // we shouldn't do this if we already have crossref/anystyle versions
-        getVersions()
+        getVersions(structures)
       }
     }
   }, [formattedOriginalText, internalNeedsValidation])
@@ -381,7 +398,6 @@ const CitationComponent = ({ node, getPos }) => {
       // console.log('Other loading has been turned off.')
       return undefined
     }, [otherLoading])
-
     return (
       <PopUpWrapper>
         {editing ? (
@@ -457,6 +473,20 @@ const CitationComponent = ({ node, getPos }) => {
                 type="anystyle"
               />
             )}
+            {structures.datacite?.formattedCitation ? (
+              <CitationVersion
+                select={() => {
+                  setPotentialCsl(structures.datacite)
+                  setPotentialText(structures.datacite.formattedCitation)
+                }}
+                selected={
+                  decodeEntities(structures.datacite.formattedCitation) ===
+                  decodeEntities(potentialText)
+                }
+                text={structures.datacite.formattedCitation}
+                type="datacite"
+              />
+            ) : null}
             {structures.crossRef
               ? structures.crossRef.map(
                   (crossRefVersion, crossRefId) =>
