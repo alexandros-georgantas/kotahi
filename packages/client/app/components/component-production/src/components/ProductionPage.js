@@ -255,7 +255,6 @@ export const updateTemplateMutation = gql`
 const ProductionPage = ({ currentUser, match, ...props }) => {
   const { groupId, controlPanel, instanceName } = useContext(ConfigContext)
   const { createYjsProvider, destroyYjsProvider } = useContext(YjsContext)
-  const client = useApolloClient()
   const [makingPdf, setMakingPdf] = React.useState(false)
   const [makingJats, setMakingJats] = React.useState(false)
   // const [saving, setSaving] = React.useState(false)
@@ -272,13 +271,47 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
     }
   }, [])
 
-  const [update] = useMutation(updateMutation)
-
   const [submitAuthorProofingFeedback] = useMutation(
     submitAuthorProofingFeedbackMutation,
   )
 
   const [updateTempl] = useMutation(updateTemplateMutation)
+
+  const updateTemplate = (id, input) =>
+    updateTempl({ variables: { id, input } })
+
+  const { data, loading, error } = useQuery(
+    query,
+    {
+      variables: {
+        id: match.params.version,
+        groupId,
+        isCms: false,
+      },
+      partialRefetch: true,
+    },
+    { refetchOnMount: true },
+  )
+
+  if (['lab'].includes(instanceName)) {
+    createYjsProvider({
+      currentUser,
+      identifier: match.params.version,
+      object: {},
+    })
+  }
+
+  const [update] = useMutation(updateMutation)
+
+  const client = useApolloClient()
+
+  if (loading) return <Spinner />
+  if (error) return <CommsErrorBanner error={error} />
+
+  const manuscript = {
+    ...data.manuscript,
+    submission: JSON.parse(data.manuscript.submission),
+  }
 
   const updateManuscript = async (versionId, manuscriptDelta) => {
     const newQuery = await update({
@@ -289,33 +322,6 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
     })
 
     return newQuery
-  }
-
-  const updateTemplate = (id, input) =>
-    updateTempl({ variables: { id, input } })
-
-  const { data, loading, error } = useQuery(query, {
-    variables: {
-      id: match.params.version,
-      groupId,
-      isCms: false,
-    },
-  })
-
-  if (loading) return <Spinner />
-  if (error) return <CommsErrorBanner error={error} />
-
-  if (['lab'].includes(instanceName)) {
-    createYjsProvider({
-      currentUser,
-      identifier: match.params.version,
-      object: {},
-    })
-  }
-
-  const manuscript = {
-    ...data.manuscript,
-    submission: JSON.parse(data.manuscript.submission),
   }
 
   const {
