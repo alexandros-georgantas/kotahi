@@ -233,6 +233,7 @@ const Manuscripts = ({ history, ...props }) => {
   })
 
   const { totalCount } = data.paginatedManuscripts
+  const isLabInstance = ['lab'].includes(config?.instanceName)
 
   const setReadyToEvaluateLabel = id => {
     if (selectedNewManuscripts.includes(id)) {
@@ -326,11 +327,7 @@ const Manuscripts = ({ history, ...props }) => {
           onClick={() => history.push(`${urlFrag}/newSubmission`)}
           primary
         >
-          {t(
-            `dashboardPage.New ${
-              ['lab'].includes(config.instanceName) ? 'Article' : 'submission'
-            }`,
-          )}
+          {t(`dashboardPage.New ${isLabInstance ? 'Article' : 'submission'}`)}
         </ActionButton>
       )}
       {shouldAllowBulkImport && !archived && (
@@ -411,8 +408,12 @@ const Manuscripts = ({ history, ...props }) => {
             <Heading $warning={archived}>
               {t(
                 archived
-                  ? 'manuscriptsPage.archivedManuscripts'
-                  : 'manuscriptsPage.Manuscripts',
+                  ? `manuscriptsPage.archived${
+                      isLabInstance ? 'Articles' : 'Manuscripts'
+                    }`
+                  : `manuscriptsPage.${
+                      isLabInstance ? 'Articles' : 'Manuscripts'
+                    }`,
               )}
             </Heading>
             {topRightControls}
@@ -448,8 +449,12 @@ const Manuscripts = ({ history, ...props }) => {
             <ViewArchivedAction onClick={toggleArchived}>
               {t(
                 archived
-                  ? 'manuscriptsPage.viewUnarchived'
-                  : 'manuscriptsPage.viewArchived',
+                  ? `manuscriptsPage.viewUnarchived${
+                      isLabInstance ? 'Articles' : 'Manuscripts'
+                    }`
+                  : `manuscriptsPage.viewArchived${
+                      isLabInstance ? 'Articles' : 'Manuscripts'
+                    }`,
               )}
             </ViewArchivedAction>
           </FlexRowWithSmallGapAbove>

@@ -220,7 +220,7 @@ const seedConfig = async (group, instanceName, index, options) => {
             teamTimezone: process.env.TEAM_TIMEZONE || 'Etc/UTC',
           },
           controlPanel: {
-            showTabs: ['Metadata'],
+            showTabs: ['Manuscript text', 'Metadata'],
             displayManuscriptShortId: true,
           },
           notification,

@@ -65,6 +65,8 @@ const EditorSection = ({
   onBlur,
   readonly,
   currentUser,
+  ydoc = null,
+  yjsProvider = null,
 }) => {
   const manuscriptFile = manuscript?.files?.find(file =>
     file.tags.includes('manuscript'),
@@ -138,6 +140,7 @@ const EditorSection = ({
           <FullWaxEditor
             authorComments={isAuthorMode}
             manuscriptId={manuscript.id}
+            name="manuscript"
             // onChange={readonly && !isAuthorMode ? null : onBlur}
             // onChange={readonly && !isAuthorMode ? null : onChange}
             onAssetManager={onAssetManager}
@@ -153,6 +156,8 @@ const EditorSection = ({
             }
             user={currentUser}
             value={manuscript.meta.source}
+            ydoc={ydoc}
+            yjsProvider={yjsProvider}
           />
         </div>
       )}

@@ -34,6 +34,7 @@ import {
 import Modal from '../../../component-modal/src/Modal'
 import Confirm from './Confirm'
 import InviteCollaborators from './InviteCollaborators'
+import YjsContext from '../../../provider-yjs/yjsProvider'
 
 export const createBlankSubmissionBasedOnForm = form => {
   const allBlankedFields = {}
@@ -72,6 +73,7 @@ const Submit = ({
   chatExpand,
 }) => {
   const config = useContext(ConfigContext)
+  const { yjsProvider, ydoc } = useContext(YjsContext)
 
   const channelData = chatProps?.channelsData?.find(
     channel => channel?.channelId === channelId,
@@ -119,6 +121,8 @@ const Submit = ({
           saveSource={source => {
             debouncedSave(source, version.id)
           }}
+          ydoc={isLabInstance ? ydoc : null}
+          yjsProvider={isLabInstance ? yjsProvider : null}
         />
       ),
       key: `editor`,
@@ -260,6 +264,7 @@ const Submit = ({
       <Manuscript>
         <ErrorBoundary>
           <VersionSwitcher
+            channelId={channelId}
             Confirm={Confirm}
             currentUser={currentUser}
             InviteCollaborators={InviteCollaborators}

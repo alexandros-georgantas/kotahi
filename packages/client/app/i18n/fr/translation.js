@@ -97,6 +97,7 @@ const fr = {
       Manuscript: 'Manuscrit',
       Dashboard: 'Tableau de bord',
       Manuscripts: 'Manuscrits',
+      Articles: 'Des Articles',
       Reports: 'Rapports',
       Settings: 'Paramètres',
       Forms: 'Formulaires',
@@ -217,9 +218,13 @@ const fr = {
     },
     manuscriptsPage: {
       Manuscripts: 'Manuscrits',
+      Articles: 'Des Articles',
       archivedManuscripts: 'Manuscrits archivés',
-      viewArchived: 'Voir les manuscrits archivés',
-      viewUnarchived: 'Retourner aux manuscrits non archivés',
+      archivedArticles: 'Articles archivés',
+      viewArchivedManuscripts: 'Voir les manuscrits archivés',
+      viewArchivedArticles: 'Voir les articles archivés',
+      viewUnarchivedManuscripts: 'Retourner aux manuscrits non archivés',
+      viewUnarchivedArticles: 'Retourner aux articles non archivés',
       manuscriptInvalid:
         'Ce manuscrit a des champs incomplets ou invalides. Veuillez les corriger et réessayer.',
       importPending: 'en attente',
@@ -242,6 +247,7 @@ const fr = {
       Team: 'Équipe',
       Decision: 'Décision',
       'Manuscript text': 'Texte du manuscrit',
+      Article: 'Article',
       Metadata: 'Métadonnées',
       'Tasks & Notifications': 'Tâches et notifications',
       'Assign Editors': 'Attribuer des éditeurs',
@@ -876,7 +882,7 @@ const fr = {
       submitForPublishing: 'Soumettre pour publication',
     },
     inviteCollaborator: {
-      selectPlaceholder: 'E-mail',
+      selectPlaceholder: 'Nom ou email',
       addUser: 'Ajouter',
     },
     chat: {
@@ -918,6 +924,7 @@ const fr = {
           Reviewer: 'Évaluateur',
           Editor: 'Éditeur',
           Author: 'Auteur',
+          Collaborator: 'Collaborateur',
         },
       },
       task: {

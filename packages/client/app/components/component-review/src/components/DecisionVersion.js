@@ -27,6 +27,7 @@ import KanbanBoard from './KanbanBoard'
 import InviteReviewer from './reviewers/InviteReviewer'
 import { ConfigContext } from '../../../config/src'
 import { getActiveTab } from '../../../../shared/manuscriptUtils'
+import YjsContext from '../../../provider-yjs/yjsProvider'
 
 const TaskSectionRow = styled(SectionRow)`
   padding: 12px 0 18px;
@@ -95,6 +96,7 @@ const DecisionVersion = ({
   emailTemplates,
 }) => {
   const config = useContext(ConfigContext)
+  const { yjsProvider, ydoc } = useContext(YjsContext)
 
   const threadedDiscussionExtendedProps = {
     ...threadedDiscussionProps,
@@ -103,6 +105,7 @@ const DecisionVersion = ({
   }
 
   const authorProofingEnabled = config.controlPanel?.authorProofingEnabled // let's set this based on the config
+  const isLabInstance = ['lab'].includes(config?.instanceName)
 
   const debouncedSave = useCallback(
     debounce(source => {
@@ -127,16 +130,19 @@ const DecisionVersion = ({
     return {
       content: (
         <EditorSection
+          allowEmptyManuscript={isLabInstance}
           currentUser={user}
           manuscript={manuscript}
           readonly={isReadOnly}
           saveSource={isReadOnly ? null : debouncedSave}
+          ydoc={isLabInstance ? ydoc : null}
+          yjsProvider={isLabInstance ? yjsProvider : null}
         />
       ),
       key: `editor`,
-      label: `${t('decisionPage.Manuscript text')} ${
-        isReadOnly ? t('decisionPage.read-only') : ''
-      }`,
+      label: `${t(
+        isLabInstance ? 'decisionPage.Article' : 'decisionPage.Manuscript text',
+      )} ${isReadOnly ? t('decisionPage.read-only') : ''}`,
     }
   }
 
@@ -235,7 +241,7 @@ const DecisionVersion = ({
       content: (
         <>
           {isCurrentVersion &&
-            ['journal', 'prc'].includes(config.instanceName) && (
+            ['journal', 'prc', 'lab'].includes(config.instanceName) && (
               <EmailNotifications
                 addReviewer={addReviewer}
                 allUsers={allUsers}

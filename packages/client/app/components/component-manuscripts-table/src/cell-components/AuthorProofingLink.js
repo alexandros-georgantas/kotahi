@@ -56,7 +56,11 @@ const AuthorProofingLink = props => {
 
   const handleClickAction = e => {
     e.stopPropagation()
-    history.push(`${urlFrag}/versions/${manuscript.id}/submit`)
+    history.push(
+      `${urlFrag}/versions/${manuscript.id}/${
+        ['lab'].includes(config?.instanceName) ? 'evaluation' : 'submit'
+      }`,
+    )
   }
   // #endregion action
 

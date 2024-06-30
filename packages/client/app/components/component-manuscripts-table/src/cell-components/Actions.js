@@ -59,7 +59,7 @@ const Actions = ({
                 {t('manuscriptsTable.actions.Evaluation')}
               </LinkAction>
             )}
-          {['journal', 'prc'].includes(config.instanceName) && (
+          {['journal', 'prc', 'lab'].includes(config.instanceName) && (
             <LinkAction to={`${urlFrag}/versions/${manuscript.id}/decision`}>
               {t('manuscriptsTable.actions.Control')}
             </LinkAction>

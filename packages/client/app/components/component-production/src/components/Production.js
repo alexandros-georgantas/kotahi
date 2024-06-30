@@ -33,6 +33,7 @@ import { CssAssistantProvider } from '../../../component-ai-assistant/hooks/CssA
 import AiPDFDesigner from '../../../component-ai-assistant/AiPDFDesigner'
 import { ConfigContext } from '../../../config/src'
 import Versioning from './Versioning'
+import YjsContext from '../../../provider-yjs/yjsProvider'
 
 const useVersioning = true
 
@@ -157,6 +158,9 @@ const Production = ({
   const { t } = useTranslation()
 
   const config = useContext(ConfigContext)
+  const { yjsProvider, ydoc } = useContext(YjsContext)
+
+  const isLabInstance = ['lab'].includes(config?.instanceName)
 
   const editorSection = {
     content: (
@@ -180,6 +184,8 @@ const Production = ({
                 saveSource={debouncedSave}
                 user={currentUser}
                 value={manuscript.meta.source}
+                ydoc={isLabInstance ? ydoc : null}
+                yjsProvider={isLabInstance ? yjsProvider : null}
               />
             ) : (
               <Spinner />

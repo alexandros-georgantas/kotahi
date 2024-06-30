@@ -91,6 +91,7 @@ const generateLabel = (created, versionNumber, count, manuscriptName, t) => {
 export const VersionSwitcher = ({
   versions = [],
   children,
+  channelId = null,
   fullWidth = false,
   isLabInstance = false,
   Confirm = null,
@@ -220,6 +221,7 @@ export const VersionSwitcher = ({
             title={t('manuscriptSubmit.collaborateArticle')}
           >
             <InviteCollaborators
+              channelId={channelId}
               currentUser={currentUser}
               manuscript={selectedVersion.manuscript}
             />

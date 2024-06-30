@@ -262,6 +262,14 @@ const resolvers = {
               const selectedEmail = collaborator?.email
               const receiverName = collaborator?.username
 
+              await addUserToManuscriptChatChannel(
+                {
+                  manuscriptId: manuscript.id,
+                  userId: collaborator.id,
+                },
+                { trx },
+              )
+
               const selectedTemplate =
                 activeConfig.formData.eventNotification
                   ?.collaboratorAccessGrantedEmailTemplate
@@ -352,6 +360,14 @@ const resolvers = {
 
           const selectedEmail = collaborator?.email
           const receiverName = collaborator?.username
+
+          await removeUserFromManuscriptChatChannel(
+            {
+              manuscriptId: manuscript.id,
+              userId,
+            },
+            { trx },
+          )
 
           const selectedTemplate =
             activeConfig.formData.eventNotification

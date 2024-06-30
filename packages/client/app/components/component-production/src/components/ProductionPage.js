@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { useQuery, useMutation, gql, useApolloClient } from '@apollo/client'
 import ReactRouterPropTypes from 'react-router-prop-types'
 import { adopt } from 'react-adopt'
@@ -10,6 +10,7 @@ import { getSpecificFilesQuery } from '../../../asset-manager/src/queries'
 import withModal from '../../../asset-manager/src/ui/Modal/withModal'
 import DownloadPdfComponent from './DownloadPdf'
 import DownloadJatsComponent from './DownloadJats'
+import YjsContext from '../../../provider-yjs/yjsProvider'
 
 const mapper = {
   getSpecificFilesQuery,
@@ -252,8 +253,8 @@ export const updateTemplateMutation = gql`
 `
 
 const ProductionPage = ({ currentUser, match, ...props }) => {
-  const { groupId, controlPanel } = useContext(ConfigContext)
-  const client = useApolloClient()
+  const { groupId, controlPanel, instanceName } = useContext(ConfigContext)
+  const { createYjsProvider, destroyYjsProvider } = useContext(YjsContext)
   const [makingPdf, setMakingPdf] = React.useState(false)
   const [makingJats, setMakingJats] = React.useState(false)
   // const [saving, setSaving] = React.useState(false)
@@ -264,13 +265,53 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
   //   error: false,
   // })
 
-  const [update] = useMutation(updateMutation)
+  useEffect(() => {
+    return () => {
+      destroyYjsProvider({ identifier: match.params.version })
+    }
+  }, [])
 
   const [submitAuthorProofingFeedback] = useMutation(
     submitAuthorProofingFeedbackMutation,
   )
 
   const [updateTempl] = useMutation(updateTemplateMutation)
+
+  const updateTemplate = (id, input) =>
+    updateTempl({ variables: { id, input } })
+
+  const { data, loading, error } = useQuery(
+    query,
+    {
+      variables: {
+        id: match.params.version,
+        groupId,
+        isCms: false,
+      },
+      partialRefetch: true,
+    },
+    { refetchOnMount: true },
+  )
+
+  if (['lab'].includes(instanceName)) {
+    createYjsProvider({
+      currentUser,
+      identifier: match.params.version,
+      object: {},
+    })
+  }
+
+  const [update] = useMutation(updateMutation)
+
+  const client = useApolloClient()
+
+  if (loading) return <Spinner />
+  if (error) return <CommsErrorBanner error={error} />
+
+  const manuscript = {
+    ...data.manuscript,
+    submission: JSON.parse(data.manuscript.submission),
+  }
 
   const updateManuscript = async (versionId, manuscriptDelta) => {
     const newQuery = await update({
@@ -281,25 +322,6 @@ const ProductionPage = ({ currentUser, match, ...props }) => {
     })
 
     return newQuery
-  }
-
-  const updateTemplate = (id, input) =>
-    updateTempl({ variables: { id, input } })
-
-  const { data, loading, error } = useQuery(query, {
-    variables: {
-      id: match.params.version,
-      groupId,
-      isCms: false,
-    },
-  })
-
-  if (loading) return <Spinner />
-  if (error) return <CommsErrorBanner error={error} />
-
-  const manuscript = {
-    ...data.manuscript,
-    submission: JSON.parse(data.manuscript.submission),
   }
 
   const {

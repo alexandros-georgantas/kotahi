@@ -99,6 +99,7 @@ const ru = {
       Manuscript: 'Рукопись',
       Dashboard: 'Панель управления',
       Manuscripts: 'Статьи',
+      Articles: 'Статьи',
       Reports: 'Аналитика',
       Settings: 'Параметры',
       Forms: 'Формы',
@@ -217,9 +218,13 @@ const ru = {
     },
     manuscriptsPage: {
       Manuscripts: 'Статьи',
+      Articles: 'Статьи',
       archivedManuscripts: 'Архивированные статьи',
-      viewArchived: 'Просмотреть архивированные статьи',
-      viewUnarchived: 'Вернуться к неархивированным статьям',
+      archivedArticles: 'Архивные статьи',
+      viewArchivedManuscripts: 'Просмотреть архивированные статьи',
+      viewArchivedArticles: 'Просмотреть архивированные статьи',
+      viewUnarchivedManuscripts: 'Вернуться к неархивированным статьям',
+      viewUnarchivedArticles: 'Вернуться к неархивированным статьям',
       manuscriptInvalid:
         'Эта рукопись содержит неполные или недопустимые поля. Исправьте их и повторите попытку.',
       importPending: 'импорт',
@@ -244,6 +249,7 @@ const ru = {
       Team: 'Исполнители',
       Decision: 'Решение',
       'Manuscript text': 'Текст статьи',
+      Article: 'Статья',
       Metadata: 'Основные данные',
       'Tasks & Notifications': 'Задачи и уведомления',
       'Assign Editors': 'Назначить редактора',
@@ -869,7 +875,7 @@ const ru = {
       submitForPublishing: 'Отправить для публикации',
     },
     inviteCollaborator: {
-      selectPlaceholder: 'Электронная почта',
+      selectPlaceholder: 'Имя или адрес электронной почты',
       addUser: 'Добавить пользователя',
     },
     chat: {
@@ -910,6 +916,7 @@ const ru = {
           Reviewer: 'Рецензент',
           Editor: 'Редактор',
           Author: 'Автор',
+          Collaborator: 'Соавтор',
         },
       },
       task: {

@@ -7,7 +7,7 @@ import { ConfigContext } from '../../../config/src'
 import { fragmentFields } from '../../../component-submit/src/graphql/queries'
 import { CommsErrorBanner, Spinner } from '../../../shared'
 import DecisionVersions from './DecisionVersions'
-import { roles } from '../../../../globals'
+import { roles, labRoles } from '../../../../globals'
 
 import {
   addReviewerMutation,
@@ -44,6 +44,7 @@ import {
   UPDATE_PENDING_COMMENT,
 } from '../../../component-formbuilder/src/components/builderComponents/ThreadedDiscussion/queries'
 import useChat from '../../../../hooks/useChat'
+import YjsContext from '../../../provider-yjs/yjsProvider'
 
 export const updateManuscriptMutation = gql`
   mutation($id: ID!, $input: String) {
@@ -86,12 +87,15 @@ const DecisionPage = ({ currentUser, match }) => {
   // start of code from submit page to handle possible form changes
   const client = useApolloClient()
   const config = useContext(ConfigContext)
+  const { createYjsProvider, destroyYjsProvider } = useContext(YjsContext)
   const { urlFrag } = config
 
   useEffect(() => {
     return () => {
       Object.values(debouncers).forEach(d => d.flush())
       debouncers = {}
+
+      destroyYjsProvider({ identifier: match.params.version })
     }
   }, [])
 
@@ -127,6 +131,16 @@ const DecisionPage = ({ currentUser, match }) => {
       c => c.type === 'editorial',
     )
     allChannel = data?.manuscript.channels.find(c => c.type === 'all')
+  }
+
+  const isLabInstance = ['lab'].includes(config?.instanceName)
+
+  if (isLabInstance) {
+    createYjsProvider({
+      currentUser,
+      identifier: match.params.version,
+      object: {},
+    })
   }
 
   const channels = [
@@ -464,7 +478,7 @@ const DecisionPage = ({ currentUser, match }) => {
       removeReviewer={removeReviewer}
       reviewers={data?.manuscript?.reviews}
       reviewForm={reviewForm}
-      roles={roles}
+      roles={isLabInstance ? labRoles : roles}
       selectedEmail={selectedEmail}
       selectedEmailIsBlacklisted={selectedEmailIsBlacklisted}
       sendChannelMessage={sendChannelMessage}

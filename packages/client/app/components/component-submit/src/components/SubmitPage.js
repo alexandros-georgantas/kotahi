@@ -24,6 +24,7 @@ import {
 import useChat from '../../../../hooks/useChat'
 import mutations from '../../../component-dashboard/src/graphql/mutations'
 import AuthErrorBanner from '../../../shared/AuthErrorBanner'
+import YjsContext from '../../../provider-yjs/yjsProvider'
 
 export const updateMutation = gql`
   mutation($id: ID!, $input: String) {
@@ -82,6 +83,7 @@ let debouncers = {}
 const SubmitPage = ({ currentUser, match, history }) => {
   const { t } = useTranslation()
   const config = useContext(ConfigContext)
+  const { createYjsProvider, destroyYjsProvider } = useContext(YjsContext)
   const { urlFrag } = config
   const [chatExpand] = useMutation(mutations.updateChatUI)
 
@@ -89,6 +91,8 @@ const SubmitPage = ({ currentUser, match, history }) => {
     return () => {
       Object.values(debouncers).forEach(d => d.flush())
       debouncers = {}
+
+      destroyYjsProvider({ identifier: match.params.version })
     }
   }, [])
 
@@ -121,6 +125,14 @@ const SubmitPage = ({ currentUser, match, history }) => {
   ) {
     editorialChannel = data?.manuscript.channels.find(c => c.type === 'all')
     channelId = editorialChannel?.id
+  }
+
+  if (['lab'].includes(config?.instanceName)) {
+    createYjsProvider({
+      currentUser,
+      identifier: match.params.version,
+      object: {},
+    })
   }
 
   const channels = [

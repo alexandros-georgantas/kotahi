@@ -8,7 +8,7 @@ import {
 } from '../../../queries'
 import { CommsErrorBanner, Spinner } from '../../shared'
 import TasksTemplate from './TasksTemplate'
-import { roles } from '../../../globals'
+import { roles, labRoles } from '../../../globals'
 import { ConfigContext } from '../../config/src'
 
 const query = gql`
@@ -114,7 +114,7 @@ const TasksTemplatePage = ({ match, ...props }) => {
     <TasksTemplate
       deleteTaskNotification={deleteTaskNotification}
       emailTemplates={data.emailTemplates}
-      roles={roles}
+      roles={['lab'].includes(config?.instanceName) ? labRoles : roles}
       tasks={data.tasks}
       updateTask={updateTask}
       updateTaskNotification={updateTaskNotification}

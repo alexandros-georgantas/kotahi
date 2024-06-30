@@ -79,43 +79,43 @@ const FullWaxEditorLayout =
         <Grid fullHeight readonly={readOnly}>
           {readOnly ? (
             <FullWaxEditorGrid useComments={false}>
-              <ReadOnlyEditorDiv className="wax-surface-scroll panelWrapper">
-                {editor}
-              </ReadOnlyEditorDiv>
-              {notes.length > 0 && (
-                <ReadOnlyNotesAreaContainer className="panelWrapper">
-                  <NotesContainer id="notes-container">
-                    <NotesHeading>Notes</NotesHeading>
-                    <NotesArea view={main} />
-                  </NotesContainer>
-                </ReadOnlyNotesAreaContainer>
-              )}
+              <EditorArea className="editorArea">
+                <ReadOnlyEditorDiv className="wax-surface-scroll panelWrapper">
+                  {editor}
+                </ReadOnlyEditorDiv>
+                {notes.length > 0 && (
+                  <ReadOnlyNotesAreaContainer className="panelWrapper">
+                    <NotesContainer id="notes-container">
+                      <NotesHeading>Notes</NotesHeading>
+                      <NotesArea view={main} />
+                    </NotesContainer>
+                  </ReadOnlyNotesAreaContainer>
+                )}
+              </EditorArea>
             </FullWaxEditorGrid>
           ) : (
             <>
               <Menu className="waxmenu">
                 <TopBar />
               </Menu>
-              <FullWaxEditorGrid useComments={false}>
-                <EditorDiv
-                  className="wax-surface-scroll panelWrapper"
-                  hideComments
-                >
-                  <EditorArea className="editorArea">
-                    <WaxSurfaceScroll className="panelWrapper">
-                      <EditorContainer>{editor}</EditorContainer>
-                    </WaxSurfaceScroll>
-                  </EditorArea>
-                </EditorDiv>
-                {notes.length > 0 && (
-                  <NotesAreaContainer className="panelWrapper">
-                    <NotesContainer id="notes-container">
-                      <NotesHeading>Notes</NotesHeading>
-                      <NotesArea view={main} />
-                    </NotesContainer>
-                  </NotesAreaContainer>
-                )}
-              </FullWaxEditorGrid>
+              <EditorDiv
+                className="wax-surface-scroll panelWrapper"
+                hideComments
+              >
+                <EditorArea className="editorArea">
+                  <WaxSurfaceScroll className="panelWrapper">
+                    <EditorContainer>{editor}</EditorContainer>
+                  </WaxSurfaceScroll>
+                </EditorArea>
+              </EditorDiv>
+              {notes.length > 0 && (
+                <NotesAreaContainer className="panelWrapper">
+                  <NotesContainer id="notes-container">
+                    <NotesHeading>Notes</NotesHeading>
+                    <NotesArea view={main} />
+                  </NotesContainer>
+                </NotesAreaContainer>
+              )}
             </>
           )}
         </Grid>

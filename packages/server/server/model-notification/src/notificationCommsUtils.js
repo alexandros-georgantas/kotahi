@@ -76,6 +76,7 @@ const sendChatNotification = async ({
       `Attempt by group ${groupId} to send chat notification for group ${channel.groupId}`,
     )
   const group = await Group.query().findById(groupId)
+  const activeConfig = await Config.getCached(groupId)
 
   // send email notification
   const appUrl = `${config['pubsweet-client'].baseUrl}/${group.name}`
@@ -92,7 +93,9 @@ const sendChatNotification = async ({
       channel.manuscriptId,
     )
 
-    if (roles.groupManager || roles.anyEditor) {
+    if (activeConfig.formData.instanceName === 'lab') {
+      discussionUrl += '/evaluation'
+    } else if (roles.groupManager || roles.anyEditor) {
       discussionUrl += '/decision'
 
       if (channel.type === 'editorial') {
@@ -118,8 +121,6 @@ const sendChatNotification = async ({
     discussionUrl,
     senderName: currentUser?.username || '',
   }
-
-  const activeConfig = await Config.getCached(groupId)
 
   const selectedTemplate = isMentioned
     ? activeConfig.formData.eventNotification.mentionNotificationTemplate

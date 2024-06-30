@@ -98,6 +98,7 @@ const esLa = {
       Manuscript: 'Manuscrito',
       Dashboard: 'Tablero',
       Manuscripts: 'Manuscritos',
+      Articles: 'Artículos',
       Reports: 'Informes',
       Settings: 'Configuración',
       Forms: 'Formularios',
@@ -215,9 +216,13 @@ const esLa = {
     },
     manuscriptsPage: {
       Manuscripts: 'Manuscritos',
+      Articles: 'Artículos',
       archivedManuscripts: 'Manuscritos archivados',
-      viewArchived: 'Ver manuscritos archivados',
-      viewUnarchived: 'Volver a los manuscritos no archivados',
+      archivedArticles: 'Artículos archivados',
+      viewArchivedManuscripts: 'Ver manuscritos archivados',
+      viewArchivedArticles: 'Ver artículos archivados',
+      viewUnarchivedManuscripts: 'Volver a los manuscritos no archivados',
+      viewUnarchivedArticles: 'Ver artículos no archivados',
       manuscriptInvalid:
         'Este manuscrito tiene campos incompletos o inválidos. Por favor, corrígelos e inténtalo de nuevo.',
       importPending: 'pendiente',
@@ -240,6 +245,7 @@ const esLa = {
       Team: 'Equipo',
       Decision: 'Decisión',
       'Manuscript text': 'Texto del Manuscrito',
+      Article: 'Artículo',
       Metadata: 'Metadatos',
       'Tasks & Notifications': 'Tareas y Notificaciones',
       'Assign Editors': 'Asignar Editores',
@@ -870,7 +876,7 @@ const esLa = {
       submitForPublishing: 'Enviar para publicación',
     },
     inviteCollaborator: {
-      selectPlaceholder: 'Correo electrónico',
+      selectPlaceholder: 'Nombre o correo electrónico',
       addUser: 'Agregar usuario',
     },
     chat: {
@@ -911,6 +917,7 @@ const esLa = {
           Reviewer: 'Revisor',
           Editor: 'Editor',
           Author: 'Autor',
+          Collaborator: 'Colaborador',
         },
       },
       task: {

@@ -2,7 +2,10 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
+import Color from 'color'
 import { Select } from '../../../shared'
+import { color } from '../../../../theme'
+import Image from '../../../component-avatar/src/image'
 
 const StyledListItem = styled.div`
   width: 100%;
@@ -28,6 +31,7 @@ const UserRow = styled.div`
 
 const UserDetails = styled.div`
   display: flex;
+  gap: 8px;
 `
 
 const AccessLabel = styled.span`
@@ -36,15 +40,14 @@ const AccessLabel = styled.span`
 
 const UserAvatar = styled.div`
   align-items: center;
-  background-color: #ffc038;
+  background-color: ${props => props.backgroundColour};
   border-radius: 50%;
-  color: #000;
+  color: ${props => props.textColour};
   display: flex;
   font-size: 14px;
   font-weight: bold;
   height: 24px;
   justify-content: center;
-  margin-right: 8px;
   width: 24px;
 `
 
@@ -71,8 +74,21 @@ const CollaboratorRow = ({
     { value: 'remove', label: t('collaborateForm.removeAccess') },
   ]
 
-  const { username, id: userId } = user
+  const { username, id: userId, profilePicture } = user
   const isAuthor = role === 'author'
+
+  const placeholderAvatar = '/profiles/default_avatar.svg'
+
+  const backgroundColour = color.brand2.base()
+  let textColour
+
+  try {
+    textColour = Color(backgroundColour).isLight()
+      ? color.text
+      : color.textReverse
+  } catch (e) {
+    textColour = color.gray90
+  }
 
   const customStyles = {
     control: provided => ({
@@ -100,7 +116,16 @@ const CollaboratorRow = ({
     <StyledListItem key={id}>
       <UserRow isAuthor={isAuthor}>
         <UserDetails>
-          <UserAvatar>{getInitials(username)}</UserAvatar>
+          {profilePicture === placeholderAvatar ? (
+            <UserAvatar
+              backgroundColour={backgroundColour}
+              textColour={textColour}
+            >
+              {getInitials(username)}
+            </UserAvatar>
+          ) : (
+            <Image size={24} src={profilePicture} type="user" />
+          )}
           <span>{username}</span>
         </UserDetails>
         {isAuthor ? (
