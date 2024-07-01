@@ -1,16 +1,13 @@
+const { NotFoundError } = require('@pubsweet/errors')
 const Form = require('../../../models/form/form.model')
 
-const {
-  evictFromCacheByPrefix,
-  evictFromCache,
-  cachedGet,
-} = require('../../querycache')
+const notFoundError = (property, value, className) =>
+  new NotFoundError(`Object not found: ${className} with ${property} ${value}`)
 
 const resolvers = {
   Mutation: {
     deleteForm: async (_, { formId }) => {
       await Form.query().deleteById(formId)
-      evictFromCacheByPrefix('form:')
       return { query: {} }
     },
     deleteFormElement: async (_, { formId, elementId }) => {
@@ -24,8 +21,6 @@ const resolvers = {
       const formRes = await Form.query().patchAndFetchById(formId, {
         structure: form.structure,
       })
-
-      evictFromCache(`form:${form.category}:${form.purpose}:${form.groupId}`)
 
       return formRes
     },
@@ -50,10 +45,6 @@ const resolvers = {
           .whereNot({ id: result.id })
       }
 
-      evictFromCache(
-        `form:${result.category}:${result.purpose}:${result.groupId}`,
-      )
-
       return result
     },
     updateFormElement: async (_, { element, formId }) => {
@@ -67,15 +58,9 @@ const resolvers = {
       if (indexToReplace < 0) form.structure.children.push(element)
       else form.structure.children[indexToReplace] = element
 
-      const result = await Form.query().patchAndFetchById(formId, {
+      return Form.query().patchAndFetchById(formId, {
         structure: form.structure,
       })
-
-      evictFromCache(
-        `form:${result.category}:${result.purpose}:${result.groupId}`,
-      )
-
-      return result
     },
   },
   Query: {
@@ -88,8 +73,28 @@ const resolvers = {
       }),
 
     /** Returns the specific requested form */
-    formForPurposeAndCategory: async (_, { purpose, category, groupId }) =>
-      cachedGet(`form:${category}:${purpose}:${groupId}`),
+    formForPurposeAndCategory: async (_, { purpose, category, groupId }) => {
+      const form = await Form.query().findOne({
+        purpose,
+        category,
+        groupId,
+      })
+
+      if (!form) {
+        throw notFoundError(
+          'Category and purpose',
+          `${purpose} ${category}`,
+          this.name,
+        )
+      }
+
+      // TODO Remove this once the form-builder no longer permits incomplete/malformed fields.
+      form.structure.children = form.structure.children.filter(
+        field => field.component && field.name,
+      )
+
+      return form
+    },
   },
 }
 
