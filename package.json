@@ -58,6 +58,5 @@
     "eslint-plugin-prettier": "^3.1.2",
     "jest": "^27.1.0",
     "start-server-and-test": "1.11.5"
-  },
-  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
+  }
 }
