@@ -96,11 +96,11 @@ services:
       - ALLOW_MANUAL_IMPORT=${ALLOW_MANUAL_IMPORT:-}
       - SEMANTIC_SCHOLAR_IMPORTS_RECENCY_PERIOD_DAYS=${SEMANTIC_SCHOLAR_IMPORTS_RECENCY_PERIOD_DAYS:-}
       - TEAM_TIMEZONE=${TEAM_TIMEZONE}
-      - SERVICE_XSWEET_CLIENT_ID=59a3392b-0c4f-4318-bbe2-f86eff6d3de4
-      - SERVICE_XSWEET_SECRET=asldkjLKJLaslkdf897kjhKUJH
-      - SERVICE_XSWEET_PROTOCOL=${SERVICE_XSWEET_PROTOCOL:-http}
-      - SERVICE_XSWEET_HOST=${SERVICE_XSWEET_HOST:-xsweet}
-      - SERVICE_XSWEET_PORT=${SERVICE_XSWEET_PORT:-3004}
+      - SERVICE_XSWEET_CLIENT_ID=${SERVICE_XSWEET_CLIENT_ID}
+      - SERVICE_XSWEET_SECRET=${SERVICE_XSWEET_SECRET}
+      - SERVICE_XSWEET_PROTOCOL=${SERVICE_XSWEET_PROTOCOL}
+      - SERVICE_XSWEET_HOST=${SERVICE_XSWEET_HOST}
+      - SERVICE_XSWEET_PORT=${SERVICE_XSWEET_PORT}
       - FLAX_EXPRESS_PORT=${FLAX_EXPRESS_PORT}
       - FLAX_EXPRESS_HOST=${FLAX_EXPRESS_HOST:-kotahi-flax-site}
       - FLAX_EXPRESS_PROTOCOL=${FLAX_EXPRESS_PROTOCOL:-http}
@@ -111,7 +111,6 @@ services:
       - USE_APERTURE_EMAIL=${USE_APERTURE_EMAIL}
       - INSTANCE_GROUPS=${INSTANCE_GROUPS:-kotahi:journal}
       - USE_COLAB_BIOPHYSICS_IMPORT=${USE_COLAB_BIOPHYSICS_IMPORT:-false}
-
     volumes:
       - ./uploads:/home/node/app/uploads
       - ./packages/server/config:/home/node/app/config
@@ -120,7 +119,7 @@ services:
   xsweet:
     depends_on:
       - db-xsweet
-    image: cokoapps/xsweet:2.3.0
+    image: cokoapps/xsweet:2.3.2
     ports:
       - ${SERVICE_XSWEET_PORT:-3004}:${SERVICE_XSWEET_PORT:-3004}
     environment:
@@ -153,7 +152,7 @@ services:
       - ./scripts/init-pgboss.sql:/docker-entrypoint-initdb.d/init-pgboss.sql
 
   kotahi-flax-site:
-    image: cokoapps/kotahi-flax:0.2.41
+    image: cokoapps/kotahi-flax:0.2.45
     depends_on:
       - server
     ports:

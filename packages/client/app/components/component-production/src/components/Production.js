@@ -1,3 +1,5 @@
+/* stylelint-disable string-quotes */
+
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { grid, th } from '@pubsweet/ui-toolkit'
@@ -12,7 +14,7 @@ import { DownloadDropdown } from './DownloadDropdown'
 import {
   Heading,
   HeadingWithAction,
-  HiddenTabs,
+  Tabs,
   Manuscript,
   ErrorBoundary,
   SectionContent,
@@ -29,6 +31,9 @@ import gatherManuscriptVersions from '../../../../shared/manuscript_versions'
 import PreviousFeedbackSubmissions from './PreviousFeedbackSubmissions'
 import { CssAssistantProvider } from '../../../component-ai-assistant/hooks/CssAssistantContext'
 import AiPDFDesigner from '../../../component-ai-assistant/AiPDFDesigner'
+import Versioning from './Versioning'
+
+const useVersioning = true
 
 const PreviousFeedBackSection = styled.div`
   margin-bottom: calc(${th('gridUnit')} * 3);
@@ -98,12 +103,20 @@ const Production = ({
   onAssetManager,
   isAuthorProofingVersion,
   isReadOnlyVersion,
+  authorList,
+  addNewVersion,
 }) => {
   const versions = gatherManuscriptVersions(unparsedManuscript)
 
   const showFeedbackTab = versions.some(
     v => v.manuscript?.authorFeedback?.previousSubmissions?.length > 0,
   )
+
+  const saveCurrentVersion = async source => {
+    // This just saves the current version of the manuscript on demand
+    // Right now, this is just saving the source of the manuscript
+    updateManuscript(manuscript.id, { meta: { source } })
+  }
 
   const debouncedSave = useCallback(
     debounce(source => {
@@ -144,6 +157,7 @@ const Production = ({
 
   const editorSection = {
     content: (
+      // eslint-disable-next-line react/jsx-no-useless-fragment
       <>
         {file &&
         file.storedObjects[0].mimetype ===
@@ -284,20 +298,41 @@ const Production = ({
 
   const tabSections = []
 
+  const versioningSection = {
+    key: 'versioning',
+    label: 'History',
+    content: (
+      <Versioning
+        addNewVersion={addNewVersion} // this is basically the same
+        authorList={authorList}
+        currentUser={currentUser}
+        manuscript={manuscript}
+        saveCurrentVersion={saveCurrentVersion}
+      />
+    ),
+  }
+
   tabSections.push(editorSection)
 
   // Only author in author proofing mode can have editor seciton and feedback section visible
   if (isAuthorProofingVersion) {
     tabSections.push(feedbackSection)
   } else {
-    if (!isReadOnlyVersion && showFeedbackTab) tabSections.push(feedbackSection) // The manuscript versions should have one feedback submitted record to show feedback tab
-    tabSections.push(
-      htmlTemplate,
-      cssPagedJS,
-      uploadAssets,
-      manuscriptMetadata,
-      cssAiAssistant,
-    )
+    // The manuscript editor can only view editor section and feedback section in readonly mode
+    /* eslint-disable no-lonely-if */
+    if (isReadOnlyVersion && showFeedbackTab) {
+      tabSections.push(feedbackSection)
+    } else {
+      if (useVersioning) tabSections.push(versioningSection)
+
+      tabSections.push(
+        htmlTemplate,
+        cssPagedJS,
+        uploadAssets,
+        manuscriptMetadata,
+        cssAiAssistant,
+      )
+    }
   }
 
   return (
@@ -321,7 +356,7 @@ const Production = ({
         </FlexRow>
       </HeadingWithAction>
       <ErrorBoundary>
-        <HiddenTabs defaultActiveKey="editor" sections={tabSections} />
+        <Tabs defaultActiveKey="editor" sections={tabSections} />
       </ErrorBoundary>
     </StyledManuscript>
   )

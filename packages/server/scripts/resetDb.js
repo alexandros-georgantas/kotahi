@@ -3,7 +3,7 @@
  * when running migrations or restoring from dump.
  */
 const waitForDbToSettle = async () => {
-  const { User } = require('@pubsweet/models')
+  const User = require('../models/user/user.model')
   let ready
 
   while (!ready) {
@@ -12,6 +12,7 @@ const waitForDbToSettle = async () => {
       ready = !!users
     } catch (e) {
       console.error(e)
+      /* eslint-disable-next-line no-promise-executor-return */
       await new Promise(resolve => setTimeout(resolve, 1000))
     }
   }

@@ -3,7 +3,7 @@ const logger = require('winston')
 const { deferConfig } = require('config/defer')
 
 const permissions = require('./permissions')
-const components = require('./components.json')
+const components = require('./components')
 const journal = require('./journal')
 
 module.exports = {
@@ -36,7 +36,7 @@ module.exports = {
   },
   mailer: {
     from: 'dev@example.com',
-    path: `${__dirname}/mailer`,
+    path: `${__dirname}/mailer`, // eslint-disable-line node/no-path-concat
   },
   'client-features': {
     displayShortIdAsIdentifier: 'false',

@@ -1,12 +1,4 @@
-/* eslint-disable no-unused-vars */
-const {
-  rule,
-  and,
-  or,
-  not,
-  allow,
-  deny,
-} = require('@coko/server/authorization')
+const { rule, and, or, allow, deny } = require('@coko/server/authorization')
 
 const { cachedGet } = require('../server/querycache')
 
@@ -30,8 +22,12 @@ const userIsEditorOfAnyManuscript = rule({
 const userIsGm = rule({
   cache: 'contextual',
 })(async (parent, args, ctx, info) => {
-  if (!ctx.user) return false
-  return cachedGet(`userIsGM:${ctx.user}:${ctx.req.headers['group-id']}`)
+  const groupId = ctx.req.headers['group-id']
+  // An 'undefined' groupId header can occasionally be obtained, especially
+  // in development. If we don't deal with it gracefully, it will cause
+  // a crash and prevent its replacement with a correct value.
+  if (!ctx.user || !groupId || groupId === 'undefined') return false
+  return cachedGet(`userIsGM:${ctx.user}:${groupId}`)
 })
 
 const userIsAdmin = rule({
@@ -354,39 +350,39 @@ const userIsAuthorOfManuscript = rule({ cache: 'strict' })(
   },
 )
 
-const userIsAuthorOfFilesAssociatedManuscript = rule({
-  cache: 'no_cache',
-})(async (parent, args, ctx, info) => {
-  if (!ctx.user) return false
-  let manuscriptId
+// const userIsAuthorOfFilesAssociatedManuscript = rule({
+//   cache: 'no_cache',
+// })(async (parent, args, ctx, info) => {
+//   if (!ctx.user) return false
+//   let manuscriptId
 
-  if (args.meta && args.meta.manuscriptId) {
-    // Meta is supplied for createFile
-    // eslint-disable-next-line prefer-destructuring
-    manuscriptId = args.meta.manuscriptId
-  } else if (args.id) {
-    // id is supplied for deletion
-    const file = await ctx.connectors.File.model.query().findById(args.id)
-    const manuscript = await cachedGet(`msOfFile:${file.id}`, ctx)
-    manuscriptId = manuscript && manuscript.id
-  }
+//   if (args.meta && args.meta.manuscriptId) {
+//     // Meta is supplied for createFile
+//     // eslint-disable-next-line prefer-destructuring
+//     manuscriptId = args.meta.manuscriptId
+//   } else if (args.id) {
+//     // id is supplied for deletion
+//     const file = await ctx.connectors.File.model.query().findById(args.id)
+//     const manuscript = await cachedGet(`msOfFile:${file.id}`, ctx)
+//     manuscriptId = manuscript && manuscript.id
+//   }
 
-  if (!manuscriptId) return false
+//   if (!manuscriptId) return false
 
-  const team = await ctx.connectors.Team.model
-    .query()
-    .where({
-      objectId: manuscriptId,
-      objectType: 'manuscript',
-      role: 'author',
-    })
-    .first()
+//   const team = await ctx.connectors.Team.model
+//     .query()
+//     .where({
+//       objectId: manuscriptId,
+//       objectType: 'manuscript',
+//       role: 'author',
+//     })
+//     .first()
 
-  if (!team) return false
-  const members = await team.$relatedQuery('members').where('userId', ctx.user)
-  if (members && members[0]) return true
-  return false
-})
+//   if (!team) return false
+//   const members = await team.$relatedQuery('members').where('userId', ctx.user)
+//   if (members && members[0]) return true
+//   return false
+// })
 
 const userIsAuthorOfTheManuscriptOfTheFile = rule({ cache: 'strict' })(
   async (parent, args, ctx, info) => {
@@ -467,8 +463,6 @@ const permissions = {
   Query: {
     authorsActivity: or(userIsGm, userIsAdmin),
     builtCss: isAuthenticated,
-    channels: deny, // Never used
-    channelsByTeamName: deny, // Never used
     config: isAuthenticated,
     convertToJats: or(userIsEditorOfAnyManuscript, userIsGm, userIsAdmin),
     convertToPdf: or(userIsEditorOfAnyManuscript, userIsGm, userIsAdmin),
@@ -477,7 +471,6 @@ const permissions = {
     editorsActivity: or(userIsGm, userIsAdmin),
     file: deny, // Never used
     files: deny, // Never used
-    findByDOI: deny, // Never used
     form: isAuthenticated,
     formForPurposeAndCategory: allow,
     forms: allow,
@@ -507,7 +500,6 @@ const permissions = {
       userIsAuthorOfManuscript,
       userIsReviewerOrInvitedReviewerOfTheManuscript,
     ),
-    manuscriptChannel: deny, // Never used
     manuscripts: isAuthenticated,
     manuscriptsActivity: or(userIsGm, userIsAdmin),
     manuscriptsPublishedSinceDate: allow,
@@ -521,14 +513,12 @@ const permissions = {
     publishedManuscripts: allow,
     publishingCollection: allow,
     reviewersActivity: or(userIsGm, userIsAdmin),
-    searchOnCrossref: deny, // Never used
     searchUsers: isAuthenticated,
     summaryActivity: or(userIsGm, userIsAdmin),
     systemWideDiscussionChannel: or(userIsGm, userIsAdmin),
     tasks: or(userIsGm, userIsAdmin),
     team: deny, // Never used
-    teamByName: deny, // Never used
-    teams: deny, // Never used
+    teams: isAuthenticated,
     threadedDiscussions: isAuthenticated,
     unreviewedPreprints: allow, // This has its own token-based authentication.
     user: isAuthenticated,
@@ -545,11 +535,8 @@ const permissions = {
     archiveManuscripts: or(userIsGm, userIsAdmin),
     assignTeamEditor: deny, // Never used
     assignUserAsAuthor: isAuthenticated, // TODO require the invitation ID to be sent in this mutation
-    changeTopic: deny, // Never used
     completeComment: isAuthenticated,
     completeComments: isAuthenticated,
-    createChannel: deny, // Never used
-    createChannelFromDOI: deny, // Never used
     // createDocxToHTMLJob seems to be exposed from xsweet???
     createFile: isAuthenticated,
     createForm: or(userIsGm, userIsAdmin),
@@ -598,6 +585,7 @@ const permissions = {
       userIsAdmin,
     ),
     submitAuthorProofingFeedback: userIsAuthorOfManuscript,
+    unarchiveManuscripts: or(userIsGm, userIsAdmin),
     updateCollection: or(userIsGm, userIsAdmin),
     updateEmail: or(userIsCurrentUser, userIsGm, userIsAdmin),
     updateConfig: or(userIsGm, userIsAdmin),

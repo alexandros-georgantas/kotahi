@@ -175,6 +175,9 @@ const fr = {
         'Publishing error': "Erreur d'édition",
         'Some targets failed to publish':
           'Certains objectifs ont échoué à publier.',
+        continueSubmission: 'Continuer la soumission',
+        revise: 'Réviser',
+        continueRevision: 'Continuer la révision',
       },
     },
     dashboardPage: {
@@ -204,6 +207,9 @@ const fr = {
     },
     manuscriptsPage: {
       Manuscripts: 'Manuscrits',
+      archivedManuscripts: 'Manuscrits archivés',
+      viewArchived: 'Voir les manuscrits archivés',
+      viewUnarchived: 'Retourner aux manuscrits non archivés',
       manuscriptInvalid:
         'Ce manuscrit a des champs incomplets ou invalides. Veuillez les corriger et réessayer.',
       importPending: 'en attente',
@@ -213,6 +219,11 @@ const fr = {
       'Select All': 'Sélectionner tout',
       selectedArticles: '{{count}} articles sélectionnés',
       Archive: 'Archiver',
+      Unarchive: "Restaurer depuis l'archive",
+      confirmArchive:
+        'Veuillez confirmer que vous souhaitez archiver les manuscrits sélectionnés.',
+      confirmUnarchive:
+        'Veuillez confirmer que vous souhaitez restaurer le statut non archivé des manuscrits sélectionnés.',
       takeAction: 'Action',
       exportAsJson: 'Télécharger JSON',
     },
@@ -579,6 +590,7 @@ const fr = {
         cse: 'Conseil des éditeurs scientifiques (CSE)',
         'Select locale for citations':
           'Sélectionnez la langue pour les citations',
+        historyIntervalInMinutes: 'Intervalle d’historique en minutes',
       },
       allowedIPs: 'Liste des adresses IP du référentiel autorisées à accéder',
       api: 'API Kotahi',
@@ -594,14 +606,14 @@ const fr = {
         'BMJ Journals': 'BMJ Journals',
         'Cambridge University Press': 'Cambridge University Press',
         ChemRxiv: 'ChemRxiv',
-        CiteCeerX: 'CiteCeerX',
+        CiteCeerX: 'CiteSeerX',
         'Clinical Trials Transformation Initiative':
           'Clinical Trials Transformation Initiative',
         'DBLP Computer Science Bibliography':
           'DBLP Computer Science Bibliography',
         'De Gruyter academic publishing': 'De Gruyter academic publishing',
         Frontiers: 'Frontiers',
-        'HAL Open Sience': 'HAL Open Sience',
+        'HAL Open Sience': 'HAL Open Science',
         HighWire: 'HighWire',
         IEEE: 'IEEE',
         'IOP Publishing': 'IOP Publishing',
@@ -766,6 +778,11 @@ const fr = {
       'Submit Feedback': 'Envoyer les commentaires',
       'Decline Invitation': "Refuser l'invitation",
       thanks: "Merci d'avoir soumis vos commentaires.",
+    },
+    invitationAcceptedPage: {
+      error:
+        "Cette invitation n'a pas pu être acceptée, parce que vous avez déjà refusé une invitation pour ce manuscrit.",
+      returnToDashboard: 'Retour au Tableau de Bord',
     },
     reviewPreviewPage: {
       Summary: 'Résumé',

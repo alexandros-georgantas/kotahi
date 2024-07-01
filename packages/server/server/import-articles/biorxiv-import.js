@@ -1,6 +1,9 @@
 /* eslint-disable camelcase, consistent-return */
 const axios = require('axios')
-const models = require('@pubsweet/models')
+
+const ArticleImportHistory = require('../../models/articleImportHistory/articleImportHistory.model')
+const ArticleImportSources = require('../../models/articleImportSources/articleImportSources.model')
+const Manuscript = require('../../models/manuscript/manuscript.model')
 
 const {
   ecologyAndSpillover,
@@ -30,30 +33,28 @@ const getData = async (groupId, ctx) => {
     Pharmaceutical_interventions: pharmaceuticalInterventions,
   }
 
-  const [checkIfSourceExists] = await models.ArticleImportSources.query().where(
-    {
-      server: 'biorxiv',
-    },
-  )
+  const [checkIfSourceExists] = await ArticleImportSources.query().where({
+    server: 'biorxiv',
+  })
 
   if (!checkIfSourceExists) {
-    await models.ArticleImportSources.query().insert({
+    await ArticleImportSources.query().insert({
       server: 'biorxiv',
     })
   }
 
-  const [biorxivImportSourceId] =
-    await models.ArticleImportSources.query().where({
-      server: 'biorxiv',
-    })
+  const [biorxivImportSourceId] = await ArticleImportSources.query().where({
+    server: 'biorxiv',
+  })
 
-  const lastImportDate = await models.ArticleImportHistory.query()
+  const lastImportDate = await ArticleImportHistory.query()
     .select('date')
     .where({
       sourceId: biorxivImportSourceId.id,
       groupId,
     })
 
+  /* eslint-disable-next-line default-param-last */
   const requests = async (cursor = 0, minDate, results = []) => {
     const { data } = await axios.get(
       `https://api.biorxiv.org/covid19/${cursor}`,
@@ -78,7 +79,7 @@ const getData = async (groupId, ctx) => {
 
   const importedManuscripts = await requests(0, date, [])
 
-  const manuscripts = await models.Manuscript.query()
+  const manuscripts = await Manuscript.query()
   const currentUris = manuscripts.map(m => m.submission.$sourceUri)
 
   const withoutDuplicates = importedManuscripts.filter(
@@ -166,10 +167,12 @@ const getData = async (groupId, ctx) => {
             {
               topic: 'Manuscript discussion',
               type: 'all',
+              groupId,
             },
             {
               topic: 'Editorial discussion',
               type: 'editorial',
+              groupId,
             },
           ],
           files: [],
@@ -184,7 +187,7 @@ const getData = async (groupId, ctx) => {
   if (!newManuscripts.length) return []
 
   try {
-    const inserted = await models.Manuscript.query().upsertGraphAndFetch(
+    const inserted = await Manuscript.query().upsertGraphAndFetch(
       newManuscripts,
       { relate: true },
     )
@@ -196,10 +199,10 @@ const getData = async (groupId, ctx) => {
     //   }
     // })
 
-    // const insertedTeams = await models.Team.query(trx).insert(teamsToInsert)
+    // const insertedTeams = await Team.query(trx).insert(teamsToInsert)
 
     if (lastImportDate.length) {
-      await models.ArticleImportHistory.query()
+      await ArticleImportHistory.query()
         .update({
           date: new Date().toISOString(),
         })
@@ -208,7 +211,7 @@ const getData = async (groupId, ctx) => {
           groupId,
         })
     } else {
-      await models.ArticleImportHistory.query().insert({
+      await ArticleImportHistory.query().insert({
         date: new Date().toISOString(),
         sourceId: biorxivImportSourceId.id,
         groupId,

@@ -1,6 +1,8 @@
-const models = require('@pubsweet/models')
 const config = require('config')
 const { pubsubManager } = require('@coko/server')
+
+const Config = require('../../../models/config/config.model')
+
 const importArticlesFromBiorxiv = require('../../import-articles/biorxiv-import')
 const importArticlesFromBiorxivWithFullTextSearch = require('../../import-articles/biorxiv-full-text-import')
 const importArticlesFromPubmed = require('../../import-articles/pubmed-import')
@@ -16,13 +18,20 @@ const shouldRunDefaultImportsForColab = [true, 'true'].includes(
 )
 
 const importManuscripts = async (groupId, ctx) => {
+  // eslint-disable-next-line no-console
+  console.log(`Importing manuscripts. Triggered by ${ctx.userId ?? 'system'}`)
   const key = `${groupId}-imports`
-  if (importsInProgress.has(key)) return false
+
+  if (importsInProgress.has(key)) {
+    // eslint-disable-next-line no-console
+    console.log('Import already in progress. Aborting new import')
+    return false
+  }
 
   try {
     importsInProgress.add(key)
 
-    const activeConfig = await models.Config.query().findOne({
+    const activeConfig = await Config.query().findOne({
       groupId,
       active: true,
     })
@@ -69,7 +78,7 @@ const importManuscriptsFromSemanticScholar = async (groupId, ctx) => {
   try {
     importsInProgress.add(key)
 
-    const activeConfig = await models.Config.query().findOne({
+    const activeConfig = await Config.query().findOne({
       groupId,
       active: true,
     })

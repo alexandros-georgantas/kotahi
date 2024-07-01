@@ -1,6 +1,9 @@
+/* stylelint-disable color-function-notation, alpha-value-notation */
+
 import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { ChevronUp, ChevronDown, X } from 'react-feather'
+import Color from 'color'
 import { LabelBadge } from '../../../shared'
 import { color } from '../../../../theme'
 
@@ -22,7 +25,7 @@ const DropdownMenu = styled.div`
   background-color: ${color.backgroundA};
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.25);
   left: 0;
   margin-top: 2px;
   max-height: 250px;
@@ -37,11 +40,21 @@ const StatusLabel = styled.span`
   margin-right: 5px;
 `
 
+const ActionsContainer = styled.div`
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+`
+
 const StyledButton = styled.button`
   align-items: center;
-  background-color: lightgrey;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
   cursor: pointer;
   display: flex;
+  outline: none;
+  overflow: hidden;
 `
 
 const DropdownMenuItem = styled.div`
@@ -116,23 +129,51 @@ const LabelDropdown = ({
         <LabelBadge color={values[0]?.color}>
           <StatusLabel>{values[0]?.displayValue}</StatusLabel>
           {isDropdownOpen ? (
-            <>
+            <ActionsContainer>
               <StyledButton onClick={() => unsetCustomStatus(manuscript.id)}>
-                <X size={18} />
+                <X
+                  color={
+                    values[0]?.color && Color(values[0]?.color).isDark()
+                      ? `${color.textReverse}`
+                      : `${color.text}`
+                  }
+                  size={18}
+                />
               </StyledButton>
               <StyledButton onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-                <ChevronUp size={18} />
+                <ChevronUp
+                  color={
+                    values[0]?.color && Color(values[0]?.color).isDark()
+                      ? `${color.textReverse}`
+                      : `${color.text}`
+                  }
+                  size={18}
+                />
               </StyledButton>
-            </>
+            </ActionsContainer>
           ) : (
-            <>
+            <ActionsContainer>
               <StyledButton onClick={() => unsetCustomStatus(manuscript.id)}>
-                <X size={18} />
+                <X
+                  color={
+                    values[0]?.color && Color(values[0]?.color).isDark()
+                      ? `${color.textReverse}`
+                      : `${color.text}`
+                  }
+                  size={18}
+                />
               </StyledButton>
               <StyledButton onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-                <ChevronDown size={18} />
+                <ChevronDown
+                  color={
+                    values[0]?.color && Color(values[0]?.color).isDark()
+                      ? `${color.textReverse}`
+                      : `${color.text}`
+                  }
+                  size={18}
+                />
               </StyledButton>
-            </>
+            </ActionsContainer>
           )}
         </LabelBadge>
       </DropdownElement>

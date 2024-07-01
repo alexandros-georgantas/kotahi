@@ -173,6 +173,9 @@ const en = {
         cancelArchiveButton: 'Cancel',
         'Publishing error': 'Publishing error',
         'Some targets failed to publish': 'Some targets failed to publish.',
+        continueSubmission: 'Continue Submission',
+        revise: 'Revise',
+        continueRevision: 'Continue Revision',
       },
     },
     dashboardPage: {
@@ -200,6 +203,9 @@ const en = {
     },
     manuscriptsPage: {
       Manuscripts: 'Manuscripts',
+      archivedManuscripts: 'Archived manuscripts',
+      viewArchived: 'View archived manuscripts',
+      viewUnarchived: 'Return to unarchived manuscripts',
       manuscriptInvalid:
         'This manuscript has incomplete or invalid fields. Please correct these and try again.',
       importPending: 'pending',
@@ -209,6 +215,11 @@ const en = {
       'Select All': 'Select All',
       selectedArticles: '{{count}} articles selected',
       Archive: 'Archive',
+      Unarchive: 'Restore from archive',
+      confirmArchive:
+        'Please confirm you wish to archive the selected manuscripts.',
+      confirmUnarchive:
+        'Please confirm you wish to restore the selected manuscripts to unarchived status.',
       takeAction: 'Action',
       exportAsJson: 'Download JSON',
     },
@@ -551,6 +562,7 @@ const en = {
         cmos: 'Chicago Manual of Style (CMOS)',
         cse: 'Council of Science Editors (CSE)',
         'Select locale for citations': 'Select locale for citations',
+        historyIntervalInMinutes: 'History interval in minutes',
       },
       allowedIPs: 'List of repository IPs allowed access',
       api: 'COAR Notify',
@@ -566,14 +578,14 @@ const en = {
         'BMJ Journals': 'BMJ Journals',
         'Cambridge University Press': 'Cambridge University Press',
         ChemRxiv: 'ChemRxiv',
-        CiteCeerX: 'CiteCeerX',
+        CiteCeerX: 'CiteSeerX',
         'Clinical Trials Transformation Initiative':
           'Clinical Trials Transformation Initiative',
         'DBLP Computer Science Bibliography':
           'DBLP Computer Science Bibliography',
         'De Gruyter academic publishing': 'De Gruyter academic publishing',
         Frontiers: 'Frontiers',
-        'HAL Open Sience': 'HAL Open Sience',
+        'HAL Open Sience': 'HAL Open Science',
         HighWire: 'HighWire',
         IEEE: 'IEEE',
         'IOP Publishing': 'IOP Publishing',
@@ -736,6 +748,11 @@ const en = {
       'Submit Feedback': 'Submit Feedback',
       'Decline Invitation': 'Decline Invitation',
       thanks: 'Thank you for submitting the feedback.',
+    },
+    invitationAcceptedPage: {
+      error:
+        'This invitation could not be accepted, because you have already declined an invitation for this manuscript.',
+      returnToDashboard: 'Return to Dashboard',
     },
     reviewPreviewPage: {
       Summary: 'Summary',

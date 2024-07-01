@@ -177,6 +177,9 @@ const ru = {
         'Publishing error': 'Ошибка публикации',
         'Some targets failed to publish':
           'Не удалось опубликовать некоторые рукописи.',
+        continueSubmission: 'Продолжить подачу',
+        revise: 'Редактировать',
+        continueRevision: 'Продолжить редактирование',
       },
     },
     dashboardPage: {
@@ -204,6 +207,9 @@ const ru = {
     },
     manuscriptsPage: {
       Manuscripts: 'Статьи',
+      archivedManuscripts: 'Архивированные статьи',
+      viewArchived: 'Просмотреть архивированные статьи',
+      viewUnarchived: 'Вернуться к неархивированным статьям',
       manuscriptInvalid:
         'Эта рукопись содержит неполные или недопустимые поля. Исправьте их и повторите попытку.',
       importPending: 'импорт',
@@ -215,6 +221,11 @@ const ru = {
       selectedArticles_few: '{{count}} статьи выбрано',
       selectedArticles_many: '{{count}} статей выбрано',
       Archive: 'Архивировать',
+      Unarchive: 'Восстановить из архива',
+      confirmArchive:
+        'Пожалуйста, подтвердите, что вы хотите архивировать выбранные манускрипты.',
+      confirmUnarchive:
+        'Пожалуйста, подтвердите, что вы хотите восстановить выбранные манускрипты из архива.',
       takeAction: 'действие',
       exportAsJson: 'Скачать JSON',
     },
@@ -571,6 +582,7 @@ const ru = {
         cmos: 'Руководство стиля Чикаго (CMOS)',
         cse: 'Совет редакторов науки (CSE)',
         'Select locale for citations': 'Выберите локаль для цитирования',
+        historyIntervalInMinutes: 'Интервал истории в минутах',
       },
       allowedIPs: 'Список IP-адресов репозитория, которым разрешен доступ',
       api: 'Один API',
@@ -586,14 +598,14 @@ const ru = {
         'BMJ Journals': 'BMJ Journals',
         'Cambridge University Press': 'Cambridge University Press',
         ChemRxiv: 'ChemRxiv',
-        CiteCeerX: 'CiteCeerX',
+        CiteCeerX: 'CiteSeerX',
         'Clinical Trials Transformation Initiative':
           'Clinical Trials Transformation Initiative',
         'DBLP Computer Science Bibliography':
           'DBLP Computer Science Bibliography',
         'De Gruyter academic publishing': 'De Gruyter academic publishing',
         Frontiers: 'Frontiers',
-        'HAL Open Sience': 'HAL Open Sience',
+        'HAL Open Sience': 'HAL Open Science',
         HighWire: 'HighWire',
         IEEE: 'IEEE',
         'IOP Publishing': 'IOP Publishing',
@@ -760,6 +772,11 @@ const ru = {
       'Submit Feedback': 'Отправить',
       'Decline Invitation': 'Отклонить приглашение',
       thanks: 'Благодарим Вас за ответ.',
+    },
+    invitationAcceptedPage: {
+      error:
+        'Это приглашение не удалось принять, потому что вы уже отклонили приглашение на эту рукопись.',
+      returnToDashboard: 'Вернуться на Панель Управления',
     },
     reviewPreviewPage: {
       Summary: 'Содержание',

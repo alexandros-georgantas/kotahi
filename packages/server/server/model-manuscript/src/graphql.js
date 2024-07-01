@@ -3,7 +3,6 @@ const { ref } = require('objection')
 const axios = require('axios')
 const { map, chunk, orderBy } = require('lodash')
 const { pubsubManager, File } = require('@coko/server')
-const models = require('@pubsweet/models')
 const cheerio = require('cheerio')
 const { raw } = require('objection')
 
@@ -14,6 +13,18 @@ const {
 
 const { manuscriptHasOverdueTasksForUser } = require('./manuscriptCommsUtils')
 const { rebuildCMSSite } = require('../../flax-site/flax-api')
+
+const Team = require('../../../models/team/team.model')
+const TeamMember = require('../../../models/teamMember/teamMember.model')
+const Group = require('../../../models/group/group.model')
+const CoarNotification = require('../../../models/coarNotification/coarNotification.model')
+const Message = require('../../../models/message/message.model')
+const Manuscript = require('../../../models/manuscript/manuscript.model')
+const PublishedArtifact = require('../../../models/publishedArtifact/publishedArtifact.model')
+const User = require('../../../models/user/user.model')
+const Invitation = require('../../../models/invitation/invitation.model')
+const Config = require('../../../models/config/config.model')
+const ReviewModel = require('../../../models/review/review.model')
 
 const {
   sendAnnouncementNotification,
@@ -140,7 +151,7 @@ const getRelatedReviews = async (manuscript, ctx) => {
   let reviews =
     manuscript.reviews ||
     (await (
-      await models.Manuscript.query().findById(manuscript.id)
+      await Manuscript.query().findById(manuscript.id)
     ).$relatedQuery('reviews')) ||
     []
 
@@ -200,7 +211,7 @@ const getRelatedPublishedArtifacts = async (manuscript, ctx) => {
   const templatedArtifacts =
     manuscript.publishedArtifacts ||
     (await (
-      await models.Manuscript.query().findById(manuscript.id)
+      await Manuscript.query().findById(manuscript.id)
     ).$relatedQuery('publishedArtifacts'))
 
   const reviews =
@@ -239,8 +250,7 @@ const manuscriptAndPublishedManuscriptSharedResolvers = {
   },
   async files(parent, _, ctx) {
     const files = (
-      parent.files ||
-      (await models.Manuscript.relatedQuery('files').for(parent.id))
+      parent.files || (await Manuscript.relatedQuery('files').for(parent.id))
     ).map(f => ({
       ...f,
       tags: f.tags || [],
@@ -307,11 +317,11 @@ const commonUpdateManuscript = async (id, input, ctx) => {
     msDelta.submission.$doi =
       msDelta.submission.$doi.split('https://doi.org/')[1]
 
-  const ms = await models.Manuscript.query()
+  const ms = await Manuscript.query()
     .findById(id)
     .withGraphFetched('[reviews.user, files, tasks]')
 
-  const activeConfig = await models.Config.getCached(ms.groupId)
+  const activeConfig = await Config.getCached(ms.groupId)
 
   // If this manuscript is getting its label set for the first time,
   // we will populate its task list from the template tasks
@@ -346,13 +356,13 @@ const commonUpdateManuscript = async (id, input, ctx) => {
     await populateTemplatedTasksForManuscript(id)
 
   await uploadAndConvertBase64ImagesInManuscript(updatedMs)
-  return models.Manuscript.query().updateAndFetchById(id, updatedMs)
+  return Manuscript.query().updateAndFetchById(id, updatedMs)
 }
 
 /** Send the manuscriptId OR a configured ref; and send token if one is configured */
 const tryPublishingWebhook = async manuscriptId => {
-  const manuscript = await models.Manuscript.query().findById(manuscriptId)
-  const activeConfig = await models.Config.getCached(manuscript.groupId)
+  const manuscript = await Manuscript.query().findById(manuscriptId)
+  const activeConfig = await Config.getCached(manuscript.groupId)
 
   const publishingWebhookUrl = activeConfig.formData.publishing.webhook.url
 
@@ -374,8 +384,8 @@ const tryPublishingWebhook = async manuscriptId => {
 }
 
 const getSupplementaryFiles = async parentId => {
-  return models.Manuscript.relatedQuery('files')
-    .for(models.Manuscript.query().where({ id: parentId }))
+  return Manuscript.relatedQuery('files')
+    .for(Manuscript.query().where({ id: parentId }))
     .where('tags', '@>', JSON.stringify(['supplementary']))
 }
 
@@ -421,7 +431,9 @@ const resolvers = {
   Mutation: {
     async createManuscript(_, vars, ctx) {
       const { meta, files, groupId } = vars.input
-      const group = await models.Group.query().findById(groupId)
+      const group = await Group.query().findById(groupId)
+      if (!group)
+        throw new Error(`Cannot create manuscript for unknown group ${groupId}`)
       const submissionForm = await getSubmissionForm(group.id)
 
       const parsedFormStructure = submissionForm.structure.children
@@ -495,18 +507,17 @@ const resolvers = {
         .toISOString()
         .split('T')[0]
 
-      const manuscript = await models.Manuscript.query().upsertGraphAndFetch(
+      const manuscript = await Manuscript.query().upsertGraphAndFetch(
         emptyManuscript,
         { relate: true },
       )
 
       await uploadAndConvertBase64ImagesInManuscript(manuscript)
 
-      const updatedManuscript =
-        await models.Manuscript.query().updateAndFetchById(
-          manuscript.id,
-          manuscript,
-        )
+      const updatedManuscript = await Manuscript.query().updateAndFetchById(
+        manuscript.id,
+        manuscript,
+      )
 
       // newly uploaded files get tasks populated
       await populateTemplatedTasksForManuscript(manuscript.id)
@@ -532,14 +543,14 @@ const resolvers = {
       await Promise.all(ids.map(id => deleteAlertsForManuscript(id)))
 
       // finding the ids of the first versions of all manuscripts:
-      const selectedManuscripts = await models.Manuscript.query()
+      const selectedManuscripts = await Manuscript.query()
         .select('parentId', 'id')
         .whereIn('id', ids)
 
       const firstVersionIds = selectedManuscripts.map(m => m.parentId || m.id)
 
       // archiving manuscripts with either firstVersionID or parentID
-      const archivedManuscripts = await models.Manuscript.query()
+      const archivedManuscripts = await Manuscript.query()
         .returning('id')
         .update({ isHidden: true })
         .whereIn('id', firstVersionIds)
@@ -548,15 +559,33 @@ const resolvers = {
       return archivedManuscripts.map(m => m.id)
     },
 
+    async unarchiveManuscripts(_, { ids }, ctx) {
+      // finding the ids of the first versions of all manuscripts:
+      const selectedManuscripts = await Manuscript.query()
+        .select('parentId', 'id')
+        .whereIn('id', ids)
+
+      const firstVersionIds = selectedManuscripts.map(m => m.parentId || m.id)
+
+      // unarchiving manuscripts with either firstVersionID or parentID
+      const unarchivedManuscripts = await Manuscript.query()
+        .returning('id')
+        .update({ isHidden: false })
+        .whereIn('id', firstVersionIds)
+        .orWhereIn('parentId', firstVersionIds)
+
+      return unarchivedManuscripts.map(m => m.id)
+    },
+
     async archiveManuscript(_, { id }, ctx) {
       await deleteAlertsForManuscript(id)
-      const manuscript = await models.Manuscript.find(id)
+      const manuscript = await Manuscript.find(id)
 
       // getting the ID of the firstVersion for all manuscripts.
       const firstVersionId = manuscript.parentId || manuscript.id
 
       // Archive Manuscript
-      const archivedManuscript = await models.Manuscript.query()
+      const archivedManuscript = await Manuscript.query()
         .returning('id')
         .update({ isHidden: true })
         .where('id', firstVersionId)
@@ -565,11 +594,11 @@ const resolvers = {
       return archivedManuscript[0].id
     },
     async assignAuthoForProofingManuscript(_, { id }, ctx) {
-      const manuscript = await models.Manuscript.query()
+      const manuscript = await Manuscript.query()
         .findById(id)
         .withGraphFetched('[channels]')
 
-      const sender = await models.User.query().findById(ctx.user)
+      const sender = await User.query().findById(ctx.user)
       const author = await manuscript.getManuscriptAuthor()
       const authorName = author?.username || ''
 
@@ -588,7 +617,7 @@ const resolvers = {
         assignedOnDate: new Date(),
       })
 
-      const updated = await models.Manuscript.query().patchAndFetchById(
+      const updated = await Manuscript.query().patchAndFetchById(
         manuscript.id,
         {
           status: 'assigned',
@@ -603,7 +632,7 @@ const resolvers = {
         },
       )
 
-      const activeConfig = await models.Config.getCached(manuscript.groupId)
+      const activeConfig = await Config.getCached(manuscript.groupId)
 
       const receiverEmail = author.email
       /* eslint-disable-next-line */
@@ -635,7 +664,7 @@ const resolvers = {
           let channelId
 
           if (manuscript.parentId) {
-            const channel = await models.Manuscript.relatedQuery('channels')
+            const channel = await Manuscript.relatedQuery('channels')
               .for(manuscript.parentId)
               .findOne({ topic: 'Editorial discussion' })
 
@@ -647,7 +676,7 @@ const resolvers = {
             ).id
           }
 
-          models.Message.createMessage({
+          Message.createMessage({
             content: `Author proof assigned Email sent by Kotahi to ${author.username}`,
             channelId,
             userId: ctx.user,
@@ -669,9 +698,7 @@ const resolvers = {
     async deleteManuscripts(_, { ids }, ctx) {
       if (ids.length > 0) {
         await Promise.all(
-          ids.map(toDeleteItem =>
-            models.Manuscript.query().deleteById(toDeleteItem),
-          ),
+          ids.map(toDeleteItem => Manuscript.query().deleteById(toDeleteItem)),
         )
       }
 
@@ -679,14 +706,14 @@ const resolvers = {
     },
     async deleteManuscript(_, { id }, ctx) {
       const toDeleteList = []
-      const manuscript = await models.Manuscript.find(id)
+      const manuscript = await Manuscript.find(id)
 
-      const activeConfig = await models.Config.getCached(manuscript.groupId)
+      const activeConfig = await Config.getCached(manuscript.groupId)
 
       toDeleteList.push(manuscript.id)
 
       if (manuscript.parentId) {
-        const parentManuscripts = await models.Manuscript.findByField(
+        const parentManuscripts = await Manuscript.findByField(
           'parent_id',
           manuscript.parentId,
         )
@@ -700,7 +727,7 @@ const resolvers = {
       await Promise.all(
         toDeleteList.map(async toDeleteItem => {
           if (activeConfig.formData.publishing.hypothesis.apiKey) {
-            const hypothesisArtifacts = models.PublishedArtifact.query().where({
+            const hypothesisArtifacts = PublishedArtifact.query().where({
               manuscriptId: toDeleteItem,
               platform: 'Hypothesis',
             })
@@ -718,7 +745,7 @@ const resolvers = {
             )
           }
 
-          models.Manuscript.query().deleteById(toDeleteItem)
+          Manuscript.query().deleteById(toDeleteItem)
         }),
       )
 
@@ -726,17 +753,12 @@ const resolvers = {
     },
     // TODO Rename to something like 'setReviewerResponse'
     async reviewerResponse(_, { action, teamId }, ctx) {
-      const {
-        Review: ReviewModel,
-        // eslint-disable-next-line global-require
-      } = require('@pubsweet/models') // Pubsweet models may initially be undefined, so we require only when resolver runs.
-
       if (action !== 'accepted' && action !== 'rejected')
         throw new Error(
           `Invalid action (reviewerResponse): Must be either "accepted" or "rejected"`,
         )
 
-      const team = await models.Team.query()
+      const team = await Team.query()
         .findById(teamId)
         .withGraphFetched('members')
 
@@ -750,7 +772,7 @@ const resolvers = {
           team.members[i].status = action
       }
 
-      await new models.Team(team).saveGraph()
+      await new Team(team).saveGraph()
 
       if (action === 'accepted') {
         await addUserToManuscriptChatChannel({
@@ -782,14 +804,14 @@ const resolvers = {
 
       if (action === 'rejected') {
         // Automated email reviewReject on rejection
-        const reviewer = await models.User.query()
+        const reviewer = await User.query()
           .findById(ctx.user)
           .withGraphJoined('[defaultIdentity]')
 
         const reviewerName =
           reviewer.username || reviewer.defaultIdentity.name || ''
 
-        const manuscript = await models.Manuscript.query()
+        const manuscript = await Manuscript.query()
           .findById(team.objectId)
           .withGraphFetched(
             '[teams.[members.[user.[defaultIdentity]]], submitter.[defaultIdentity], channels]',
@@ -820,7 +842,7 @@ const resolvers = {
           handlingEditor.user.defaultIdentity.name ||
           ''
 
-        const activeConfig = await models.Config.getCached(manuscript.groupId)
+        const activeConfig = await Config.getCached(manuscript.groupId)
 
         const selectedTemplate =
           activeConfig.formData.eventNotification?.reviewRejectedEmailTemplate
@@ -850,7 +872,7 @@ const resolvers = {
             await sendEmailWithPreparedData(notificationInput, ctx, reviewer)
 
             // Send Notification in Editorial Discussion Panel
-            models.Message.createMessage({
+            Message.createMessage({
               content: `Review Rejection Email sent by Kotahi to ${receiverName}`,
               channelId: editorialChannel.id,
               userId: manuscript.submitterId,
@@ -876,7 +898,7 @@ const resolvers = {
       let updated = await commonUpdateManuscript(id, input, ctx)
 
       if (updated.status === 'completed') {
-        const manuscript = await models.Manuscript.query()
+        const manuscript = await Manuscript.query()
           .findById(id)
           .withGraphJoined('[teams.members.user.defaultIdentity, channels]')
 
@@ -890,9 +912,7 @@ const resolvers = {
         }
 
         const submitter = manuscript.authorFeedback.submitterId
-          ? await models.User.query().findById(
-              manuscript.authorFeedback.submitterId,
-            )
+          ? await User.query().findById(manuscript.authorFeedback.submitterId)
           : null
 
         if (manuscript.authorFeedback.submitted) {
@@ -915,23 +935,20 @@ const resolvers = {
           delete manuscript.authorFeedback.submitted
         }
 
-        updated = await models.Manuscript.query().patchAndFetchById(
-          manuscript.id,
-          {
-            authorFeedback: {
-              ...manuscript.authorFeedback,
-              previousSubmissions: orderBy(
-                previousSubmissions,
-                [obj => new Date(obj.submitted)],
-                ['desc'],
-              ),
-            },
+        updated = await Manuscript.query().patchAndFetchById(manuscript.id, {
+          authorFeedback: {
+            ...manuscript.authorFeedback,
+            previousSubmissions: orderBy(
+              previousSubmissions,
+              [obj => new Date(obj.submitted)],
+              ['desc'],
+            ),
           },
-        )
+        })
 
-        const author = await models.User.query().findById(ctx.user)
+        const author = await User.query().findById(ctx.user)
 
-        const activeConfig = await models.Config.getCached(manuscript.groupId)
+        const activeConfig = await Config.getCached(manuscript.groupId)
 
         const editorTeam =
           manuscript.teams &&
@@ -981,7 +998,7 @@ const resolvers = {
             let channelId
 
             if (manuscript.parentId) {
-              const channel = await models.Manuscript.relatedQuery('channels')
+              const channel = await Manuscript.relatedQuery('channels')
                 .for(manuscript.parentId)
                 .findOne({ topic: 'Editorial discussion' })
 
@@ -992,7 +1009,7 @@ const resolvers = {
               ).id
             }
 
-            models.Message.createMessage({
+            Message.createMessage({
               content: `Author proof completed Email sent by Kotahi to ${editor.user.username}`,
               channelId,
               userId: editor.user.id,
@@ -1012,25 +1029,25 @@ const resolvers = {
       return updated
     },
     async createNewVersion(_, { id }, ctx) {
-      const manuscript = await models.Manuscript.query().findById(id)
+      const manuscript = await Manuscript.query().findById(id)
       return manuscript.createNewVersion()
     },
     async submitManuscript(_, { id, input }, ctx) {
       // Automated email submissionConfirmation on submission
-      const manuscript = await models.Manuscript.query()
+      const manuscript = await Manuscript.query()
         .findById(id)
         .withGraphFetched('[submitter.defaultIdentity, channels]')
 
-      const activeConfig = await models.Config.getCached(manuscript.groupId)
+      const activeConfig = await Config.getCached(manuscript.groupId)
 
       const selectedTemplate =
         activeConfig.formData.eventNotification
           ?.submissionConfirmationEmailTemplate
 
       if (selectedTemplate && manuscript.submitter) {
-        const sender = await models.User.query().findById(ctx.user)
+        const sender = await User.query().findById(ctx.user)
         const receiverEmail = manuscript.submitter.email
-        /* eslint-disable-next-line */
+
         const receiverName =
           manuscript.submitter.username ||
           manuscript.submitter.defaultIdentity.name ||
@@ -1057,7 +1074,7 @@ const resolvers = {
           let channelId
 
           if (manuscript.parentId) {
-            const channel = await models.Manuscript.relatedQuery('channels')
+            const channel = await Manuscript.relatedQuery('channels')
               .for(manuscript.parentId)
               .findOne({ topic: 'Editorial discussion' })
 
@@ -1069,7 +1086,7 @@ const resolvers = {
             ).id
           }
 
-          models.Message.createMessage({
+          Message.createMessage({
             content: `Submission Confirmation Email sent by Kotahi to ${manuscript.submitter.username}`,
             channelId,
             userId: manuscript.submitterId,
@@ -1089,13 +1106,13 @@ const resolvers = {
     },
 
     async makeDecision(_, { id, decision: decisionString }, ctx) {
-      const manuscript = await models.Manuscript.query()
+      const manuscript = await Manuscript.query()
         .findById(id)
         .withGraphFetched(
           '[submitter.[defaultIdentity], channels, teams.members.user, reviews.user]',
         )
 
-      const activeConfig = await models.Config.getCached(manuscript.groupId)
+      const activeConfig = await Config.getCached(manuscript.groupId)
 
       switch (decisionString) {
         case 'accept':
@@ -1138,7 +1155,7 @@ const resolvers = {
           manuscript.submitter.defaultIdentity.name ||
           ''
 
-        const sender = await models.User.query().findById(ctx.user)
+        const sender = await User.query().findById(ctx.user)
 
         const selectedTemplate =
           activeConfig.formData.eventNotification
@@ -1175,7 +1192,7 @@ const resolvers = {
                 channel => channel.topic === 'Editorial discussion',
               ).id
 
-              models.Message.createMessage({
+              Message.createMessage({
                 content: body,
                 channelId,
                 userId: manuscript.submitterId,
@@ -1193,16 +1210,16 @@ const resolvers = {
         }
       }
 
-      return models.Manuscript.query().updateAndFetchById(id, manuscript)
+      return Manuscript.query().updateAndFetchById(id, manuscript)
     },
     async addReviewer(_, { manuscriptId, userId, invitationId }, ctx) {
-      const manuscript = await models.Manuscript.query().findById(manuscriptId)
+      const manuscript = await Manuscript.query().findById(manuscriptId)
       const status = invitationId ? 'accepted' : 'invited'
 
       let invitationData
 
       if (invitationId) {
-        invitationData = await models.Invitation.query().findById(invitationId)
+        invitationData = await Invitation.query().findById(invitationId)
       }
 
       const existingTeam = await manuscript
@@ -1219,7 +1236,7 @@ const resolvers = {
             .resultSize()) > 0
 
         if (!reviewerExists) {
-          await new models.TeamMember({
+          await new TeamMember({
             teamId: existingTeam.id,
             status,
             userId,
@@ -1232,7 +1249,7 @@ const resolvers = {
 
       // Create a new team of reviewers if it doesn't exist
 
-      const newTeam = await new models.Team({
+      const newTeam = await new Team({
         objectId: manuscriptId,
         objectType: 'manuscript',
         members: [{ status, userId }],
@@ -1243,14 +1260,14 @@ const resolvers = {
       return newTeam
     },
     async removeReviewer(_, { manuscriptId, userId }, ctx) {
-      const manuscript = await models.Manuscript.query().findById(manuscriptId)
+      const manuscript = await Manuscript.query().findById(manuscriptId)
 
       const reviewerTeam = await manuscript
         .$relatedQuery('teams')
         .where('role', 'reviewer')
         .first()
 
-      await models.TeamMember.query()
+      await TeamMember.query()
         .where({
           userId,
           teamId: reviewerTeam.id,
@@ -1274,7 +1291,7 @@ const resolvers = {
       _,
       { manuscriptId, objectId, fieldName, shouldPublish },
     ) {
-      const manuscript = await models.Manuscript.query()
+      const manuscript = await Manuscript.query()
         .findById(manuscriptId)
         .withGraphFetched('[teams, channels, files, reviews.user]')
 
@@ -1305,7 +1322,7 @@ const resolvers = {
           .filter(ff => ff.fieldsToPublish.length)
       }
 
-      const updated = await models.Manuscript.query().updateAndFetchById(
+      const updated = await Manuscript.query().updateAndFetchById(
         manuscriptId,
         manuscript,
       )
@@ -1313,13 +1330,13 @@ const resolvers = {
       return updated
     },
     async publishManuscript(_, { id }, ctx) {
-      const manuscript = await models.Manuscript.query()
+      const manuscript = await Manuscript.query()
         .findById(id)
         .withGraphFetched('[reviews, publishedArtifacts]')
 
       const containsElifeStyleEvaluations = hasElifeStyleEvaluations(manuscript)
 
-      const activeConfig = await models.Config.getCached(manuscript.groupId)
+      const activeConfig = await Config.getCached(manuscript.groupId)
 
       // We will roll back to the following values if all publishing steps fail:
       const prevPublishedDate = manuscript.published
@@ -1329,12 +1346,12 @@ const resolvers = {
       // We update the manuscript in advance, so that external services such as Flax
       // will be able to retrieve it as a "published" manuscript. If all publishing steps
       // fail, we will revert these changes at the end.
-      await models.Manuscript.query().patchAndFetchById(id, {
+      await Manuscript.query().patchAndFetchById(id, {
         published: newPublishedDate,
         status: 'published',
       })
 
-      const notification = await models.CoarNotification.query().findOne({
+      const notification = await CoarNotification.query().findOne({
         manuscriptId: manuscript.id,
       })
 
@@ -1467,16 +1484,16 @@ const resolvers = {
       let updatedManuscript
 
       if (steps.some(step => step.succeeded)) {
-        updatedManuscript = await models.Manuscript.query().patchAndFetchById(
+        updatedManuscript = await Manuscript.query().patchAndFetchById(
           id,
           update,
         )
       } else {
         // Revert the changes to published date and status
-        updatedManuscript = await models.Manuscript.query().patchAndFetchById(
-          id,
-          { published: prevPublishedDate, status: prevStatus },
-        )
+        updatedManuscript = await Manuscript.query().patchAndFetchById(id, {
+          published: prevPublishedDate,
+          status: prevStatus,
+        })
       }
 
       return { manuscript: updatedManuscript, steps }
@@ -1493,7 +1510,7 @@ const resolvers = {
   },
   Query: {
     async manuscript(_, { id }, ctx) {
-      return models.Manuscript.query().findById(id)
+      return Manuscript.query().findById(id)
     },
     // TODO This is overcomplicated, trying to do three things at once (find manuscripts
     // where user is author, reviewer or editor).
@@ -1515,7 +1532,7 @@ const resolvers = {
       const submissionForm = await getSubmissionForm(groupId)
 
       const firstVersionIds =
-        await models.Manuscript.getFirstVersionIdsOfManuscriptsUserHasARoleIn(
+        await Manuscript.getFirstVersionIdsOfManuscriptsUserHasARoleIn(
           ctx.user,
           groupId,
         )
@@ -1526,7 +1543,7 @@ const resolvers = {
       // eslint-disable-next-line no-restricted-syntax
       for (const someIds of chunk(firstVersionIds, 20)) {
         // eslint-disable-next-line no-await-in-loop
-        const someManuscriptsWithInfo = await models.Manuscript.query()
+        const someManuscriptsWithInfo = await Manuscript.query()
           .withGraphFetched(
             '[teams.members, tasks, invitations, manuscriptVersions(orderByCreatedDesc).[teams.members, tasks, invitations]]',
           )
@@ -1583,13 +1600,14 @@ const resolvers = {
         offset,
         limit,
         filters,
+        false,
         submissionForm,
         timezoneOffsetMinutes || 0,
         Object.keys(userManuscriptsWithInfo),
         groupId,
       )
 
-      const knex = models.Manuscript.knex()
+      const knex = Manuscript.knex()
       const rawQResult = await knex.raw(rawQuery, rawParams)
       let totalCount = 0
 
@@ -1608,13 +1626,13 @@ const resolvers = {
       return { totalCount, manuscripts: result }
     },
     async manuscripts(_, { where }, ctx) {
-      return models.Manuscript.query()
+      return Manuscript.query()
         .where({ parentId: null })
         .whereNot({ isHidden: true })
         .orderBy('created', 'desc')
     },
     async publishedManuscripts(_, { sort, offset, limit, groupId }, ctx) {
-      const query = models.Manuscript.query()
+      const query = Manuscript.query()
         .where({ groupId })
         .whereNotNull('published')
 
@@ -1637,7 +1655,15 @@ const resolvers = {
 
     async paginatedManuscripts(
       _,
-      { sort, offset, limit, filters, timezoneOffsetMinutes, groupId },
+      {
+        sort,
+        offset,
+        limit,
+        filters,
+        timezoneOffsetMinutes,
+        archived,
+        groupId,
+      },
       ctx,
     ) {
       const groupIdFromHeader = ctx.req.headers['group-id']
@@ -1650,20 +1676,21 @@ const resolvers = {
         offset,
         limit,
         filters,
+        archived,
         submissionForm,
         timezoneOffsetMinutes || 0,
         null,
         finalGroupId,
       )
 
-      const knex = models.Manuscript.knex()
+      const knex = Manuscript.knex()
       const rawQResult = await knex.raw(rawQuery, rawParams)
       let totalCount = 0
       if (rawQResult.rowCount)
         totalCount = parseInt(rawQResult.rows[0].full_count, 10)
 
       const ids = rawQResult.rows.map(row => row.id)
-      const manuscripts = await models.Manuscript.query().findByIds(ids)
+      const manuscripts = await Manuscript.query().findByIds(ids)
 
       const result = rawQResult.rows.map(row => ({
         ...manuscripts.find(m => m.id === row.id),
@@ -1679,7 +1706,7 @@ const resolvers = {
       { startDate, limit, offset, groupName },
       ctx,
     ) {
-      const groups = await models.Group.query().where({ isArchived: false })
+      const groups = await Group.query().where({ isArchived: false })
       let group = null
       const groupIdFromHeader = ctx.req.headers['group-id']
 
@@ -1690,15 +1717,15 @@ const resolvers = {
 
       if (!group) throw new Error(`Group with name '${groupName}' not found`)
 
-      const subQuery = models.Manuscript.query()
+      const subQuery = Manuscript.query()
         .select('short_id')
         .max('created as latest_created')
         .where('group_id', group.id)
         .groupBy('short_id')
 
-      const query = models.Manuscript.query()
+      const query = Manuscript.query()
         .select('m.*', raw('count(*) over () as totalCount'))
-        .from(models.Manuscript.query().as('m'))
+        .from(Manuscript.query().as('m'))
         .innerJoin(subQuery.as('sub'), 'm.short_id', 'sub.short_id')
         .andWhere('m.created', '=', raw('sub.latest_created'))
         .whereNotNull('m.published')
@@ -1712,16 +1739,16 @@ const resolvers = {
       return query
     },
     async publishedManuscript(_, { id }, ctx) {
-      return models.Manuscript.query().findById(id).whereNotNull('published')
+      return Manuscript.query().findById(id).whereNotNull('published')
     },
     async unreviewedPreprints(_, { token, groupName = null }, ctx) {
-      const groups = await models.Group.query().where({ isArchived: false })
+      const groups = await Group.query().where({ isArchived: false })
       let group = null
       if (groupName) group = groups.find(g => g.name === groupName)
       else if (groups.length === 1) [group] = groups
       if (!group) throw new Error(`Group with name '${groupName}' not found`)
 
-      const activeConfig = await models.Config.getCached(group.id)
+      const activeConfig = await Config.getCached(group.id)
 
       if (activeConfig.formData.kotahiApis.tokens) {
         validateApiToken(token, activeConfig.formData.kotahiApis.tokens)
@@ -1729,7 +1756,7 @@ const resolvers = {
         throw new Error('Kotahi api tokens are not configured!')
       }
 
-      const manuscripts = await models.Manuscript.query()
+      const manuscripts = await Manuscript.query()
         .where({ status: 'new', groupId: group.id })
         .whereRaw(`submission->>'$customStatus' = 'readyToEvaluate'`)
 
@@ -1744,11 +1771,11 @@ const resolvers = {
       }))
     },
     async doisToRegister(_, { id }, ctx) {
-      const manuscript = await models.Manuscript.query()
+      const manuscript = await Manuscript.query()
         .findById(id)
         .withGraphJoined('reviews')
 
-      const activeConfig = await models.Config.getCached(manuscript.groupId)
+      const activeConfig = await Config.getCached(manuscript.groupId)
 
       if (!activeConfig.formData.publishing.crossref.login) {
         return null
@@ -1840,14 +1867,14 @@ const resolvers = {
     // To be called in submit manuscript as
     // first validation step for custom suffix
     async validateSuffix(_, { suffix, groupId }, ctx) {
-      const activeConfig = await models.Config.getCached(groupId)
+      const activeConfig = await Config.getCached(groupId)
 
       const doi = getDoi(suffix, activeConfig)
       return { isDOIValid: await doiIsAvailable(doi) }
     },
 
     async getManuscriptsData(_, { selectedManuscripts }, ctx) {
-      const manuscripts = await models.Manuscript.query()
+      const manuscripts = await Manuscript.query()
         .findByIds(selectedManuscripts)
         .withGraphFetched('[reviews.[user], teams.[members]]')
 
@@ -1883,12 +1910,12 @@ const resolvers = {
       ctx,
     ) {
       const otherVersions = await (
-        await models.Manuscript.query().findById(manuscriptId)
+        await Manuscript.query().findById(manuscriptId)
       ).getManuscriptVersions()
 
       const versionIds = [manuscriptId, ...otherVersions.map(v => v.id)]
 
-      const assignments = await models.User.relatedQuery('teams')
+      const assignments = await User.relatedQuery('teams')
         .for(ctx.user)
         .select('objectId')
         .where({ role: 'reviewer' })
@@ -1902,7 +1929,7 @@ const resolvers = {
     async channels(parent) {
       return (
         parent.channels ||
-        models.Manuscript.relatedQuery('channels').for(
+        Manuscript.relatedQuery('channels').for(
           parent.parentId || parent.id, // chat channels belong to the first-version manuscript
         )
       )
@@ -1916,15 +1943,13 @@ const resolvers = {
     async invitations(parent) {
       return (
         parent.invitations ||
-        models.Manuscript.relatedQuery('invitations').for(parent.id)
+        Manuscript.relatedQuery('invitations').for(parent.id)
       )
     },
     async tasks(parent) {
       return (
         parent.tasks ||
-        models.Manuscript.relatedQuery('tasks')
-          .for(parent.id)
-          .orderBy('sequenceIndex')
+        Manuscript.relatedQuery('tasks').for(parent.id).orderBy('sequenceIndex')
       )
     },
     async manuscriptVersions(parent) {
@@ -1937,15 +1962,13 @@ const resolvers = {
       if (parent.created && !parent.parentId) return parent.created
       const id = parent.parentId || parent.id
 
-      const record = await models.Manuscript.query()
-        .findById(id)
-        .select('created')
+      const record = await Manuscript.query().findById(id).select('created')
 
       return record.created
     },
     async authorFeedback(parent) {
       if (parent.authorFeedback && parent.authorFeedback.submitterId) {
-        const submitter = await models.User.query().findById(
+        const submitter = await User.query().findById(
           parent.authorFeedback.submitterId,
         )
 
@@ -1965,7 +1988,7 @@ const resolvers = {
       const files = (
         parent.files ||
         (await (
-          await models.Manuscript.query().findById(parent.id)
+          await Manuscript.query().findById(parent.id)
         ).$relatedQuery('files'))
       ).map(f => ({
         ...f,
@@ -1981,7 +2004,7 @@ const resolvers = {
       let files = (
         parent.files ||
         (await (
-          await models.Manuscript.query().findById(parent.id)
+          await Manuscript.query().findById(parent.id)
         ).$relatedQuery('files'))
       ).map(f => ({
         ...f,
@@ -2053,18 +2076,18 @@ const resolvers = {
       )
     },
     async editors(parent) {
-      const teams = await models.Team.query()
+      const teams = await Team.query()
         .where({ objectId: parent.id })
         .whereIn('role', ['seniorEditor', 'handlingEditor', 'editor'])
 
-      const teamMembers = await models.TeamMember.query().whereIn(
+      const teamMembers = await TeamMember.query().whereIn(
         'team_id',
         teams.map(t => t.id),
       )
 
       const editorAndRoles = await Promise.all(
         teamMembers.map(async member => {
-          const user = await models.User.query().findById(member.userId)
+          const user = await User.query().findById(member.userId)
           const team = teams.find(t => t.id === member.teamId)
           return {
             name: user.username,
@@ -2106,7 +2129,7 @@ const resolvers = {
       let files =
         parent.manuscriptFiles ||
         (await (
-          await models.Manuscript.query().findById(parent.manuscriptId)
+          await Manuscript.query().findById(parent.manuscriptId)
         ).$relatedQuery('files'))
 
       files = await getFilesWithUrl(files)
@@ -2120,7 +2143,7 @@ const resolvers = {
         return { id: '', username: 'Anonymous User' }
       }
 
-      const user = await models.User.query().findById(parent.userId)
+      const user = await User.query().findById(parent.userId)
       return user
     },
   },
@@ -2131,7 +2154,7 @@ const typeDefs = `
     globalTeams: [Team]
     manuscript(id: ID!): Manuscript!
     manuscripts: [Manuscript]!
-    paginatedManuscripts(offset: Int, limit: Int, sort: ManuscriptsSort, filters: [ManuscriptsFilter!]!, timezoneOffsetMinutes: Int, groupId: ID!): PaginatedManuscripts
+    paginatedManuscripts(offset: Int, limit: Int, sort: ManuscriptsSort, filters: [ManuscriptsFilter!]!, timezoneOffsetMinutes: Int, archived: Boolean!, groupId: ID!): PaginatedManuscripts
     manuscriptsUserHasCurrentRoleIn(reviewerStatus: String, wantedRoles: [String]!, offset: Int, limit: Int, sort: ManuscriptsSort, filters: [ManuscriptsFilter!]!, timezoneOffsetMinutes: Int, groupId: ID!, searchInAllVersions: Boolean!): PaginatedManuscripts
     publishedManuscripts(sort:String, offset: Int, limit: Int, groupId: ID!): PaginatedManuscripts
     validateDOI(doiOrUrl: String): validateDOIResponse
@@ -2188,6 +2211,7 @@ const typeDefs = `
     setShouldPublishField(manuscriptId: ID!, objectId: ID!, fieldName: String!, shouldPublish: Boolean!): Manuscript!
     archiveManuscript(id: ID!): ID!
     archiveManuscripts(ids: [ID]!): [ID!]!
+    unarchiveManuscripts(ids: [ID]!): [ID!]!
     assignAuthoForProofingManuscript(id: ID!): Manuscript!
   }
 
@@ -2307,6 +2331,18 @@ const typeDefs = `
     affiliation: String
   }
 
+  type PreviousVersionUser {
+    userName: String!
+    id: ID!
+  }
+
+  type PreviousVersion {
+    source: String!
+    title: String
+    user: PreviousVersionUser!
+    created: DateTime!
+  }
+
   type ManuscriptMeta {
     title: String
     source: String
@@ -2314,6 +2350,7 @@ const typeDefs = `
     subjects: [String]
     history: [MetaDate]
     manuscriptId: ID
+    previousVersions: [PreviousVersion]
   }
 
   type ManuscriptAuthorFeeback {
@@ -2385,9 +2422,9 @@ const typeDefs = `
     supplementaryFiles: String
     publishedArtifacts: [PublishedArtifact!]!
     publishedDate: DateTime
-		printReadyPdfUrl: String
-		styledHtml: String
-		css: String
+    printReadyPdfUrl: String
+    styledHtml: String
+    css: String
     decision: String
     totalCount: Int
     editors: [Editor!]

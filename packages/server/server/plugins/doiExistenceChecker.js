@@ -1,5 +1,6 @@
-const models = require('@pubsweet/models')
 const { raw } = require('objection')
+
+const Manuscript = require('../../models/manuscript/manuscript.model')
 
 class DoiExistenceChecker {
   constructor(groupId, archiveStatus) {
@@ -11,14 +12,14 @@ class DoiExistenceChecker {
     if (this.timeoutId) clearTimeout(this.timeoutId)
 
     while (this.doiSet === 'wait')
-      // eslint-disable-next-line no-await-in-loop
+      // eslint-disable-next-line no-await-in-loop, no-promise-executor-return
       await new Promise(resolve => setTimeout(resolve, 50))
 
     if (!this.doiSet) {
       try {
         this.doiSet = 'wait' // Any other tasks trying to access simultaneously must wait until this becomes a proper Set with data loaded
 
-        const dois = await models.Manuscript.query()
+        const dois = await Manuscript.query()
           .select(raw("submission->>'$doi'").as('doi'))
           .whereRaw("submission->>'$doi' IS NOT null")
           .whereRaw("submission->>'$doi' <> ''")

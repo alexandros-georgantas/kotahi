@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable jest/expect-expect */
 import { dashboard, manuscripts } from '../../support/routes1'
 import { ManuscriptsPage } from '../../page-object/manuscripts-page'
@@ -68,7 +67,7 @@ describe('manuscripts page checkboxes tests', () => {
       ManuscriptsPage.clickDelete()
       ManuscriptsPage.getConfirmationMessageForBulkDelete().should(
         'contain',
-        'Please confirm you would like to archive selected manuscripts',
+        'Please confirm you wish to archive the selected manuscripts.',
       )
       ManuscriptsPage.clickConfirm()
       ManuscriptsPage.getConfirmationMessageForBulkDelete().should('not.exist')

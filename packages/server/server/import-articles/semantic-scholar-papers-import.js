@@ -1,7 +1,11 @@
 /* eslint-disable no-console */
 
 const axios = require('axios')
-const models = require('@pubsweet/models')
+
+const ArticleImportHistory = require('../../models/articleImportHistory/articleImportHistory.model')
+const ArticleImportSources = require('../../models/articleImportSources/articleImportSources.model')
+const Manuscript = require('../../models/manuscript/manuscript.model')
+const Config = require('../../models/config/config.model')
 
 const {
   getLastImportDate,
@@ -9,25 +13,26 @@ const {
   rawAbstractToSafeHtml,
 } = require('./importTools')
 
+const semanticScholarServers = require('./semanitc-scholar-servers.json')
+const { getUrlByDoi } = require('../utils/crossrefCommsUtils')
+
 const SAVE_CHUNK_SIZE = 50
 
 const getData = async (groupId, ctx) => {
-  const activeConfig = await models.Config.getCached(groupId)
+  const activeConfig = await Config.getCached(groupId)
 
-  const [checkIfSourceExists] = await models.ArticleImportSources.query().where(
-    {
-      server: 'semantic-scholar',
-    },
-  )
+  const [checkIfSourceExists] = await ArticleImportSources.query().where({
+    server: 'semantic-scholar',
+  })
 
   if (!checkIfSourceExists) {
-    await models.ArticleImportSources.query().insert({
+    await ArticleImportSources.query().insert({
       server: 'semantic-scholar',
     })
   }
 
   const [semanticScholarImportSourceId] =
-    await models.ArticleImportSources.query().where({
+    await ArticleImportSources.query().where({
       server: 'semantic-scholar',
     })
 
@@ -37,12 +42,13 @@ const getData = async (groupId, ctx) => {
 
   const lastImportDate = await getLastImportDate(sourceId, groupId)
 
-  const manuscripts = await models.Manuscript.query()
-    .where({ groupId, isHidden: false })
+  const manuscripts = await Manuscript.query()
+    .where({ groupId })
     .orderBy('created', 'desc')
 
   const selectedManuscripts = manuscripts.filter(
-    manuscript => manuscript.submission.$customStatus,
+    manuscript =>
+      manuscript.submission.$customStatus && !manuscript.submission.isHidden,
   )
 
   const latestLimitedSelectedManuscripts = selectedManuscripts.slice(0, 100)
@@ -63,7 +69,7 @@ const getData = async (groupId, ctx) => {
     })
 
     const semanticSholarRequestUri =
-      'https://api.semanticscholar.org/recommendations/v1/papers?limit=500&fields=url,venue,year,externalIds,title,abstract,authors,journal,publicationDate,venue'
+      'https://api.semanticscholar.org/recommendations/v1/papers?limit=500&fields=url,venue,year,externalIds,title,abstract,authors,journal,publicationDate'
 
     const { data } = await axios.post(
       semanticSholarRequestUri,
@@ -84,7 +90,7 @@ const getData = async (groupId, ctx) => {
     }
 
     const importsOnlyWithDOI = imports.filter(
-      preprints => preprints.externalIds.DOI,
+      preprint => preprint.externalIds.DOI,
     )
 
     console.log(`  ${importsOnlyWithDOI.length} of these have DOIs...`)
@@ -123,48 +129,68 @@ const getData = async (groupId, ctx) => {
       })`,
     )
 
+    const currentDOIs = new Set(
+      manuscripts.map(({ submission }) => submission.$doi),
+    )
+
+    const withoutDoiDuplicates = recentImports.filter(
+      preprints => !currentDOIs.has(preprints.externalIds.DOI),
+    )
+
+    console.log(
+      `  ${withoutDoiDuplicates.length} of these don't match DOIs already in Kotahi.`,
+    )
+
+    const withSourceUris = await Promise.all(
+      withoutDoiDuplicates.map(async preprint => ({
+        ...preprint,
+        sourceUri: await getUrlByDoi(
+          preprint.externalIds.DOI,
+          activeConfig.formData.groupIdentity.contact,
+        ),
+      })),
+    )
+
     const allowedPreprintServers =
       activeConfig.formData.semanticScholar.semanticScholarPublishingServers
 
-    const importsFromSpecificPreprintServers = recentImports.filter(
-      preprint => {
-        const venueLcTokens = preprint.venue.toLowerCase().split(/\s+/)
-        return allowedPreprintServers.some(server =>
-          venueLcTokens.includes(server.toLowerCase()),
-        )
-      },
+    const allowedDomains = allowedPreprintServers
+      .map(server => semanticScholarServers[server] ?? [])
+      .flat()
+
+    // Regex to match any of the given domains in a URL
+    const domainsRegex = new RegExp(
+      `^https?://[^/]*\\b(${allowedDomains
+        .map(d => d.replaceAll('.', '\\.'))
+        .join('|')})/`,
+    )
+
+    const importsFromSpecificPreprintServers = withSourceUris.filter(preprint =>
+      domainsRegex.test(preprint.sourceUri ?? ''),
     )
 
     console.log(
       `  ${importsFromSpecificPreprintServers.length} of these are from the selected servers...`,
     )
 
-    const currentDOIs = new Set(
-      manuscripts.map(({ submission }) => submission.$doi),
-    )
+    const currentUris = new Set(manuscripts.map(m => m.submission.$sourceUri))
 
-    const currentURLs = new Set(manuscripts.map(m => m.submission.$sourceUri))
-
-    const withoutDOIDuplicates = importsFromSpecificPreprintServers.filter(
-      preprints => !currentDOIs.has(preprints.externalIds.DOI),
-    )
-
-    const withoutUrlDuplicates = withoutDOIDuplicates.filter(
-      preprints => !currentURLs.has(preprints.url),
+    const withoutUriDuplicates = importsFromSpecificPreprintServers.filter(
+      preprints => !currentUris.has(preprints.sourceUri),
     )
 
     console.log(
-      `  ${withoutUrlDuplicates.length} of these are new to this group.`,
+      `  ${withoutUriDuplicates.length} of these are new to this group.`,
     )
 
     const emptySubmission = getEmptySubmission(groupId)
 
-    const newManuscripts = withoutUrlDuplicates.map(
+    const newManuscripts = withoutUriDuplicates.map(
       ({
         title,
         authors,
         abstract,
-        url,
+        sourceUri,
         externalIds,
         publicationDate,
         venue,
@@ -184,7 +210,7 @@ const getData = async (groupId, ctx) => {
           $abstract: rawAbstractToSafeHtml(abstract),
           datePublished: publicationDate,
           journal: venue,
-          $sourceUri: url,
+          $sourceUri: sourceUri,
           $doi: externalIds?.DOI || '',
         },
         meta: {},
@@ -193,10 +219,12 @@ const getData = async (groupId, ctx) => {
           {
             topic: 'Manuscript discussion',
             type: 'all',
+            groupId,
           },
           {
             topic: 'Editorial discussion',
             type: 'editorial',
+            groupId,
           },
         ],
         files: [],
@@ -215,10 +243,9 @@ const getData = async (groupId, ctx) => {
         const chunk = newManuscripts.slice(i, i + SAVE_CHUNK_SIZE)
 
         // eslint-disable-next-line no-await-in-loop
-        const inserted = await models.Manuscript.query().upsertGraphAndFetch(
-          chunk,
-          { relate: true },
-        )
+        const inserted = await Manuscript.query().upsertGraphAndFetch(chunk, {
+          relate: true,
+        })
 
         Array.prototype.push.apply(result, inserted)
       }
@@ -228,13 +255,13 @@ const getData = async (groupId, ctx) => {
       )
 
       if (lastImportDate > 0) {
-        await models.ArticleImportHistory.query()
+        await ArticleImportHistory.query()
           .update({
             date: new Date().toISOString(),
           })
           .where({ sourceId, groupId })
       } else {
-        await models.ArticleImportHistory.query().insert({
+        await ArticleImportHistory.query().insert({
           date: new Date().toISOString(),
           sourceId,
           groupId,

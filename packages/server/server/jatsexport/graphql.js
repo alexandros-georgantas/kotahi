@@ -1,10 +1,11 @@
-const models = require('@pubsweet/models')
 const { XMLValidator } = require('fast-xml-parser')
 const { makeJats } = require('../utils/jatsUtils')
 const articleMetadata = require('../pdfexport/pdfTemplates/articleMetadata')
 const publicationMetadata = require('../pdfexport/pdfTemplates/publicationMetadata')
 const validateJats = require('./validation')
 const makeZippedJats = require('./makeZippedJats')
+
+const Manuscript = require('../../models/manuscript/manuscript.model')
 
 const failXML = false // if this is true, we pass errorJats (which is invalid XML) to the parser
 const skipValidation = false
@@ -28,7 +29,7 @@ fe</publisher>
 </sec>`
 
 const getManuscriptById = async id => {
-  return models.Manuscript.query().findById(id)
+  return Manuscript.query().findById(id)
 }
 
 const jatsHandler = async manuscriptId => {
@@ -54,7 +55,7 @@ const jatsHandler = async manuscriptId => {
 
     // if we have valid XML, then check for valid jats
 
-    const jatsResult = validateJats(jats) // this returns empty array if it's valid, array of errors if not
+    const jatsResult = await validateJats(jats) // this returns empty array if it's valid, array of errors if not
 
     if (jatsResult.length) {
       parseError = jatsResult

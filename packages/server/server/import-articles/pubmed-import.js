@@ -4,7 +4,9 @@ const xml2json = require('xml-js')
 const FormData = require('form-data')
 const fetch = require('node-fetch')
 
-const models = require('@pubsweet/models')
+const ArticleImportHistory = require('../../models/articleImportHistory/articleImportHistory.model')
+const ArticleImportSources = require('../../models/articleImportSources/articleImportSources.model')
+const Manuscript = require('../../models/manuscript/manuscript.model')
 
 const flattenObj = require('../utils/flattenObj')
 const { getSubmissionForm } = require('../model-review/src/reviewCommsUtils')
@@ -43,7 +45,7 @@ const pubmedQueries = {
 const joinToStringIfArray = x => (Array.isArray(x) ? x.join(' ') : x)
 
 const getData = async (groupId, ctx) => {
-  const manuscripts = await models.Manuscript.query().where({ groupId })
+  const manuscripts = await Manuscript.query().where({ groupId })
   const currentArticleURLs = manuscripts.map(m => m.submission.$sourceUri)
 
   const dateTwoWeeksAgoFormatted = new Date(Date.now() - 12096e5)
@@ -56,24 +58,21 @@ const getData = async (groupId, ctx) => {
     .split('T')[0]
     .replace(/-/g, '/')
 
-  const [checkIfSourceExists] = await models.ArticleImportSources.query().where(
-    {
-      server: 'pubmed',
-    },
-  )
+  const [checkIfSourceExists] = await ArticleImportSources.query().where({
+    server: 'pubmed',
+  })
 
   if (!checkIfSourceExists) {
-    await models.ArticleImportSources.query().insert({
+    await ArticleImportSources.query().insert({
       server: 'pubmed',
     })
   }
 
-  const [pubmedImportSourceId] =
-    await models.ArticleImportSources.query().where({
-      server: 'pubmed',
-    })
+  const [pubmedImportSourceId] = await ArticleImportSources.query().where({
+    server: 'pubmed',
+  })
 
-  const lastImportDate = await models.ArticleImportHistory.query()
+  const lastImportDate = await ArticleImportHistory.query()
     .select('date')
     .where({
       sourceId: pubmedImportSourceId.id,
@@ -359,10 +358,12 @@ const getData = async (groupId, ctx) => {
                   {
                     topic: 'Manuscript discussion',
                     type: 'all',
+                    groupId,
                   },
                   {
                     topic: 'Editorial discussion',
                     type: 'editorial',
+                    groupId,
                   },
                 ],
                 files: [],
@@ -377,7 +378,7 @@ const getData = async (groupId, ctx) => {
       if (!newManuscripts.length) return []
 
       try {
-        const inserted = await models.Manuscript.query().upsertGraphAndFetch(
+        const inserted = await Manuscript.query().upsertGraphAndFetch(
           newManuscripts,
           { relate: true },
         )
@@ -390,7 +391,7 @@ const getData = async (groupId, ctx) => {
   )
 
   if (lastImportDate.length) {
-    await models.ArticleImportHistory.query()
+    await ArticleImportHistory.query()
       .update({
         date: new Date().toISOString(),
       })
@@ -399,7 +400,7 @@ const getData = async (groupId, ctx) => {
         groupId,
       })
   } else {
-    await models.ArticleImportHistory.query().insert({
+    await ArticleImportHistory.query().insert({
       date: new Date().toISOString(),
       sourceId: pubmedImportSourceId.id,
       groupId,

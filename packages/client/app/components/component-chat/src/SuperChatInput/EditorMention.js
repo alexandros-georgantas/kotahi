@@ -1,4 +1,6 @@
 /* eslint-disable react/prop-types */
+/* stylelint-disable color-function-notation, alpha-value-notation */
+
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import ChatWaxEditor from '../ChatWaxEditor'
@@ -228,6 +230,11 @@ const EditorMention = ({
 
         const item = filteredList[currentIndex]
         const oldFrom = action.range.from
+
+        if (!item) {
+          setFilter('')
+          return false
+        }
 
         const tr = action.view.state.tr
           .deleteRange(action.range.from, action.range.to)

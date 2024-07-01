@@ -1,3 +1,5 @@
+/* stylelint-disable alpha-value-notation, color-function-notation */
+
 import React from 'react'
 import styled from 'styled-components'
 import PropTypes from 'prop-types'
@@ -23,6 +25,7 @@ const Column = styled.div`
   display: inline-block;
   height: 300px;
   margin-inline: 7.5px;
+  /* stylelint-disable-next-line scss/operator-no-unspaced */
   width: calc(${100 / (statuses.length - 1)}% - 15px);
 `
 
@@ -33,7 +36,7 @@ const StatusLabel = styled.div`
   display: inline-block;
   font-weight: bold;
   margin-block: 4px;
-  padding: 4px 10px 4px 10px;
+  padding: 4px 10px;
 `
 
 const CardsWrapper = styled.div`
@@ -55,6 +58,14 @@ const VersionNumber = styled.div`
   color: rgba(0, 0, 0, 0.5);
 `
 
+// TODO standardise all statuses to camelCase and 'invited' instead
+// of 'unanswered' so we don't have to do this!
+const normalizeStatus = statusString =>
+  statusString
+    .toLowerCase()
+    .replaceAll('_', '')
+    .replace('unanswered', 'invited')
+
 const KanbanBoard = ({
   invitations,
   version,
@@ -71,36 +82,47 @@ const KanbanBoard = ({
   const reviewers = getMembersOfTeam(version, 'reviewer')
   const { t } = useTranslation()
 
-  const emailAndWebReviewers = [
-    ...reviewers.map(reviewer => {
-      return {
-        ...reviewer,
-        // Set isEmail flag true if the reviewer has pending reviewer invitations
-        isEmail: !!invitations.find(
-          invitation =>
-            invitation.invitedPersonType === 'REVIEWER' &&
-            invitation.user?.id === reviewer.user.id,
-        ),
-      }
-    }),
-    ...invitations
-      .filter(invitation => {
-        const reviewerAlreadyExist = reviewers.find(
-          reviewer =>
-            invitation.invitedPersonType === 'REVIEWER' &&
-            invitation.user?.id === reviewer.user.id,
-        )
+  const emailAndWebReviewers = []
 
-        // Filter only REVIEWER invitations to avoid other invitedPersonType's to be listed here
-        // Exclude invitation record if user is already a reviewer to avoid duplicate kanban cards
-        return (
-          invitation.invitedPersonType === 'REVIEWER' && !reviewerAlreadyExist
-        )
-      })
-      .map(invitation => {
-        return { ...invitation, isEmail: true }
-      }),
-  ]
+  reviewers.forEach(reviewer => {
+    emailAndWebReviewers.push({
+      ...reviewer,
+      status: normalizeStatus(reviewer.status),
+      isEmail: false, // This will be revised to true if we find a matching invitation below
+    })
+  })
+
+  invitations
+    .filter(i => i.invitedPersonType === 'REVIEWER')
+    .map(i => ({ ...i, status: normalizeStatus(i.status) }))
+    .forEach(invitation => {
+      const existingReviewer = emailAndWebReviewers.find(
+        r =>
+          r.user &&
+          (r.user.id === invitation.user?.id ||
+            r.user.email === invitation.toEmail),
+      )
+      // TODO Currently, you can't reinvite someone who's already declined.
+      // If we do allow this, we'll need to make sure we only merge one invite with the teamMember record, and only if the dates are correct.
+
+      if (existingReviewer) {
+        existingReviewer.isEmail = true
+
+        const {
+          id,
+          isShared,
+          user,
+          userId,
+          status,
+          updated,
+          ...invitationChosenFields
+        } = invitation
+
+        Object.assign(existingReviewer, invitationChosenFields)
+      } else {
+        emailAndWebReviewers.push({ ...invitation, isEmail: true })
+      }
+    })
 
   const LocalizedReviewFilterOptions = localizeReviewFilterOptions(statuses, t)
 
@@ -130,8 +152,7 @@ const KanbanBoard = ({
       )
       .filter((reviewer, index) => {
         const hasTheRightStatus =
-          reviewer.status === status.value ||
-          (reviewer.status === 'UNANSWERED' && status.value === 'invited')
+          reviewer.status === normalizeStatus(status.value)
 
         const isDuplicate =
           !!reviewer.user &&
@@ -157,7 +178,7 @@ const KanbanBoard = ({
         <SectionRow style={{ padding: 0 }}>
           <Kanban>
             {LocalizedReviewFilterOptions.filter(
-              status => !['rejected'].includes(status.value.toLowerCase()),
+              status => status.value !== 'rejected',
             ).map(status => (
               <Column key={status.value}>
                 <StatusLabel

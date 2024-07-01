@@ -1,3 +1,5 @@
+/* stylelint-disable alpha-value-notation, color-function-notation */
+
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
@@ -37,11 +39,11 @@ const FormContainer = styled(Container)`
 
   header {
     border-bottom: 1px solid #e8e8e8;
-    display: flex;
+    display: ${({ noHeader }) => (noHeader ? 'none' : 'flex')};
     flex-direction: column;
     justify-content: center;
     /* account for <NoteRight> */
-    padding: 28px 28px 44px 28px;
+    padding: 28px 28px 44px;
 
     h1 {
       font-weight: 700;
@@ -51,10 +53,10 @@ const FormContainer = styled(Container)`
   }
 
   form {
-    padding: 30px;
+    padding: ${({ noPadding }) => (noPadding ? 0 : '30px')};
 
     section {
-      margin: 0 0 44px 0;
+      margin: 0 0 44px;
     }
   }
 `
@@ -184,6 +186,8 @@ const FormTemplate = ({
   shouldStoreFilesInForm,
   initializeReview,
   tagForFiles,
+  noPadding,
+  noHeader,
   threadedDiscussionProps: tdProps,
   fieldsToPublish,
   setShouldPublishField,
@@ -360,7 +364,7 @@ const FormTemplate = ({
           isSubmission && manuscriptFiles.length ? manuscriptFiles[0] : null
 
         return (
-          <FormContainer>
+          <FormContainer noHeader={noHeader} noPadding={noPadding}>
             {displayShortIdAsIdentifier && (
               <NoteRight>
                 {t('decisionPage.metadataTab.Manuscript Number')}{' '}

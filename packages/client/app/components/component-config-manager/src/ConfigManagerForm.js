@@ -76,6 +76,7 @@ const Footer = styled.div`
 
 // TODO Improve on this hardcoded hack to hide the "Publishing" heading.
 const StyledWrapper = styled.div`
+  /* stylelint-disable-next-line selector-id-pattern */
   #form-integrations_publishing > legend:nth-of-type(1) {
     display: ${p => (p.$hideFirstLegend ? 'none' : 'block')};
   }
@@ -239,6 +240,7 @@ const ConfigManagerForm = ({
           <StyledSectionContent>
             <StyledForm
               disabled={disabled}
+              /* eslint-disable-next-line react/no-unstable-nested-components */
               FieldTemplate={props => (
                 <FieldTemplate
                   showInstanceType={key === 'general'}
@@ -257,6 +259,9 @@ const ConfigManagerForm = ({
               schema={schemas.data[key]}
               uiSchema={schemas.ui[key]}
             >
+              {/* The blank fragment that follows is to suppress the submit button.
+              See https://github.com/rjsf-team/react-jsonschema-form/issues/1602 */}
+              {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
               <></>
             </StyledForm>
           </StyledSectionContent>
