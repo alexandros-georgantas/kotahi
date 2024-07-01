@@ -10,7 +10,6 @@ const esLa = {
       revise: 'Revisar',
       revising: 'Revisando',
       published: 'Publicado',
-      unpublished: 'Inédito',
       assigned: 'Prueba de autor asignada',
       inProgress: 'Revisión del autor en curso',
       completed: 'Prueba de autor completada',
@@ -87,11 +86,6 @@ const esLa = {
         day: 'día',
         day_plural: 'días',
       },
-    },
-    error: {
-      authError: '¡Error de autenticación!',
-      noEditRights: 'No tienes derechos para editar este artículo.',
-      redirectToDashboard: 'Redirigir al panel',
     },
     leftMenu: {
       'Summary Info': 'Información Resumen',
@@ -174,7 +168,6 @@ const esLa = {
         Archive: 'Archivo',
         Production: 'Producción',
         Publish: 'Publicar',
-        Republish: 'Republicar',
         confirmArchive:
           'Por favor, confirma que deseas archivar este manuscrito',
         confirmArchiveButton: 'Archivar',
@@ -182,18 +175,18 @@ const esLa = {
         'Publishing error': 'Error de Publicación',
         'Some targets failed to publish':
           'Algunos objetivos no pudieron ser publicados.',
-        openOnline: 'Abrir en línea',
+        continueSubmission: 'Continuar con el envío',
+        revise: 'Revisar',
+        continueRevision: 'Continuar con la revisión',
       },
     },
     dashboardPage: {
       Dashboard: 'Tablero',
       'New submission': '+ Nueva presentación',
-      'New Article': '+ Nueva publicación',
       'New Alerts': 'Nuevas Alertas',
       'My Submissions': 'Mis presentaciones',
       'To Review': 'Asignaciones de revisión',
       "Manuscripts I'm editor of": 'Cola de edición',
-      Articles: 'Artículos',
       mySubmissions: {
         'Provide production feedback': 'Proporcionar comentarios de producción',
         'View production feedback': 'Ver comentarios de producción',
@@ -553,12 +546,6 @@ const esLa = {
         'Prueba del autor completada y comentarios enviados.',
       'Editors edit reviews':
         'Los editores pueden editar las reseñas enviadas.',
-      collaboratorAccessGrantedEmailTemplate:
-        'Acceso al artículo de colaborador concedido',
-      collaboratorAccessChangeEmailTemplate:
-        'Se cambió el tipo de acceso al artículo del colaborador',
-      collaboratorAccessRemovedEmailTemplate:
-        'Se eliminó el acceso al artículo de colaborador',
       Reports: 'Reportes',
       reportShowInMenu:
         'El Gerente de Grupo y el administrador pueden acceder a los Reportes',
@@ -597,6 +584,7 @@ const esLa = {
         'Select locale for citations':
           'Seleccionar configuración regional para citas',
         getDataFromDatacite: 'Obtener datos de citas de Datacite',
+        historyIntervalInMinutes: 'Intervalo de historia en minutos',
       },
       allowedIPs: 'Lista de IP del repositorio a las que se permite el acceso',
       api: 'API de Kotahi',
@@ -859,16 +847,6 @@ const esLa = {
       'No reviews to show': 'No hay revisiones para mostrar.',
       'No completed reviews': 'No hay revisiones completadas.',
       Metadata: 'Metadatos',
-      Article: 'Artículo',
-      Publish: 'Publicar',
-      Share: 'Compartir',
-      Collaborate: 'Colaborar',
-      collaborateArticle: 'Artículo colaborativo',
-      submitForPublishing: 'Enviar para publicación',
-    },
-    inviteCollaborator: {
-      selectPlaceholder: 'Correo electrónico',
-      addUser: 'Agregar usuario',
     },
     chat: {
       'Your message here...': 'Tu mensaje aquí...',
@@ -881,7 +859,6 @@ const esLa = {
       'Show admin discussion': 'Mostrar discusión de Administrador',
       'Show group manager discussion': 'Mostrar discusión de Gerente de Grupo',
       'Discussion with editorial team': 'Discusión con el equipo editorial',
-      'Discussion with author team': 'Discusión con el equipo de autores',
       'Show Chat': 'Mostrar Chat',
       'Hide Chat': 'Ocultar Chat',
       'Discussion with author': 'Discusión con el autor',
@@ -1061,12 +1038,8 @@ const esLa = {
     },
     newSubmission: {
       'New submission': 'Nueva presentación',
-      'New Article': 'Nueva publicación',
       'Submission created': 'Presentación creada',
-      'Creating article': 'Creando artículo',
-      'Article created': 'Artículo creado',
       'Upload Manuscript': 'Subir Manuscrito',
-      'Upload Article': 'Subir Artículo',
       dragNDrop: 'Arrastra y suelta o haz clic para seleccionar un archivo',
       acceptedFiletypes:
         'Tipos de archivo aceptados: pdf, epub, zip, docx, latex',
@@ -1074,12 +1047,6 @@ const esLa = {
         'Tu manuscrito se está convirtiendo en una versión directamente editable. Esto podría tomar unos segundos.',
       'Submit a URL instead': 'Enviar una URL en su lugar',
       errorUploading: '{{error}}',
-    },
-    collaborateForm: {
-      author: 'Autor(a)',
-      canView: 'Puedo ver',
-      canEdit: 'Poder editar',
-      removeAccess: 'Quitar acceso',
     },
     formBuilder: {
       'New Form': 'Nuevo Formulario',

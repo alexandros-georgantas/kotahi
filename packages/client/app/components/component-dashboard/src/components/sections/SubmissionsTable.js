@@ -17,13 +17,15 @@ import {
   Title,
 } from '../../../../shared'
 
-const SubmissionsTable = ({
-  currentUser,
-  manuscriptsUserHasCurrentRoleIn,
-  submissionForm,
-  applyQueryParams,
-  uriQueryParams,
-}) => {
+const SubmissionsTable = props => {
+  const {
+    currentUser,
+    manuscriptsUserHasCurrentRoleIn,
+    submissionForm,
+    applyQueryParams,
+    uriQueryParams,
+  } = props
+
   const config = useContext(ConfigContext)
   const { urlFrag } = config
   const { t } = useTranslation()
@@ -69,28 +71,20 @@ const SubmissionsTable = ({
   return (
     <SectionContent>
       <SectionHeader>
-        <Title>
-          {t(
-            `dashboardPage.${
-              ['lab'].includes(config.instanceName)
-                ? 'Articles'
-                : 'My Submissions'
-            }`,
-          )}
-        </Title>
+        <Title>{t('dashboardPage.My Submissions')}</Title>
       </SectionHeader>
+
       <ManuscriptsTable
         applyQueryParams={applyQueryParams}
         columnsProps={columnsProps}
         getMainActionLink={manuscript =>
-          `${urlFrag}/versions/${manuscript.parentId || manuscript.id}/${
-            ['lab'].includes(config.instanceName) ? 'evaluation' : 'submit'
-          }`
+          `${urlFrag}/versions/${manuscript.parentId || manuscript.id}/submit`
         }
         manuscripts={manuscriptsUserHasCurrentRoleIn.manuscripts}
         sortDirection={sortDirection}
         sortName={sortName}
       />
+
       <Pagination
         limit={limit}
         page={page}
