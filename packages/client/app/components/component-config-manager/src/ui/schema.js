@@ -644,6 +644,49 @@ export const generateSchemas = (
                 },
               },
             },
+            datacite: {
+              type: 'object',
+              title: t('configPage.Datacite'),
+              properties: {
+                login: {
+                  type: ['string', 'null'],
+                  description: t('configPage.dataciteLogin'),
+                },
+                password: {
+                  type: ['string', 'null'],
+                  description: t('configPage.datacitePassword'),
+                },
+                doiPrefix: {
+                  type: ['string', 'null'],
+                  description: t('configPage.dataciteDoiPrefix'),
+                },
+                useSandbox: {
+                  type: 'boolean',
+                  title: t('configPage.dataciteUseSandbox'),
+                  default: false,
+                },
+                publishedArticleLocationPrefix: {
+                  type: ['string', 'null'],
+                  description: t('configPage.publishedArticleLocationPrefix'),
+                },
+                licenseUrl: {
+                  type: ['string', 'null'],
+                  description: t('configPage.licenseUrl'),
+                },
+                publisher: {
+                  type: ['string', 'null'],
+                  description: t('configPage.publisher'),
+                },
+                journalName: {
+                  type: ['string', 'null'],
+                  description: t('configPage.journalName'),
+                },
+                journalAbbreviatedName: {
+                  type: ['string', 'null'],
+                  description: t('configPage.journalAbbreviatedName'),
+                },
+              },
+            },
             crossref: {
               type: 'object',
               title: t('configPage.Crossref'),
@@ -1473,6 +1516,49 @@ export const generateSchemas = (
                   type: 'boolean',
                   title: t('configPage.reverseFieldOrder'),
                   default: false,
+                },
+              },
+            },
+            datacite: {
+              type: 'object',
+              title: t('configPage.Datacite'),
+              properties: {
+                login: {
+                  type: ['string', 'null'],
+                  description: t('configPage.dataciteLogin'),
+                },
+                password: {
+                  type: ['string', 'null'],
+                  description: t('configPage.datacitePassword'),
+                },
+                doiPrefix: {
+                  type: ['string', 'null'],
+                  description: t('configPage.dataciteDoiPrefix'),
+                },
+                useSandbox: {
+                  type: 'boolean',
+                  title: t('configPage.dataciteUseSandbox'),
+                  default: false,
+                },
+                publishedArticleLocationPrefix: {
+                  type: ['string', 'null'],
+                  description: t('configPage.publishedArticleLocationPrefix'),
+                },
+                licenseUrl: {
+                  type: ['string', 'null'],
+                  description: t('configPage.licenseUrl'),
+                },
+                publisher: {
+                  type: ['string', 'null'],
+                  description: t('configPage.publisher'),
+                },
+                journalName: {
+                  type: ['string', 'null'],
+                  description: t('configPage.journalName'),
+                },
+                journalAbbreviatedName: {
+                  type: ['string', 'null'],
+                  description: t('configPage.journalAbbreviatedName'),
                 },
               },
             },
@@ -2313,6 +2399,49 @@ export const generateSchemas = (
                 },
               },
             },
+            datacite: {
+              type: 'object',
+              title: t('configPage.Datacite'),
+              properties: {
+                login: {
+                  type: ['string', 'null'],
+                  description: t('configPage.dataciteLogin'),
+                },
+                password: {
+                  type: ['string', 'null'],
+                  description: t('configPage.datacitePassword'),
+                },
+                deleteFileoiPrefix: {
+                  type: ['string', 'null'],
+                  description: t('configPage.dataciteDoiPrefix'),
+                },
+                useSandbox: {
+                  type: 'boolean',
+                  title: t('configPage.dataciteUseSandbox'),
+                  default: false,
+                },
+                publishedArticleLocationPrefix: {
+                  type: ['string', 'null'],
+                  description: t('configPage.publishedArticleLocationPrefix'),
+                },
+                licenseUrl: {
+                  type: ['string', 'null'],
+                  description: t('configPage.licenseUrl'),
+                },
+                publisher: {
+                  type: ['string', 'null'],
+                  description: t('configPage.publisher'),
+                },
+                journalName: {
+                  type: ['string', 'null'],
+                  description: t('configPage.journalName'),
+                },
+                journalAbbreviatedName: {
+                  type: ['string', 'null'],
+                  description: t('configPage.journalAbbreviatedName'),
+                },
+              },
+            },
             crossref: {
               type: 'object',
               title: t('configPage.Crossref'),
@@ -3150,6 +3279,51 @@ export const generateSchemas = (
                 },
               },
             },
+            datacite: {
+              type: 'object',
+              title: t('configPage.Datacite'),
+              properties: {
+                login: {
+                  type: ['string', 'null'],
+                  description: t('configPage.dataciteLogin'),
+                },
+                password: {
+                  type: ['string', 'null'],
+                  description: t('configPage.datacitePassword'),
+                },
+                doiPrefix: {
+                  type: ['string', 'null'],
+                  description: t('configPage.dataciteDoiPrefix'),
+                },
+                useSandbox: {
+                  type: 'boolean',
+                  title: t('configPage.dataciteUseSandbox'),
+                  default: false,
+                },
+                publishedArticleLocationPrefix: {
+                  type: ['string', 'null'],
+                  description: t(
+                    'configPage.publishedArticleLocationPrefixDatacite',
+                  ),
+                },
+                licenseUrl: {
+                  type: ['string', 'null'],
+                  description: t('configPage.licenseUrl'),
+                },
+                publisher: {
+                  type: ['string', 'null'],
+                  description: t('configPage.publisher'),
+                },
+                journalName: {
+                  type: ['string', 'null'],
+                  description: t('configPage.journalName'),
+                },
+                journalAbbreviatedName: {
+                  type: ['string', 'null'],
+                  description: t('configPage.journalAbbreviatedName'),
+                },
+              },
+            },
             crossref: {
               type: 'object',
               title: t('configPage.Crossref'),
@@ -3507,6 +3681,12 @@ export const generateSchemas = (
       publishing: {
         hypothesis: {
           classNames: 'col-md-12 col-md-offset-0',
+        },
+        datacite: {
+          classNames: 'col-md-12 col-md-offset-0',
+          password: {
+            'ui:widget': 'password',
+          },
         },
         crossref: {
           classNames: 'col-md-12 col-md-offset-0',

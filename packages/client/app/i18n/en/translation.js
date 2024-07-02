@@ -495,7 +495,13 @@ const en = {
       shouldAllowTagging: 'Apply Hypothesis tags in the submission form',
       reverseFieldOrder:
         'Reverse the order of Submission/Decision form fields published to Hypothesis',
+      Datacite: 'Datacite',
+      dataciteLogin: 'Datacite username',
+      datacitePassword: 'Datacite password',
+      dataciteUseSandbox: 'Publish to Datacite sandbox',
+      dataciteDoiPrefix: 'Datacite DOI prefix',
       Crossref: 'Crossref',
+      publisher: 'Publisher',
       journalName: 'Journal/Group name',
       journalAbbreviatedName: 'Abbreviated name',
       journalHomepage: 'Home page',
@@ -506,6 +512,8 @@ const en = {
       crossrefDepositorEmail: 'Depositor email address',
       publicationType: 'Select publication type',
       doiPrefix: 'Crossref DOI prefix',
+      publishedArticleLocationPrefixDatacite:
+        'Datacite published article location',
       publishedArticleLocationPrefix: 'Crossref published article location',
       licenseUrl: 'Publication license URL',
       useSandbox: 'Publish to Crossref sandbox',

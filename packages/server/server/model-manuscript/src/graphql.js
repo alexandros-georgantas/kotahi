@@ -43,6 +43,8 @@ const {
   doiExists,
 } = require('../../publishing/crossref')
 
+const { publishToDatacite } = require('../../publishing/datacite')
+
 const checkIsAbstractValueEmpty = require('../../utils/checkIsAbstractValueEmpty')
 
 const {
@@ -1359,6 +1361,32 @@ const resolvers = {
 
       const update = { published: newPublishedDate, status: 'published' } // This will also collect any properties we may want to update in the DB
       const steps = []
+
+      if (activeConfig.formData.publishing.datacite.login) {
+        const stepLabel = 'Datacite'
+        let succeeded = false
+        let errorMessage
+
+        if (
+          containsElifeStyleEvaluations ||
+          manuscript.status !== 'evaluated'
+        ) {
+          try {
+            await publishToDatacite(manuscript)
+            succeeded = true
+          } catch (e) {
+            console.error('error publishing to datacite')
+            console.error(e)
+            errorMessage = e.message
+          }
+        }
+
+        steps.push({
+          stepLabel,
+          succeeded,
+          errorMessage,
+        })
+      }
 
       if (activeConfig.formData.publishing.crossref.login) {
         const stepLabel = 'Crossref'

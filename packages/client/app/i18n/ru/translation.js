@@ -507,7 +507,13 @@ const ru = {
       shouldAllowTagging: 'Применить теги гипотез в форме подачи',
       reverseFieldOrder:
         'Изменить порядок полей форм "Подача/Решение", публикуемых в гипотезе',
+      Datacite: 'Datacite',
+      dataciteLogin: 'Имя пользователя Datacite',
+      datacitePassword: 'Пароль Datacite',
+      dataciteUseSandbox: 'Опубликовать в Datacite sandbox',
+      dataciteDoiPrefix: 'Префикс DOI в Datacite',
       Crossref: 'Crossref',
+      publisher: 'Издатель',
       journalName: 'Название журнала',
       journalAbbreviatedName: 'Сокращенное название',
       journalHomepage: 'Домашняя страница',
@@ -518,6 +524,8 @@ const ru = {
       crossrefDepositorEmail: 'Email владельца',
       publicationType: 'Выбрать тип публикации',
       doiPrefix: 'Префикс DOI в Crossref',
+      publishedArticleLocationPrefixDatacite:
+        'Размещение опубликованной статьи в Datacite',
       publishedArticleLocationPrefix:
         'Размещение опубликованной статьи в Crossref',
       licenseUrl: 'URL-адрес лицензии на публикацию',
