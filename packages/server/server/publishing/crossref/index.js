@@ -462,6 +462,7 @@ const publishReviewsToCrossref = async manuscript => {
     item =>
       item.permitPublishing === 'always' || item.permitPublishing === 'true',
   )
+
   const decisionFormPublishableFields =
     decisionForm?.structure?.children.filter(
       item =>
@@ -503,12 +504,11 @@ const publishReviewsToCrossref = async manuscript => {
     const { isDecision, isHiddenFromAuthor } = review
     const isHidden = isHiddenFromAuthor === null || isHiddenFromAuthor === true
 
-    if (!isDecision && shouldPublishReview && !isHidden) {
+    if (!isDecision && reviewFormPublishableFields.length > 0 && !isHidden) {
       return true
     }
 
-    // if (isDecision && shouldPublishDecision && !isHiddenFromAuthor) {
-    if (isDecision && shouldPublishDecision) {
+    if (isDecision && decisionFormPublishableFields.length > 0) {
       return true
     }
 
