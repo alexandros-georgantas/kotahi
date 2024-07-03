@@ -17,13 +17,15 @@ import {
   Title,
 } from '../../../../shared'
 
-const SubmissionsTable = ({
-  currentUser,
-  manuscriptsUserHasCurrentRoleIn,
-  submissionForm,
-  applyQueryParams,
-  uriQueryParams,
-}) => {
+const SubmissionsTable = props => {
+  const {
+    currentUser,
+    manuscriptsUserHasCurrentRoleIn,
+    submissionForm,
+    applyQueryParams,
+    uriQueryParams,
+  } = props
+
   const config = useContext(ConfigContext)
   const { urlFrag } = config
   const { t } = useTranslation()
@@ -71,6 +73,7 @@ const SubmissionsTable = ({
       <SectionHeader>
         <Title>{t('dashboardPage.My Submissions')}</Title>
       </SectionHeader>
+
       <ManuscriptsTable
         applyQueryParams={applyQueryParams}
         columnsProps={columnsProps}
@@ -81,6 +84,7 @@ const SubmissionsTable = ({
         sortDirection={sortDirection}
         sortName={sortName}
       />
+
       <Pagination
         limit={limit}
         page={page}

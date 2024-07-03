@@ -1,3 +1,5 @@
+// Shield's `race` rule is misnamed, as it doesn't race the different rules but applies them sequentially until one succeeds. `or`, on the other hand, applies all rules in parallel.
+const { race: lazyOr } = require('graphql-shield')
 const { rule, and, or, allow, deny } = require('@coko/server/authorization')
 
 const { cachedGet } = require('../server/querycache')
@@ -22,8 +24,12 @@ const userIsEditorOfAnyManuscript = rule({
 const userIsGm = rule({
   cache: 'contextual',
 })(async (parent, args, ctx, info) => {
-  if (!ctx.user) return false
-  return cachedGet(`userIsGM:${ctx.user}:${ctx.req.headers['group-id']}`)
+  const groupId = ctx.req.headers['group-id']
+  // An 'undefined' groupId header can occasionally be obtained, especially
+  // in development. If we don't deal with it gracefully, it will cause
+  // a crash and prevent its replacement with a correct value.
+  if (!ctx.user || !groupId || groupId === 'undefined') return false
+  return cachedGet(`userIsGM:${ctx.user}:${groupId}`)
 })
 
 const userIsAdmin = rule({
@@ -455,12 +461,23 @@ const userIsCurrentUser = rule({ cache: 'strict' })(
   },
 )
 
+const isForManuscriptsPublishedSinceDateQuery = rule()(
+  async (parent, args, ctx, info) => {
+    let { path } = info
+
+    while (path) {
+      if (path.key === 'manuscriptsPublishedSinceDate') return true
+      path = path.prev
+    }
+
+    return false
+  },
+)
+
 const permissions = {
   Query: {
     authorsActivity: or(userIsGm, userIsAdmin),
     builtCss: isAuthenticated,
-    channels: deny, // Never used
-    channelsByTeamName: deny, // Never used
     config: isAuthenticated,
     convertToJats: or(userIsEditorOfAnyManuscript, userIsGm, userIsAdmin),
     convertToPdf: or(userIsEditorOfAnyManuscript, userIsGm, userIsAdmin),
@@ -469,7 +486,6 @@ const permissions = {
     editorsActivity: or(userIsGm, userIsAdmin),
     file: deny, // Never used
     files: deny, // Never used
-    findByDOI: deny, // Never used
     form: isAuthenticated,
     formForPurposeAndCategory: allow,
     forms: allow,
@@ -499,7 +515,6 @@ const permissions = {
       userIsAuthorOfManuscript,
       userIsReviewerOrInvitedReviewerOfTheManuscript,
     ),
-    manuscriptChannel: deny, // Never used
     manuscripts: isAuthenticated,
     manuscriptsActivity: or(userIsGm, userIsAdmin),
     manuscriptsPublishedSinceDate: allow,
@@ -513,14 +528,12 @@ const permissions = {
     publishedManuscripts: allow,
     publishingCollection: allow,
     reviewersActivity: or(userIsGm, userIsAdmin),
-    searchOnCrossref: deny, // Never used
     searchUsers: isAuthenticated,
     summaryActivity: or(userIsGm, userIsAdmin),
     systemWideDiscussionChannel: or(userIsGm, userIsAdmin),
     tasks: or(userIsGm, userIsAdmin),
     team: deny, // Never used
-    teamByName: deny, // Never used
-    teams: deny, // Never used
+    teams: isAuthenticated,
     threadedDiscussions: isAuthenticated,
     unreviewedPreprints: allow, // This has its own token-based authentication.
     user: isAuthenticated,
@@ -537,11 +550,8 @@ const permissions = {
     archiveManuscripts: or(userIsGm, userIsAdmin),
     assignTeamEditor: deny, // Never used
     assignUserAsAuthor: isAuthenticated, // TODO require the invitation ID to be sent in this mutation
-    changeTopic: deny, // Never used
     completeComment: isAuthenticated,
     completeComments: isAuthenticated,
-    createChannel: deny, // Never used
-    createChannelFromDOI: deny, // Never used
     // createDocxToHTMLJob seems to be exposed from xsweet???
     createFile: isAuthenticated,
     createForm: or(userIsGm, userIsAdmin),
@@ -655,7 +665,8 @@ const permissions = {
   Config: allow,
   PaginatedManuscripts: allow,
   Manuscript: allow,
-  File: or(
+  File: lazyOr(
+    isForManuscriptsPublishedSinceDateQuery,
     isExportTemplatingFile,
     isCMSFile,
     isPublishingCollection,

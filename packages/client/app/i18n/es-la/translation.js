@@ -175,6 +175,9 @@ const esLa = {
         'Publishing error': 'Error de Publicación',
         'Some targets failed to publish':
           'Algunos objetivos no pudieron ser publicados.',
+        continueSubmission: 'Continuar con el envío',
+        revise: 'Revisar',
+        continueRevision: 'Continuar con la revisión',
       },
     },
     dashboardPage: {
@@ -580,6 +583,7 @@ const esLa = {
         cse: 'Consejo de Editores Científicos (CSE)',
         'Select locale for citations':
           'Seleccionar configuración regional para citas',
+        historyIntervalInMinutes: 'Intervalo de historia en minutos',
       },
       allowedIPs: 'Lista de IP del repositorio a las que se permite el acceso',
       api: 'API de Kotahi',
@@ -768,6 +772,11 @@ const esLa = {
       'Submit Feedback': 'Enviar Comentarios',
       'Decline Invitation': 'Declinar Invitación',
       thanks: 'Gracias por enviar los comentarios.',
+    },
+    invitationAcceptedPage: {
+      error:
+        'Esta invitación no pudo ser aceptada, porque ya has rechazado una invitación para este manuscrito.',
+      returnToDashboard: 'Regresar al Tablero',
     },
     reviewPreviewPage: {
       Summary: 'Resumen',

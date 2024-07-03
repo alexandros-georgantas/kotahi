@@ -199,7 +199,9 @@ const buildSpecialColumnProps = (
       },
     },
     reviewerLinks: {
+      title: 'Action',
       flex: '0 1 10em',
+      centered: true,
       component: ReviewerItemLinks,
       extraProps: {
         urlFrag,

@@ -173,6 +173,9 @@ const en = {
         cancelArchiveButton: 'Cancel',
         'Publishing error': 'Publishing error',
         'Some targets failed to publish': 'Some targets failed to publish.',
+        continueSubmission: 'Continue Submission',
+        revise: 'Revise',
+        continueRevision: 'Continue Revision',
       },
     },
     dashboardPage: {
@@ -559,6 +562,7 @@ const en = {
         cmos: 'Chicago Manual of Style (CMOS)',
         cse: 'Council of Science Editors (CSE)',
         'Select locale for citations': 'Select locale for citations',
+        historyIntervalInMinutes: 'History interval in minutes',
       },
       allowedIPs: 'List of repository IPs allowed access',
       api: 'COAR Notify',
@@ -744,6 +748,11 @@ const en = {
       'Submit Feedback': 'Submit Feedback',
       'Decline Invitation': 'Decline Invitation',
       thanks: 'Thank you for submitting the feedback.',
+    },
+    invitationAcceptedPage: {
+      error:
+        'This invitation could not be accepted, because you have already declined an invitation for this manuscript.',
+      returnToDashboard: 'Return to Dashboard',
     },
     reviewPreviewPage: {
       Summary: 'Summary',

@@ -58,6 +58,14 @@ const VersionNumber = styled.div`
   color: rgba(0, 0, 0, 0.5);
 `
 
+// TODO standardise all statuses to camelCase and 'invited' instead
+// of 'unanswered' so we don't have to do this!
+const normalizeStatus = statusString =>
+  statusString
+    .toLowerCase()
+    .replaceAll('_', '')
+    .replace('unanswered', 'invited')
+
 const KanbanBoard = ({
   invitations,
   version,
@@ -79,18 +87,20 @@ const KanbanBoard = ({
   reviewers.forEach(reviewer => {
     emailAndWebReviewers.push({
       ...reviewer,
+      status: normalizeStatus(reviewer.status),
       isEmail: false, // This will be revised to true if we find a matching invitation below
     })
   })
 
   invitations
     .filter(i => i.invitedPersonType === 'REVIEWER')
-    .map(i => ({ ...i, status: i.status.toLowerCase() }))
+    .map(i => ({ ...i, status: normalizeStatus(i.status) }))
     .forEach(invitation => {
       const existingReviewer = emailAndWebReviewers.find(
         r =>
-          r.user.id === invitation.user?.id ||
-          r.user.email === invitation.toEmail,
+          r.user &&
+          (r.user.id === invitation.user?.id ||
+            r.user.email === invitation.toEmail),
       )
       // TODO Currently, you can't reinvite someone who's already declined.
       // If we do allow this, we'll need to make sure we only merge one invite with the teamMember record, and only if the dates are correct.
@@ -142,8 +152,7 @@ const KanbanBoard = ({
       )
       .filter((reviewer, index) => {
         const hasTheRightStatus =
-          reviewer.status === status.value ||
-          (reviewer.status === 'UNANSWERED' && status.value === 'invited')
+          reviewer.status === normalizeStatus(status.value)
 
         const isDuplicate =
           !!reviewer.user &&
@@ -169,7 +178,7 @@ const KanbanBoard = ({
         <SectionRow style={{ padding: 0 }}>
           <Kanban>
             {LocalizedReviewFilterOptions.filter(
-              status => !['rejected'].includes(status.value.toLowerCase()),
+              status => status.value !== 'rejected',
             ).map(status => (
               <Column key={status.value}>
                 <StatusLabel
