@@ -184,7 +184,11 @@ const getIssueYear = manuscript => {
   return yearString
 }
 
-const checkIfRequiredFieldsArePublishable = (submissionForm, fields) => {
+const checkIfRequiredFieldsArePublishable = (
+  manuscript,
+  submissionForm,
+  fields,
+) => {
   const fieldConfigurations = fields.map(fieldName =>
     submissionForm?.structure?.children.find(item => item.name === fieldName),
   )
@@ -192,7 +196,13 @@ const checkIfRequiredFieldsArePublishable = (submissionForm, fields) => {
   let shouldAllowPublish = true
 
   fieldConfigurations.forEach(field => {
-    if (field?.permitPublishing !== 'always') {
+    if (
+      (field?.permitPublishing !== 'always' ||
+        field?.permitPublishing !== 'true') &&
+      !manuscript.formFieldsToPublish
+        .find(ff => ff.objectId === manuscript.id)
+        ?.fieldsToPublish?.includes(field.name)
+    ) {
       shouldAllowPublish = false
     }
   })
@@ -305,7 +315,7 @@ const publishArticleToCrossref = async manuscript => {
   const submissionForm = await getSubmissionForm(manuscript.groupId)
 
   if (
-    !checkIfRequiredFieldsArePublishable(submissionForm, [
+    !checkIfRequiredFieldsArePublishable(manuscript, submissionForm, [
       'submission.$title',
       'submission.$abstract',
       'submission.$issueNumber',
@@ -322,13 +332,12 @@ const publishArticleToCrossref = async manuscript => {
   const publishDate = new Date()
   const journalDoi = getDoi(0, activeConfig)
 
-  let doiSuffix
-  let doi = $doi
-
-  if (!$doi) {
-    doiSuffix = getReviewOrSubmissionField(manuscript, '$doiSuffix') || id
-    doi = getDoi(doiSuffix, activeConfig)
-  }
+  const doi =
+    $doi ||
+    getDoi(
+      getReviewOrSubmissionField(manuscript, '$doiSuffix') || id,
+      activeConfig,
+    )
 
   if (!(await doiIsAvailable(doi))) throw Error('Custom DOI is not available.')
 
@@ -449,20 +458,20 @@ const publishReviewsToCrossref = async manuscript => {
   const decisionForm = await getDecisionForm(manuscript.groupId)
   const reviewForm = await getReviewForm(manuscript.groupId)
 
-  const reviewFormComment = reviewForm?.structure?.children.find(
-    item => item.name === 'comment',
+  const reviewFormPublishableFields = reviewForm?.structure?.children.filter(
+    item =>
+      item.permitPublishing === 'always' || item.permitPublishing === 'true',
   )
+  const decisionFormPublishableFields =
+    decisionForm?.structure?.children.filter(
+      item =>
+        item.permitPublishing === 'always' || item.permitPublishing === 'true',
+    )
 
-  const decisionFormComment = decisionForm?.structure?.children.find(
-    item => item.name === 'comment',
-  )
-
-  const shouldPublishReview = reviewFormComment?.permitPublishing === 'always'
-
-  const shouldPublishDecision =
-    decisionFormComment?.permitPublishing === 'always'
-
-  if (!shouldPublishDecision && !shouldPublishReview) {
+  if (
+    decisionFormPublishableFields.length === 0 &&
+    reviewFormPublishableFields.length === 0
+  ) {
     throw new Error(
       'Your form configuration for Review and Decision does not allow publishing to external providers',
     )
