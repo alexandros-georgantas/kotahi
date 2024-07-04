@@ -197,8 +197,7 @@ const checkIfRequiredFieldsArePublishable = (
 
   fieldConfigurations.forEach(field => {
     if (
-      (field?.permitPublishing !== 'always' ||
-        field?.permitPublishing !== 'true') &&
+      !['always', 'true'].includes(field?.permitPublishing) &&
       !manuscript.formFieldsToPublish
         .find(ff => ff.objectId === manuscript.id)
         ?.fieldsToPublish?.includes(field.name)
@@ -459,14 +458,12 @@ const publishReviewsToCrossref = async manuscript => {
   const reviewForm = await getReviewForm(manuscript.groupId)
 
   const reviewFormPublishableFields = reviewForm?.structure?.children.filter(
-    item =>
-      item.permitPublishing === 'always' || item.permitPublishing === 'true',
+    item => ['always', 'true'].includes(item.permitPublishing),
   )
 
   const decisionFormPublishableFields =
-    decisionForm?.structure?.children.filter(
-      item =>
-        item.permitPublishing === 'always' || item.permitPublishing === 'true',
+    decisionForm?.structure?.children.filter(item =>
+      ['always', 'true'].includes(item.permitPublishing),
     )
 
   if (
