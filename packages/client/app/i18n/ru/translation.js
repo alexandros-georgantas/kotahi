@@ -1127,6 +1127,9 @@ const ru = {
         links: 'Список ссылок (URL)',
         verdict: 'Вердикт',
         discussion: 'Обсуждение',
+        issueNumber: 'Номер выпуска',
+        volumeNumber: 'номер тома',
+        issueYear: 'год выпуска',
       },
       typeOptions: {
         Select: 'Выбор',

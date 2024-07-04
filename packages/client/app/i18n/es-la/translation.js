@@ -1133,6 +1133,9 @@ const esLa = {
         links: 'Lista de enlaces (URL)',
         verdict: 'Veredicto',
         discussion: 'Discusión',
+        issueNumber: 'Número de emisión',
+        volumeNumber: 'Número de volumen',
+        issueYear: 'Año de emisión',
       },
       typeOptions: {
         Select: 'Selección',

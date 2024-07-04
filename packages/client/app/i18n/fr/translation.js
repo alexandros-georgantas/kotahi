@@ -1143,6 +1143,9 @@ const fr = {
         links: 'Liste de liens (URL)',
         verdict: 'Verdict',
         discussion: 'Discussion',
+        issueNumber: 'Numéro de délivrer',
+        volumeNumber: 'Numéro de volume',
+        issueYear: 'Année de parution',
       },
       typeOptions: {
         Select: 'Sélection',
