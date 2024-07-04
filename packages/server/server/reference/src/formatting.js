@@ -40,8 +40,12 @@ const formatCitation = async (cslObject, groupId) => {
   if (csl.doi && !csl.DOI) csl.DOI = csl.doi
 
   const activeConfig = await Config.query().findOne({ groupId, active: true })
-  const localeName = activeConfig.formData.production?.localeName || 'en-US'
-  const styleName = activeConfig.formData.production?.styleName || 'apa'
+
+  const localeName =
+    activeConfig.formData.production?.citationStyles?.localeName || 'en-US'
+
+  const styleName =
+    activeConfig.formData.production?.citationStyles?.styleName || 'apa'
 
   // const styleName = getStyleNameFromTitle(styleTitle)
 
