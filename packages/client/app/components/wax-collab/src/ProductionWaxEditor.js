@@ -6,6 +6,8 @@ import { gql } from '@apollo/client'
 import waxTheme from './layout/waxTheme'
 import { JournalContext } from '../../xpub-journal/src'
 
+import yjsConfig from './config/yjsConfig'
+
 import productionWaxEditorConfig from './config/ProductionWaxEditorConfig'
 import ProductionWaxEditorLayout from './layout/ProductionWaxEditorLayout'
 import ProductionWaxEditorNoCommentsLayout from './layout/ProductionWaxEditorNoCommentsLayout'
@@ -84,6 +86,9 @@ const ProductionWaxEditor = ({
   manuscriptId,
   onAssetManager,
   isAuthorProofingVersion,
+  wsProvider,
+  ydoc,
+  name,
   ...rest
 }) => {
   const handleAssetManager = () => onAssetManager(manuscriptId)
@@ -212,27 +217,29 @@ const ProductionWaxEditor = ({
     ? ProductionWaxEditorLayout(readonly)
     : ProductionWaxEditorNoCommentsLayout(readonly)
 
+  let config = isAuthorProofingVersion
+    ? authorProofingWaxEditorConfig(
+        handleAssetManager,
+        updateAnystyle,
+        updateCrossRef,
+        updateCiteProc,
+      )
+    : productionWaxEditorConfig(
+        handleAssetManager,
+        updateAnystyle,
+        updateCrossRef,
+        updateCiteProc,
+        readonly,
+      )
+
+  config = yjsConfig(config, { wsProvider, ydoc, yjsType: name })
+
   return (
     <ThemeProvider theme={{ textStyles: journal.textStyles, ...waxTheme }}>
       <div className={validationStatus}>
         <Wax
           autoFocus={autoFocus}
-          config={
-            isAuthorProofingVersion
-              ? authorProofingWaxEditorConfig(
-                  handleAssetManager,
-                  updateAnystyle,
-                  updateCrossRef,
-                  updateCiteProc,
-                )
-              : productionWaxEditorConfig(
-                  handleAssetManager,
-                  updateAnystyle,
-                  updateCrossRef,
-                  updateCiteProc,
-                  readonly,
-                )
-          }
+          config={config}
           fileUpload={file => renderImage(file)}
           key={`readonly-${readonly}`} // Force remount to overcome Wax bugs on changing between editable and readonly
           layout={productionLayout}

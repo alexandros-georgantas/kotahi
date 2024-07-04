@@ -45,6 +45,7 @@ export const generateSchemas = (
   createFile,
   config,
   defaultReviewerInvitationTemplate,
+  defaultCollaborativeReviewerInvitationTemplate,
   defaultAuthorProofingInvitationTemplate,
   defaultAuthorProofingSubmittedTemplate,
   t,
@@ -780,6 +781,15 @@ export const generateSchemas = (
               oneOf: emailNotificationOptions,
               uniqueItems: true,
               default: defaultReviewerInvitationTemplate.const,
+            },
+            reviewerCollaborativeInvitationPrimaryEmailTemplate: {
+              description: t(
+                'configPage.reviewerCollaborativeInvitationPrimaryEmailTemplate',
+              ),
+              type: ['string', 'null'],
+              oneOf: emailNotificationOptions,
+              uniqueItems: true,
+              default: defaultCollaborativeReviewerInvitationTemplate.const,
             },
             authorProofingInvitationEmailTemplate: {
               description: t(
@@ -1611,6 +1621,15 @@ export const generateSchemas = (
               oneOf: emailNotificationOptions,
               uniqueItems: true,
               default: defaultReviewerInvitationTemplate.const,
+            },
+            reviewerCollaborativeInvitationPrimaryEmailTemplate: {
+              description: t(
+                'configPage.reviewerCollaborativeInvitationPrimaryEmailTemplate',
+              ),
+              type: ['string', 'null'],
+              oneOf: emailNotificationOptions,
+              uniqueItems: true,
+              default: defaultCollaborativeReviewerInvitationTemplate.const,
             },
             authorProofingInvitationEmailTemplate: {
               description: t(
@@ -2448,6 +2467,15 @@ export const generateSchemas = (
               oneOf: emailNotificationOptions,
               uniqueItems: true,
               default: defaultReviewerInvitationTemplate.const,
+            },
+            reviewerCollaborativeInvitationPrimaryEmailTemplate: {
+              description: t(
+                'configPage.reviewerCollaborativeInvitationPrimaryEmailTemplate',
+              ),
+              type: ['string', 'null'],
+              oneOf: emailNotificationOptions,
+              uniqueItems: true,
+              default: defaultCollaborativeReviewerInvitationTemplate.const,
             },
             authorProofingInvitationEmailTemplate: {
               description: t(
@@ -3292,6 +3320,15 @@ export const generateSchemas = (
               oneOf: emailNotificationOptions,
               uniqueItems: true,
               default: defaultReviewerInvitationTemplate.const,
+            },
+            reviewerCollaborativeInvitationPrimaryEmailTemplate: {
+              description: t(
+                'configPage.reviewerCollaborativeInvitationPrimaryEmailTemplate',
+              ),
+              type: ['string', 'null'],
+              oneOf: emailNotificationOptions,
+              uniqueItems: true,
+              default: defaultCollaborativeReviewerInvitationTemplate.const,
             },
             evaluationCompleteEmailTemplate: {
               description: t('configPage.evaluationCompleteEmailTemplate'),
