@@ -35,8 +35,6 @@ exports.up = async knex => {
       )
     }
 
-    logger.info(
-      `Updated Semantic Scholar settings default value for prc instances.`,
-    )
+    logger.info(`Updated production config values for citation lookup.`)
   })
 }
