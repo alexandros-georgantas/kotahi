@@ -1,6 +1,8 @@
 /* eslint-disable jest/valid-expect-in-promise */
 /* eslint-disable jest/expect-expect */
 import { DashboardPage } from '../../page-object/dashboard-page'
+import { ManuscriptsPage } from '../../page-object/manuscripts-page'
+import { Menu } from '../../page-object/page-component/menu'
 import { ReviewPage } from '../../page-object/review-page'
 import { dashboard } from '../../support/routes'
 
@@ -26,6 +28,11 @@ const reviewDataList = [
     comment: 'Please use a linear scale.',
     radioButton: 'revise',
   },
+  {
+    verdict: 'accept',
+    comment: 'Progress comment check.',
+    radioButton: 'test',
+  },
 ]
 
 describe('Completing a review', () => {
@@ -39,6 +46,7 @@ describe('Completing a review', () => {
       doReview(name.role.reviewers[2], reviewDataList[2])
       doReview(name.role.reviewers[3], reviewDataList[3])
       doReview(name.role.reviewers[4], reviewDataList[4])
+      doReview(name.role.tester, reviewDataList[5])
 
       // login as seniorEditor and assert the 3 reviews are completed
       cy.login(name.role.seniorEditor, dashboard)
@@ -55,6 +63,26 @@ describe('Completing a review', () => {
 
       cy.get('[fill="#c23d20"]').should('be.visible').trigger('mouseover')
       cy.contains('Declined: 1')
+
+      cy.login(name.role.admin, dashboard)
+
+      cy.awaitDisappearSpinner()
+      Menu.clickManuscriptsAndAssertPageLoad()
+      ManuscriptsPage.selectOptionWithText('Control')
+      cy.awaitDisappearSpinner()
+      cy.get(
+        '[class*=KanbanBoard__Kanban] > :nth-child(1) > [class*=KanbanBoard__CardsWrapper] > [class*=KanbanCard]',
+      ).should('contain', name.role.reviewers[5])
+      // ControlPage.getInvitedReviewer
+      cy.get(
+        '[class*=KanbanBoard__Kanban] > :nth-child(2) > [class*=KanbanBoard__CardsWrapper] > [class*=KanbanCard]',
+      ).should('contain', name.role.reviewers[3])
+      cy.get(
+        '[class*=KanbanBoard__Kanban] > :nth-child(4) > [class*=KanbanBoard__CardsWrapper] > [class*=KanbanCard]',
+      ).should('contain', name.role.reviewers[1])
+      cy.get(
+        '[class*=KanbanBoard__Kanban] > :nth-child(3) > [class*=KanbanBoard__CardsWrapper] > [class*=KanbanCard]',
+      ).should('contain', name.role.tester)
     })
   })
 })
@@ -88,6 +116,7 @@ function doReview(name, reviewData) {
         ReviewPage.clickRejectRadioButton()
       if (reviewData.radioButton === 'revise')
         ReviewPage.clickReviseRadioButton()
+      if (reviewData.radioButton === 'test') return
 
       // Submit the review
       ReviewPage.clickSubmitButton()
