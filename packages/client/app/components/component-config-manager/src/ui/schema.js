@@ -25,6 +25,7 @@ export const tabKeyBasedSchema = {
     'taskManager',
     'report',
     'user',
+    'betaFunctionality',
   ],
   production: ['production'],
   integrations: [
@@ -870,6 +871,17 @@ export const generateSchemas = (
             repoIpAddress: {
               type: ['string', 'null'],
               description: t('configPage.allowedIPs'),
+            },
+          },
+        },
+        betaFunctionality: {
+          type: 'object',
+          title: t('configPage.betaFunctionality'),
+          properties: {
+            betaFunctionality: {
+              type: 'boolean',
+              title: t('configPage.enableBetaFunctionality'),
+              default: false,
             },
           },
         },
@@ -1720,6 +1732,17 @@ export const generateSchemas = (
             repoIpAddress: {
               type: ['string', 'null'],
               description: t('configPage.allowedIPs'),
+            },
+          },
+        },
+        betaFunctionality: {
+          type: 'object',
+          title: t('configPage.betaFunctionality'),
+          properties: {
+            betaFunctionality: {
+              type: 'boolean',
+              title: t('configPage.enableBetaFunctionality'),
+              default: false,
             },
           },
         },
@@ -2576,6 +2599,17 @@ export const generateSchemas = (
             repoIpAddress: {
               type: ['string', 'null'],
               description: t('configPage.allowedIPs'),
+            },
+          },
+        },
+        betaFunctionality: {
+          type: 'object',
+          title: t('configPage.betaFunctionality'),
+          properties: {
+            betaFunctionality: {
+              type: 'boolean',
+              title: t('configPage.enableBetaFunctionality'),
+              default: false,
             },
           },
         },
@@ -3451,6 +3485,17 @@ export const generateSchemas = (
             repoIpAddress: {
               type: ['string', 'null'],
               description: t('configPage.allowedIPs'),
+            },
+          },
+        },
+        betaFunctionality: {
+          type: 'object',
+          title: t('configPage.betaFunctionality'),
+          properties: {
+            betaFunctionality: {
+              type: 'boolean',
+              title: t('configPage.enableBetaFunctionality'),
+              default: false,
             },
           },
         },

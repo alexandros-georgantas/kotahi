@@ -633,6 +633,9 @@ const esLa = {
         Wiley: 'Wiley',
         'Wolters Kluwer': 'Wolters Kluwer',
       },
+      betaFunctionality: 'Funcionalidad Beta',
+      enableBetaFunctionality:
+        'Habilite la funcionalidad beta para funciones aún en desarrollo',
     },
     reportsPage: {
       Reports: 'Reportes',

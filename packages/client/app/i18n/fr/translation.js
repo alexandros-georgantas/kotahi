@@ -643,6 +643,9 @@ const fr = {
         Wiley: 'Wiley',
         'Wolters Kluwer': 'Wolters Kluwer',
       },
+      betaFunctionality: 'Fonctionnalité bêta',
+      enableBetaFunctionality:
+        'Activer la fonctionnalité bêta pour les fonctionnalités encore en cours de développement',
     },
     reportsPage: {
       Reports: 'Rapports',
